@@ -1,0 +1,95 @@
+public with sharing class PartnerOnboardingService {
+  public static void processDecision(PartnerApprovalRequestDTO request) {
+    PartnerAccessService.assertInternalUser();
+
+    PartnerApplicationApprovalDomain.validateDecision(request);
+
+    SecurityUtil.assertUpdateable(Partner_Application__c.SObjectType);
+
+    Partner_Application__c application = PartnerApplicationSelector.selectById(
+      request.applicationId
+    );
+
+    if (
+      application.Application_Status__c == 'Approved' ||
+      application.Application_Status__c == 'Rejected'
+    ) {
+      throw new PartnerSyncHandledException(
+        'This application has already been decided.'
+      );
+    }
+
+    if (request.decision == 'Rejected') {
+      rejectApplication(application, request);
+      return;
+    }
+
+    approveApplication(application, request);
+  }
+
+  private static void rejectApplication(
+    Partner_Application__c application,
+    PartnerApprovalRequestDTO request
+  ) {
+    application.Application_Status__c = 'Rejected';
+    application.Decision__c = 'Rejected';
+    application.Decision_By__c = UserInfo.getUserId();
+    application.Decision_On__c = System.now();
+    application.Rejection_Reason__c = request.rejectionReason;
+
+    update SecurityUtil.stripForUpdate(new List<SObject>{ application });
+
+    LoggingService.info(
+      'PartnerOnboardingService',
+      'Partner application rejected: ' + application.Id
+    );
+  }
+
+  private static void approveApplication(
+    Partner_Application__c application,
+    PartnerApprovalRequestDTO request
+  ) {
+    SecurityUtil.assertCreateable(Account.SObjectType);
+    SecurityUtil.assertCreateable(Contact.SObjectType);
+
+    Account partnerAccount = PartnerApplicationApprovalDomain.buildPartnerAccount(
+      application
+    );
+
+    List<SObject> sanitizedAccounts = SecurityUtil.stripForCreate(
+      new List<SObject>{ partnerAccount }
+    );
+
+    insert sanitizedAccounts;
+
+    Account insertedAccount = (Account) sanitizedAccounts[0];
+
+    Contact partnerContact = PartnerApplicationApprovalDomain.buildPrimaryPartnerContact(
+      application,
+      insertedAccount.Id
+    );
+
+    List<SObject> sanitizedContacts = SecurityUtil.stripForCreate(
+      new List<SObject>{ partnerContact }
+    );
+
+    insert sanitizedContacts;
+
+    Contact insertedContact = (Contact) sanitizedContacts[0];
+
+    application.Application_Status__c = 'Approved';
+    application.Decision__c = 'Approved';
+    application.Decision_By__c = UserInfo.getUserId();
+    application.Decision_On__c = System.now();
+    application.Approval_Notes__c = request.approvalNotes;
+    application.Created_Account__c = insertedAccount.Id;
+    application.Created_Contact__c = insertedContact.Id;
+
+    update SecurityUtil.stripForUpdate(new List<SObject>{ application });
+
+    LoggingService.info(
+      'PartnerOnboardingService',
+      'Partner application approved: ' + application.Id
+    );
+  }
+}

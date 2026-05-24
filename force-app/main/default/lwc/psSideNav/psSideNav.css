@@ -1,0 +1,79 @@
+.nav-shell {
+  height: 100%;
+  padding: var(--lwc-varSpacingLarge, var(--lwc-spacingLarge))
+    var(--lwc-varSpacingMedium, var(--lwc-spacingMedium));
+  background: var(--lwc-colorBackgroundAlt);
+}
+
+.brand {
+  gap: var(--lwc-spacingMedium);
+  padding: var(--lwc-spacingNone, 0)
+    var(--lwc-varSpacingSmall, var(--lwc-spacingSmall));
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--lwc-borderRadiusMedium);
+  background: linear-gradient(
+    135deg,
+    var(--ps-color-primary),
+    var(--ps-color-accent)
+  );
+
+  display: grid;
+  place-items: center;
+
+  font-weight: 900;
+  font-size: var(--lwc-fontSize5);
+}
+
+.brand h1 {
+  font-size: var(--lwc-fontSize5);
+  font-weight: 900;
+}
+
+.brand p {
+  font-size: var(--lwc-fontSize4);
+}
+
+.nav-list {
+  display: grid;
+  gap: var(--lwc-spacingXSmall);
+}
+
+.nav-item {
+  display: flex;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  text-decoration: none;
+
+  border-radius: var(--lwc-borderRadiusMedium);
+
+  padding: var(--lwc-varSpacingSmall, var(--lwc-spacingSmall))
+    var(--lwc-varSpacingMedium, var(--lwc-spacingMedium));
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: var(--lwc-colorBackgroundRowHover);
+  color: var(--lwc-colorTextInverse);
+}
+
+.nav-item.active {
+  background: linear-gradient(
+    135deg,
+    var(--ps-color-primary),
+    var(--ps-color-accent)
+  );
+  color: var(--lwc-colorTextInverse);
+
+  box-shadow: var(--lwc-spacingNone, 0) var(--lwc-varSpacingXxxSmall, 2px)
+    var(--lwc-varSpacingXxSmall, 4px) var(--lwc-spacingNone, 0)
+    rgba(0, 0, 0, 0.16);
+}

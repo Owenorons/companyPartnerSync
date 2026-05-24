@@ -1,0 +1,18 @@
+<template>
+  <div class="slds-text-align_center empty-shell">
+    <lightning-icon icon-name={iconName} size="large"> </lightning-icon>
+
+    <h2 class="slds-var-m-top_medium">{title}</h2>
+
+    <p class="slds-var-m-top_x-small">{message}</p>
+
+    <template if:true={buttonLabel}>
+      <lightning-button
+        label={buttonLabel}
+        onclick={handleClick}
+        variant="brand"
+      >
+      </lightning-button>
+    </template>
+  </div>
+</template>

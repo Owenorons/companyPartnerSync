@@ -1,0 +1,32 @@
+.empty-shell {
+  display: grid;
+  place-items: center;
+
+  padding: 4rem 2rem;
+
+  color: var(--ps-color-text-muted);
+}
+
+.empty-shell h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ps-color-text);
+}
+
+.empty-shell p {
+  max-width: 420px;
+}
+
+.empty-shell button {
+  margin-top: 1.5rem;
+
+  border: none;
+  border-radius: 1rem;
+
+  background: var(--ps-color-primary);
+  color: white;
+
+  padding: 0.8rem 1.2rem;
+
+  font-weight: 900;
+}

@@ -1,0 +1,30 @@
+public with sharing class PartnerSyncResponseDTO {
+  @AuraEnabled
+  public Boolean success;
+  @AuraEnabled
+  public String message;
+  @AuraEnabled
+  public Object data;
+  @AuraEnabled
+  public List<String> errors;
+
+  public PartnerSyncResponseDTO() {
+    this.errors = new List<String>();
+  }
+
+  public static PartnerSyncResponseDTO ok(String message, Object data) {
+    PartnerSyncResponseDTO response = new PartnerSyncResponseDTO();
+    response.success = true;
+    response.message = message;
+    response.data = data;
+    return response;
+  }
+
+  public static PartnerSyncResponseDTO fail(String message) {
+    PartnerSyncResponseDTO response = new PartnerSyncResponseDTO();
+    response.success = false;
+    response.message = message;
+    response.errors.add(message);
+    return response;
+  }
+}

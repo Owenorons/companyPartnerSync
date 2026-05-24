@@ -5,5 +5,10 @@
     "**/.sf": true,
     "**/.sfdx": true
   },
-  "xml.preferences.showSchemaDocumentationType": "none"
+  "xml.preferences.showSchemaDocumentationType": "none",
+  "prettier.prettierPath": "./node_modules/prettier",
+  "prettier.requireConfig": false,
+  "remoteHub.richNavigation.indexMode": {},
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true
 }

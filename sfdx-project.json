@@ -6,7 +6,7 @@
     }
   ],
   "name": "partnerSyncApp",
-  "namespace": "",
+  "namespace": "psync",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "66.0"
 }
