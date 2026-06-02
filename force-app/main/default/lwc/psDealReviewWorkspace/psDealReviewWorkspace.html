@@ -1,0 +1,142 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Operations</p>
+        <h1>Deal Review</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium filter-panel">
+        <lightning-input type="search" label="Search" onchange={handleSearch}>
+        </lightning-input>
+
+        <lightning-combobox
+          label="Status"
+          value={selectedStatus}
+          options={statusOptions}
+          onchange={handleStatus}
+        >
+        </lightning-combobox>
+
+        <lightning-combobox
+          label="Conflict"
+          value={selectedConflict}
+          options={conflictOptions}
+          onchange={handleConflict}
+        >
+        </lightning-combobox>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template for:each={filteredDeals} for:item="deal">
+          <button
+            key={deal.dealId}
+            class={deal.rowClass}
+            data-id={deal.dealId}
+            onclick={handleSelectDeal}
+          >
+            <div
+              class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+            >
+              <span class="deal-number">{deal.dealNumber}</span>
+              <span class={deal.statusClass}>{deal.status}</span>
+            </div>
+
+            <h3>{deal.customerName}</h3>
+
+            <div class="slds-grid_align-spread slds-grid queue-meta">
+              <span>{deal.partnerName}</span>
+              <strong>{deal.formattedValue}</strong>
+            </div>
+          </button>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedDeal}>
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">Deal Registration</p>
+            <h2>{selectedDeal.customerName}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span>{selectedDeal.partnerName}</span>
+              <span>{selectedDeal.stage}</span>
+              <span>{selectedDeal.formattedValue}</span>
+            </div>
+          </div>
+
+          <div class="slds-grid hero-actions">
+            <button class="approve" onclick={handleApprove}>Approve</button>
+
+            <button class="reject" onclick={handleReject}>Reject</button>
+          </div>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Conflict Analysis</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Conflict Status</span>
+              <strong class={selectedDeal.conflictClass}>
+                {selectedDeal.conflictStatus}
+              </strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Protection Window</span>
+              <strong>{selectedDeal.protectionEndLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Submitted</span>
+              <strong>{selectedDeal.createdDateLabel}</strong>
+            </div>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">AI Deal Risk</h3>
+
+            <div class="risk-score">{selectedDeal.aiRiskScore}</div>
+
+            <p class="risk-label">Risk Score</p>
+
+            <div
+              class="slds-var-m-top_medium slds-var-p-around_medium risk-summary"
+            >
+              {selectedDeal.aiSummary}
+            </div>
+
+            <div class="slds-var-m-top_medium recommendation">
+              <strong>Recommendation</strong>
+              <p>{selectedDeal.aiRecommendation}</p>
+            </div>
+          </article>
+
+          <article class="panel-card full-width">
+            <h3 class="slds-var-m-bottom_medium">Deal Notes</h3>
+
+            <div class="slds-var-p-around_medium notes-body">
+              {selectedDeal.notes}
+            </div>
+          </article>
+        </section>
+      </template>
+
+      <template if:false={selectedDeal}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:queue" size="large">
+          </lightning-icon>
+
+          <h2>Select a deal</h2>
+
+          <p>Choose a deal from the review queue to begin assessment.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+</template>

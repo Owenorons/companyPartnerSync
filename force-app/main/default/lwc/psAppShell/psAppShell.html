@@ -1,0 +1,17 @@
+<template>
+  <div class="shell">
+    <aside class="sidebar">
+      <c-ps-side-nav></c-ps-side-nav>
+    </aside>
+
+    <div class="main-layout">
+      <header class="topbar">
+        <c-ps-top-nav></c-ps-top-nav>
+      </header>
+
+      <main class="content">
+        <slot></slot>
+      </main>
+    </div>
+  </div>
+</template>

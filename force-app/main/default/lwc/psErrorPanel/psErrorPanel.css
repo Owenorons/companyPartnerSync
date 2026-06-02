@@ -1,0 +1,20 @@
+.error-shell {
+  display: flex;
+  gap: 1rem;
+
+  background: #fef2f2;
+  color: #991b1b;
+
+  border: var(--lwc-borderWidthThin, 1px) solid #fecaca;
+  border-radius: var(--lwc-varSpacingMedium, 1rem);
+
+  padding: var(--lwc-varSpacingMedium, 1rem);
+}
+
+.error-shell h2 {
+  font-weight: 900;
+}
+
+.error-shell p {
+  margin-top: 0.3rem;
+}

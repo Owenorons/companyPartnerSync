@@ -1,0 +1,45 @@
+.metric-card {
+  background: var(--lwc-colorBackgroundLight, #ffffff);
+  border: 1px solid #e5e7eb;
+  border-radius: 1.25rem;
+  padding: var(--lwc-squareIconUtilityMedium, 1.25rem);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--lwc-spacingNone, 0) 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.icon-wrap {
+  height: var(--lwc-varSpacingXxLarge, 3rem);
+  border-radius: var(--lwc-varSpacingMedium, 1rem);
+}
+
+.tone-blue .icon-wrap {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.tone-purple .icon-wrap {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.tone-green .icon-wrap {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.label {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.value {
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-top: 0.1rem;
+}

@@ -1,0 +1,50 @@
+<template>
+  <div class="ai-panel">
+    <div class="ai-header">
+      <div>
+        <p class="eyebrow">AI Insights</p>
+        <h2>Partner Intelligence</h2>
+      </div>
+
+      <div class="ai-badge">AI Enabled</div>
+    </div>
+
+    <template for:each={insights} for:item="insight">
+      <article key={insight.insightId} class="insight-card">
+        <div class="insight-top">
+          <div>
+            <h3>{insight.insightType}</h3>
+            <p>{insight.generatedLabel}</p>
+          </div>
+
+          <div class="score-circle">{insight.score}</div>
+        </div>
+
+        <div class="summary">{insight.summary}</div>
+
+        <div class="recommendation">
+          <strong>Recommendation</strong>
+          <p>{insight.recommendation}</p>
+        </div>
+
+        <div class="reason">
+          <strong>Why?</strong>
+          <p>{insight.reason}</p>
+        </div>
+
+        <div class="confidence">
+          <span>Confidence</span>
+
+          <div class="confidence-bar">
+            <span
+              class="confidence-fill"
+              data-confidence={insight.confidenceStyle}
+            ></span>
+          </div>
+
+          <strong>{insight.confidenceLabel}</strong>
+        </div>
+      </article>
+    </template>
+  </div>
+</template>

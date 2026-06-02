@@ -1,0 +1,26 @@
+.request-list {
+  padding: var(--lwc-varSpacingLarge, 1.5rem);
+  border: 1px solid var(--ps-color-border);
+  border-radius: var(--ps-radius-md);
+  background: var(--ps-color-card);
+  box-shadow: var(--ps-shadow-sm);
+}
+
+.eyebrow {
+  color: var(--ps-color-text-muted);
+  font-size: var(--ps-font-xs);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h2 {
+  color: var(--ps-color-text);
+  font-size: var(--ps-font-lg);
+  font-weight: 900;
+}
+
+.empty-state {
+  margin-top: var(--lwc-varSpacingMedium, 1rem);
+  color: var(--ps-color-text-muted);
+}

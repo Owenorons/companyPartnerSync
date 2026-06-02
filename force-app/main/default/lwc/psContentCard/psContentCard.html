@@ -1,0 +1,26 @@
+<template>
+  <article class="content-card">
+    <div
+      class="slds-grid_align-center slds-media_center slds-grid slds-large-size_xxx-small icon"
+    >
+      <lightning-icon icon-name="utility:file" size="small"></lightning-icon>
+    </div>
+
+    <div class="body">
+      <div class="slds-grid_align-spread slds-grid top-row">
+        <span class="category">{content.category}</span>
+
+        <template if:true={content.featured}>
+          <span class="featured">Featured</span>
+        </template>
+      </div>
+
+      <h3 class="slds-var-m-top_small">{content.title}</h3>
+      <p class="slds-m-top_x-small">{content.description}</p>
+
+      <button class="slds-var-m-top_medium" onclick={handleDownload}>
+        Download
+      </button>
+    </div>
+  </article>
+</template>

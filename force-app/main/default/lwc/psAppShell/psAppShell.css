@@ -1,0 +1,27 @@
+.shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+  background: var(--ps-color-bg);
+}
+
+.sidebar {
+  background: #0f172a;
+  color: white;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 72px;
+  border-bottom: 1px solid var(--ps-color-border);
+  background: white;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+}

@@ -1,1 +1,76 @@
-<template> </template>
+<template>
+  <div class="ps-page">
+    <section class="page-header">
+      <div>
+        <p class="eyebrow">Pipeline</p>
+        <h1>Deal Registrations</h1>
+        <p>
+          Track registered, approved, conflicted, and protected partner deals.
+        </p>
+      </div>
+
+      <lightning-button
+        variant="brand"
+        label="Register Deal"
+        onclick={handleRegisterDeal}
+      >
+      </lightning-button>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state message="Loading deals..."></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasDeals}>
+      <div class="deal-grid">
+        <template for:each={deals} for:item="deal">
+          <article key={deal.dealId} class="deal-card">
+            <div class="deal-top">
+              <div>
+                <p class="deal-number">{deal.dealNumber}</p>
+                <h2>{deal.customerName}</h2>
+              </div>
+              <span class={deal.badgeClass}>{deal.status}</span>
+            </div>
+
+            <div class="deal-meta">
+              <div>
+                <span>Value</span>
+                <strong>{deal.formattedValue}</strong>
+              </div>
+              <div>
+                <span>Stage</span>
+                <strong>{deal.stage}</strong>
+              </div>
+              <div>
+                <span>Protection Ends</span>
+                <strong>{deal.protectionEndLabel}</strong>
+              </div>
+            </div>
+
+            <div class="deal-footer">
+              <span class="conflict">{deal.conflictStatus}</span>
+              <button data-id={deal.dealId} onclick={handleOpenDeal}>
+                View Details
+              </button>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+
+    <template if:false={hasDeals}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="No deals yet"
+          message="Register your first deal to request partner protection."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

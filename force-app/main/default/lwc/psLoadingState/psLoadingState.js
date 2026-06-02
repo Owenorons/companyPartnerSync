@@ -1,3 +1,5 @@
-import { LightningElement } from "lwc";
+import { api, LightningElement } from "lwc";
 
-export default class PsLoadingState extends LightningElement {}
+export default class PsLoadingState extends LightningElement {
+  @api message = "Loading...";
+}

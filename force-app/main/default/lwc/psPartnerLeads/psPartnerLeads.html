@@ -1,1 +1,97 @@
-<template> </template>
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header leads-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Lead Distribution</p>
+        <h1>Assigned Leads</h1>
+        <p>
+          Review vendor-assigned leads, respond quickly, and convert accepted
+          leads into pipeline.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading assigned leads..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasLeads}>
+      <div class="lead-grid">
+        <template for:each={leads} for:item="lead">
+          <article key={lead.leadId} class="lead-card">
+            <div class="slds-grid_align-spread slds-grid lead-top">
+              <div>
+                <p class="slds-text-body_small lead-label">Lead</p>
+                <h2>{lead.company}</h2>
+                <p class="slds-var-m-top_xx-small lead-name">{lead.leadName}</p>
+              </div>
+
+              <span class={lead.badgeClass}>{lead.status}</span>
+            </div>
+
+            <div class="slds-var-m-top_medium lead-details">
+              <div>
+                <span class="slds-text-body_small">Email</span>
+                <strong>{lead.email}</strong>
+              </div>
+              <div>
+                <span class="slds-text-body_small">Phone</span>
+                <strong>{lead.phone}</strong>
+              </div>
+              <div>
+                <span class="slds-text-body_small">SLA Deadline</span>
+                <strong>{lead.slaLabel}</strong>
+              </div>
+            </div>
+
+            <div class="slds-grid slds-var-m-top_medium lead-actions">
+              <template if:true={lead.canRespond}>
+                <button
+                  class="accept"
+                  data-id={lead.leadId}
+                  onclick={handleAccept}
+                >
+                  Accept
+                </button>
+
+                <button
+                  class="reject"
+                  data-id={lead.leadId}
+                  onclick={handleReject}
+                >
+                  Reject
+                </button>
+              </template>
+
+              <template if:true={lead.canConvert}>
+                <button
+                  class="convert"
+                  data-id={lead.leadId}
+                  onclick={handleConvert}
+                >
+                  Convert
+                </button>
+              </template>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+
+    <template if:false={hasLeads}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="No assigned leads"
+          message="When leads are assigned to your partner account, they will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

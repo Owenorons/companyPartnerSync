@@ -1,1 +1,141 @@
-<template> </template>
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading your partner workspace..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={dashboard}>
+      <section class="slds-var-p-around_x-large ps-gradient-header">
+        <div
+          class="slds-media_center slds-grid_align-spread slds-grid header-content"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">PartnerSync Accelerator</p>
+            <h1>Welcome back, {dashboard.partnerName}</h1>
+            <p class="subtitle">
+              Track leads, deals, MDF, content, and performance from one partner
+              workspace.
+            </p>
+          </div>
+
+          <div class="slds-text-align_right status-panel">
+            <span class={statusClass}>{dashboard.partnerStatus}</span>
+            <p class="slds-var-m-top_x-small tier">
+              {dashboard.partnerTier} Partner
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slds-var-m-top_large metrics-grid">
+        <c-ps-dashboard-metric-card
+          label="Open Deals"
+          value={dashboard.openDealCount}
+          icon-name="utility:opportunity"
+          icon-alternative-text="Open Deals"
+          tone="blue"
+        >
+        </c-ps-dashboard-metric-card>
+
+        <c-ps-dashboard-metric-card
+          label="Assigned Leads"
+          value={dashboard.assignedLeadCount}
+          icon-name="utility:lead"
+          icon-alternative-text="Assigned Leads"
+          tone="purple"
+        >
+        </c-ps-dashboard-metric-card>
+
+        <c-ps-dashboard-metric-card
+          label="Open MDF"
+          value={dashboard.openMdfCount}
+          icon-name="utility:money"
+          icon-alternative-text="Open MDF"
+          tone="green"
+        >
+        </c-ps-dashboard-metric-card>
+      </section>
+
+      <section class="slds-var-m-top_large workspace-grid">
+        <div class="ps-card quick-actions">
+          <h2 class="slds-var-m-bottom_medium">Quick Actions</h2>
+          <div class="action-list">
+            <lightning-button
+              type="button"
+              class="action-button"
+              label="Register Deal"
+              icon-name="utility:add"
+              title="Register Deal"
+              onclick={handleNewDeal}
+            >
+            </lightning-button>
+
+            <lightning-button
+              type="button"
+              class="action-button"
+              label="View Leads"
+              icon-name="utility:lead"
+              title="View Leads"
+              onclick={handleLeads}
+            >
+            </lightning-button>
+
+            <lightning-button
+              type="button"
+              class="action-button"
+              label="Request MDF"
+              icon-name="utility:money"
+              title="Request MDF"
+              onclick={handleMdf}
+            >
+            </lightning-button>
+
+            <lightning-button
+              type="button"
+              class="action-button"
+              label="Content Hub"
+              icon-name="utility:file"
+              title="Content Hub"
+              onclick={handleContent}
+            >
+            </lightning-button>
+          </div>
+        </div>
+
+        <div class="ps-card alerts">
+          <h2 class="slds-var-m-bottom_medium">Recommended Actions</h2>
+
+          <template if:true={hasAlerts}>
+            <template for:each={dashboard.alerts} for:item="alert">
+              <div
+                key={alert}
+                class="slds-var-m-bottom_x-small slds-media_center slds-grid alert-row"
+              >
+                <lightning-icon
+                  icon-name="utility:info"
+                  alternative-text="Recommended action"
+                  size="x-small"
+                ></lightning-icon>
+                <span>{alert}</span>
+              </div>
+            </template>
+          </template>
+
+          <template if:false={hasAlerts}>
+            <c-ps-empty-state
+              title="All clear"
+              message="No urgent partner actions right now."
+            >
+            </c-ps-empty-state>
+          </template>
+        </div>
+      </section>
+    </template>
+  </div>
+</template>

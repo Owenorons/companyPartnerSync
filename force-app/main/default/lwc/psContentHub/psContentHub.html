@@ -1,1 +1,73 @@
-<template> </template>
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header content-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Enablement</p>
+        <h1>Content Hub</h1>
+        <p>
+          Access sales decks, product sheets, training, case studies, and
+          campaign kits.
+        </p>
+      </div>
+    </section>
+
+    <section class="slds-var-p-around_medium filter-card">
+      <lightning-input
+        type="search"
+        label="Search content"
+        value={searchTerm}
+        onchange={handleSearch}
+      >
+      </lightning-input>
+
+      <lightning-combobox
+        label="Category"
+        value={selectedCategory}
+        options={categoryOptions}
+        onchange={handleCategory}
+      >
+      </lightning-combobox>
+    </section>
+
+    <template if:true={featuredContent.length}>
+      <section class="slds-var-m-top_large featured-section">
+        <h2 class="slds-var-m-bottom_medium">Featured</h2>
+        <div class="content-grid">
+          <template for:each={featuredContent} for:item="item">
+            <c-ps-content-card
+              key={item.contentId}
+              content={item}
+              ondownload={handleDownload}
+            >
+            </c-ps-content-card>
+          </template>
+        </div>
+      </section>
+    </template>
+
+    <section class="slds-var-m-top_large content-section">
+      <h2 class="slds-var-m-bottom_medium">All Content</h2>
+
+      <template if:true={filteredContent.length}>
+        <div class="content-grid">
+          <template for:each={filteredContent} for:item="item">
+            <c-ps-content-card
+              key={item.contentId}
+              content={item}
+              ondownload={handleDownload}
+            >
+            </c-ps-content-card>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={filteredContent.length}>
+        <c-ps-empty-state
+          title="No content found"
+          message="Try changing your search or category filter."
+        >
+        </c-ps-empty-state>
+      </template>
+    </section>
+  </div>
+</template>

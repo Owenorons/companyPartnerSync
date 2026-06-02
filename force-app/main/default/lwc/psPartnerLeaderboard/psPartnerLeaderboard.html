@@ -1,0 +1,73 @@
+<template>
+  <div class="leaderboard-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Channel Analytics</p>
+        <h1>Partner Leaderboard</h1>
+        <p>
+          Monitor top-performing partners by revenue, conversions, MDF
+          utilisation, and lead responsiveness.
+        </p>
+      </div>
+    </section>
+
+    <section class="top-metrics">
+      <c-ps-dashboard-metric-card
+        label="Total Partner Revenue"
+        value={totalRevenueLabel}
+        tone="blue"
+      >
+      </c-ps-dashboard-metric-card>
+
+      <c-ps-dashboard-metric-card
+        label="Closed Won Deals"
+        value={wonDeals}
+        tone="green"
+      >
+      </c-ps-dashboard-metric-card>
+
+      <c-ps-dashboard-metric-card
+        label="Active Partners"
+        value={activePartners}
+        tone="purple"
+      >
+      </c-ps-dashboard-metric-card>
+    </section>
+
+    <section class="leaderboard-table">
+      <div class="table-header">
+        <h2>Performance Rankings</h2>
+      </div>
+
+      <template for:each={partners} for:item="partner">
+        <article key={partner.partnerAccountId} class="partner-row">
+          <div class="rank">#{partner.rank}</div>
+
+          <div class="partner-main">
+            <h3>{partner.partnerName}</h3>
+            <p>{partner.partnerTier}</p>
+          </div>
+
+          <div class="partner-metric">
+            <span>Revenue</span>
+            <strong>{partner.revenueLabel}</strong>
+          </div>
+
+          <div class="partner-metric">
+            <span>Conversion</span>
+            <strong>{partner.conversionLabel}</strong>
+          </div>
+
+          <div class="partner-metric">
+            <span>Won Deals</span>
+            <strong>{partner.wonDeals}</strong>
+          </div>
+
+          <div class="partner-score">
+            <div class="score-ring">{partner.score}</div>
+          </div>
+        </article>
+      </template>
+    </section>
+  </div>
+</template>

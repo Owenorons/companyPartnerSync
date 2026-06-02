@@ -1,1 +1,22 @@
-<template> </template>
+<template>
+  <div class="ps-page">
+    <section class="page-header mdf-header">
+      <div>
+        <p class="eyebrow">Partner Funding</p>
+        <h1>MDF Workspace</h1>
+        <p>Request marketing development funds and track approval status.</p>
+      </div>
+    </section>
+
+    <div class="workspace-grid">
+      <c-ps-mdf-budget-card budget={budget}></c-ps-mdf-budget-card>
+      <c-ps-mdf-request-form
+        onrequestcreated={handleRequestCreated}
+      ></c-ps-mdf-request-form>
+    </div>
+
+    <section class="list-section">
+      <c-ps-mdf-list refresh-token={refreshToken}></c-ps-mdf-list>
+    </section>
+  </div>
+</template>

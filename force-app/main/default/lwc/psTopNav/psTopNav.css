@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 var(--lwc-varSpacingLarge, var(--lwc-spacingLarge));
+}
+
+.eyebrow {
+  color: var(--ps-color-text-muted);
+  font-size: var(--ps-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  color: var(--ps-color-text);
+  font-size: var(--ps-font-md);
+  font-weight: 700;
+}

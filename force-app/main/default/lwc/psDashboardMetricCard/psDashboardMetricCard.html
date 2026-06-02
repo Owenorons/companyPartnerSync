@@ -1,0 +1,19 @@
+<template>
+  <div class={cardClass}>
+    <div
+      class="slds-grid_align-center slds-media_center slds-grid slds-max-large-size_xxx-small icon-wrap"
+    >
+      <lightning-icon
+        icon-name={iconName}
+        alternative-text={computedIconAlternativeText}
+        size="small"
+      >
+      </lightning-icon>
+    </div>
+
+    <div>
+      <p class="label">{label}</p>
+      <p class="value">{value}</p>
+    </div>
+  </div>
+</template>
