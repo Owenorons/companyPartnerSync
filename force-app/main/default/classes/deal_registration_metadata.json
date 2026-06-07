@@ -1,0 +1,310 @@
+[
+  {
+    "apiName": "Deal_Registration__c",
+    "label": "Deal Registration",
+    "pluralLabel": "Deal Registrations",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Deal Registration Number",
+    "displayFormat": "DR-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account that submitted or owns the deal registration.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Deal_Registrations"
+      },
+      {
+        "apiName": "Customer_Account__c",
+        "label": "Customer Account",
+        "description": "Customer account associated with the registered deal.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Customer_Deal_Registrations"
+      },
+      {
+        "apiName": "Opportunity__c",
+        "label": "Opportunity",
+        "description": "Opportunity created from or linked to this deal registration.",
+        "type": "Lookup",
+        "referenceTo": "Opportunity",
+        "relationshipName": "Deal_Registrations"
+      },
+      {
+        "apiName": "Source_Lead__c",
+        "label": "Source Lead",
+        "description": "Lead record that originated the deal registration.",
+        "type": "Lookup",
+        "referenceTo": "Lead",
+        "relationshipName": "Deal_Registrations"
+      },
+      {
+        "apiName": "Partner_Contact__c",
+        "label": "Partner Contact",
+        "description": "Primary partner contact for the deal registration.",
+        "type": "Lookup",
+        "referenceTo": "Contact",
+        "relationshipName": "Deal_Registrations"
+      },
+      {
+        "apiName": "Deal_Name__c",
+        "label": "Deal Name",
+        "description": "Partner-provided name or title for the registered deal.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Customer_Name__c",
+        "label": "Customer Name",
+        "description": "Name of the customer or prospect for the registered deal.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Customer_Email__c",
+        "label": "Customer Email",
+        "description": "Primary customer email address for the registered deal.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Deal_Value__c",
+        "label": "Deal Value",
+        "description": "Estimated monetary value of the registered deal.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Estimated_Amount__c",
+        "label": "Estimated Amount",
+        "description": "Estimated amount expected for the registered deal.",
+        "type": "Currency",
+        "precision": 16,
+        "scale": 2
+      },
+      {
+        "apiName": "Stage__c",
+        "label": "Stage",
+        "description": "Current sales stage for the registered deal.",
+        "type": "Picklist",
+        "values": [
+          "Qualification",
+          "Discovery",
+          "Proposal",
+          "Negotiation",
+          "Closed Won",
+          "Closed Lost"
+        ]
+      },
+      {
+        "apiName": "Status__c",
+        "label": "Status",
+        "description": "Approval and lifecycle status of the deal registration.",
+        "type": "Picklist",
+        "values": [
+          "Draft",
+          "Submitted",
+          "Under Review",
+          "Approved",
+          "Rejected",
+          "Expired",
+          "Converted",
+          "Closed Won",
+          "Closed Lost"
+        ]
+      },
+      {
+        "apiName": "Conflict_Status__c",
+        "label": "Conflict Status",
+        "description": "Conflict review state for duplicate or competing deal registrations.",
+        "type": "Picklist",
+        "values": [
+          "None",
+          "Potential Conflict",
+          "Confirmed Conflict",
+          "Resolved"
+        ]
+      },
+      {
+        "apiName": "Submitted_Date__c",
+        "label": "Submitted Date",
+        "description": "Date and time when the deal registration was submitted.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Approved_Date__c",
+        "label": "Approved Date",
+        "description": "Date and time when the deal registration was approved.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Approved_By__c",
+        "label": "Approved By",
+        "description": "User who approved the deal registration.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Approved_Deal_Registrations"
+      },
+      {
+        "apiName": "Protection_Start_Date__c",
+        "label": "Protection Start Date",
+        "description": "Start date for partner deal protection.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Protection_End_Date__c",
+        "label": "Protection End Date",
+        "description": "End date for partner deal protection.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Expiration_Date__c",
+        "label": "Expiration Date",
+        "description": "Date when the deal registration expires if not converted or renewed.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Notes__c",
+        "label": "Notes",
+        "description": "Additional notes, context, or review comments for the deal registration.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      }
+    ],
+    "validationRules": [
+      {
+        "apiName": "Require_Customer_Name_When_Submitted",
+        "active": true,
+        "errorConditionFormula": "AND(ISPICKVAL(Status__c, \"Submitted\"), ISBLANK(Customer_Name__c))",
+        "errorDisplayField": "Customer_Name__c",
+        "errorMessage": "Customer Name is required before submitting."
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Customer_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Opportunity__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Source_Lead__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Contact__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Deal_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Customer_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Customer_Email__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Deal_Value__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Estimated_Amount__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Stage__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Conflict_Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Submitted_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Approved_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Approved_By__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Protection_Start_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Protection_End_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Expiration_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Notes__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]
