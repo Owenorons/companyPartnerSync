@@ -1,11 +1,5 @@
 public with sharing class SandboxMetadataBuilder {
   private static Integer CREATE_METADATA_BATCH_SIZE = 10;
-  private static Set<String> SUPPORTED_STANDARD_OBJECTS = new Set<String>{
-    'Account',
-    'Contact',
-    'Lead',
-    'Opportunity'
-  };
 
   public interface IMetadataService {
     MetadataService.SaveResult[] createMetadata(
@@ -34,6 +28,7 @@ public with sharing class SandboxMetadataBuilder {
     public String label;
     public String pluralLabel;
     public String sharingModel;
+    public Boolean skipObjectCreation;
 
     // Name field configuration. Supported values: Text, AutoNumber.
     public String nameFieldType;
@@ -134,7 +129,7 @@ public with sharing class SandboxMetadataBuilder {
 
     // Phase 1: create objects first.
     for (ObjectDef objDef : objectDefs) {
-      if (isCustomObjectDef(objDef)) {
+      if (!shouldSkipObjectCreation(objDef)) {
         createObject(metadataService, objDef);
       }
     }
@@ -163,7 +158,7 @@ public with sharing class SandboxMetadataBuilder {
 
   @TestVisible
   static void createObject(IMetadataService metadataService, ObjectDef objDef) {
-    if (isStandardObjectDef(objDef)) {
+    if (shouldSkipObjectCreation(objDef)) {
       return;
     }
 
@@ -583,9 +578,9 @@ public with sharing class SandboxMetadataBuilder {
         'Object label is required for ' + objDef.apiName
       );
     }
-    if (!isCustomObjectDef(objDef) && !isStandardObjectDef(objDef)) {
+    if (!isCustomObjectDef(objDef) && !shouldSkipObjectCreation(objDef)) {
       throw new MetadataBuilderException(
-        'Object API name should end with __c or __mdt, or be a supported standard object: ' +
+        'Object API name should end with __c or __mdt unless skipObjectCreation is true: ' +
         objDef.apiName
       );
     }
@@ -597,9 +592,8 @@ public with sharing class SandboxMetadataBuilder {
       (objDef.apiName.endsWith('__c') || objDef.apiName.endsWith('__mdt'));
   }
 
-  private static Boolean isStandardObjectDef(ObjectDef objDef) {
-    return objDef != null &&
-      SUPPORTED_STANDARD_OBJECTS.contains(objDef.apiName);
+  private static Boolean shouldSkipObjectCreation(ObjectDef objDef) {
+    return objDef != null && objDef.skipObjectCreation == true;
   }
 
   private static void validateFieldDef(

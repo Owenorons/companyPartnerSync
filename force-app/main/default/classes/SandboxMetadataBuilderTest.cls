@@ -474,6 +474,7 @@ private class SandboxMetadataBuilderTest {
       '"apiName":"Lead",' +
       '"label":"Lead",' +
       '"pluralLabel":"Leads",' +
+      '"skipObjectCreation":true,' +
       '"fields":[' +
       '{"apiName":"Partner_Account__c","label":"Partner Account","type":"Lookup","referenceTo":"Account","relationshipName":"Partner_Distributed_Leads"}' +
       ']' +
@@ -607,7 +608,7 @@ private class SandboxMetadataBuilderTest {
       SandboxMetadataBuilder.buildObject(objDef);
       System.assert(false, 'Expected MetadataBuilderException.');
     } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
-      System.assert(ex.getMessage().contains('should end with __c or __mdt'));
+      System.assert(ex.getMessage().contains('skipObjectCreation is true'));
     }
   }
 

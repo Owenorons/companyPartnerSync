@@ -1210,6 +1210,7 @@
     "apiName": "Lead",
     "label": "Lead",
     "pluralLabel": "Leads",
+    "skipObjectCreation": true,
     "fields": [
       {
         "apiName": "Partner_Account__c",
@@ -1280,6 +1281,7 @@
     "apiName": "Opportunity",
     "label": "Opportunity",
     "pluralLabel": "Opportunities",
+    "skipObjectCreation": true,
     "fields": [
       {
         "apiName": "Partner_Account__c",
@@ -1457,6 +1459,7 @@
     "apiName": "Account",
     "label": "Account",
     "pluralLabel": "Accounts",
+    "skipObjectCreation": true,
     "fields": [
       {
         "apiName": "Partner_ID__c",
@@ -1579,6 +1582,7 @@
     "apiName": "Contact",
     "label": "Contact",
     "pluralLabel": "Contacts",
+    "skipObjectCreation": true,
     "fields": [
       {
         "apiName": "Portal_Role__c",
