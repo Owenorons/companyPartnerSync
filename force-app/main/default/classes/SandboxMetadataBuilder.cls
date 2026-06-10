@@ -1,5 +1,11 @@
 public with sharing class SandboxMetadataBuilder {
   private static Integer CREATE_METADATA_BATCH_SIZE = 10;
+  private static Set<String> SUPPORTED_STANDARD_OBJECTS = new Set<String>{
+    'Account',
+    'Contact',
+    'Lead',
+    'Opportunity'
+  };
 
   public interface IMetadataService {
     MetadataService.SaveResult[] createMetadata(
@@ -38,6 +44,7 @@ public with sharing class SandboxMetadataBuilder {
     public List<FieldDef> fields;
     public List<ValidationRuleDef> validationRules;
     public List<FieldPermissionDef> fieldPermissions;
+    public List<ObjectPermissionDef> objectPermissions;
   }
 
   public class FieldDef {
@@ -55,6 +62,8 @@ public with sharing class SandboxMetadataBuilder {
     public Boolean externalId;
 
     public String defaultValue;
+    public String displayFormat;
+    public Integer startingNumber;
 
     public String referenceTo;
     public String relationshipName;
@@ -62,6 +71,8 @@ public with sharing class SandboxMetadataBuilder {
 
     public String description;
     public String inlineHelpText;
+    public String formula;
+    public String formulaReturnType;
 
     public List<String> values;
   }
@@ -81,6 +92,17 @@ public with sharing class SandboxMetadataBuilder {
     public String field;
     public Boolean readable;
     public Boolean editable;
+  }
+
+  public class ObjectPermissionDef {
+    public String permissionSet;
+    public String objectApiName;
+    public Boolean allowRead;
+    public Boolean allowCreate;
+    public Boolean allowEdit;
+    public Boolean allowDelete;
+    public Boolean viewAllRecords;
+    public Boolean modifyAllRecords;
   }
 
   public static void createFromJson(String jsonConfig) {
@@ -112,7 +134,9 @@ public with sharing class SandboxMetadataBuilder {
 
     // Phase 1: create objects first.
     for (ObjectDef objDef : objectDefs) {
-      createObject(metadataService, objDef);
+      if (isCustomObjectDef(objDef)) {
+        createObject(metadataService, objDef);
+      }
     }
 
     // Phase 2: create fields after objects exist.
@@ -131,9 +155,7 @@ public with sharing class SandboxMetadataBuilder {
 
     // Phase 4: create permission sets after fields exist.
     for (ObjectDef objDef : objectDefs) {
-      if (
-        objDef.fieldPermissions != null && !objDef.fieldPermissions.isEmpty()
-      ) {
+      if (hasFieldPermissions(objDef) || hasObjectPermissions(objDef)) {
         createFieldPermissions(metadataService, objDef);
       }
     }
@@ -141,6 +163,10 @@ public with sharing class SandboxMetadataBuilder {
 
   @TestVisible
   static void createObject(IMetadataService metadataService, ObjectDef objDef) {
+    if (isStandardObjectDef(objDef)) {
+      return;
+    }
+
     MetadataService.CustomObject obj = buildObject(objDef);
 
     MetadataService.SaveResult[] results = metadataService.createMetadata(
@@ -154,16 +180,27 @@ public with sharing class SandboxMetadataBuilder {
   static void createFields(IMetadataService metadataService, ObjectDef objDef) {
     validateObjectDef(objDef);
 
-    List<MetadataService.Metadata> metadataItems = new List<MetadataService.Metadata>();
+    List<MetadataService.Metadata> standardFields = new List<MetadataService.Metadata>();
+    List<MetadataService.Metadata> formulaFields = new List<MetadataService.Metadata>();
 
     for (FieldDef fieldDef : objDef.fields) {
-      metadataItems.add(buildField(objDef.apiName, fieldDef));
+      MetadataService.CustomField field = buildField(objDef.apiName, fieldDef);
+      if (fieldDef.type == 'Formula') {
+        formulaFields.add(field);
+      } else {
+        standardFields.add(field);
+      }
     }
 
     createMetadataInBatches(
       metadataService,
-      metadataItems,
+      standardFields,
       'Fields for: ' + objDef.apiName
+    );
+    createMetadataInBatches(
+      metadataService,
+      formulaFields,
+      'Formula fields for: ' + objDef.apiName
     );
   }
 
@@ -279,6 +316,14 @@ public with sharing class SandboxMetadataBuilder {
       field.visibleLines = fieldDef.visibleLines == null
         ? 5
         : fieldDef.visibleLines;
+    } else if (fieldType == 'AutoNumber') {
+      field.type_x = 'AutoNumber';
+      field.displayFormat = String.isBlank(fieldDef.displayFormat)
+        ? 'AUTO-{000000}'
+        : fieldDef.displayFormat;
+      field.startingNumber = fieldDef.startingNumber == null
+        ? 1
+        : fieldDef.startingNumber;
     } else if (fieldType == 'Number') {
       field.type_x = 'Number';
       field.precision = fieldDef.precision == null ? 18 : fieldDef.precision;
@@ -287,6 +332,14 @@ public with sharing class SandboxMetadataBuilder {
       field.type_x = 'Currency';
       field.precision = fieldDef.precision == null ? 18 : fieldDef.precision;
       field.scale = fieldDef.scale == null ? 2 : fieldDef.scale;
+    } else if (fieldType == 'Percent') {
+      field.type_x = 'Percent';
+      field.precision = fieldDef.precision == null ? 18 : fieldDef.precision;
+      field.scale = fieldDef.scale == null ? 2 : fieldDef.scale;
+    } else if (fieldType == 'Formula') {
+      field.type_x = fieldDef.formulaReturnType;
+      field.formula = fieldDef.formula;
+      applyFormulaReturnTypeSettings(field, fieldDef);
     } else if (fieldType == 'Date') {
       field.type_x = 'Date';
     } else if (fieldType == 'DateTime') {
@@ -331,6 +384,23 @@ public with sharing class SandboxMetadataBuilder {
     return field;
   }
 
+  private static void applyFormulaReturnTypeSettings(
+    MetadataService.CustomField field,
+    FieldDef fieldDef
+  ) {
+    String returnType = fieldDef.formulaReturnType;
+
+    if (returnType == 'Text') {
+      field.length = fieldDef.length == null ? 255 : fieldDef.length;
+    } else if (returnType == 'Number') {
+      field.precision = fieldDef.precision == null ? 18 : fieldDef.precision;
+      field.scale = fieldDef.scale == null ? 0 : fieldDef.scale;
+    } else if (returnType == 'Currency' || returnType == 'Percent') {
+      field.precision = fieldDef.precision == null ? 18 : fieldDef.precision;
+      field.scale = fieldDef.scale == null ? 2 : fieldDef.scale;
+    }
+  }
+
   @TestVisible
   static MetadataService.ValidationRule buildValidationRule(
     String objectApiName,
@@ -362,29 +432,61 @@ public with sharing class SandboxMetadataBuilder {
   ) {
     validateObjectDef(objDef);
 
-    Map<String, List<MetadataService.FieldPermissions>> permissionsBySet = new Map<String, List<MetadataService.FieldPermissions>>();
+    Map<String, List<MetadataService.FieldPermissions>> fieldPermissionsBySet = new Map<String, List<MetadataService.FieldPermissions>>();
+    Map<String, List<MetadataService.ObjectPermissions>> objectPermissionsBySet = new Map<String, List<MetadataService.ObjectPermissions>>();
 
-    for (FieldPermissionDef permissionDef : objDef.fieldPermissions) {
-      validateFieldPermissionDef(objDef.apiName, permissionDef);
+    if (hasFieldPermissions(objDef)) {
+      for (FieldPermissionDef permissionDef : objDef.fieldPermissions) {
+        validateFieldPermissionDef(objDef.apiName, permissionDef);
 
-      if (!permissionsBySet.containsKey(permissionDef.permissionSet)) {
-        permissionsBySet.put(
-          permissionDef.permissionSet,
-          new List<MetadataService.FieldPermissions>()
-        );
+        if (!fieldPermissionsBySet.containsKey(permissionDef.permissionSet)) {
+          fieldPermissionsBySet.put(
+            permissionDef.permissionSet,
+            new List<MetadataService.FieldPermissions>()
+          );
+        }
+
+        fieldPermissionsBySet.get(permissionDef.permissionSet)
+          .add(buildFieldPermission(objDef.apiName, permissionDef));
       }
+    }
 
-      permissionsBySet.get(permissionDef.permissionSet)
-        .add(buildFieldPermission(objDef.apiName, permissionDef));
+    if (hasObjectPermissions(objDef)) {
+      for (ObjectPermissionDef permissionDef : objDef.objectPermissions) {
+        validateObjectPermissionDef(objDef.apiName, permissionDef);
+
+        if (!objectPermissionsBySet.containsKey(permissionDef.permissionSet)) {
+          objectPermissionsBySet.put(
+            permissionDef.permissionSet,
+            new List<MetadataService.ObjectPermissions>()
+          );
+        }
+
+        objectPermissionsBySet.get(permissionDef.permissionSet)
+          .add(buildObjectPermission(objDef.apiName, permissionDef));
+      }
     }
 
     List<MetadataService.PermissionSet> permissionSets = new List<MetadataService.PermissionSet>();
 
-    for (String permissionSetName : permissionsBySet.keySet()) {
+    Set<String> permissionSetNames = new Set<String>();
+    permissionSetNames.addAll(fieldPermissionsBySet.keySet());
+    permissionSetNames.addAll(objectPermissionsBySet.keySet());
+
+    for (String permissionSetName : permissionSetNames) {
       MetadataService.PermissionSet permissionSet = new MetadataService.PermissionSet();
       permissionSet.fullName = permissionSetName;
       permissionSet.label = permissionSetName.replace('_', ' ');
-      permissionSet.fieldPermissions = permissionsBySet.get(permissionSetName);
+      if (fieldPermissionsBySet.containsKey(permissionSetName)) {
+        permissionSet.fieldPermissions = fieldPermissionsBySet.get(
+          permissionSetName
+        );
+      }
+      if (objectPermissionsBySet.containsKey(permissionSetName)) {
+        permissionSet.objectPermissions = objectPermissionsBySet.get(
+          permissionSetName
+        );
+      }
       permissionSets.add(permissionSet);
     }
 
@@ -401,6 +503,33 @@ public with sharing class SandboxMetadataBuilder {
       : objectApiName + '.' + permissionDef.field;
     permission.editable = permissionDef.editable == true;
     permission.readable = permission.editable || permissionDef.readable == true;
+    return permission;
+  }
+
+  private static MetadataService.ObjectPermissions buildObjectPermission(
+    String objectApiName,
+    ObjectPermissionDef permissionDef
+  ) {
+    MetadataService.ObjectPermissions permission = new MetadataService.ObjectPermissions();
+    permission.object_x = String.isBlank(permissionDef.objectApiName)
+      ? objectApiName
+      : permissionDef.objectApiName;
+    permission.allowCreate = permissionDef.allowCreate == true;
+    permission.allowDelete = permissionDef.allowDelete == true;
+    permission.allowEdit =
+      permissionDef.allowEdit == true ||
+      permission.allowDelete == true;
+    permission.allowRead =
+      permissionDef.allowRead == true ||
+      permission.allowCreate == true ||
+      permission.allowEdit == true ||
+      permission.allowDelete == true ||
+      permissionDef.viewAllRecords == true ||
+      permissionDef.modifyAllRecords == true;
+    permission.viewAllRecords =
+      permissionDef.viewAllRecords == true ||
+      permissionDef.modifyAllRecords == true;
+    permission.modifyAllRecords = permissionDef.modifyAllRecords == true;
     return permission;
   }
 
@@ -454,11 +583,23 @@ public with sharing class SandboxMetadataBuilder {
         'Object label is required for ' + objDef.apiName
       );
     }
-    if (!objDef.apiName.endsWith('__c') && !objDef.apiName.endsWith('__mdt')) {
+    if (!isCustomObjectDef(objDef) && !isStandardObjectDef(objDef)) {
       throw new MetadataBuilderException(
-        'Custom object API name should end with __c or __mdt: ' + objDef.apiName
+        'Object API name should end with __c or __mdt, or be a supported standard object: ' +
+        objDef.apiName
       );
     }
+  }
+
+  private static Boolean isCustomObjectDef(ObjectDef objDef) {
+    return objDef != null &&
+      !String.isBlank(objDef.apiName) &&
+      (objDef.apiName.endsWith('__c') || objDef.apiName.endsWith('__mdt'));
+  }
+
+  private static Boolean isStandardObjectDef(ObjectDef objDef) {
+    return objDef != null &&
+      SUPPORTED_STANDARD_OBJECTS.contains(objDef.apiName);
   }
 
   private static void validateFieldDef(
@@ -504,6 +645,41 @@ public with sharing class SandboxMetadataBuilder {
             fieldDef.apiName
         );
       }
+    }
+    if (fieldDef.type == 'Formula') {
+      validateFormulaFieldDef(fieldDef);
+    }
+  }
+
+  private static void validateFormulaFieldDef(FieldDef fieldDef) {
+    if (String.isBlank(fieldDef.formula)) {
+      throw new MetadataBuilderException(
+        'Formula field requires formula: ' + fieldDef.apiName
+      );
+    }
+    if (String.isBlank(fieldDef.formulaReturnType)) {
+      throw new MetadataBuilderException(
+        'Formula field requires formulaReturnType: ' + fieldDef.apiName
+      );
+    }
+
+    Set<String> supportedReturnTypes = new Set<String>{
+      'Checkbox',
+      'Currency',
+      'Date',
+      'DateTime',
+      'Number',
+      'Percent',
+      'Text'
+    };
+
+    if (!supportedReturnTypes.contains(fieldDef.formulaReturnType)) {
+      throw new MetadataBuilderException(
+        'Unsupported formulaReturnType: ' +
+          fieldDef.formulaReturnType +
+          ' for ' +
+          fieldDef.apiName
+      );
     }
   }
 
@@ -566,6 +742,36 @@ public with sharing class SandboxMetadataBuilder {
         permissionDef.permissionSet
       );
     }
+  }
+
+  private static void validateObjectPermissionDef(
+    String objectApiName,
+    ObjectPermissionDef permissionDef
+  ) {
+    if (String.isBlank(objectApiName)) {
+      throw new MetadataBuilderException('Parent object API name is required.');
+    }
+    if (permissionDef == null) {
+      throw new MetadataBuilderException(
+        'Object permission definition cannot be null.'
+      );
+    }
+    if (String.isBlank(permissionDef.permissionSet)) {
+      throw new MetadataBuilderException(
+        'Object permission permissionSet is required for object ' +
+        objectApiName
+      );
+    }
+  }
+
+  private static Boolean hasFieldPermissions(ObjectDef objDef) {
+    return objDef.fieldPermissions != null &&
+      !objDef.fieldPermissions.isEmpty();
+  }
+
+  private static Boolean hasObjectPermissions(ObjectDef objDef) {
+    return objDef.objectPermissions != null &&
+      !objDef.objectPermissions.isEmpty();
   }
 
   private static void createMetadataInBatches(

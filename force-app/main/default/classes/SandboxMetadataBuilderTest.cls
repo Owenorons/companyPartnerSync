@@ -79,6 +79,26 @@ private class SandboxMetadataBuilderTest {
   }
 
   @IsTest
+  static void buildsAutoNumberField() {
+    SandboxMetadataBuilder.FieldDef def = fieldDef(
+      'Application_Number__c',
+      'Application Number',
+      'AutoNumber'
+    );
+    def.displayFormat = 'PA-{000000}';
+    def.startingNumber = 1;
+
+    MetadataService.CustomField field = SandboxMetadataBuilder.buildField(
+      'Partner_Application__c',
+      def
+    );
+
+    System.assertEquals('AutoNumber', field.type_x);
+    System.assertEquals('PA-{000000}', field.displayFormat);
+    System.assertEquals(1, field.startingNumber);
+  }
+
+  @IsTest
   static void buildsNumberAndCurrencyFields() {
     SandboxMetadataBuilder.FieldDef numberDef = fieldDef(
       'Score__c',
@@ -113,6 +133,47 @@ private class SandboxMetadataBuilderTest {
     System.assertEquals('Currency', currencyField.type_x);
     System.assertEquals(18, currencyField.precision);
     System.assertEquals(2, currencyField.scale);
+  }
+
+  @IsTest
+  static void buildsFormulaFields() {
+    SandboxMetadataBuilder.FieldDef textFormulaDef = fieldDef(
+      'Display_Status__c',
+      'Display Status',
+      'Formula'
+    );
+    textFormulaDef.formulaReturnType = 'Text';
+    textFormulaDef.formula = 'TEXT(Status__c) & " - " & TEXT(Stage__c)';
+    textFormulaDef.length = 1300;
+
+    MetadataService.CustomField textFormulaField = SandboxMetadataBuilder.buildField(
+      'Deal_Registration__c',
+      textFormulaDef
+    );
+
+    System.assertEquals('Text', textFormulaField.type_x);
+    System.assertEquals(textFormulaDef.formula, textFormulaField.formula);
+    System.assertEquals(1300, textFormulaField.length);
+
+    SandboxMetadataBuilder.FieldDef numberFormulaDef = fieldDef(
+      'Protection_Days_Remaining__c',
+      'Protection Days Remaining',
+      'Formula'
+    );
+    numberFormulaDef.formulaReturnType = 'Number';
+    numberFormulaDef.formula = 'Protection_End_Date__c - TODAY()';
+    numberFormulaDef.precision = 18;
+    numberFormulaDef.scale = 0;
+
+    MetadataService.CustomField numberFormulaField = SandboxMetadataBuilder.buildField(
+      'Deal_Registration__c',
+      numberFormulaDef
+    );
+
+    System.assertEquals('Number', numberFormulaField.type_x);
+    System.assertEquals(numberFormulaDef.formula, numberFormulaField.formula);
+    System.assertEquals(18, numberFormulaField.precision);
+    System.assertEquals(0, numberFormulaField.scale);
   }
 
   @IsTest
@@ -278,6 +339,18 @@ private class SandboxMetadataBuilderTest {
       fieldPermissionDef('Partner_Sync_Admin', 'Customer_Name__c', true, true),
       fieldPermissionDef('Partner_Sync_Admin', 'Status__c', true, false)
     };
+    objDef.objectPermissions = new List<SandboxMetadataBuilder.ObjectPermissionDef>{
+      objectPermissionDef(
+        'Partner_Sync_Admin',
+        null,
+        true,
+        true,
+        true,
+        false,
+        true,
+        false
+      )
+    };
 
     List<MetadataService.PermissionSet> permissionSets = SandboxMetadataBuilder.buildPermissionSets(
       objDef
@@ -294,6 +367,29 @@ private class SandboxMetadataBuilderTest {
     System.assertEquals(true, permissionSets[0].fieldPermissions[0].readable);
     System.assertEquals(true, permissionSets[0].fieldPermissions[0].editable);
     System.assertEquals(false, permissionSets[0].fieldPermissions[1].editable);
+    System.assertEquals(1, permissionSets[0].objectPermissions.size());
+    System.assertEquals(
+      'Deal_Registration__c',
+      permissionSets[0].objectPermissions[0].object_x
+    );
+    System.assertEquals(true, permissionSets[0].objectPermissions[0].allowRead);
+    System.assertEquals(
+      true,
+      permissionSets[0].objectPermissions[0].allowCreate
+    );
+    System.assertEquals(true, permissionSets[0].objectPermissions[0].allowEdit);
+    System.assertEquals(
+      false,
+      permissionSets[0].objectPermissions[0].allowDelete
+    );
+    System.assertEquals(
+      true,
+      permissionSets[0].objectPermissions[0].viewAllRecords
+    );
+    System.assertEquals(
+      false,
+      permissionSets[0].objectPermissions[0].modifyAllRecords
+    );
   }
 
   @IsTest
@@ -321,6 +417,9 @@ private class SandboxMetadataBuilderTest {
       '"fieldPermissions":[' +
       '{"permissionSet":"Partner_Sync_Admin","field":"Customer_Name__c","readable":true,"editable":true},' +
       '{"permissionSet":"Partner_Sync_Admin","field":"Status__c","readable":true,"editable":false}' +
+      '],' +
+      '"objectPermissions":[' +
+      '{"permissionSet":"Partner_Sync_Admin","allowRead":true,"allowCreate":true,"allowEdit":true,"allowDelete":false,"viewAllRecords":true,"modifyAllRecords":false}' +
       ']' +
       '}]';
 
@@ -337,32 +436,61 @@ private class SandboxMetadataBuilderTest {
     );
     System.assertEquals(6, mockService.getTotalMetadataCount());
 
-    MetadataService.CustomObject createdObj = (MetadataService.CustomObject) mockService.getFirstMetadataFromBatch(
-      0
-    );
+    MetadataService.CustomObject createdObj = mockService.getCustomObject(0, 0);
     System.assertEquals('Deal_Registration__c', createdObj.fullName);
 
-    MetadataService.CustomField firstField = (MetadataService.CustomField) mockService.getFirstMetadataFromBatch(
-      1
-    );
+    MetadataService.CustomField firstField = mockService.getCustomField(1, 0);
     System.assertEquals(
       'Deal_Registration__c.Customer_Name__c',
       firstField.fullName
     );
 
-    MetadataService.ValidationRule firstRule = (MetadataService.ValidationRule) mockService.getFirstMetadataFromBatch(
-      2
+    MetadataService.ValidationRule firstRule = mockService.getValidationRule(
+      2,
+      0
     );
     System.assertEquals(
       'Deal_Registration__c.Require_Customer_Name_When_Submitted',
       firstRule.fullName
     );
 
-    MetadataService.PermissionSet firstPermissionSet = (MetadataService.PermissionSet) mockService.getFirstMetadataFromBatch(
-      3
+    MetadataService.PermissionSet firstPermissionSet = mockService.getPermissionSet(
+      3,
+      0
     );
     System.assertEquals('Partner_Sync_Admin', firstPermissionSet.fullName);
     System.assertEquals(2, firstPermissionSet.fieldPermissions.size());
+    System.assertEquals(1, firstPermissionSet.objectPermissions.size());
+    System.assertEquals(
+      'Deal_Registration__c',
+      firstPermissionSet.objectPermissions[0].object_x
+    );
+  }
+
+  @IsTest
+  static void createFromJsonCreatesStandardObjectFieldsWithoutCreatingObject() {
+    String jsonConfig =
+      '[{' +
+      '"apiName":"Lead",' +
+      '"label":"Lead",' +
+      '"pluralLabel":"Leads",' +
+      '"fields":[' +
+      '{"apiName":"Partner_Account__c","label":"Partner Account","type":"Lookup","referenceTo":"Account","relationshipName":"Partner_Distributed_Leads"}' +
+      ']' +
+      '}]';
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.createFromJson(jsonConfig, mockService);
+    Test.stopTest();
+
+    System.assertEquals(1, mockService.getBatchCount());
+    System.assertEquals(1, mockService.getTotalMetadataCount());
+    System.assertEquals(
+      'Lead.Partner_Account__c',
+      mockService.getCustomField(0, 0).fullName
+    );
   }
 
   @IsTest
@@ -402,6 +530,72 @@ private class SandboxMetadataBuilderTest {
     System.assertEquals(10, mockService.capturedBatches[0].size());
     System.assertEquals(1, mockService.capturedBatches[1].size());
     System.assertEquals(11, mockService.getTotalMetadataCount());
+  }
+
+  @IsTest
+  static void createFieldsCreatesFormulaFieldsAfterStandardFields() {
+    SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
+    SandboxMetadataBuilder.FieldDef formulaDef = fieldDef(
+      'Display_Status__c',
+      'Display Status',
+      'Formula'
+    );
+    formulaDef.formulaReturnType = 'Text';
+    formulaDef.formula = 'TEXT(Status__c)';
+
+    objDef.fields = new List<SandboxMetadataBuilder.FieldDef>{
+      formulaDef,
+      fieldDef('Status__c', 'Status', 'Text')
+    };
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.createFields(mockService, objDef);
+    Test.stopTest();
+
+    System.assertEquals(2, mockService.getBatchCount());
+
+    MetadataService.CustomField standardField = mockService.getCustomField(
+      0,
+      0
+    );
+    MetadataService.CustomField formulaField = mockService.getCustomField(1, 0);
+
+    System.assertEquals(
+      'Deal_Registration__c.Status__c',
+      standardField.fullName
+    );
+    System.assertEquals(
+      'Deal_Registration__c.Display_Status__c',
+      formulaField.fullName
+    );
+    System.assertEquals('TEXT(Status__c)', formulaField.formula);
+  }
+
+  @IsTest
+  static void mockMetadataServiceSupportsTargetedFailures() {
+    SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
+    objDef.fields = new List<SandboxMetadataBuilder.FieldDef>{
+      fieldDef('First_Field__c', 'First Field', 'Text'),
+      fieldDef('Second_Field__c', 'Second Field', 'Text')
+    };
+
+    MockMetadataService mockService = new MockMetadataService();
+    mockService.failingFullNames.add('Deal_Registration__c.Second_Field__c');
+
+    Test.startTest();
+    SandboxMetadataBuilder.createFields(mockService, objDef);
+    Test.stopTest();
+
+    System.assertEquals(1, mockService.getBatchCount());
+    System.assertEquals(1, mockService.capturedResults.size());
+    System.assertEquals(true, mockService.getSaveResult(0, 0).success);
+    System.assertEquals(false, mockService.getSaveResult(0, 1).success);
+    System.assertEquals(
+      'MOCK_METADATA_FAILURE',
+      mockService.getSaveResult(0, 1).errors[0].statusCode
+    );
   }
 
   @IsTest
@@ -450,6 +644,41 @@ private class SandboxMetadataBuilderTest {
   }
 
   @IsTest
+  static void throwsForFormulaWithoutFormula() {
+    SandboxMetadataBuilder.FieldDef def = fieldDef(
+      'Bad_Formula__c',
+      'Bad Formula',
+      'Formula'
+    );
+    def.formulaReturnType = 'Text';
+
+    try {
+      SandboxMetadataBuilder.buildField('Deal_Registration__c', def);
+      System.assert(false, 'Expected MetadataBuilderException.');
+    } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
+      System.assert(ex.getMessage().contains('requires formula'));
+    }
+  }
+
+  @IsTest
+  static void throwsForUnsupportedFormulaReturnType() {
+    SandboxMetadataBuilder.FieldDef def = fieldDef(
+      'Bad_Formula__c',
+      'Bad Formula',
+      'Formula'
+    );
+    def.formula = 'Name';
+    def.formulaReturnType = 'Picklist';
+
+    try {
+      SandboxMetadataBuilder.buildField('Deal_Registration__c', def);
+      System.assert(false, 'Expected MetadataBuilderException.');
+    } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
+      System.assert(ex.getMessage().contains('Unsupported formulaReturnType'));
+    }
+  }
+
+  @IsTest
   static void throwsForLookupWithoutReferenceTo() {
     SandboxMetadataBuilder.FieldDef def = fieldDef(
       'Partner_Account__c',
@@ -486,6 +715,21 @@ private class SandboxMetadataBuilderTest {
     SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
     objDef.fieldPermissions = new List<SandboxMetadataBuilder.FieldPermissionDef>{
       fieldPermissionDef(null, 'Customer_Name__c', true, true)
+    };
+
+    try {
+      SandboxMetadataBuilder.buildPermissionSets(objDef);
+      System.assert(false, 'Expected MetadataBuilderException.');
+    } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
+      System.assert(ex.getMessage().contains('permissionSet is required'));
+    }
+  }
+
+  @IsTest
+  static void throwsForObjectPermissionWithoutPermissionSet() {
+    SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
+    objDef.objectPermissions = new List<SandboxMetadataBuilder.ObjectPermissionDef>{
+      objectPermissionDef(null, null, true, true, true, false, false, false)
     };
 
     try {
@@ -537,6 +781,28 @@ private class SandboxMetadataBuilderTest {
     def.field = field;
     def.readable = readable;
     def.editable = editable;
+    return def;
+  }
+
+  private static SandboxMetadataBuilder.ObjectPermissionDef objectPermissionDef(
+    String permissionSet,
+    String objectApiName,
+    Boolean allowRead,
+    Boolean allowCreate,
+    Boolean allowEdit,
+    Boolean allowDelete,
+    Boolean viewAllRecords,
+    Boolean modifyAllRecords
+  ) {
+    SandboxMetadataBuilder.ObjectPermissionDef def = new SandboxMetadataBuilder.ObjectPermissionDef();
+    def.permissionSet = permissionSet;
+    def.objectApiName = objectApiName;
+    def.allowRead = allowRead;
+    def.allowCreate = allowCreate;
+    def.allowEdit = allowEdit;
+    def.allowDelete = allowDelete;
+    def.viewAllRecords = viewAllRecords;
+    def.modifyAllRecords = modifyAllRecords;
     return def;
   }
 }

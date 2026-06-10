@@ -306,5 +306,1329 @@
         "editable": true
       }
     ]
+  },
+  {
+    "apiName": "Partner_Record_Share__c",
+    "label": "Partner Record Share",
+    "pluralLabel": "Partner Record Shares",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Partner Record Share Number",
+    "displayFormat": "PRS-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Target_Record_Id__c",
+        "label": "Target Record Id",
+        "description": "Record being shared.",
+        "type": "Text",
+        "length": 18,
+        "required": true
+      },
+      {
+        "apiName": "Target_Object__c",
+        "label": "Target Object",
+        "description": "Object type.",
+        "type": "Picklist",
+        "required": true,
+        "values": [
+          "Deal Registration",
+          "MDF Request",
+          "Opportunity",
+          "AI Insight",
+          "Partner Performance Snapshot"
+        ]
+      },
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner receiving access.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Record_Shares",
+        "required": true
+      },
+      {
+        "apiName": "Access_Level__c",
+        "label": "Access Level",
+        "description": "Business access level.",
+        "type": "Picklist",
+        "required": true,
+        "values": ["Read", "Edit", "Review", "Approve"]
+      },
+      {
+        "apiName": "Share_Reason__c",
+        "label": "Share Reason",
+        "description": "Reason access was granted.",
+        "type": "Picklist",
+        "required": true,
+        "values": [
+          "Co-Sell",
+          "Distributor",
+          "Regional Manager",
+          "Escalation",
+          "Deal Conflict Review",
+          "MDF Review",
+          "Multi-Account Access"
+        ]
+      },
+      {
+        "apiName": "Expiry_Date__c",
+        "label": "Expiry Date",
+        "description": "Optional access expiry.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Whether share is active.",
+        "type": "Checkbox",
+        "required": true,
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Granted_By__c",
+        "label": "Granted By",
+        "description": "User who granted access.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Granted_Partner_Record_Shares"
+      },
+      {
+        "apiName": "Granted_On__c",
+        "label": "Granted On",
+        "description": "Date access was granted.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Revoked_On__c",
+        "label": "Revoked On",
+        "description": "Date access was revoked.",
+        "type": "DateTime"
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Target_Record_Id__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Target_Object__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Access_Level__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Share_Reason__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Expiry_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Active__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Granted_By__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Granted_On__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Revoked_On__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  },
+  {
+    "apiName": "Partner_Access_Group__c",
+    "label": "Partner Access Group",
+    "pluralLabel": "Partner Access Groups",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Partner Access Group Number",
+    "displayFormat": "PAG-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Access_Groups",
+        "required": true
+      },
+      {
+        "apiName": "Group_Id__c",
+        "label": "Group Id",
+        "description": "Salesforce Group Id.",
+        "type": "Text",
+        "length": 18,
+        "required": true
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Active mapping.",
+        "type": "Checkbox",
+        "required": true,
+        "defaultValue": "true"
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Group_Id__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Active__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  },
+  {
+    "apiName": "Usage_Metric__c",
+    "label": "Usage Metric",
+    "pluralLabel": "Usage Metrics",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Metric ID",
+    "displayFormat": "UM-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Metric_Type__c",
+        "label": "Metric Type",
+        "description": "Type of billable partner activity being tracked.",
+        "type": "Picklist",
+        "required": true,
+        "values": [
+          "AI Request",
+          "Deal Submitted",
+          "MDF Request",
+          "Lead Assigned",
+          "Content Download",
+          "Notification Sent"
+        ]
+      },
+      {
+        "apiName": "Metric_Date__c",
+        "label": "Metric Date",
+        "description": "Usage date for the billable activity.",
+        "type": "Date",
+        "required": true
+      },
+      {
+        "apiName": "Quantity__c",
+        "label": "Quantity",
+        "description": "Count of billable activity units recorded for this metric.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0,
+        "required": true
+      },
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account related to the billable activity.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Usage_Metrics",
+        "required": true
+      },
+      {
+        "apiName": "License_Tier__c",
+        "label": "License Tier",
+        "description": "Active license tier at the time the usage metric was recorded.",
+        "type": "Text",
+        "length": 255
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Metric_Type__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Metric_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Quantity__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "License_Tier__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  },
+  {
+    "apiName": "PartnerSync_License_Tier__mdt",
+    "label": "PartnerSync License Tier",
+    "pluralLabel": "PartnerSync License Tiers",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "License Tier Name",
+    "fields": [
+      {
+        "apiName": "Tier_Name__c",
+        "label": "Tier Name",
+        "description": "License tier name, such as Starter, Professional, or Enterprise.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Max_Partners__c",
+        "label": "Max Partners",
+        "description": "Maximum number of partners allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_Deals_Per_Month__c",
+        "label": "Max Deals Per Month",
+        "description": "Maximum number of deals allowed per month for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_AI_Requests__c",
+        "label": "Max AI Requests",
+        "description": "Maximum number of AI requests allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_MDF_Requests__c",
+        "label": "Max MDF Requests",
+        "description": "Maximum number of MDF requests allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Enable_AI__c",
+        "label": "Enable AI",
+        "description": "Indicates whether AI functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_MDF__c",
+        "label": "Enable MDF",
+        "description": "Indicates whether MDF functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_Analytics__c",
+        "label": "Enable Analytics",
+        "description": "Indicates whether analytics functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_Webhooks__c",
+        "label": "Enable Webhooks",
+        "description": "Indicates whether webhooks are available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the license tier configuration is enabled.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  },
+  {
+    "apiName": "Feature_Flag__mdt",
+    "label": "Feature Flag",
+    "pluralLabel": "Feature Flags",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Feature Flag Name",
+    "fields": [
+      {
+        "apiName": "Feature_Name__c",
+        "label": "Feature Name",
+        "description": "Name of the feature controlled by this flag.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Enabled__c",
+        "label": "Enabled",
+        "description": "Indicates whether the feature flag is enabled.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "License_Tier__c",
+        "label": "License Tier",
+        "description": "License tier associated with the feature flag.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Description__c",
+        "label": "Description",
+        "description": "Description of the feature flag and its intended behavior.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  },
+  {
+    "apiName": "Data_Retention_Policy__mdt",
+    "label": "Data Retention Policy",
+    "pluralLabel": "Data Retention Policies",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Data Retention Policy Name",
+    "fields": [
+      {
+        "apiName": "Object_API_Name__c",
+        "label": "Object API Name",
+        "description": "API name of the object governed by this retention policy.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Retention_Days__c",
+        "label": "Retention Days",
+        "description": "Number of days records should be retained.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Archive_Enabled__c",
+        "label": "Archive Enabled",
+        "description": "Indicates whether records should be archived before deletion.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the retention policy is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  },
+  {
+    "apiName": "Partner_Tier__mdt",
+    "label": "Partner Tier",
+    "pluralLabel": "Partner Tiers",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Tier Name",
+    "fields": [
+      {
+        "apiName": "Tier_Name__c",
+        "label": "Tier Name",
+        "description": "Partner tier name, such as Bronze, Silver, Gold, Platinum, or Elite.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Minimum_Score__c",
+        "label": "Minimum Score",
+        "description": "Minimum score required to qualify for the partner tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "MDF_Multiplier__c",
+        "label": "MDF Multiplier",
+        "description": "MDF multiplier applied for partners in this tier.",
+        "type": "Percent",
+        "precision": 5,
+        "scale": 2
+      },
+      {
+        "apiName": "Lead_Priority__c",
+        "label": "Lead Priority",
+        "description": "Lead assignment priority for partners in this tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Badge_Name__c",
+        "label": "Badge Name",
+        "description": "Badge name displayed for partners in this tier.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  },
+  {
+    "apiName": "Approval_Rule__mdt",
+    "label": "Approval Rule",
+    "pluralLabel": "Approval Rules",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Approval Rule Name",
+    "fields": [
+      {
+        "apiName": "Rule_Name__c",
+        "label": "Rule Name",
+        "description": "Business name of the approval rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Object_Name__c",
+        "label": "Object Name",
+        "description": "Object name that the approval rule applies to.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Minimum_Amount__c",
+        "label": "Minimum Amount",
+        "description": "Minimum amount required before this approval rule applies.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Approver_Role__c",
+        "label": "Approver Role",
+        "description": "Role responsible for approving records that match this rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the approval rule is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  },
+  {
+    "apiName": "Business_SLA_Config__mdt",
+    "label": "Business SLA Config",
+    "pluralLabel": "Business SLA Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Business SLA Config Name",
+    "fields": [
+      {
+        "apiName": "SLA_Name__c",
+        "label": "SLA Name",
+        "description": "Name of the service-level agreement configuration.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Business_Hours_Name__c",
+        "label": "Business Hours Name",
+        "description": "Business hours name used to calculate SLA timing.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the SLA configuration is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  },
+  {
+    "apiName": "Webhook_Endpoint__mdt",
+    "label": "Webhook Endpoint",
+    "pluralLabel": "Webhook Endpoints",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Webhook Endpoint Name",
+    "fields": [
+      {
+        "apiName": "Endpoint_Name__c",
+        "label": "Endpoint Name",
+        "description": "Business name of the webhook endpoint.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "URL__c",
+        "label": "URL",
+        "description": "Webhook endpoint URL.",
+        "type": "Url"
+      },
+      {
+        "apiName": "Secret_Key__c",
+        "label": "Secret Key",
+        "description": "Secret key used to sign webhook calls. This builder creates it as text; protected metadata behavior is not applied.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the webhook endpoint is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Events__c",
+        "label": "Events",
+        "description": "Comma-separated event names sent to this endpoint, such as Deal Approved or Lead Converted.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  },
+  {
+    "apiName": "AI_Usage_Limit__mdt",
+    "label": "AI Usage Limit",
+    "pluralLabel": "AI Usage Limits",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "AI Usage Limit Name",
+    "fields": [
+      {
+        "apiName": "License_Tier__c",
+        "label": "License Tier",
+        "description": "License tier governed by this AI usage limit.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Daily_Request_Limit__c",
+        "label": "Daily Request Limit",
+        "description": "Maximum number of AI requests allowed per day.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Monthly_Request_Limit__c",
+        "label": "Monthly Request Limit",
+        "description": "Maximum number of AI requests allowed per month.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      }
+    ]
+  },
+  {
+    "apiName": "Partner_Notification__c",
+    "label": "Partner Notification",
+    "pluralLabel": "Partner Notifications",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Partner Notification Number",
+    "displayFormat": "PN-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account associated with the notification.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Notifications"
+      },
+      {
+        "apiName": "Recipient_User__c",
+        "label": "Recipient User",
+        "description": "User who should receive or has received the notification.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Partner_Notifications"
+      },
+      {
+        "apiName": "Title__c",
+        "label": "Title",
+        "description": "Short title displayed for the notification.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Message__c",
+        "label": "Message",
+        "description": "Detailed notification message shown to the recipient.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Notification_Type__c",
+        "label": "Notification Type",
+        "description": "Business category for the notification.",
+        "type": "Picklist",
+        "values": ["Deal", "MDF", "Lead", "AI", "System", "Content"]
+      },
+      {
+        "apiName": "Is_Read__c",
+        "label": "Is Read",
+        "description": "Indicates whether the recipient has read the notification.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Related_Record_Id__c",
+        "label": "Related Record Id",
+        "description": "Salesforce record Id related to the notification.",
+        "type": "Text",
+        "length": 18
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Recipient_User__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Title__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Message__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Notification_Type__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Is_Read__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Related_Record_Id__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  },
+  {
+    "apiName": "AI_Insight__c",
+    "label": "AI Insight",
+    "pluralLabel": "AI Insights",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "AI Insight Number",
+    "displayFormat": "AI-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account associated with the AI insight.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "AI_Insights"
+      },
+      {
+        "apiName": "Feature_Name__c",
+        "label": "Feature Name",
+        "description": "Feature or product area that generated the AI insight.",
+        "type": "Picklist",
+        "values": [
+          "AI",
+          "MDF",
+          "Analytics",
+          "Notifications",
+          "Content Hub",
+          "Leaderboards",
+          "Webhooks",
+          "Agentforce"
+        ]
+      },
+      {
+        "apiName": "Provider__c",
+        "label": "Provider",
+        "description": "AI provider that generated the insight.",
+        "type": "Picklist",
+        "values": ["OpenAI", "Azure OpenAI", "Einstein", "Agentforce"]
+      },
+      {
+        "apiName": "Confidence__c",
+        "label": "Confidence",
+        "description": "Confidence score returned for the AI insight.",
+        "type": "Percent",
+        "precision": 5,
+        "scale": 2
+      },
+      {
+        "apiName": "Insight_Text__c",
+        "label": "Insight Text",
+        "description": "Generated AI insight text.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Recommendation__c",
+        "label": "Recommendation",
+        "description": "Recommended action generated from the AI insight.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Status__c",
+        "label": "Status",
+        "description": "Lifecycle status of the AI insight.",
+        "type": "Picklist",
+        "values": [
+          "Draft",
+          "Generated",
+          "Reviewed",
+          "Accepted",
+          "Dismissed",
+          "Archived"
+        ]
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Feature_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Provider__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Confidence__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Insight_Text__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Recommendation__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Status__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  },
+  {
+    "apiName": "Lead",
+    "label": "Lead",
+    "pluralLabel": "Leads",
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account assigned to work the distributed lead.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Distributed_Leads"
+      },
+      {
+        "apiName": "Assigned_Partner_User__c",
+        "label": "Assigned Partner User",
+        "description": "Partner user assigned to respond to the distributed lead.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Assigned_Distributed_Leads"
+      },
+      {
+        "apiName": "Lead_Distribution_Status__c",
+        "label": "Lead Distribution Status",
+        "description": "Current distribution status for the partner lead.",
+        "type": "Picklist",
+        "values": [
+          "Pending",
+          "Assigned",
+          "Accepted",
+          "Rejected",
+          "Reassigned",
+          "Converted"
+        ]
+      },
+      {
+        "apiName": "Lead_Distribution_Date__c",
+        "label": "Lead Distribution Date",
+        "description": "Date and time when the lead was distributed to the partner.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Lead_Channel_Source__c",
+        "label": "Lead Channel Source",
+        "description": "Channel source that generated the distributed lead.",
+        "type": "Picklist",
+        "values": ["Web", "Event", "Referral", "Campaign", "Partner", "Other"]
+      },
+      {
+        "apiName": "Partner_Response_Due__c",
+        "label": "Partner Response Due",
+        "description": "Date by which the partner should respond to the distributed lead.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Distribution_Rule_Key__c",
+        "label": "Distribution Rule Key",
+        "description": "Rule key used to determine lead distribution.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Partner_Accepted__c",
+        "label": "Partner Accepted",
+        "description": "Indicates whether the assigned partner accepted the lead.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      }
+    ]
+  },
+  {
+    "apiName": "Opportunity",
+    "label": "Opportunity",
+    "pluralLabel": "Opportunities",
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account associated with the opportunity.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Opportunities"
+      },
+      {
+        "apiName": "Deal_Registration__c",
+        "label": "Deal Registration",
+        "description": "Deal registration linked to the partner opportunity.",
+        "type": "Lookup",
+        "referenceTo": "Deal_Registration__c",
+        "relationshipName": "Opportunities"
+      },
+      {
+        "apiName": "Is_Channel_Opportunity__c",
+        "label": "Is Channel Opportunity",
+        "description": "Indicates whether the opportunity is part of the partner channel pipeline.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Partner_Contribution_Type__c",
+        "label": "Partner Contribution Type",
+        "description": "Type of contribution the partner made to the opportunity.",
+        "type": "Picklist",
+        "values": [
+          "Sourced",
+          "Influenced",
+          "Co-Sell",
+          "Fulfillment",
+          "Implementation",
+          "Referral"
+        ]
+      },
+      {
+        "apiName": "Deal_Protection_End_Date__c",
+        "label": "Deal Protection End Date",
+        "description": "Date when partner deal protection ends for the opportunity.",
+        "type": "Date"
+      }
+    ]
+  },
+  {
+    "apiName": "Partner_Application__c",
+    "label": "Partner Application",
+    "pluralLabel": "Partner Applications",
+    "sharingModel": "Private",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Application Name",
+    "fields": [
+      {
+        "apiName": "Application_Number__c",
+        "label": "Application Number",
+        "description": "Auto-generated application number for the partner onboarding request.",
+        "type": "AutoNumber",
+        "displayFormat": "PA-{000000}",
+        "startingNumber": 1
+      },
+      {
+        "apiName": "Company_Name__c",
+        "label": "Company Name",
+        "description": "Company name submitted on the partner application.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Business_Email__c",
+        "label": "Business Email",
+        "description": "Business email address for the partner application.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Phone__c",
+        "label": "Phone",
+        "description": "Phone number for the partner applicant.",
+        "type": "Phone"
+      },
+      {
+        "apiName": "Website__c",
+        "label": "Website",
+        "description": "Website for the prospective partner company.",
+        "type": "Url"
+      },
+      {
+        "apiName": "Country__c",
+        "label": "Country",
+        "description": "Country where the prospective partner is based.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Region__c",
+        "label": "Region",
+        "description": "Region where the prospective partner operates.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Requested_Tier__c",
+        "label": "Requested Tier",
+        "description": "Partner tier requested by the applicant.",
+        "type": "Picklist",
+        "values": ["Silver", "Gold", "Platinum", "Strategic"]
+      },
+      {
+        "apiName": "Partner_Type__c",
+        "label": "Partner Type",
+        "description": "Type of partner relationship requested by the applicant.",
+        "type": "Picklist",
+        "values": ["Distributor", "Reseller", "Agent", "Dealer", "Referral"]
+      },
+      {
+        "apiName": "Application_Status__c",
+        "label": "Application Status",
+        "description": "Current review status of the partner application.",
+        "type": "Picklist",
+        "values": ["Draft", "Submitted", "Under Review", "Approved", "Rejected"]
+      },
+      {
+        "apiName": "Submitted_By_Contact_Name__c",
+        "label": "Submitted By Contact Name",
+        "description": "Name of the person who submitted the partner application.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Submitted_By_Email__c",
+        "label": "Submitted By Email",
+        "description": "Email address of the person who submitted the partner application.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Assigned_Reviewer__c",
+        "label": "Assigned Reviewer",
+        "description": "Internal user assigned to review the partner application.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Reviewed_Partner_Applications"
+      },
+      {
+        "apiName": "Approval_Date__c",
+        "label": "Approval Date",
+        "description": "Date when the partner application was approved.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Approval_Notes__c",
+        "label": "Approval Notes",
+        "description": "Reviewer notes captured during application approval.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Source__c",
+        "label": "Source",
+        "description": "Source that generated the partner application.",
+        "type": "Picklist",
+        "values": [
+          "Website",
+          "Referral",
+          "Event",
+          "Campaign",
+          "Partner",
+          "Other"
+        ]
+      }
+    ]
+  },
+  {
+    "apiName": "Account",
+    "label": "Account",
+    "pluralLabel": "Accounts",
+    "fields": [
+      {
+        "apiName": "Partner_ID__c",
+        "label": "Partner ID",
+        "description": "External partner identifier for the partner company.",
+        "type": "Text",
+        "length": 255,
+        "externalId": true,
+        "unique": true
+      },
+      {
+        "apiName": "Partner_Status__c",
+        "label": "Partner Status",
+        "description": "Lifecycle status of the partner company.",
+        "type": "Picklist",
+        "values": [
+          "Prospect",
+          "Pending Approval",
+          "Active",
+          "Suspended",
+          "Inactive"
+        ]
+      },
+      {
+        "apiName": "Partner_Tier__c",
+        "label": "Partner Tier",
+        "description": "Program tier assigned to the partner company.",
+        "type": "Picklist",
+        "values": ["Silver", "Gold", "Platinum", "Strategic"]
+      },
+      {
+        "apiName": "Partner_Type__c",
+        "label": "Partner Type",
+        "description": "Type of partner company.",
+        "type": "Picklist",
+        "values": ["Distributor", "Reseller", "Agent", "Dealer", "Referral"]
+      },
+      {
+        "apiName": "Partner_Region__c",
+        "label": "Partner Region",
+        "description": "Region assigned to the partner company.",
+        "type": "Picklist",
+        "values": ["Americas", "EMEA", "APAC", "ANZ", "Japan", "Global"]
+      },
+      {
+        "apiName": "Partner_Capacity__c",
+        "label": "Partner Capacity",
+        "description": "Capacity score or count used to route partner work.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Onboarding_Status__c",
+        "label": "Onboarding Status",
+        "description": "Current onboarding status for the partner company.",
+        "type": "Picklist",
+        "values": [
+          "Not Started",
+          "In Progress",
+          "Approved",
+          "Rejected",
+          "Complete"
+        ]
+      },
+      {
+        "apiName": "Program_Start_Date__c",
+        "label": "Program Start Date",
+        "description": "Date when the partner program relationship starts.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Program_End_Date__c",
+        "label": "Program End Date",
+        "description": "Date when the partner program relationship ends.",
+        "type": "Date"
+      },
+      {
+        "apiName": "MDF_Annual_Budget__c",
+        "label": "MDF Annual Budget",
+        "description": "Annual MDF budget allocated to the partner company.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "MDF_Available_Budget__c",
+        "label": "MDF Available Budget",
+        "description": "Remaining MDF budget available to the partner company.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Assigned_Channel_Manager__c",
+        "label": "Assigned Channel Manager",
+        "description": "Internal channel manager assigned to the partner company.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Managed_Partner_Accounts"
+      },
+      {
+        "apiName": "Primary_Partner_Admin_Contact__c",
+        "label": "Primary Partner Admin Contact",
+        "description": "Primary partner administrator contact for the account.",
+        "type": "Lookup",
+        "referenceTo": "Contact",
+        "relationshipName": "Admin_For_Partner_Accounts"
+      },
+      {
+        "apiName": "Is_Partner__c",
+        "label": "Is Partner",
+        "description": "Indicates whether the account represents a partner company.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      }
+    ]
+  },
+  {
+    "apiName": "Contact",
+    "label": "Contact",
+    "pluralLabel": "Contacts",
+    "fields": [
+      {
+        "apiName": "Portal_Role__c",
+        "label": "Portal Role",
+        "description": "Portal role assigned to the partner contact.",
+        "type": "Picklist",
+        "values": [
+          "Partner Admin",
+          "Sales Rep",
+          "Marketing Rep",
+          "Finance",
+          "Executive",
+          "Read Only"
+        ]
+      },
+      {
+        "apiName": "Certification_Status__c",
+        "label": "Certification Status",
+        "description": "Certification status for the partner contact.",
+        "type": "Picklist",
+        "values": ["Not Certified", "Active", "Expired"]
+      },
+      {
+        "apiName": "Is_Partner_User__c",
+        "label": "Is Partner User",
+        "description": "Indicates whether the contact is associated with a partner user.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_Submit_Deals__c",
+        "label": "Can Submit Deals",
+        "description": "Indicates whether the partner contact can submit deal registrations.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_Submit_MDF__c",
+        "label": "Can Submit MDF",
+        "description": "Indicates whether the partner contact can submit MDF requests.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_View_Analytics__c",
+        "label": "Can View Analytics",
+        "description": "Indicates whether the partner contact can view partner analytics.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      }
+    ]
   }
 ]

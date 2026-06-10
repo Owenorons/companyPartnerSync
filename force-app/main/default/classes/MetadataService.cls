@@ -728,6 +728,7 @@ public class MetadataService {
     public MetadataService.FieldPermissions[] fieldPermissions;
     public Boolean hasActivationRequired;
     public String label;
+    public MetadataService.ObjectPermissions[] objectPermissions;
     private String[] description_type_info = new List<String>{
       'description',
       SOAP_M_URI,
@@ -760,6 +761,14 @@ public class MetadataService {
       '1',
       'false'
     };
+    private String[] objectPermissions_type_info = new List<String>{
+      'objectPermissions',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
     private String[] apex_schema_type_info = new List<String>{
       SOAP_M_URI,
       'true',
@@ -771,7 +780,88 @@ public class MetadataService {
       'description',
       'fieldPermissions',
       'hasActivationRequired',
-      'label'
+      'label',
+      'objectPermissions'
+    };
+  }
+
+  public class ObjectPermissions {
+    public Boolean allowCreate;
+    public Boolean allowDelete;
+    public Boolean allowEdit;
+    public Boolean allowRead;
+    public Boolean modifyAllRecords;
+    public String object_x;
+    public Boolean viewAllRecords;
+    private String[] allowCreate_type_info = new List<String>{
+      'allowCreate',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] allowDelete_type_info = new List<String>{
+      'allowDelete',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] allowEdit_type_info = new List<String>{
+      'allowEdit',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] allowRead_type_info = new List<String>{
+      'allowRead',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] modifyAllRecords_type_info = new List<String>{
+      'modifyAllRecords',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] object_x_type_info = new List<String>{
+      'object',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] viewAllRecords_type_info = new List<String>{
+      'viewAllRecords',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{
+      'allowCreate',
+      'allowDelete',
+      'allowEdit',
+      'allowRead',
+      'modifyAllRecords',
+      'object_x',
+      'viewAllRecords'
     };
   }
 
