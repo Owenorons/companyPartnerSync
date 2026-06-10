@@ -29,6 +29,9 @@ public with sharing class SandboxMetadataBuilder {
     public String pluralLabel;
     public String sharingModel;
     public Boolean skipObjectCreation;
+    public String defaultFieldPermissionSet;
+    public Boolean defaultFieldReadable;
+    public Boolean defaultFieldEditable;
 
     // Name field configuration. Supported values: Text, AutoNumber.
     public String nameFieldType;
@@ -150,7 +153,11 @@ public with sharing class SandboxMetadataBuilder {
 
     // Phase 4: create permission sets after fields exist.
     for (ObjectDef objDef : objectDefs) {
-      if (hasFieldPermissions(objDef) || hasObjectPermissions(objDef)) {
+      if (
+        hasDefaultFieldPermissions(objDef) ||
+        hasFieldPermissions(objDef) ||
+        hasObjectPermissions(objDef)
+      ) {
         createFieldPermissions(metadataService, objDef);
       }
     }
@@ -427,22 +434,36 @@ public with sharing class SandboxMetadataBuilder {
   ) {
     validateObjectDef(objDef);
 
-    Map<String, List<MetadataService.FieldPermissions>> fieldPermissionsBySet = new Map<String, List<MetadataService.FieldPermissions>>();
+    Map<String, Map<String, MetadataService.FieldPermissions>> fieldPermissionsBySet = new Map<String, Map<String, MetadataService.FieldPermissions>>();
     Map<String, List<MetadataService.ObjectPermissions>> objectPermissionsBySet = new Map<String, List<MetadataService.ObjectPermissions>>();
+
+    if (hasDefaultFieldPermissions(objDef)) {
+      for (FieldDef fieldDef : objDef.fields) {
+        MetadataService.FieldPermissions permission = buildDefaultFieldPermission(
+          objDef,
+          fieldDef
+        );
+        addFieldPermission(
+          fieldPermissionsBySet,
+          objDef.defaultFieldPermissionSet,
+          permission
+        );
+      }
+    }
 
     if (hasFieldPermissions(objDef)) {
       for (FieldPermissionDef permissionDef : objDef.fieldPermissions) {
         validateFieldPermissionDef(objDef.apiName, permissionDef);
 
-        if (!fieldPermissionsBySet.containsKey(permissionDef.permissionSet)) {
-          fieldPermissionsBySet.put(
-            permissionDef.permissionSet,
-            new List<MetadataService.FieldPermissions>()
-          );
-        }
-
-        fieldPermissionsBySet.get(permissionDef.permissionSet)
-          .add(buildFieldPermission(objDef.apiName, permissionDef));
+        MetadataService.FieldPermissions permission = buildFieldPermission(
+          objDef.apiName,
+          permissionDef
+        );
+        addFieldPermission(
+          fieldPermissionsBySet,
+          permissionDef.permissionSet,
+          permission
+        );
       }
     }
 
@@ -474,8 +495,9 @@ public with sharing class SandboxMetadataBuilder {
       permissionSet.label = permissionSetName.replace('_', ' ');
       if (fieldPermissionsBySet.containsKey(permissionSetName)) {
         permissionSet.fieldPermissions = fieldPermissionsBySet.get(
-          permissionSetName
-        );
+            permissionSetName
+          )
+          .values();
       }
       if (objectPermissionsBySet.containsKey(permissionSetName)) {
         permissionSet.objectPermissions = objectPermissionsBySet.get(
@@ -486,6 +508,41 @@ public with sharing class SandboxMetadataBuilder {
     }
 
     return permissionSets;
+  }
+
+  private static void addFieldPermission(
+    Map<String, Map<String, MetadataService.FieldPermissions>> fieldPermissionsBySet,
+    String permissionSetName,
+    MetadataService.FieldPermissions permission
+  ) {
+    if (!fieldPermissionsBySet.containsKey(permissionSetName)) {
+      fieldPermissionsBySet.put(
+        permissionSetName,
+        new Map<String, MetadataService.FieldPermissions>()
+      );
+    }
+
+    fieldPermissionsBySet.get(permissionSetName)
+      .put(permission.field, permission);
+  }
+
+  private static MetadataService.FieldPermissions buildDefaultFieldPermission(
+    ObjectDef objDef,
+    FieldDef fieldDef
+  ) {
+    MetadataService.FieldPermissions permission = new MetadataService.FieldPermissions();
+    permission.field = objDef.apiName + '.' + fieldDef.apiName;
+    permission.editable =
+      objDef.defaultFieldEditable == true && !isReadOnlyField(fieldDef);
+    permission.readable =
+      permission.editable || objDef.defaultFieldReadable != false;
+    return permission;
+  }
+
+  private static Boolean isReadOnlyField(FieldDef fieldDef) {
+    return fieldDef != null &&
+      (fieldDef.type == 'Formula' ||
+      fieldDef.type == 'AutoNumber');
   }
 
   private static MetadataService.FieldPermissions buildFieldPermission(
@@ -761,6 +818,13 @@ public with sharing class SandboxMetadataBuilder {
   private static Boolean hasFieldPermissions(ObjectDef objDef) {
     return objDef.fieldPermissions != null &&
       !objDef.fieldPermissions.isEmpty();
+  }
+
+  private static Boolean hasDefaultFieldPermissions(ObjectDef objDef) {
+    return objDef != null &&
+      !String.isBlank(objDef.defaultFieldPermissionSet) &&
+      objDef.fields != null &&
+      !objDef.fields.isEmpty();
   }
 
   private static Boolean hasObjectPermissions(ObjectDef objDef) {

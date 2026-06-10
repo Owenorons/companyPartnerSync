@@ -393,6 +393,61 @@ private class SandboxMetadataBuilderTest {
   }
 
   @IsTest
+  static void buildsDefaultFieldPermissionsForObjectFields() {
+    SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
+    objDef.defaultFieldPermissionSet = 'Partner_Sync_Admin';
+    objDef.defaultFieldReadable = true;
+    objDef.defaultFieldEditable = true;
+
+    SandboxMetadataBuilder.FieldDef formulaDef = fieldDef(
+      'Display_Status__c',
+      'Display Status',
+      'Formula'
+    );
+    formulaDef.formulaReturnType = 'Text';
+    formulaDef.formula = 'TEXT(Status__c)';
+
+    objDef.fields = new List<SandboxMetadataBuilder.FieldDef>{
+      fieldDef('Customer_Name__c', 'Customer Name', 'Text'),
+      fieldDef('Application_Number__c', 'Application Number', 'AutoNumber'),
+      formulaDef
+    };
+
+    List<MetadataService.PermissionSet> permissionSets = SandboxMetadataBuilder.buildPermissionSets(
+      objDef
+    );
+
+    System.assertEquals(1, permissionSets.size());
+    System.assertEquals(3, permissionSets[0].fieldPermissions.size());
+
+    Map<String, MetadataService.FieldPermissions> permissionsByField = new Map<String, MetadataService.FieldPermissions>();
+    for (
+      MetadataService.FieldPermissions permission : permissionSets[0]
+        .fieldPermissions
+    ) {
+      permissionsByField.put(permission.field, permission);
+    }
+
+    System.assertEquals(
+      true,
+      permissionsByField.get('Deal_Registration__c.Customer_Name__c').editable
+    );
+    System.assertEquals(
+      false,
+      permissionsByField.get('Deal_Registration__c.Application_Number__c')
+        .editable
+    );
+    System.assertEquals(
+      false,
+      permissionsByField.get('Deal_Registration__c.Display_Status__c').editable
+    );
+    System.assertEquals(
+      true,
+      permissionsByField.get('Deal_Registration__c.Display_Status__c').readable
+    );
+  }
+
+  @IsTest
   static void createFromJsonCreatesObjectsFieldsValidationRulesThenFieldPermissions() {
     String jsonConfig =
       '[{' +

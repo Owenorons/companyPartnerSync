@@ -1211,6 +1211,9 @@
     "label": "Lead",
     "pluralLabel": "Leads",
     "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
     "fields": [
       {
         "apiName": "Partner_Account__c",
@@ -1282,6 +1285,9 @@
     "label": "Opportunity",
     "pluralLabel": "Opportunities",
     "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
     "fields": [
       {
         "apiName": "Partner_Account__c",
@@ -1333,6 +1339,9 @@
     "label": "Partner Application",
     "pluralLabel": "Partner Applications",
     "sharingModel": "Private",
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
     "nameFieldType": "Text",
     "nameFieldLabel": "Partner Application Name",
     "fields": [
@@ -1460,6 +1469,9 @@
     "label": "Account",
     "pluralLabel": "Accounts",
     "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
     "fields": [
       {
         "apiName": "Partner_ID__c",
@@ -1583,6 +1595,9 @@
     "label": "Contact",
     "pluralLabel": "Contacts",
     "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
     "fields": [
       {
         "apiName": "Portal_Role__c",
