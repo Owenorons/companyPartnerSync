@@ -1,0 +1,72 @@
+[
+  {
+    "apiName": "Deal_Registration__c",
+    "label": "Deal Registration",
+    "pluralLabel": "Deal Registrations",
+    "skipObjectCreation": true,
+    "fields": [
+      {
+        "apiName": "Customer_Name__c",
+        "label": "Customer Name",
+        "description": "Name of the customer or prospect for the registered deal.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Customer_Email__c",
+        "label": "Customer Email",
+        "description": "Primary customer email address for the registered deal.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Deal_Value__c",
+        "label": "Deal Value",
+        "description": "Estimated monetary value of the registered deal.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Estimated_Amount__c",
+        "label": "Estimated Amount",
+        "description": "Estimated amount expected for the registered deal.",
+        "type": "Currency",
+        "precision": 16,
+        "scale": 2
+      },
+      {
+        "apiName": "Estimated_Close_Date__c",
+        "label": "Estimated Close Date",
+        "description": "Estimated date when the registered deal is expected to close.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Deal_Type__c",
+        "label": "Deal Type",
+        "description": "Type of registered deal.",
+        "type": "Picklist",
+        "values": [
+          "New Business",
+          "Expansion",
+          "Renewal",
+          "Co-Sell",
+          "Referral"
+        ]
+      },
+      {
+        "apiName": "Territory__c",
+        "label": "Territory",
+        "description": "Sales territory associated with the registered deal.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Product_Family__c",
+        "label": "Product Family",
+        "description": "Product family associated with the registered deal.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  }
+]

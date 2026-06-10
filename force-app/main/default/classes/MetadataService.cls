@@ -53,6 +53,35 @@ public class MetadataService {
       response_x = response_map_x.get('response_x');
       return response_x == null ? null : response_x.result;
     }
+
+    public MetadataService.UpsertResult[] upsertMetadata(
+      MetadataService.Metadata[] metadata
+    ) {
+      MetadataService.upsertMetadata_element request_x = new MetadataService.upsertMetadata_element();
+      request_x.metadata = metadata;
+
+      MetadataService.upsertMetadataResponse_element response_x;
+      Map<String, MetadataService.upsertMetadataResponse_element> response_map_x = new Map<String, MetadataService.upsertMetadataResponse_element>();
+      response_map_x.put('response_x', response_x);
+
+      WebServiceCallout.invoke(
+        this,
+        request_x,
+        response_map_x,
+        new List<String>{
+          endpoint_x,
+          '',
+          SOAP_M_URI,
+          'upsertMetadata',
+          SOAP_M_URI,
+          'upsertMetadataResponse',
+          'MetadataService.upsertMetadataResponse_element'
+        }
+      );
+
+      response_x = response_map_x.get('response_x');
+      return response_x == null ? null : response_x.result;
+    }
   }
 
   public class SessionHeader_element {
@@ -155,6 +184,92 @@ public class MetadataService {
       'false'
     };
     private String[] field_order_type_info = new List<String>{ 'result' };
+  }
+
+  public class upsertMetadata_element {
+    public MetadataService.Metadata[] metadata;
+    private String[] metadata_type_info = new List<String>{
+      'metadata',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{ 'metadata' };
+  }
+
+  public class upsertMetadataResponse_element {
+    public MetadataService.UpsertResult[] result;
+    private String[] result_type_info = new List<String>{
+      'result',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{ 'result' };
+  }
+
+  public class UpsertResult {
+    public Boolean created;
+    public MetadataService.Error[] errors;
+    public String fullName;
+    public Boolean success;
+    private String[] created_type_info = new List<String>{
+      'created',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] errors_type_info = new List<String>{
+      'errors',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] fullName_type_info = new List<String>{
+      'fullName',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] success_type_info = new List<String>{
+      'success',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{
+      'created',
+      'errors',
+      'fullName',
+      'success'
+    };
   }
 
   public class SaveResult {
@@ -262,6 +377,7 @@ public class MetadataService {
     public MetadataService.CustomField nameField;
     public String pluralLabel;
     public String sharingModel;
+    public String visibility;
     private String[] deploymentStatus_type_info = new List<String>{
       'deploymentStatus',
       SOAP_M_URI,
@@ -374,6 +490,14 @@ public class MetadataService {
       '1',
       'false'
     };
+    private String[] visibility_type_info = new List<String>{
+      'visibility',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
     private String[] apex_schema_type_info = new List<String>{
       SOAP_M_URI,
       'true',
@@ -395,7 +519,250 @@ public class MetadataService {
       'label',
       'nameField',
       'pluralLabel',
-      'sharingModel'
+      'sharingModel',
+      'visibility'
+    };
+
+    public void useCustomMetadataTypeFieldOrder() {
+      field_order_type_info = new List<String>{
+        'fullName',
+        'description',
+        'label',
+        'pluralLabel',
+        'visibility'
+      };
+    }
+  }
+
+  public class Layout extends Metadata {
+    public String type = 'Layout';
+    public String fullName;
+    public MetadataService.LayoutSection[] layoutSections;
+    private String[] fullName_type_info = new List<String>{
+      'fullName',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
+    private String[] layoutSections_type_info = new List<String>{
+      'layoutSections',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] type_att_info = new List<String>{ 'xsi:type' };
+    private String[] field_order_type_info = new List<String>{
+      'fullName',
+      'layoutSections'
+    };
+  }
+
+  public class LayoutSection {
+    public Boolean customLabel;
+    public Boolean detailHeading;
+    public Boolean editHeading;
+    public String label;
+    public MetadataService.LayoutColumn[] layoutColumns;
+    public String style;
+    private String[] customLabel_type_info = new List<String>{
+      'customLabel',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] detailHeading_type_info = new List<String>{
+      'detailHeading',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] editHeading_type_info = new List<String>{
+      'editHeading',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] label_type_info = new List<String>{
+      'label',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
+    private String[] layoutColumns_type_info = new List<String>{
+      'layoutColumns',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] style_type_info = new List<String>{
+      'style',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{
+      'customLabel',
+      'detailHeading',
+      'editHeading',
+      'label',
+      'layoutColumns',
+      'style'
+    };
+  }
+
+  public class LayoutColumn {
+    public MetadataService.LayoutItem[] layoutItems;
+    private String[] layoutItems_type_info = new List<String>{
+      'layoutItems',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{ 'layoutItems' };
+  }
+
+  public class LayoutItem {
+    public String behavior;
+    public String field;
+    private String[] behavior_type_info = new List<String>{
+      'behavior',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] field_type_info = new List<String>{
+      'field',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{
+      'behavior',
+      'field'
+    };
+  }
+
+  public class CustomMetadata extends Metadata {
+    public String type = 'CustomMetadata';
+    public String fullName;
+    public String label;
+    public Boolean protected_x;
+    public MetadataService.CustomMetadataValue[] values;
+    private String[] fullName_type_info = new List<String>{
+      'fullName',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
+    private String[] label_type_info = new List<String>{
+      'label',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] protected_x_type_info = new List<String>{
+      'protected',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] values_type_info = new List<String>{
+      'values',
+      SOAP_M_URI,
+      null,
+      '0',
+      '-1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] type_att_info = new List<String>{ 'xsi:type' };
+    private String[] field_order_type_info = new List<String>{
+      'fullName',
+      'label',
+      'protected',
+      'values'
+    };
+  }
+
+  public class CustomMetadataValue {
+    public String field;
+    public String value;
+    private String[] field_type_info = new List<String>{
+      'field',
+      SOAP_M_URI,
+      null,
+      '1',
+      '1',
+      'false'
+    };
+    private String[] value_type_info = new List<String>{
+      'value',
+      SOAP_M_URI,
+      null,
+      '0',
+      '1',
+      'false'
+    };
+    private String[] apex_schema_type_info = new List<String>{
+      SOAP_M_URI,
+      'true',
+      'false'
+    };
+    private String[] field_order_type_info = new List<String>{
+      'field',
+      'value'
     };
   }
 

@@ -1,0 +1,59 @@
+[
+  {
+    "apiName": "Partner_Access_Group__c",
+    "label": "Partner Access Group",
+    "pluralLabel": "Partner Access Groups",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Partner Access Group Number",
+    "displayFormat": "PAG-{000000}",
+    "startingNumber": 1,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Access_Groups",
+        "required": true
+      },
+      {
+        "apiName": "Group_Id__c",
+        "label": "Group Id",
+        "description": "Salesforce Group Id.",
+        "type": "Text",
+        "length": 18,
+        "required": true
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Active mapping.",
+        "type": "Checkbox",
+        "required": true,
+        "defaultValue": "true"
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Group_Id__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Active__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]

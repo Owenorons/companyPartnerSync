@@ -1,0 +1,54 @@
+[
+  {
+    "apiName": "Content_Category_Config__mdt",
+    "label": "Content Category Config",
+    "pluralLabel": "Content Category Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Content Category Config Name",
+    "fields": [
+      {
+        "apiName": "Category_Code__c",
+        "label": "Category Code",
+        "description": "Code identifying the content category.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Category_Label__c",
+        "label": "Category Label",
+        "description": "Display label for the content category.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Allowed_Tiers__c",
+        "label": "Allowed Tiers",
+        "description": "Comma-separated partner tiers allowed to access the category.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Allowed_Regions__c",
+        "label": "Allowed Regions",
+        "description": "Comma-separated regions allowed to access the category.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Sort_Order__c",
+        "label": "Sort Order",
+        "description": "Sort order for displaying the content category.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the content category is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  }
+]

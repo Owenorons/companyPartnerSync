@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Can_Submit_Deals__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description
+  >Indicates whether the partner contact can submit deal registrations.</description>
+    <label>Can Submit Deals</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

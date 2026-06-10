@@ -1,0 +1,45 @@
+[
+  {
+    "apiName": "Webhook_Endpoint__mdt",
+    "label": "Webhook Endpoint",
+    "pluralLabel": "Webhook Endpoints",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Webhook Endpoint Name",
+    "fields": [
+      {
+        "apiName": "Endpoint_Name__c",
+        "label": "Endpoint Name",
+        "description": "Business name of the webhook endpoint.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "URL__c",
+        "label": "URL",
+        "description": "Webhook endpoint URL.",
+        "type": "Url"
+      },
+      {
+        "apiName": "Secret_Key__c",
+        "label": "Secret Key",
+        "description": "Secret key used to sign webhook calls. This builder creates it as text; protected metadata behavior is not applied.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the webhook endpoint is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Events__c",
+        "label": "Events",
+        "description": "Comma-separated event names sent to this endpoint, such as Deal Approved or Lead Converted.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  }
+]

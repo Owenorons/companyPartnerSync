@@ -1,0 +1,131 @@
+[
+  {
+    "apiName": "Partner_Performance__c",
+    "label": "Partner Performance",
+    "pluralLabel": "Partner Performance Snapshots",
+    "sharingModel": "Private",
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Performance Name",
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account represented by the performance snapshot.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Performance_Snapshots"
+      },
+      {
+        "apiName": "Reporting_Period_Start__c",
+        "label": "Reporting Period Start",
+        "description": "Start date for the reporting period.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Reporting_Period_End__c",
+        "label": "Reporting Period End",
+        "description": "End date for the reporting period.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Leads_Assigned__c",
+        "label": "Leads Assigned",
+        "description": "Number of leads assigned to the partner during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Leads_Accepted__c",
+        "label": "Leads Accepted",
+        "description": "Number of assigned leads accepted by the partner during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Leads_Converted__c",
+        "label": "Leads Converted",
+        "description": "Number of partner leads converted during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Opportunities_Created__c",
+        "label": "Opportunities Created",
+        "description": "Number of opportunities created from partner activity during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Opportunities_Won__c",
+        "label": "Opportunities Won",
+        "description": "Number of partner opportunities won during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Pipeline_Value__c",
+        "label": "Pipeline Value",
+        "description": "Pipeline value attributed to the partner during the period.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Won_Value__c",
+        "label": "Won Value",
+        "description": "Closed-won value attributed to the partner during the period.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "MDF_Approved__c",
+        "label": "MDF Approved",
+        "description": "MDF amount approved for the partner during the period.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "MDF_Claimed__c",
+        "label": "MDF Claimed",
+        "description": "MDF amount claimed by the partner during the period.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Content_Downloads__c",
+        "label": "Content Downloads",
+        "description": "Number of content downloads attributed to the partner during the period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Partner_Score__c",
+        "label": "Partner Score",
+        "description": "Calculated partner score for the reporting period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Leaderboard_Rank__c",
+        "label": "Leaderboard Rank",
+        "description": "Leaderboard rank for the partner during the reporting period.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      }
+    ]
+  }
+]

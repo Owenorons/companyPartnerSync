@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Primary_Partner_Admin_Contact__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >Primary partner administrator contact for the account.</description>
+    <label>Primary Partner Admin Contact</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipName>Admin_For_Partner_Accounts</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Lookup</type>
+</CustomField>

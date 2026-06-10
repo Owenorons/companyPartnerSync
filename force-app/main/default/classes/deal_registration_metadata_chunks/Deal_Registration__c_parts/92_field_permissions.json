@@ -1,0 +1,70 @@
+[
+  {
+    "apiName": "Deal_Registration__c",
+    "label": "Deal Registration",
+    "pluralLabel": "Deal Registrations",
+    "skipObjectCreation": true,
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Deal_Value__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Estimated_Amount__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Estimated_Close_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Deal_Type__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Territory__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Product_Family__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Stage__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Conflict_Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Submitted_Date__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,85 @@
+[
+  {
+    "apiName": "PartnerSync_License_Tier__mdt",
+    "label": "PartnerSync License Tier",
+    "pluralLabel": "PartnerSync License Tiers",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "License Tier Name",
+    "fields": [
+      {
+        "apiName": "Tier_Name__c",
+        "label": "Tier Name",
+        "description": "License tier name, such as Starter, Professional, or Enterprise.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Max_Partners__c",
+        "label": "Max Partners",
+        "description": "Maximum number of partners allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_Deals_Per_Month__c",
+        "label": "Max Deals Per Month",
+        "description": "Maximum number of deals allowed per month for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_AI_Requests__c",
+        "label": "Max AI Requests",
+        "description": "Maximum number of AI requests allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Max_MDF_Requests__c",
+        "label": "Max MDF Requests",
+        "description": "Maximum number of MDF requests allowed for the license tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Enable_AI__c",
+        "label": "Enable AI",
+        "description": "Indicates whether AI functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_MDF__c",
+        "label": "Enable MDF",
+        "description": "Indicates whether MDF functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_Analytics__c",
+        "label": "Enable Analytics",
+        "description": "Indicates whether analytics functionality is available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Enable_Webhooks__c",
+        "label": "Enable Webhooks",
+        "description": "Indicates whether webhooks are available for the license tier.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the license tier configuration is enabled.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  }
+]

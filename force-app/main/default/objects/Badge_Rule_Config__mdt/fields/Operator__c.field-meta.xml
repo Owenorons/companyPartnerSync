@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Operator__c</fullName>
+    <description>Comparison operator used by the badge rule.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Operator</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Equals</fullName>
+                <default>false</default>
+                <label>Equals</label>
+            </value>
+            <value>
+                <fullName>Greater Than</fullName>
+                <default>false</default>
+                <label>Greater Than</label>
+            </value>
+            <value>
+                <fullName>Greater Or Equal</fullName>
+                <default>false</default>
+                <label>Greater Or Equal</label>
+            </value>
+            <value>
+                <fullName>Less Than</fullName>
+                <default>false</default>
+                <label>Less Than</label>
+            </value>
+            <value>
+                <fullName>Less Or Equal</fullName>
+                <default>false</default>
+                <label>Less Or Equal</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

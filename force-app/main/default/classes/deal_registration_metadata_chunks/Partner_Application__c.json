@@ -1,0 +1,132 @@
+[
+  {
+    "apiName": "Partner_Application__c",
+    "label": "Partner Application",
+    "pluralLabel": "Partner Applications",
+    "sharingModel": "Private",
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Application Name",
+    "fields": [
+      {
+        "apiName": "Application_Number__c",
+        "label": "Application Number",
+        "description": "Auto-generated application number for the partner onboarding request.",
+        "type": "AutoNumber",
+        "displayFormat": "PA-{000000}",
+        "startingNumber": 1
+      },
+      {
+        "apiName": "Company_Name__c",
+        "label": "Company Name",
+        "description": "Company name submitted on the partner application.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Business_Email__c",
+        "label": "Business Email",
+        "description": "Business email address for the partner application.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Phone__c",
+        "label": "Phone",
+        "description": "Phone number for the partner applicant.",
+        "type": "Phone"
+      },
+      {
+        "apiName": "Website__c",
+        "label": "Website",
+        "description": "Website for the prospective partner company.",
+        "type": "Url"
+      },
+      {
+        "apiName": "Country__c",
+        "label": "Country",
+        "description": "Country where the prospective partner is based.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Region__c",
+        "label": "Region",
+        "description": "Region where the prospective partner operates.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Requested_Tier__c",
+        "label": "Requested Tier",
+        "description": "Partner tier requested by the applicant.",
+        "type": "Picklist",
+        "values": ["Silver", "Gold", "Platinum", "Strategic"]
+      },
+      {
+        "apiName": "Partner_Type__c",
+        "label": "Partner Type",
+        "description": "Type of partner relationship requested by the applicant.",
+        "type": "Picklist",
+        "values": ["Distributor", "Reseller", "Agent", "Dealer", "Referral"]
+      },
+      {
+        "apiName": "Application_Status__c",
+        "label": "Application Status",
+        "description": "Current review status of the partner application.",
+        "type": "Picklist",
+        "values": ["Draft", "Submitted", "Under Review", "Approved", "Rejected"]
+      },
+      {
+        "apiName": "Submitted_By_Contact_Name__c",
+        "label": "Submitted By Contact Name",
+        "description": "Name of the person who submitted the partner application.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Submitted_By_Email__c",
+        "label": "Submitted By Email",
+        "description": "Email address of the person who submitted the partner application.",
+        "type": "Email"
+      },
+      {
+        "apiName": "Assigned_Reviewer__c",
+        "label": "Assigned Reviewer",
+        "description": "Internal user assigned to review the partner application.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Reviewed_Partner_Applications"
+      },
+      {
+        "apiName": "Approval_Date__c",
+        "label": "Approval Date",
+        "description": "Date when the partner application was approved.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Approval_Notes__c",
+        "label": "Approval Notes",
+        "description": "Reviewer notes captured during application approval.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Source__c",
+        "label": "Source",
+        "description": "Source that generated the partner application.",
+        "type": "Picklist",
+        "values": [
+          "Website",
+          "Referral",
+          "Event",
+          "Campaign",
+          "Partner",
+          "Other"
+        ]
+      }
+    ]
+  }
+]

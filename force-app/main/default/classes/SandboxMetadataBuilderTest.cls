@@ -36,6 +36,50 @@ private class SandboxMetadataBuilderTest {
   }
 
   @IsTest
+  static void buildsCustomMetadataTypeWithoutCustomObjectOnlyProperties() {
+    SandboxMetadataBuilder.ObjectDef objDef = new SandboxMetadataBuilder.ObjectDef();
+    objDef.apiName = 'AI_Usage_Limit__mdt';
+    objDef.label = 'AI Usage Limit';
+    objDef.pluralLabel = 'AI Usage Limits';
+    objDef.description = 'AI usage limits by license tier.';
+    objDef.nameFieldType = 'Text';
+    objDef.nameFieldLabel = 'AI Usage Limit Name';
+
+    MetadataService.CustomObject obj = SandboxMetadataBuilder.buildObject(
+      objDef
+    );
+
+    System.assertEquals('AI_Usage_Limit__mdt', obj.fullName);
+    System.assertEquals('AI Usage Limit', obj.label);
+    System.assertEquals('AI Usage Limits', obj.pluralLabel);
+    System.assertEquals('AI usage limits by license tier.', obj.description);
+    System.assertEquals('Public', obj.visibility);
+    System.assertEquals(null, obj.deploymentStatus);
+    System.assertEquals(null, obj.sharingModel);
+    System.assertEquals(null, obj.nameField);
+  }
+
+  @IsTest
+  static void buildsCustomMetadataCurrencyAsNumberField() {
+    SandboxMetadataBuilder.FieldDef def = fieldDef(
+      'Minimum_Amount__c',
+      'Minimum Amount',
+      'Currency'
+    );
+    def.precision = 18;
+    def.scale = 2;
+
+    MetadataService.CustomField field = SandboxMetadataBuilder.buildField(
+      'Approval_Rule__mdt',
+      def
+    );
+
+    System.assertEquals('Number', field.type_x);
+    System.assertEquals(18, field.precision);
+    System.assertEquals(2, field.scale);
+  }
+
+  @IsTest
   static void buildsTextField() {
     SandboxMetadataBuilder.FieldDef def = fieldDef(
       'Customer_Name__c',
@@ -231,6 +275,7 @@ private class SandboxMetadataBuilderTest {
     );
     System.assertEquals('Checkbox', checkboxField.type_x);
     System.assertEquals('true', checkboxField.defaultValue);
+    System.assertEquals(null, checkboxField.required);
   }
 
   @IsTest
@@ -280,7 +325,7 @@ private class SandboxMetadataBuilderTest {
     System.assertEquals('Lookup', field.type_x);
     System.assertEquals('Account', field.referenceTo);
     System.assertEquals('Deal_Registrations', field.relationshipName);
-    System.assertEquals('SetNull', field.deleteConstraint);
+    System.assertEquals('Restrict', field.deleteConstraint);
     System.assertEquals(true, field.required);
   }
 
@@ -550,6 +595,214 @@ private class SandboxMetadataBuilderTest {
   }
 
   @IsTest
+  static void upsertFromJsonUpsertsObjectsFieldsValidationRulesAndPermissions() {
+    String jsonConfig =
+      '[{' +
+      '"apiName":"Deal_Registration__c",' +
+      '"label":"Deal Registration",' +
+      '"pluralLabel":"Deal Registrations",' +
+      '"fields":[' +
+      '{"apiName":"Customer_Name__c","label":"Customer Name","type":"Text","length":255}' +
+      '],' +
+      '"validationRules":[' +
+      '{"apiName":"Require_Customer_Name_When_Submitted","active":true,' +
+      '"errorConditionFormula":"ISBLANK(Customer_Name__c)",' +
+      '"errorMessage":"Customer Name is required."}' +
+      '],' +
+      '"fieldPermissions":[' +
+      '{"permissionSet":"Partner_Sync_Admin","field":"Customer_Name__c","readable":true,"editable":true}' +
+      ']' +
+      '}]';
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.upsertFromJson(jsonConfig, mockService);
+    Test.stopTest();
+
+    System.assertEquals(4, mockService.getBatchCount());
+    System.assertEquals(4, mockService.capturedOperations.size());
+
+    for (String operation : mockService.capturedOperations) {
+      System.assertEquals('upsert', operation);
+    }
+
+    System.assertEquals(
+      'Deal_Registration__c',
+      mockService.getCustomObject(0, 0).fullName
+    );
+    System.assertEquals(
+      'Deal_Registration__c.Customer_Name__c',
+      mockService.getCustomField(1, 0).fullName
+    );
+    System.assertEquals(
+      'Deal_Registration__c.Require_Customer_Name_When_Submitted',
+      mockService.getValidationRule(2, 0).fullName
+    );
+    System.assertEquals(
+      'Partner_Sync_Admin',
+      mockService.getPermissionSet(3, 0).fullName
+    );
+  }
+
+  @IsTest
+  static void upsertFromJsonCreatesCustomMetadataTypeBeforeUpsertingFields() {
+    String jsonConfig =
+      '[{' +
+      '"apiName":"AI_Usage_Limit__mdt",' +
+      '"label":"AI Usage Limit",' +
+      '"pluralLabel":"AI Usage Limits",' +
+      '"fields":[' +
+      '{"apiName":"License_Tier__c","label":"License Tier","type":"Text","length":255}' +
+      ']' +
+      '}]';
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.upsertFromJson(jsonConfig, mockService);
+    Test.stopTest();
+
+    System.assertEquals(3, mockService.getBatchCount());
+    System.assertEquals('create', mockService.capturedOperations[0]);
+    System.assertEquals('upsert', mockService.capturedOperations[1]);
+    System.assertEquals('upsert', mockService.capturedOperations[2]);
+
+    MetadataService.CustomObject metadataType = mockService.getCustomObject(
+      0,
+      0
+    );
+    System.assertEquals('AI_Usage_Limit__mdt', metadataType.fullName);
+    System.assertEquals('Public', metadataType.visibility);
+
+    System.assertEquals(
+      'AI_Usage_Limit__mdt.License_Tier__c',
+      mockService.getCustomField(1, 0).fullName
+    );
+
+    MetadataService.Layout layout = mockService.getLayout(2, 0);
+    System.assertEquals(
+      'AI_Usage_Limit__mdt-AI Usage Limit Layout',
+      layout.fullName
+    );
+    System.assertEquals(1, layout.layoutSections.size());
+    System.assertEquals(2, layout.layoutSections[0].layoutColumns.size());
+    System.assertEquals(
+      'DeveloperName',
+      layout.layoutSections[0].layoutColumns[0].layoutItems[0].field
+    );
+    System.assertEquals(
+      'Required',
+      layout.layoutSections[0].layoutColumns[0].layoutItems[0].behavior
+    );
+    System.assertEquals(
+      'MasterLabel',
+      layout.layoutSections[0].layoutColumns[1].layoutItems[0].field
+    );
+    System.assertEquals(
+      'Required',
+      layout.layoutSections[0].layoutColumns[1].layoutItems[0].behavior
+    );
+    System.assertEquals(
+      'IsProtected',
+      layout.layoutSections[0].layoutColumns[0].layoutItems[1].field
+    );
+    System.assertEquals(
+      'Edit',
+      layout.layoutSections[0].layoutColumns[0].layoutItems[1].behavior
+    );
+    System.assertEquals(
+      'NamespacePrefix',
+      layout.layoutSections[0].layoutColumns[1].layoutItems[1].field
+    );
+    System.assertEquals(
+      'Edit',
+      layout.layoutSections[0].layoutColumns[1].layoutItems[1].behavior
+    );
+    System.assertEquals(
+      'License_Tier__c',
+      layout.layoutSections[0].layoutColumns[0].layoutItems[2].field
+    );
+  }
+
+  @IsTest
+  static void upsertFromJsonCreatesCustomMetadataRecordsLast() {
+    String jsonConfig =
+      '[{' +
+      '"apiName":"Approval_Routing_Config__mdt",' +
+      '"label":"Approval Routing Config",' +
+      '"pluralLabel":"Approval Routing Configs",' +
+      '"fields":[' +
+      '{"apiName":"Module__c","label":"Module","type":"Text","length":255},' +
+      '{"apiName":"Active__c","label":"Active","type":"Checkbox","defaultValue":"true"}' +
+      '],' +
+      '"records":[' +
+      '{"developerName":"Default","label":"Default","values":{"Module__c":"Deals","Active__c":"true"}}' +
+      ']' +
+      '}]';
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.upsertFromJson(jsonConfig, mockService);
+    Test.stopTest();
+
+    System.assertEquals(4, mockService.getBatchCount());
+    System.assertEquals('create', mockService.capturedOperations[0]);
+    System.assertEquals('upsert', mockService.capturedOperations[1]);
+    System.assertEquals('upsert', mockService.capturedOperations[2]);
+    System.assertEquals('upsert', mockService.capturedOperations[3]);
+
+    MetadataService.CustomMetadata record = mockService.getCustomMetadata(3, 0);
+    System.assertEquals(
+      'Approval_Routing_Config__mdt.Default',
+      record.fullName
+    );
+    System.assertEquals('Default', record.label);
+    System.assertEquals(false, record.protected_x);
+    System.assertEquals(2, record.values.size());
+  }
+
+  @IsTest
+  static void upsertObjectFromStaticResourceFiltersObject() {
+    String jsonConfig =
+      '[{' +
+      '"apiName":"First_Object__c",' +
+      '"label":"First Object",' +
+      '"fields":[{"apiName":"First_Field__c","label":"First Field","type":"Text"}]' +
+      '},{' +
+      '"apiName":"Second_Object__c",' +
+      '"label":"Second Object",' +
+      '"fields":[{"apiName":"Second_Field__c","label":"Second Field","type":"Text"}]' +
+      '}]';
+    SandboxMetadataBuilder.staticResourceBodiesByName.put(
+      'PartnerSync_Metadata_Test',
+      jsonConfig
+    );
+
+    MockMetadataService mockService = new MockMetadataService();
+
+    Test.startTest();
+    SandboxMetadataBuilder.upsertFromJson(
+      SandboxMetadataBuilder.filterObjectJson(jsonConfig, 'Second_Object__c'),
+      mockService
+    );
+    Test.stopTest();
+
+    System.assertEquals(2, mockService.getBatchCount());
+    System.assertEquals(
+      'Second_Object__c',
+      mockService.getCustomObject(0, 0).fullName
+    );
+    System.assertEquals(
+      'Second_Object__c.Second_Field__c',
+      mockService.getCustomField(1, 0).fullName
+    );
+
+    SandboxMetadataBuilder.staticResourceBodiesByName.clear();
+  }
+
+  @IsTest
   static void createObjectHandlesMockErrorsWithoutException() {
     MockMetadataService mockService = new MockMetadataService();
     mockService.returnErrors = true;
@@ -681,6 +934,30 @@ private class SandboxMetadataBuilderTest {
     } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
       System.assert(ex.getMessage().contains('Unsupported field type'));
     }
+  }
+
+  @IsTest
+  static void throwsForDuplicateFieldApiNamesBeforeMetadataCall() {
+    SandboxMetadataBuilder.ObjectDef objDef = baseObjectDef();
+    objDef.fields = new List<SandboxMetadataBuilder.FieldDef>{
+      fieldDef('Customer_Name__c', 'Customer Name', 'Text'),
+      fieldDef('customer_name__c', 'Customer Name Duplicate', 'Text')
+    };
+    MockMetadataService mockService = new MockMetadataService();
+
+    try {
+      SandboxMetadataBuilder.createFields(mockService, objDef);
+      System.assert(false, 'Expected MetadataBuilderException.');
+    } catch (SandboxMetadataBuilder.MetadataBuilderException ex) {
+      System.assert(ex.getMessage().contains('Duplicate field apiName'));
+      System.assert(ex.getMessage().contains('Customer_Name__c'));
+    }
+
+    System.assertEquals(
+      0,
+      mockService.getBatchCount(),
+      'Duplicate fields should be rejected before any Metadata API call.'
+    );
   }
 
   @IsTest

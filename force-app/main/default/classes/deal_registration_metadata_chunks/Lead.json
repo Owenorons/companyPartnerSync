@@ -1,0 +1,147 @@
+[
+  {
+    "apiName": "Lead",
+    "label": "Lead",
+    "pluralLabel": "Leads",
+    "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Assigned partner.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Distributed_Leads"
+      },
+      {
+        "apiName": "Partner_Contact__c",
+        "label": "Partner Contact",
+        "description": "Primary partner contact.",
+        "type": "Lookup",
+        "referenceTo": "Contact",
+        "relationshipName": "Partner_Distributed_Leads"
+      },
+      {
+        "apiName": "Assigned_Partner_User__c",
+        "label": "Assigned Partner User",
+        "description": "Partner user assigned to respond to the distributed lead.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Assigned_Distributed_Leads"
+      },
+      {
+        "apiName": "Lead_Distribution_Status__c",
+        "label": "Lead Distribution Status",
+        "description": "Partner lifecycle. Partner account assigned to work the distributed lead.",
+        "type": "Picklist",
+        "required": true,
+        "values": [
+          "New",
+          "Assigned",
+          "Accepted",
+          "Rejected",
+          "Converted",
+          "Expired"
+        ]
+      },
+      {
+        "apiName": "Assigned_Date__c",
+        "label": "Assigned Date",
+        "description": "Assignment timestamp.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Accepted_Date__c",
+        "label": "Accepted Date",
+        "description": "Acceptance timestamp.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Rejected_Date__c",
+        "label": "Rejected Date",
+        "description": "Rejection timestamp.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "SLA_Deadline__c",
+        "label": "SLA Deadline",
+        "description": "Response due date.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Response_Minutes__c",
+        "label": "Response Minutes",
+        "description": "Actual response time.",
+        "type": "Number",
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "apiName": "Converted_Deal__c",
+        "label": "Converted Deal Registration",
+        "description": "Resulting deal.",
+        "type": "Lookup",
+        "referenceTo": "Deal_Registration__c",
+        "relationshipName": "Converted_Leads"
+      },
+      {
+        "apiName": "Distribution_Reason__c",
+        "label": "Distribution Reason",
+        "description": "Routing reason.",
+        "type": "Picklist",
+        "values": [
+          "Territory Match",
+          "Product Match",
+          "Round Robin",
+          "Channel Manager Override",
+          "AI Recommendation",
+          "Manual Assignment"
+        ]
+      },
+      {
+        "apiName": "Routing_Score__c",
+        "label": "Routing Score",
+        "description": "AI/manual routing score.",
+        "type": "Number",
+        "precision": 5,
+        "scale": 2
+      },
+      {
+        "apiName": "Lead_Distribution_Date__c",
+        "label": "Lead Distribution Date",
+        "description": "Date and time when the lead was distributed to the partner.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Lead_Channel_Source__c",
+        "label": "Lead Channel Source",
+        "description": "Channel source that generated the distributed lead.",
+        "type": "Picklist",
+        "values": ["Web", "Event", "Referral", "Campaign", "Partner", "Other"]
+      },
+      {
+        "apiName": "Partner_Response_Due__c",
+        "label": "Partner Response Due",
+        "description": "Date by which the partner should respond to the distributed lead.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Distribution_Rule_Key__c",
+        "label": "Distribution Rule Key",
+        "description": "Rule key used to determine lead distribution.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Partner_Accepted__c",
+        "label": "Partner Accepted",
+        "description": "Indicates whether the assigned partner accepted the lead.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      }
+    ]
+  }
+]

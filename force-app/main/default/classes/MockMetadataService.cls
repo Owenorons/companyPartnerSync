@@ -2,12 +2,27 @@
 public class MockMetadataService implements SandboxMetadataBuilder.IMetadataService {
   public List<List<MetadataService.Metadata>> capturedBatches = new List<List<MetadataService.Metadata>>();
   public List<List<MetadataService.SaveResult>> capturedResults = new List<List<MetadataService.SaveResult>>();
+  public List<String> capturedOperations = new List<String>();
   public Set<String> failingFullNames = new Set<String>();
   public Boolean returnErrors = false;
 
   public MetadataService.SaveResult[] createMetadata(
     MetadataService.Metadata[] metadataItems
   ) {
+    return processMetadata('create', metadataItems);
+  }
+
+  public MetadataService.SaveResult[] upsertMetadata(
+    MetadataService.Metadata[] metadataItems
+  ) {
+    return processMetadata('upsert', metadataItems);
+  }
+
+  private MetadataService.SaveResult[] processMetadata(
+    String operation,
+    MetadataService.Metadata[] metadataItems
+  ) {
+    capturedOperations.add(operation);
     capturedBatches.add(new List<MetadataService.Metadata>(metadataItems));
 
     List<MetadataService.SaveResult> results = new List<MetadataService.SaveResult>();
@@ -45,6 +60,12 @@ public class MockMetadataService implements SandboxMetadataBuilder.IMetadataServ
     }
     if (metadataItem instanceof MetadataService.PermissionSet) {
       return ((MetadataService.PermissionSet) metadataItem).fullName;
+    }
+    if (metadataItem instanceof MetadataService.Layout) {
+      return ((MetadataService.Layout) metadataItem).fullName;
+    }
+    if (metadataItem instanceof MetadataService.CustomMetadata) {
+      return ((MetadataService.CustomMetadata) metadataItem).fullName;
     }
     return metadataItem.fullName;
   }
@@ -100,6 +121,20 @@ public class MockMetadataService implements SandboxMetadataBuilder.IMetadataServ
     Integer itemIndex
   ) {
     return (MetadataService.PermissionSet) getMetadata(batchIndex, itemIndex);
+  }
+
+  public MetadataService.Layout getLayout(
+    Integer batchIndex,
+    Integer itemIndex
+  ) {
+    return (MetadataService.Layout) getMetadata(batchIndex, itemIndex);
+  }
+
+  public MetadataService.CustomMetadata getCustomMetadata(
+    Integer batchIndex,
+    Integer itemIndex
+  ) {
+    return (MetadataService.CustomMetadata) getMetadata(batchIndex, itemIndex);
   }
 
   public MetadataService.SaveResult getSaveResult(

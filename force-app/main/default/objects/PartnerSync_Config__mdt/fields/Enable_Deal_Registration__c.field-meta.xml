@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enable_Deal_Registration__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description
+  >Indicates whether deal registration functionality is enabled.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Enable Deal Registration</label>
+    <type>Checkbox</type>
+</CustomField>

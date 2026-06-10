@@ -5,6 +5,9 @@ public with sharing class SandboxMetadataBuilder {
     MetadataService.SaveResult[] createMetadata(
       MetadataService.Metadata[] metadataItems
     );
+    MetadataService.SaveResult[] upsertMetadata(
+      MetadataService.Metadata[] metadataItems
+    );
   }
 
   public class MetadataServiceImpl implements IMetadataService {
@@ -21,12 +24,45 @@ public with sharing class SandboxMetadataBuilder {
     ) {
       return service.createMetadata(metadataItems);
     }
+
+    public MetadataService.SaveResult[] upsertMetadata(
+      MetadataService.Metadata[] metadataItems
+    ) {
+      return toSaveResults(service.upsertMetadata(metadataItems));
+    }
+
+    private MetadataService.SaveResult[] toSaveResults(
+      MetadataService.UpsertResult[] upsertResults
+    ) {
+      if (upsertResults == null) {
+        return null;
+      }
+
+      List<MetadataService.SaveResult> saveResults = new List<MetadataService.SaveResult>();
+      for (MetadataService.UpsertResult upsertResult : upsertResults) {
+        MetadataService.SaveResult saveResult = new MetadataService.SaveResult();
+        saveResult.errors = upsertResult.errors;
+        saveResult.fullName = upsertResult.fullName;
+        saveResult.success = upsertResult.success;
+        saveResults.add(saveResult);
+      }
+      return saveResults;
+    }
   }
+
+  private enum MetadataOperation {
+    CREATE,
+    UPSERT_METADATA
+  }
+
+  @TestVisible
+  private static Map<String, String> staticResourceBodiesByName = new Map<String, String>();
 
   public class ObjectDef {
     public String apiName;
     public String label;
     public String pluralLabel;
+    public String description;
     public String sharingModel;
     public Boolean skipObjectCreation;
     public String defaultFieldPermissionSet;
@@ -43,6 +79,7 @@ public with sharing class SandboxMetadataBuilder {
     public List<ValidationRuleDef> validationRules;
     public List<FieldPermissionDef> fieldPermissions;
     public List<ObjectPermissionDef> objectPermissions;
+    public List<CustomMetadataRecordDef> records;
   }
 
   public class FieldDef {
@@ -103,14 +140,65 @@ public with sharing class SandboxMetadataBuilder {
     public Boolean modifyAllRecords;
   }
 
+  public class CustomMetadataRecordDef {
+    public String developerName;
+    public String label;
+    public Boolean protected_x;
+    public Map<String, String> values;
+  }
+
   public static void createFromJson(String jsonConfig) {
     createFromJson(jsonConfig, new MetadataServiceImpl());
+  }
+
+  public static void upsertFromJson(String jsonConfig) {
+    upsertFromJson(jsonConfig, new MetadataServiceImpl());
+  }
+
+  public static void createFromStaticResource(String staticResourceName) {
+    createFromJson(loadStaticResourceText(staticResourceName));
+  }
+
+  public static void upsertFromStaticResource(String staticResourceName) {
+    upsertFromJson(loadStaticResourceText(staticResourceName));
+  }
+
+  public static void upsertObjectFromStaticResource(
+    String staticResourceName,
+    String objectApiName
+  ) {
+    upsertFromJson(
+      filterObjectJson(
+        loadStaticResourceText(staticResourceName),
+        objectApiName
+      )
+    );
   }
 
   @TestVisible
   static void createFromJson(
     String jsonConfig,
     IMetadataService metadataService
+  ) {
+    processFromJson(jsonConfig, metadataService, MetadataOperation.CREATE);
+  }
+
+  @TestVisible
+  static void upsertFromJson(
+    String jsonConfig,
+    IMetadataService metadataService
+  ) {
+    processFromJson(
+      jsonConfig,
+      metadataService,
+      MetadataOperation.UPSERT_METADATA
+    );
+  }
+
+  private static void processFromJson(
+    String jsonConfig,
+    IMetadataService metadataService,
+    MetadataOperation operation
   ) {
     if (String.isBlank(jsonConfig)) {
       throw new MetadataBuilderException('JSON configuration is required.');
@@ -133,54 +221,159 @@ public with sharing class SandboxMetadataBuilder {
     // Phase 1: create objects first.
     for (ObjectDef objDef : objectDefs) {
       if (!shouldSkipObjectCreation(objDef)) {
-        createObject(metadataService, objDef);
+        processObject(metadataService, objDef, operation);
       }
     }
 
     // Phase 2: create fields after objects exist.
     for (ObjectDef objDef : objectDefs) {
       if (objDef.fields != null && !objDef.fields.isEmpty()) {
-        createFields(metadataService, objDef);
+        processFields(metadataService, objDef, operation);
       }
     }
 
     // Phase 3: create validation rules after fields exist.
     for (ObjectDef objDef : objectDefs) {
       if (objDef.validationRules != null && !objDef.validationRules.isEmpty()) {
-        createValidationRules(metadataService, objDef);
+        processValidationRules(metadataService, objDef, operation);
       }
     }
 
-    // Phase 4: create permission sets after fields exist.
+    // Phase 4: create custom metadata layouts after fields exist.
+    for (ObjectDef objDef : objectDefs) {
+      if (
+        isCustomMetadataTypeDef(objDef) &&
+        objDef.fields != null &&
+        !objDef.fields.isEmpty()
+      ) {
+        processCustomMetadataLayout(metadataService, objDef, operation);
+      }
+    }
+
+    // Phase 5: create permission sets after fields exist.
     for (ObjectDef objDef : objectDefs) {
       if (
         hasDefaultFieldPermissions(objDef) ||
         hasFieldPermissions(objDef) ||
         hasObjectPermissions(objDef)
       ) {
-        createFieldPermissions(metadataService, objDef);
+        processFieldPermissions(metadataService, objDef, operation);
+      }
+    }
+
+    // Phase 6: create custom metadata records last.
+    for (ObjectDef objDef : objectDefs) {
+      if (
+        isCustomMetadataTypeDef(objDef) &&
+        objDef.records != null &&
+        !objDef.records.isEmpty()
+      ) {
+        processCustomMetadataRecords(metadataService, objDef, operation);
       }
     }
   }
 
+  private static String loadStaticResourceText(String staticResourceName) {
+    if (String.isBlank(staticResourceName)) {
+      throw new MetadataBuilderException('Static resource name is required.');
+    }
+
+    if (staticResourceBodiesByName.containsKey(staticResourceName)) {
+      return staticResourceBodiesByName.get(staticResourceName);
+    }
+
+    List<StaticResource> resources = [
+      SELECT Body
+      FROM StaticResource
+      WHERE Name = :staticResourceName
+      LIMIT 1
+    ];
+
+    if (resources.isEmpty()) {
+      throw new MetadataBuilderException(
+        'Static resource not found: ' + staticResourceName
+      );
+    }
+
+    return resources[0].Body.toString();
+  }
+
+  @TestVisible
+  private static String filterObjectJson(
+    String jsonConfig,
+    String objectApiName
+  ) {
+    if (String.isBlank(objectApiName)) {
+      throw new MetadataBuilderException('Object API name is required.');
+    }
+
+    List<ObjectDef> objectDefs = (List<ObjectDef>) JSON.deserialize(
+      jsonConfig,
+      List<ObjectDef>.class
+    );
+
+    for (ObjectDef objDef : objectDefs) {
+      if (objDef.apiName == objectApiName) {
+        return JSON.serialize(new List<ObjectDef>{ objDef });
+      }
+    }
+
+    throw new MetadataBuilderException(
+      'Object not found in JSON configuration: ' + objectApiName
+    );
+  }
+
   @TestVisible
   static void createObject(IMetadataService metadataService, ObjectDef objDef) {
+    processObject(metadataService, objDef, MetadataOperation.CREATE);
+  }
+
+  @TestVisible
+  static void upsertObject(IMetadataService metadataService, ObjectDef objDef) {
+    processObject(metadataService, objDef, MetadataOperation.UPSERT_METADATA);
+  }
+
+  private static void processObject(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
+  ) {
     if (shouldSkipObjectCreation(objDef)) {
       return;
     }
 
     MetadataService.CustomObject obj = buildObject(objDef);
+    MetadataOperation actualOperation = objectOperation(objDef, operation);
 
-    MetadataService.SaveResult[] results = metadataService.createMetadata(
-      new List<MetadataService.Metadata>{ obj }
+    MetadataService.SaveResult[] results = callMetadataService(
+      metadataService,
+      new List<MetadataService.Metadata>{ obj },
+      actualOperation
     );
 
-    handleResults(results, 'Object: ' + objDef.apiName);
+    handleResults(
+      results,
+      operationLabel(actualOperation) + ' object: ' + objDef.apiName
+    );
   }
 
   @TestVisible
   static void createFields(IMetadataService metadataService, ObjectDef objDef) {
+    processFields(metadataService, objDef, MetadataOperation.CREATE);
+  }
+
+  @TestVisible
+  static void upsertFields(IMetadataService metadataService, ObjectDef objDef) {
+    processFields(metadataService, objDef, MetadataOperation.UPSERT_METADATA);
+  }
+
+  private static void processFields(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
+  ) {
     validateObjectDef(objDef);
+    validateNoDuplicateFields(objDef);
 
     List<MetadataService.Metadata> standardFields = new List<MetadataService.Metadata>();
     List<MetadataService.Metadata> formulaFields = new List<MetadataService.Metadata>();
@@ -194,15 +387,17 @@ public with sharing class SandboxMetadataBuilder {
       }
     }
 
-    createMetadataInBatches(
+    processMetadataInBatches(
       metadataService,
       standardFields,
-      'Fields for: ' + objDef.apiName
+      operation,
+      operationLabel(operation) + ' fields for: ' + objDef.apiName
     );
-    createMetadataInBatches(
+    processMetadataInBatches(
       metadataService,
       formulaFields,
-      'Formula fields for: ' + objDef.apiName
+      operation,
+      operationLabel(operation) + ' formula fields for: ' + objDef.apiName
     );
   }
 
@@ -210,6 +405,26 @@ public with sharing class SandboxMetadataBuilder {
   static void createValidationRules(
     IMetadataService metadataService,
     ObjectDef objDef
+  ) {
+    processValidationRules(metadataService, objDef, MetadataOperation.CREATE);
+  }
+
+  @TestVisible
+  static void upsertValidationRules(
+    IMetadataService metadataService,
+    ObjectDef objDef
+  ) {
+    processValidationRules(
+      metadataService,
+      objDef,
+      MetadataOperation.UPSERT_METADATA
+    );
+  }
+
+  private static void processValidationRules(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
   ) {
     validateObjectDef(objDef);
 
@@ -219,10 +434,11 @@ public with sharing class SandboxMetadataBuilder {
       metadataItems.add(buildValidationRule(objDef.apiName, ruleDef));
     }
 
-    createMetadataInBatches(
+    processMetadataInBatches(
       metadataService,
       metadataItems,
-      'Validation rules for: ' + objDef.apiName
+      operation,
+      operationLabel(operation) + ' validation rules for: ' + objDef.apiName
     );
   }
 
@@ -230,6 +446,26 @@ public with sharing class SandboxMetadataBuilder {
   static void createFieldPermissions(
     IMetadataService metadataService,
     ObjectDef objDef
+  ) {
+    processFieldPermissions(metadataService, objDef, MetadataOperation.CREATE);
+  }
+
+  @TestVisible
+  static void upsertFieldPermissions(
+    IMetadataService metadataService,
+    ObjectDef objDef
+  ) {
+    processFieldPermissions(
+      metadataService,
+      objDef,
+      MetadataOperation.UPSERT_METADATA
+    );
+  }
+
+  private static void processFieldPermissions(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
   ) {
     validateObjectDef(objDef);
 
@@ -241,10 +477,43 @@ public with sharing class SandboxMetadataBuilder {
       metadataItems.add(permissionSet);
     }
 
-    createMetadataInBatches(
+    processMetadataInBatches(
       metadataService,
       metadataItems,
-      'Field permissions for: ' + objDef.apiName
+      operation,
+      operationLabel(operation) + ' field permissions for: ' + objDef.apiName
+    );
+  }
+
+  private static void processCustomMetadataLayout(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
+  ) {
+    MetadataService.Layout layout = buildCustomMetadataLayout(objDef);
+    processMetadataInBatches(
+      metadataService,
+      new List<MetadataService.Metadata>{ layout },
+      operation,
+      operationLabel(operation) + ' layout for: ' + objDef.apiName
+    );
+  }
+
+  private static void processCustomMetadataRecords(
+    IMetadataService metadataService,
+    ObjectDef objDef,
+    MetadataOperation operation
+  ) {
+    List<MetadataService.Metadata> metadataItems = new List<MetadataService.Metadata>();
+    for (CustomMetadataRecordDef recordDef : objDef.records) {
+      metadataItems.add(buildCustomMetadataRecord(objDef.apiName, recordDef));
+    }
+
+    processMetadataInBatches(
+      metadataService,
+      metadataItems,
+      operation,
+      operationLabel(operation) + ' records for: ' + objDef.apiName
     );
   }
 
@@ -256,9 +525,17 @@ public with sharing class SandboxMetadataBuilder {
 
     obj.fullName = objDef.apiName;
     obj.label = objDef.label;
+    obj.description = objDef.description;
     obj.pluralLabel = String.isBlank(objDef.pluralLabel)
       ? objDef.label + 's'
       : objDef.pluralLabel;
+
+    if (isCustomMetadataTypeDef(objDef)) {
+      obj.visibility = 'Public';
+      obj.useCustomMetadataTypeFieldOrder();
+      return obj;
+    }
+
     obj.deploymentStatus = 'Deployed';
     obj.sharingModel = String.isBlank(objDef.sharingModel)
       ? 'ReadWrite'
@@ -307,7 +584,7 @@ public with sharing class SandboxMetadataBuilder {
     field.description = fieldDef.description;
     field.inlineHelpText = fieldDef.inlineHelpText;
 
-    String fieldType = fieldDef.type;
+    String fieldType = effectiveFieldType(objectApiName, fieldDef);
 
     if (fieldType == 'Text') {
       field.type_x = 'Text';
@@ -364,7 +641,9 @@ public with sharing class SandboxMetadataBuilder {
       field.type_x = 'Lookup';
       field.referenceTo = fieldDef.referenceTo;
       field.relationshipName = fieldDef.relationshipName;
-      field.deleteConstraint = 'SetNull';
+      field.deleteConstraint = fieldDef.required == true
+        ? 'Restrict'
+        : 'SetNull';
     } else if (fieldType == 'MasterDetail') {
       field.type_x = 'MasterDetail';
       field.referenceTo = fieldDef.referenceTo;
@@ -379,11 +658,101 @@ public with sharing class SandboxMetadataBuilder {
       );
     }
 
-    field.required = fieldDef.required == true;
+    if (fieldType != 'Checkbox') {
+      field.required = fieldDef.required == true;
+    }
     field.unique = fieldDef.unique == true;
     field.externalId = fieldDef.externalId == true;
 
     return field;
+  }
+
+  @TestVisible
+  static MetadataService.Layout buildCustomMetadataLayout(ObjectDef objDef) {
+    validateObjectDef(objDef);
+
+    MetadataService.Layout layout = new MetadataService.Layout();
+    layout.fullName = objDef.apiName + '-' + objDef.label + ' Layout';
+
+    MetadataService.LayoutSection section = new MetadataService.LayoutSection();
+    section.customLabel = true;
+    section.detailHeading = true;
+    section.editHeading = true;
+    section.label = 'Information';
+    section.style = 'TwoColumnsTopToBottom';
+
+    MetadataService.LayoutColumn leftColumn = new MetadataService.LayoutColumn();
+    MetadataService.LayoutColumn rightColumn = new MetadataService.LayoutColumn();
+    leftColumn.layoutItems = new List<MetadataService.LayoutItem>();
+    rightColumn.layoutItems = new List<MetadataService.LayoutItem>();
+    leftColumn.layoutItems.add(buildRequiredLayoutItem('DeveloperName'));
+    rightColumn.layoutItems.add(buildRequiredLayoutItem('MasterLabel'));
+    leftColumn.layoutItems.add(buildLayoutItem('IsProtected'));
+    rightColumn.layoutItems.add(buildLayoutItem('NamespacePrefix'));
+
+    for (Integer index = 0; index < objDef.fields.size(); index++) {
+      FieldDef fieldDef = objDef.fields[index];
+      MetadataService.LayoutItem item = buildLayoutItem(fieldDef.apiName);
+
+      if (Math.mod(index, 2) == 0) {
+        leftColumn.layoutItems.add(item);
+      } else {
+        rightColumn.layoutItems.add(item);
+      }
+    }
+
+    section.layoutColumns = new List<MetadataService.LayoutColumn>{
+      leftColumn,
+      rightColumn
+    };
+    layout.layoutSections = new List<MetadataService.LayoutSection>{ section };
+
+    return layout;
+  }
+
+  private static MetadataService.LayoutItem buildLayoutItem(
+    String fieldApiName
+  ) {
+    MetadataService.LayoutItem item = new MetadataService.LayoutItem();
+    item.behavior = 'Edit';
+    item.field = fieldApiName;
+    return item;
+  }
+
+  private static MetadataService.LayoutItem buildRequiredLayoutItem(
+    String fieldApiName
+  ) {
+    MetadataService.LayoutItem item = new MetadataService.LayoutItem();
+    item.behavior = 'Required';
+    item.field = fieldApiName;
+    return item;
+  }
+
+  @TestVisible
+  static MetadataService.CustomMetadata buildCustomMetadataRecord(
+    String objectApiName,
+    CustomMetadataRecordDef recordDef
+  ) {
+    validateCustomMetadataRecordDef(objectApiName, recordDef);
+
+    MetadataService.CustomMetadata record = new MetadataService.CustomMetadata();
+    record.fullName = objectApiName + '.' + recordDef.developerName;
+    record.label = String.isBlank(recordDef.label)
+      ? recordDef.developerName
+      : recordDef.label;
+    record.protected_x = recordDef.protected_x == null
+      ? false
+      : recordDef.protected_x;
+    record.values = new List<MetadataService.CustomMetadataValue>();
+
+    for (String fieldApiName : recordDef.values.keySet()) {
+      MetadataService.CustomMetadataValue value = new MetadataService.CustomMetadataValue();
+      value.field = fieldApiName;
+      value.value = recordDef.values.get(fieldApiName);
+      record.values.add(value);
+    }
+
+    return record;
   }
 
   private static void applyFormulaReturnTypeSettings(
@@ -642,6 +1011,31 @@ public with sharing class SandboxMetadataBuilder {
       );
     }
   }
+  private static void validateNoDuplicateFields(ObjectDef objDef) {
+    if (objDef == null || objDef.fields == null || objDef.fields.isEmpty()) {
+      return;
+    }
+
+    Map<String, String> fieldApiNamesByNormalizedName = new Map<String, String>();
+    for (FieldDef fieldDef : objDef.fields) {
+      if (fieldDef == null || String.isBlank(fieldDef.apiName)) {
+        continue;
+      }
+
+      String normalizedApiName = fieldDef.apiName.trim().toLowerCase();
+      if (fieldApiNamesByNormalizedName.containsKey(normalizedApiName)) {
+        throw new MetadataBuilderException(
+          'Duplicate field apiName on ' +
+            objDef.apiName +
+            ': ' +
+            fieldApiNamesByNormalizedName.get(normalizedApiName) +
+            ' conflicts with ' +
+            fieldDef.apiName
+        );
+      }
+      fieldApiNamesByNormalizedName.put(normalizedApiName, fieldDef.apiName);
+    }
+  }
 
   private static Boolean isCustomObjectDef(ObjectDef objDef) {
     return objDef != null &&
@@ -649,8 +1043,29 @@ public with sharing class SandboxMetadataBuilder {
       (objDef.apiName.endsWith('__c') || objDef.apiName.endsWith('__mdt'));
   }
 
+  private static Boolean isCustomMetadataTypeDef(ObjectDef objDef) {
+    return objDef != null &&
+      !String.isBlank(objDef.apiName) &&
+      objDef.apiName.endsWith('__mdt');
+  }
+
   private static Boolean shouldSkipObjectCreation(ObjectDef objDef) {
     return objDef != null && objDef.skipObjectCreation == true;
+  }
+
+  private static String effectiveFieldType(
+    String objectApiName,
+    FieldDef fieldDef
+  ) {
+    if (
+      !String.isBlank(objectApiName) &&
+      objectApiName.endsWith('__mdt') &&
+      fieldDef != null &&
+      fieldDef.type == 'Currency'
+    ) {
+      return 'Number';
+    }
+    return fieldDef == null ? null : fieldDef.type;
   }
 
   private static void validateFieldDef(
@@ -795,6 +1210,38 @@ public with sharing class SandboxMetadataBuilder {
     }
   }
 
+  private static void validateCustomMetadataRecordDef(
+    String objectApiName,
+    CustomMetadataRecordDef recordDef
+  ) {
+    if (String.isBlank(objectApiName)) {
+      throw new MetadataBuilderException('Parent object API name is required.');
+    }
+    if (!objectApiName.endsWith('__mdt')) {
+      throw new MetadataBuilderException(
+        'Custom metadata records require a __mdt object: ' + objectApiName
+      );
+    }
+    if (recordDef == null) {
+      throw new MetadataBuilderException(
+        'Custom metadata record definition cannot be null.'
+      );
+    }
+    if (String.isBlank(recordDef.developerName)) {
+      throw new MetadataBuilderException(
+        'Custom metadata record developerName is required for ' + objectApiName
+      );
+    }
+    if (recordDef.values == null || recordDef.values.isEmpty()) {
+      throw new MetadataBuilderException(
+        'Custom metadata record values are required for ' +
+          objectApiName +
+          '.' +
+          recordDef.developerName
+      );
+    }
+  }
+
   private static void validateObjectPermissionDef(
     String objectApiName,
     ObjectPermissionDef permissionDef
@@ -832,9 +1279,10 @@ public with sharing class SandboxMetadataBuilder {
       !objDef.objectPermissions.isEmpty();
   }
 
-  private static void createMetadataInBatches(
+  private static void processMetadataInBatches(
     IMetadataService metadataService,
     List<MetadataService.Metadata> metadataItems,
+    MetadataOperation operation,
     String context
   ) {
     if (metadataItems == null || metadataItems.isEmpty()) {
@@ -856,8 +1304,10 @@ public with sharing class SandboxMetadataBuilder {
         batch.add(metadataItems[itemIndex]);
       }
 
-      MetadataService.SaveResult[] results = metadataService.createMetadata(
-        batch
+      MetadataService.SaveResult[] results = callMetadataService(
+        metadataService,
+        batch,
+        operation
       );
 
       handleResults(
@@ -865,6 +1315,34 @@ public with sharing class SandboxMetadataBuilder {
         context + ' batch ' + ((startIndex / CREATE_METADATA_BATCH_SIZE) + 1)
       );
     }
+  }
+
+  private static MetadataService.SaveResult[] callMetadataService(
+    IMetadataService metadataService,
+    List<MetadataService.Metadata> metadataItems,
+    MetadataOperation operation
+  ) {
+    if (operation == MetadataOperation.UPSERT_METADATA) {
+      return metadataService.upsertMetadata(metadataItems);
+    }
+    return metadataService.createMetadata(metadataItems);
+  }
+
+  private static MetadataOperation objectOperation(
+    ObjectDef objDef,
+    MetadataOperation requestedOperation
+  ) {
+    if (
+      requestedOperation == MetadataOperation.UPSERT_METADATA &&
+      isCustomMetadataTypeDef(objDef)
+    ) {
+      return MetadataOperation.CREATE;
+    }
+    return requestedOperation;
+  }
+
+  private static String operationLabel(MetadataOperation operation) {
+    return operation == MetadataOperation.UPSERT_METADATA ? 'Upsert' : 'Create';
   }
 
   private static void handleResults(
@@ -884,7 +1362,7 @@ public with sharing class SandboxMetadataBuilder {
         continue;
       }
       if (result.success) {
-        System.debug(LoggingLevel.INFO, context + ' created successfully.');
+        System.debug(LoggingLevel.INFO, context + ' completed successfully.');
       } else if (result.errors != null) {
         for (MetadataService.Error err : result.errors) {
           System.debug(LoggingLevel.ERROR, context + ' failed: ' + err.message);

@@ -1,0 +1,55 @@
+[
+  {
+    "apiName": "Partner_Tier_Config__mdt",
+    "label": "Partner Tier Config",
+    "pluralLabel": "Partner Tier Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Tier Config Name",
+    "fields": [
+      {
+        "apiName": "Tier_Name__c",
+        "label": "Tier Name",
+        "description": "Partner tier governed by the configuration.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Max_MDF_Budget__c",
+        "label": "Max MDF Budget",
+        "description": "Maximum MDF budget available to partners in this tier.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
+        "apiName": "Deal_Protection_Days__c",
+        "label": "Deal Protection Days",
+        "description": "Number of deal protection days granted to partners in this tier.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Can_Access_Premium_Content__c",
+        "label": "Can Access Premium Content",
+        "description": "Indicates whether partners in this tier can access premium content.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Badge_Eligibility__c",
+        "label": "Badge Eligibility",
+        "description": "Badge eligibility rule or label for partners in this tier.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Analytics_Access_Level__c",
+        "label": "Analytics Access Level",
+        "description": "Analytics access level granted to partners in this tier.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  }
+]

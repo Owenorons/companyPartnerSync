@@ -1,0 +1,98 @@
+[
+  {
+    "apiName": "Lead_Distribution_Rule__mdt",
+    "label": "Lead Distribution Rule",
+    "pluralLabel": "Lead Distribution Rules",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Lead Distribution Rule Name",
+    "fields": [
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the lead distribution rule is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Priority__c",
+        "label": "Priority",
+        "description": "Priority order used when evaluating distribution rules.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Region__c",
+        "label": "Region",
+        "description": "Region matched by the lead distribution rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Country__c",
+        "label": "Country",
+        "description": "Country matched by the lead distribution rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Industry__c",
+        "label": "Industry",
+        "description": "Industry matched by the lead distribution rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Partner_Tier__c",
+        "label": "Partner Tier",
+        "description": "Partner tier matched by the lead distribution rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Partner_Type__c",
+        "label": "Partner Type",
+        "description": "Partner type matched by the lead distribution rule.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Capacity_Min__c",
+        "label": "Capacity Min",
+        "description": "Minimum partner capacity required for the distribution rule.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Capacity_Max__c",
+        "label": "Capacity Max",
+        "description": "Maximum partner capacity allowed for the distribution rule.",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0
+      },
+      {
+        "apiName": "Assignment_Method__c",
+        "label": "Assignment Method",
+        "description": "Assignment method used by the lead distribution rule.",
+        "type": "Picklist",
+        "values": ["Round Robin", "Fixed Owner", "Capacity Based"]
+      },
+      {
+        "apiName": "Assign_To_User_Id__c",
+        "label": "Assign To User Id",
+        "description": "User Id or logical key used when assignment method targets a fixed owner.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Partner_Account_Key__c",
+        "label": "Partner Account Key",
+        "description": "Partner account key used by the distribution rule.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  }
+]

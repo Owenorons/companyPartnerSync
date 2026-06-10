@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Share_Reason__c</fullName>
+    <description>Reason access was granted.</description>
+    <label>Share Reason</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Co-Sell</fullName>
+                <default>false</default>
+                <label>Co-Sell</label>
+            </value>
+            <value>
+                <fullName>Distributor</fullName>
+                <default>false</default>
+                <label>Distributor</label>
+            </value>
+            <value>
+                <fullName>Regional Manager</fullName>
+                <default>false</default>
+                <label>Regional Manager</label>
+            </value>
+            <value>
+                <fullName>Escalation</fullName>
+                <default>false</default>
+                <label>Escalation</label>
+            </value>
+            <value>
+                <fullName>Deal Conflict Review</fullName>
+                <default>false</default>
+                <label>Deal Conflict Review</label>
+            </value>
+            <value>
+                <fullName>MDF Review</fullName>
+                <default>false</default>
+                <label>MDF Review</label>
+            </value>
+            <value>
+                <fullName>Multi-Account Access</fullName>
+                <default>false</default>
+                <label>Multi-Account Access</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,62 @@
+[
+  {
+    "apiName": "Contact",
+    "label": "Contact",
+    "pluralLabel": "Contacts",
+    "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "fields": [
+      {
+        "apiName": "Portal_Role__c",
+        "label": "Portal Role",
+        "description": "Portal role assigned to the partner contact.",
+        "type": "Picklist",
+        "values": [
+          "Partner Admin",
+          "Sales Rep",
+          "Marketing Rep",
+          "Finance",
+          "Executive",
+          "Read Only"
+        ]
+      },
+      {
+        "apiName": "Certification_Status__c",
+        "label": "Certification Status",
+        "description": "Certification status for the partner contact.",
+        "type": "Picklist",
+        "values": ["Not Certified", "Active", "Expired"]
+      },
+      {
+        "apiName": "Is_Partner_User__c",
+        "label": "Is Partner User",
+        "description": "Indicates whether the contact is associated with a partner user.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_Submit_Deals__c",
+        "label": "Can Submit Deals",
+        "description": "Indicates whether the partner contact can submit deal registrations.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_Submit_MDF__c",
+        "label": "Can Submit MDF",
+        "description": "Indicates whether the partner contact can submit MDF requests.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Can_View_Analytics__c",
+        "label": "Can View Analytics",
+        "description": "Indicates whether the partner contact can view partner analytics.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      }
+    ]
+  }
+]

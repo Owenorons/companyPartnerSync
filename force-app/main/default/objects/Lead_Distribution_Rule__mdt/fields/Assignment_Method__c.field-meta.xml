@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assignment_Method__c</fullName>
+    <description
+  >Assignment method used by the lead distribution rule.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Assignment Method</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Round Robin</fullName>
+                <default>false</default>
+                <label>Round Robin</label>
+            </value>
+            <value>
+                <fullName>Fixed Owner</fullName>
+                <default>false</default>
+                <label>Fixed Owner</label>
+            </value>
+            <value>
+                <fullName>Capacity Based</fullName>
+                <default>false</default>
+                <label>Capacity Based</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

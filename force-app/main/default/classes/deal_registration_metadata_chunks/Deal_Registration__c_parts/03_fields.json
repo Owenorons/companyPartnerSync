@@ -1,0 +1,85 @@
+[
+  {
+    "apiName": "Deal_Registration__c",
+    "label": "Deal Registration",
+    "pluralLabel": "Deal Registrations",
+    "skipObjectCreation": true,
+    "fields": [
+      {
+        "apiName": "Stage__c",
+        "label": "Stage",
+        "description": "Current sales stage for the registered deal.",
+        "type": "Picklist",
+        "values": [
+          "Qualification",
+          "Discovery",
+          "Proposal",
+          "Negotiation",
+          "Closed Won",
+          "Closed Lost"
+        ]
+      },
+      {
+        "apiName": "Status__c",
+        "label": "Status",
+        "description": "Approval and lifecycle status of the deal registration.",
+        "type": "Picklist",
+        "values": [
+          "Draft",
+          "Submitted",
+          "Under Review",
+          "Approved",
+          "Rejected",
+          "Expired",
+          "Converted",
+          "Closed Won",
+          "Closed Lost"
+        ]
+      },
+      {
+        "apiName": "Conflict_Status__c",
+        "label": "Conflict Status",
+        "description": "Conflict review state for duplicate or competing deal registrations.",
+        "type": "Picklist",
+        "values": [
+          "None",
+          "Potential Conflict",
+          "Confirmed Conflict",
+          "Resolved"
+        ]
+      },
+      {
+        "apiName": "Submitted_Date__c",
+        "label": "Submitted Date",
+        "description": "Date and time when the deal registration was submitted.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Approved_Date__c",
+        "label": "Approved Date",
+        "description": "Date and time when the deal registration was approved.",
+        "type": "DateTime"
+      },
+      {
+        "apiName": "Approved_By__c",
+        "label": "Approved By",
+        "description": "User who approved the deal registration.",
+        "type": "Lookup",
+        "referenceTo": "User",
+        "relationshipName": "Approved_Deal_Registrations"
+      },
+      {
+        "apiName": "Protection_Start_Date__c",
+        "label": "Protection Start Date",
+        "description": "Start date for partner deal protection.",
+        "type": "Date"
+      },
+      {
+        "apiName": "Protection_End_Date__c",
+        "label": "Protection End Date",
+        "description": "End date for partner deal protection.",
+        "type": "Date"
+      }
+    ]
+  }
+]

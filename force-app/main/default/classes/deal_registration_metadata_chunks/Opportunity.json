@@ -1,0 +1,56 @@
+[
+  {
+    "apiName": "Opportunity",
+    "label": "Opportunity",
+    "pluralLabel": "Opportunities",
+    "skipObjectCreation": true,
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "fields": [
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account associated with the opportunity.",
+        "type": "Lookup",
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Opportunities"
+      },
+      {
+        "apiName": "Deal_Registration__c",
+        "label": "Deal Registration",
+        "description": "Deal registration linked to the partner opportunity.",
+        "type": "Lookup",
+        "referenceTo": "Deal_Registration__c",
+        "relationshipName": "Opportunities"
+      },
+      {
+        "apiName": "Is_Channel_Opportunity__c",
+        "label": "Is Channel Opportunity",
+        "description": "Indicates whether the opportunity is part of the partner channel pipeline.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Partner_Contribution_Type__c",
+        "label": "Partner Contribution Type",
+        "description": "Type of contribution the partner made to the opportunity.",
+        "type": "Picklist",
+        "values": [
+          "Sourced",
+          "Influenced",
+          "Co-Sell",
+          "Fulfillment",
+          "Implementation",
+          "Referral"
+        ]
+      },
+      {
+        "apiName": "Deal_Protection_End_Date__c",
+        "label": "Deal Protection End Date",
+        "description": "Date when partner deal protection ends for the opportunity.",
+        "type": "Date"
+      }
+    ]
+  }
+]

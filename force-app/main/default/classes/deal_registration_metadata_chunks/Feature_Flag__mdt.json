@@ -1,0 +1,39 @@
+[
+  {
+    "apiName": "Feature_Flag__mdt",
+    "label": "Feature Flag",
+    "pluralLabel": "Feature Flags",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Feature Flag Name",
+    "fields": [
+      {
+        "apiName": "Feature_Name__c",
+        "label": "Feature Name",
+        "description": "Name of the feature controlled by this flag.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Enabled__c",
+        "label": "Enabled",
+        "description": "Indicates whether the feature flag is enabled.",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "License_Tier__c",
+        "label": "License Tier",
+        "description": "License tier associated with the feature flag.",
+        "type": "Text",
+        "length": 255
+      },
+      {
+        "apiName": "Description__c",
+        "label": "Description",
+        "description": "Description of the feature flag and its intended behavior.",
+        "type": "Text",
+        "length": 255
+      }
+    ]
+  }
+]
