@@ -1,1 +1,52 @@
-<template> </template>
+<template>
+  <section class="nba-shell">
+    <div class="nba-header">
+      <p class="eyebrow">Recommended Actions</p>
+      <h2>Next Best Actions</h2>
+    </div>
+
+    <template lwc:if={isLoading}>
+      <c-ps-loading-state
+        message="Loading recommendations"
+      ></c-ps-loading-state>
+    </template>
+
+    <template lwc:elseif={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template lwc:elseif={hasActions}>
+      <div class="action-list">
+        <template for:each={actions} for:item="action">
+          <article key={action.actionId} class="action-card">
+            <div>
+              <div class="action-topline">
+                <span class="priority">{action.priority}</span>
+                <span>{action.sourceSignal}</span>
+              </div>
+              <h3>{action.title}</h3>
+              <p>{action.recommendation}</p>
+            </div>
+
+            <div class="action-rationale">
+              <strong>Why now</strong>
+              <p>{action.reason}</p>
+            </div>
+
+            <div class="confidence">
+              <span>Confidence</span>
+              <strong>{action.confidenceLabel}</strong>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+
+    <template lwc:else>
+      <c-ps-empty-state
+        title="No recommendations yet"
+        message="PartnerSync will show next best actions after governed AI insights are generated."
+      ></c-ps-empty-state>
+    </template>
+  </section>
+</template>

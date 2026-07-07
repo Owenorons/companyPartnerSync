@@ -9,42 +9,59 @@
       <div class="ai-badge">AI Enabled</div>
     </div>
 
-    <template for:each={insights} for:item="insight">
-      <article key={insight.insightId} class="insight-card">
-        <div class="insight-top">
-          <div>
-            <h3>{insight.insightType}</h3>
-            <p>{insight.generatedLabel}</p>
+    <template lwc:if={isLoading}>
+      <c-ps-loading-state message="Loading AI insights"></c-ps-loading-state>
+    </template>
+
+    <template lwc:elseif={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template lwc:elseif={hasInsights}>
+      <template for:each={insights} for:item="insight">
+        <article key={insight.insightId} class="insight-card">
+          <div class="insight-top">
+            <div>
+              <h3>{insight.insightType}</h3>
+              <p>{insight.generatedLabel}</p>
+            </div>
+
+            <div class="score-circle">{insight.score}</div>
           </div>
 
-          <div class="score-circle">{insight.score}</div>
-        </div>
+          <div class="summary">{insight.summary}</div>
 
-        <div class="summary">{insight.summary}</div>
-
-        <div class="recommendation">
-          <strong>Recommendation</strong>
-          <p>{insight.recommendation}</p>
-        </div>
-
-        <div class="reason">
-          <strong>Why?</strong>
-          <p>{insight.reason}</p>
-        </div>
-
-        <div class="confidence">
-          <span>Confidence</span>
-
-          <div class="confidence-bar">
-            <span
-              class="confidence-fill"
-              data-confidence={insight.confidenceStyle}
-            ></span>
+          <div class="recommendation">
+            <strong>Recommendation</strong>
+            <p>{insight.recommendation}</p>
           </div>
 
-          <strong>{insight.confidenceLabel}</strong>
-        </div>
-      </article>
+          <div class="reason">
+            <strong>Why?</strong>
+            <p>{insight.reason}</p>
+          </div>
+
+          <div class="confidence">
+            <span>Confidence</span>
+
+            <div class="confidence-bar">
+              <span
+                class="confidence-fill"
+                style={insight.confidenceStyle}
+              ></span>
+            </div>
+
+            <strong>{insight.confidenceLabel}</strong>
+          </div>
+        </article>
+      </template>
+    </template>
+
+    <template lwc:else>
+      <c-ps-empty-state
+        title="No AI insights yet"
+        message="Insights will appear after PartnerSync has enough partner activity to generate governed recommendations."
+      ></c-ps-empty-state>
     </template>
   </div>
 </template>

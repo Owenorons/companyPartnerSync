@@ -6,7 +6,7 @@ public with sharing class AIInsightDTO {
   public String insightType;
 
   @AuraEnabled
-  public Decimal score;
+  public String provider;
 
   @AuraEnabled
   public Decimal confidence;
@@ -16,6 +16,12 @@ public with sharing class AIInsightDTO {
 
   @AuraEnabled
   public String summary;
+
+  @AuraEnabled
+  public String reason;
+
+  @AuraEnabled
+  public String status;
 
   @AuraEnabled
   public Datetime generatedOn;

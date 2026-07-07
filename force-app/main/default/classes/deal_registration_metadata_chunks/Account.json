@@ -93,6 +93,14 @@
         "scale": 2
       },
       {
+        "apiName": "MDF_Used__c",
+        "label": "MDF Used",
+        "description": "MDF budget amount already approved or used by the partner company.",
+        "type": "Currency",
+        "precision": 18,
+        "scale": 2
+      },
+      {
         "apiName": "MDF_Available_Budget__c",
         "label": "MDF Available Budget",
         "description": "Remaining MDF budget available to the partner company.",

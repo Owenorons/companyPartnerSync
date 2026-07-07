@@ -1,0 +1,62 @@
+.nba-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.nba-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  color: #5c6f82;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.action-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.action-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #d8dde6;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.action-topline,
+.confidence {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #5c6f82;
+  font-size: 0.75rem;
+}
+
+.priority {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #032d60;
+  font-weight: 700;
+}
+
+.action-rationale {
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  background: #f8f9fb;
+}

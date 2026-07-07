@@ -1,5 +1,9 @@
 public with sharing class AIInsightService {
   public static List<AIInsightDTO> getMyInsights() {
+    if (!TenantConfigService.isAiEnabled()) {
+      throw new PartnerSyncHandledException('AI insights are disabled.');
+    }
+
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
     List<AIInsightDTO> results = new List<AIInsightDTO>();

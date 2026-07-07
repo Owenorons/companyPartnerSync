@@ -93,4 +93,38 @@ public with sharing class PartnerRecordAccessService {
       throw new PartnerSyncHandledException('Notification not accessible.');
     }
   }
+
+  public static void assertPartnerAccessToContent(Id contentId) {
+    if (PartnerAccessService.isInternalUser()) {
+      return;
+    }
+
+    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+
+    Account partner = [
+      SELECT Id, Partner_Tier__c, Partner_Type__c
+      FROM Account
+      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
+      LIMIT 1
+    ];
+
+    Partner_Content__c content = PartnerContentSelector.selectById(contentId);
+
+    if (!PartnerContentDomain.isVisibleToPartner(content, partner)) {
+      throw new PartnerSyncHandledException('Content not accessible.');
+    }
+  }
+
+  public static void assertPartnerAccessToAIInsight(Id insightId) {
+    if (PartnerAccessService.isInternalUser()) {
+      return;
+    }
+
+    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+    AI_Insight__c insight = AIInsightSelector.selectById(insightId);
+
+    if (insight.Partner_Account__c != partnerAccountId) {
+      throw new PartnerSyncHandledException('AI insight not accessible.');
+    }
+  }
 }
