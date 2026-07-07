@@ -1,0 +1,153 @@
+{
+  "fullName": "PartnerSync_Content_Hub_User",
+  "label": "PartnerSync Content Hub User",
+  "description": "Read partner content and create controlled content usage telemetry.",
+  "hasActivationRequired": false,
+  "objectPermissions": [
+    {
+      "objectApiName": "Content_Usage_Log__c",
+      "allowRead": true,
+      "allowCreate": true,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Content__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Content_Access__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    }
+  ],
+  "fieldPermissions": [
+    {
+      "field": "Content_Usage_Log__c.Action__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Content_Usage_Log__c.Partner_Account__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Content_Usage_Log__c.Partner_Contact__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Content_Usage_Log__c.Partner_Content__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Content_Usage_Log__c.Performed_By__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Content_Usage_Log__c.Performed_On__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Partner_Content__c.Category__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Content_Document_Id__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Description__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Featured__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Is_Active__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Partner_Tier__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Partner_Type__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Published_Date__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Sort_Order__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content__c.Visibility__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.Access_Status__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.Content_Category__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.ContentDocumentId__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.Partner_Tier__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Content_Access__c.Region__c",
+      "readable": true,
+      "editable": false
+    }
+  ],
+  "classAccesses": [
+    {
+      "apexClass": "PartnerContentController",
+      "enabled": true
+    }
+  ]
+}

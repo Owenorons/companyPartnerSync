@@ -1,4 +1,50 @@
 public with sharing class LeadDistributionSelector {
+  public static Account selectActivePartnerAccount(Id partnerAccountId) {
+    SecurityUtil.assertReadable(Account.SObjectType);
+
+    List<Account> rows = [
+      SELECT Id, Is_Partner__c, Partner_Status__c
+      FROM Account
+      WHERE
+        Id = :partnerAccountId
+        AND Is_Partner__c = TRUE
+        AND Partner_Status__c = 'Active'
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException(
+        'Selected partner account is not active or is not a valid partner account.'
+      );
+    }
+
+    return rows[0];
+  }
+
+  public static Contact selectPartnerContact(
+    Id contactId,
+    Id partnerAccountId
+  ) {
+    SecurityUtil.assertReadable(Contact.SObjectType);
+
+    List<Contact> rows = [
+      SELECT Id, AccountId, Is_Partner_User__c
+      FROM Contact
+      WHERE Id = :contactId AND AccountId = :partnerAccountId
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException(
+        'Selected contact does not belong to the partner account.'
+      );
+    }
+
+    return rows[0];
+  }
+
   public static Lead selectInternalLead(Id leadId) {
     SecurityUtil.assertReadable(Lead.SObjectType);
 

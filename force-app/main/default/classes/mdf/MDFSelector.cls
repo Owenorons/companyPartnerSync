@@ -46,6 +46,24 @@ public with sharing class MDFSelector {
     ];
   }
 
+  public static Account selectPartnerBudget(Id partnerAccountId) {
+    SecurityUtil.assertReadable(Account.SObjectType);
+
+    List<Account> rows = [
+      SELECT Id, MDF_Annual_Budget__c, MDF_Used__c
+      FROM Account
+      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException('Partner account not found.');
+    }
+
+    return rows[0];
+  }
+
   public static MDF_Request__c selectForPartner(
     Id requestId,
     Id partnerAccountId

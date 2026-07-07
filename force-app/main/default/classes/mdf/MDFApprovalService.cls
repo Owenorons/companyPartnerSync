@@ -36,12 +36,9 @@ public with sharing class MDFApprovalService {
   }
 
   private static void approve(MDF_Request__c record, MDFDecisionDTO request) {
-    Account partner = [
-      SELECT Id, MDF_Annual_Budget__c, MDF_Used__c
-      FROM Account
-      WHERE Id = :record.Partner_Account__c
-      LIMIT 1
-    ];
+    Account partner = MDFSelector.selectPartnerBudget(
+      record.Partner_Account__c
+    );
 
     Decimal budget = partner.MDF_Annual_Budget__c == null
       ? 0

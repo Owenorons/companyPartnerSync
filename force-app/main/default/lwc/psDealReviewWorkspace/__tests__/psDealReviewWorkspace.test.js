@@ -122,4 +122,65 @@ describe("c-ps-deal-review-workspace", () => {
       })
     });
   });
+
+  it("requires a rejection reason before submitting a reject decision", async () => {
+    getReviewDetail.mockResolvedValue({
+      dealId: "a02xx0000000001",
+      customerName: "Acme",
+      partnerName: "North Partner",
+      status: "Submitted",
+      conflictStatus: "No Conflict"
+    });
+    processDecision.mockResolvedValue();
+
+    const element = createElement("c-ps-deal-review-workspace", {
+      is: PsDealReviewWorkspace
+    });
+
+    document.body.appendChild(element);
+
+    getReviewQueue.emit([
+      {
+        dealId: "a02xx0000000001",
+        customerName: "Acme",
+        partnerName: "North Partner",
+        status: "Submitted",
+        conflictStatus: "No Conflict"
+      }
+    ]);
+    await flushPromises();
+    await flushPromises();
+
+    element.shadowRoot.querySelector(".reject").click();
+    await flushPromises();
+
+    const textarea = element.shadowRoot.querySelector("lightning-textarea");
+    let rejectButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Reject");
+
+    expect(textarea).not.toBeNull();
+    expect(rejectButton.disabled).toBe(true);
+
+    textarea.value = "Insufficient qualification evidence.";
+    textarea.dispatchEvent(new CustomEvent("change"));
+    await flushPromises();
+
+    rejectButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Reject");
+
+    expect(rejectButton.disabled).toBe(false);
+
+    rejectButton.click();
+    await flushPromises();
+
+    expect(processDecision).toHaveBeenCalledWith({
+      request: expect.objectContaining({
+        dealId: "a02xx0000000001",
+        decision: "Rejected",
+        rejectionReason: "Insufficient qualification evidence."
+      })
+    });
+  });
 });

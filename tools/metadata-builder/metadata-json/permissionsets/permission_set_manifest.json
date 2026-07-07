@@ -1,0 +1,42 @@
+[
+  {
+    "fullName": "PartnerSync_Base_Access",
+    "fields": 43,
+    "objects": 4
+  },
+  {
+    "fullName": "PartnerSync_Deal_Registration_User",
+    "fields": 72,
+    "objects": 5
+  },
+  {
+    "fullName": "PartnerSync_MDF_User",
+    "fields": 23,
+    "objects": 2
+  },
+  {
+    "fullName": "PartnerSync_Content_Hub_User",
+    "fields": 22,
+    "objects": 3
+  },
+  {
+    "fullName": "PartnerSync_Analytics_User",
+    "fields": 29,
+    "objects": 3
+  },
+  {
+    "fullName": "PartnerSync_Partner_Admin",
+    "fields": 141,
+    "objects": 10
+  },
+  {
+    "fullName": "PartnerSync_Internal_Channel_Manager",
+    "fields": 231,
+    "objects": 20
+  },
+  {
+    "fullName": "PartnerSync_Internal_Admin",
+    "fields": 231,
+    "objects": 20
+  }
+]

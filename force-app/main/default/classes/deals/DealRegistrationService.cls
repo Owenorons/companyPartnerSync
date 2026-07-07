@@ -6,12 +6,9 @@ public with sharing class DealRegistrationService {
 
     SecurityUtil.assertCreateable(Deal_Registration__c.SObjectType);
 
-    Opportunity opportunity = [
-      SELECT Id, AccountId, Partner_Account__c, Partner_Contact__c, StageName
-      FROM Opportunity
-      WHERE Id = :request.opportunityId
-      LIMIT 1
-    ];
+    Opportunity opportunity = DealRegistrationSelector.selectOpportunityForRegistration(
+      request.opportunityId
+    );
 
     Id currentPartnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 

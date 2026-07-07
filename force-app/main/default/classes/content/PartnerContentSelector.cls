@@ -1,4 +1,22 @@
 public with sharing class PartnerContentSelector {
+  public static Account selectPartnerVisibilityContext(Id partnerAccountId) {
+    SecurityUtil.assertReadable(Account.SObjectType);
+
+    List<Account> rows = [
+      SELECT Id, Partner_Tier__c, Partner_Type__c
+      FROM Account
+      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException('Partner account not found.');
+    }
+
+    return rows[0];
+  }
+
   public static List<Partner_Content__c> selectActiveContent() {
     SecurityUtil.assertReadable(Partner_Content__c.SObjectType);
 

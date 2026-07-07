@@ -1,4 +1,22 @@
 public with sharing class DealRegistrationSelector {
+  public static Opportunity selectOpportunityForRegistration(Id opportunityId) {
+    SecurityUtil.assertReadable(Opportunity.SObjectType);
+
+    List<Opportunity> rows = [
+      SELECT Id, AccountId, Partner_Account__c, Partner_Contact__c, StageName
+      FROM Opportunity
+      WHERE Id = :opportunityId
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException('Opportunity not found.');
+    }
+
+    return rows[0];
+  }
+
   public static List<Deal_Registration__c> selectPartnerDeals(
     Id partnerAccountId
   ) {

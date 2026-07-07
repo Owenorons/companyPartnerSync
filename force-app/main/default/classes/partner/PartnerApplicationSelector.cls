@@ -52,6 +52,26 @@ public with sharing class PartnerApplicationSelector {
     return rows[0];
   }
 
+  public static Partner_Application__c selectSubmissionResultById(
+    Id applicationId
+  ) {
+    SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
+
+    List<Partner_Application__c> rows = [
+      SELECT Id, Name, Application_Status__c
+      FROM Partner_Application__c
+      WHERE Id = :applicationId
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException('Partner application not found.');
+    }
+
+    return rows[0];
+  }
+
   public static List<Partner_Application__c> selectPendingApplications() {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 

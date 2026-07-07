@@ -43,12 +43,9 @@ public with sharing class PartnerApplicationService {
 
     Partner_Application__c insertedRecord = (Partner_Application__c) sanitized[0];
 
-    insertedRecord = [
-      SELECT Id, Name, Application_Status__c
-      FROM Partner_Application__c
-      WHERE Id = :insertedRecord.Id
-      LIMIT 1
-    ];
+    insertedRecord = PartnerApplicationSelector.selectSubmissionResultById(
+      insertedRecord.Id
+    );
 
     LoggingService.info(
       'PartnerApplicationService',

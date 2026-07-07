@@ -1,0 +1,192 @@
+{
+  "fullName": "PartnerSync_Analytics_User",
+  "label": "PartnerSync Analytics User",
+  "description": "Read partner performance, badges, and insights.",
+  "hasActivationRequired": false,
+  "objectPermissions": [
+    {
+      "objectApiName": "AI_Insight__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Badge__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Performance__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    }
+  ],
+  "fieldPermissions": [
+    {
+      "field": "AI_Insight__c.Confidence__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Feature_Name__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Insight_Text__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Provider__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Recommendation__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "AI_Insight__c.Status__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Active__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Awarded_By_Process__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Awarded_On__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Badge_Code__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Badge_Name__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Badge__c.Reason__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Content_Downloads__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Leaderboard_Rank__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Leads_Accepted__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Leads_Assigned__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Leads_Converted__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.MDF_Approved__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.MDF_Claimed__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Opportunities_Created__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Opportunities_Won__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Partner_Score__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Pipeline_Value__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Reporting_Period_End__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Reporting_Period_Start__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Performance__c.Won_Value__c",
+      "readable": true,
+      "editable": false
+    }
+  ],
+  "classAccesses": [
+    {
+      "apexClass": "AnalyticsController",
+      "enabled": true
+    },
+    {
+      "apexClass": "PartnerAIController",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+{
+  "fullName": "PartnerSync_Base_Access",
+  "label": "PartnerSync Base Access",
+  "description": "Base external partner access for core PartnerSync pages and owned records.",
+  "hasActivationRequired": false,
+  "objectPermissions": [
+    {
+      "objectApiName": "Account",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Contact",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Activity__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": false,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    },
+    {
+      "objectApiName": "Partner_Notification__c",
+      "allowRead": true,
+      "allowCreate": false,
+      "allowEdit": true,
+      "allowDelete": false,
+      "viewAllRecords": false,
+      "modifyAllRecords": false
+    }
+  ],
+  "fieldPermissions": [
+    {
+      "field": "Account.Assigned_Channel_Manager__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Is_Partner__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.MDF_Annual_Budget__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.MDF_Available_Budget__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.MDF_Used__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Onboarding_Status__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_Capacity__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_ID__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_Region__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_Status__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_Tier__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Partner_Type__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Primary_Partner_Admin_Contact__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Program_End_Date__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Account.Program_Start_Date__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Can_Submit_Deals__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Can_Submit_MDF__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Can_View_Analytics__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Certification_Status__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Is_Partner_User__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Contact.Portal_Role__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Activity_DateTime__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Activity_Message__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Activity_Type__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Performed_By_User__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Related_Object__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Related_Record_Id__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Activity__c.Visibility__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Action_Label__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Action_URL__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Dismissed__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Partner_Notification__c.Is_Read__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Partner_Notification__c.Message__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Notification_Type__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Partner_Account__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Priority__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Read_On__c",
+      "readable": true,
+      "editable": true
+    },
+    {
+      "field": "Partner_Notification__c.Recipient_Contact__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Recipient_User__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Related_Object__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Related_Record_Id__c",
+      "readable": true,
+      "editable": false
+    },
+    {
+      "field": "Partner_Notification__c.Title__c",
+      "readable": true,
+      "editable": false
+    }
+  ],
+  "classAccesses": [
+    {
+      "apexClass": "NotificationController",
+      "enabled": true
+    },
+    {
+      "apexClass": "PartnerPortalController",
+      "enabled": true
+    }
+  ]
+}

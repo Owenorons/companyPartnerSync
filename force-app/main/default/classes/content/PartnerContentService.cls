@@ -6,12 +6,9 @@ public with sharing class PartnerContentService {
 
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
-    Account partner = [
-      SELECT Id, Partner_Tier__c, Partner_Type__c
-      FROM Account
-      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
-      LIMIT 1
-    ];
+    Account partner = PartnerContentSelector.selectPartnerVisibilityContext(
+      partnerAccountId
+    );
 
     List<PartnerContentDTO> results = new List<PartnerContentDTO>();
 
@@ -34,12 +31,9 @@ public with sharing class PartnerContentService {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
     Contact contact = PartnerAccessService.getCurrentPartnerContact();
 
-    Account partner = [
-      SELECT Id, Partner_Tier__c, Partner_Type__c
-      FROM Account
-      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
-      LIMIT 1
-    ];
+    Account partner = PartnerContentSelector.selectPartnerVisibilityContext(
+      partnerAccountId
+    );
 
     Partner_Content__c content = PartnerContentSelector.selectById(contentId);
 

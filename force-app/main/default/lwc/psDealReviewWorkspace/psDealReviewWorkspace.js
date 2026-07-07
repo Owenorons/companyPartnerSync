@@ -29,6 +29,8 @@ export default class PsDealReviewWorkspace extends LightningElement {
   error;
   detailError;
   loadingDetail = false;
+  showRejectDialog = false;
+  rejectionReason = "";
   wiredQueueResult;
 
   statusOptions = STATUS_OPTIONS;
@@ -90,6 +92,10 @@ export default class PsDealReviewWorkspace extends LightningElement {
     return !this.error && !this.hasFilteredDeals;
   }
 
+  get isRejectDisabled() {
+    return !this.rejectionReason.trim();
+  }
+
   handleSearch(event) {
     this.searchTerm = event.target.value || "";
   }
@@ -110,10 +116,32 @@ export default class PsDealReviewWorkspace extends LightningElement {
     await this.submitDecision("Approved");
   }
 
-  async handleReject() {
-    await this.submitDecision("Rejected", {
-      rejectionReason: "Rejected from deal review workspace."
+  handleReject() {
+    this.rejectionReason = "";
+    this.showRejectDialog = true;
+  }
+
+  handleRejectionReasonChange(event) {
+    this.rejectionReason = event.target.value || "";
+  }
+
+  handleCancelReject() {
+    this.showRejectDialog = false;
+    this.rejectionReason = "";
+  }
+
+  async handleConfirmReject() {
+    if (this.isRejectDisabled) {
+      return;
+    }
+
+    const wasSubmitted = await this.submitDecision("Rejected", {
+      rejectionReason: this.rejectionReason.trim()
     });
+
+    if (wasSubmitted) {
+      this.handleCancelReject();
+    }
   }
 
   async loadDeal(dealId) {
@@ -141,7 +169,7 @@ export default class PsDealReviewWorkspace extends LightningElement {
 
   async submitDecision(decision, extraFields = {}) {
     if (!this.selectedDealId) {
-      return;
+      return false;
     }
 
     try {
@@ -159,11 +187,13 @@ export default class PsDealReviewWorkspace extends LightningElement {
 
       await refreshApex(this.wiredQueueResult);
       await this.loadDeal(this.selectedDealId);
+      return true;
     } catch (error) {
       this.detailError = this.getErrorMessage(
         error,
         "Unable to process deal decision."
       );
+      return false;
     }
   }
 

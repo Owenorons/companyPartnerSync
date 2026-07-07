@@ -53,13 +53,7 @@ public with sharing class MDFService {
 
   public static MDFBudgetDTO getMyBudget() {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
-
-    Account account = [
-      SELECT MDF_Annual_Budget__c, MDF_Used__c
-      FROM Account
-      WHERE Id = :partnerAccountId
-      LIMIT 1
-    ];
+    Account account = MDFSelector.selectPartnerBudget(partnerAccountId);
 
     return MDFDomain.toBudgetDTO(account);
   }

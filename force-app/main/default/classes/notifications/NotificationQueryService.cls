@@ -4,21 +4,11 @@ public with sharing class NotificationQueryService {
 
     List<PartnerNotificationDTO> results = new List<PartnerNotificationDTO>();
 
-    for (Partner_Notification__c row : [
-      SELECT
-        Id,
-        Title__c,
-        Message__c,
-        Action_Label__c,
-        Action_URL__c,
-        Priority__c,
-        Is_Read__c,
-        CreatedDate
-      FROM Partner_Notification__c
-      WHERE Recipient_User__c = :userId AND Dismissed__c = FALSE
-      ORDER BY CreatedDate DESC
-      LIMIT 100
-    ]) {
+    for (
+      Partner_Notification__c row : NotificationSelector.selectMyActiveNotifications(
+        userId
+      )
+    ) {
       PartnerNotificationDTO dto = new PartnerNotificationDTO();
 
       dto.notificationId = row.Id;
@@ -37,13 +27,6 @@ public with sharing class NotificationQueryService {
   }
 
   public static Integer getUnreadCount() {
-    return [
-      SELECT COUNT()
-      FROM Partner_Notification__c
-      WHERE
-        Recipient_User__c = :UserInfo.getUserId()
-        AND Is_Read__c = FALSE
-        AND Dismissed__c = FALSE
-    ];
+    return NotificationSelector.countUnreadForUser(UserInfo.getUserId());
   }
 }

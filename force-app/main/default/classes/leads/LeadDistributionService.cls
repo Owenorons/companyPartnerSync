@@ -78,41 +78,13 @@ public with sharing class LeadDistributionService {
   }
 
   private static void validatePartnerAccount(Id partnerAccountId) {
-    List<Account> rows = [
-      SELECT Id, Is_Partner__c, Partner_Status__c
-      FROM Account
-      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
-      throw new PartnerSyncHandledException(
-        'Selected account is not a valid partner account.'
-      );
-    }
-
-    if (rows[0].Partner_Status__c != 'Active') {
-      throw new PartnerSyncHandledException(
-        'Selected partner account is not active.'
-      );
-    }
+    LeadDistributionSelector.selectActivePartnerAccount(partnerAccountId);
   }
 
   private static void validatePartnerContact(
     Id contactId,
     Id partnerAccountId
   ) {
-    List<Contact> rows = [
-      SELECT Id, AccountId, Is_Partner_User__c
-      FROM Contact
-      WHERE Id = :contactId AND AccountId = :partnerAccountId
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
-      throw new PartnerSyncHandledException(
-        'Selected contact does not belong to the partner account.'
-      );
-    }
+    LeadDistributionSelector.selectPartnerContact(contactId, partnerAccountId);
   }
 }

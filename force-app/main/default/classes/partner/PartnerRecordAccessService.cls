@@ -21,16 +21,7 @@ public with sharing class PartnerRecordAccessService {
 
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
-    List<Lead> rows = [
-      SELECT Id
-      FROM Lead
-      WHERE Id = :leadId AND Partner_Account__c = :partnerAccountId
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
-      throw new PartnerSyncHandledException('Lead not accessible.');
-    }
+    LeadDistributionSelector.selectPartnerLeadById(leadId, partnerAccountId);
   }
 
   public static void assertPartnerAccessToDeal(Id dealId) {
@@ -39,15 +30,9 @@ public with sharing class PartnerRecordAccessService {
     }
 
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+    Deal_Registration__c deal = DealRegistrationSelector.selectById(dealId);
 
-    List<Deal_Registration__c> rows = [
-      SELECT Id
-      FROM Deal_Registration__c
-      WHERE Id = :dealId AND Partner_Account__c = :partnerAccountId
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
+    if (deal.Partner_Account__c != partnerAccountId) {
       throw new PartnerSyncHandledException('Deal not accessible.');
     }
   }
@@ -59,16 +44,7 @@ public with sharing class PartnerRecordAccessService {
 
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
-    List<MDF_Request__c> rows = [
-      SELECT Id
-      FROM MDF_Request__c
-      WHERE Id = :requestId AND Partner_Account__c = :partnerAccountId
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
-      throw new PartnerSyncHandledException('MDF request not accessible.');
-    }
+    MDFSelector.selectForPartner(requestId, partnerAccountId);
   }
 
   public static void assertPartnerAccessToNotification(Id notificationId) {
@@ -79,19 +55,11 @@ public with sharing class PartnerRecordAccessService {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
     Id userId = UserInfo.getUserId();
 
-    List<Partner_Notification__c> rows = [
-      SELECT Id
-      FROM Partner_Notification__c
-      WHERE
-        Id = :notificationId
-        AND Partner_Account__c = :partnerAccountId
-        AND Recipient_User__c = :userId
-      LIMIT 1
-    ];
-
-    if (rows.isEmpty()) {
-      throw new PartnerSyncHandledException('Notification not accessible.');
-    }
+    NotificationSelector.selectAccessibleNotification(
+      notificationId,
+      partnerAccountId,
+      userId
+    );
   }
 
   public static void assertPartnerAccessToContent(Id contentId) {
@@ -100,13 +68,9 @@ public with sharing class PartnerRecordAccessService {
     }
 
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
-
-    Account partner = [
-      SELECT Id, Partner_Tier__c, Partner_Type__c
-      FROM Account
-      WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
-      LIMIT 1
-    ];
+    Account partner = PartnerContentSelector.selectPartnerVisibilityContext(
+      partnerAccountId
+    );
 
     Partner_Content__c content = PartnerContentSelector.selectById(contentId);
 

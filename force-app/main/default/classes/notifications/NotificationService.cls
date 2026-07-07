@@ -5,6 +5,8 @@ public with sharing class NotificationService {
     }
 
     try {
+      SecurityUtil.assertCreateable(Partner_Notification__c.SObjectType);
+
       Partner_Notification__c notification = new Partner_Notification__c();
 
       notification.Partner_Account__c = request.partnerAccountId;
@@ -35,7 +37,7 @@ public with sharing class NotificationService {
 
       notification.Is_Read__c = false;
 
-      insert notification;
+      insert SecurityUtil.stripForCreate(new List<SObject>{ notification });
     } catch (Exception ex) {
       LoggingService.error(
         'NotificationService',
