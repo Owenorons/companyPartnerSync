@@ -1,0 +1,121 @@
+[
+  {
+    "apiName": "Partner_Content_Access__c",
+    "label": "Partner Content Access",
+    "pluralLabel": "Partner Content Access",
+    "sharingModel": "Private",
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Content Access Name",
+    "fields": [
+      {
+        "apiName": "Access_Status__c",
+        "label": "Access Status",
+        "description": "Current status of the content access mapping.",
+        "type": "Picklist",
+        "required": false,
+        "values": ["Active", "Inactive", "Pending", "Expired"]
+      },
+      {
+        "apiName": "ContentDocumentId__c",
+        "label": "Content Document Id",
+        "type": "Text",
+        "length": 18,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Content_Category__c",
+        "label": "Content Category",
+        "description": "Content category associated with the access rule.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account granted content access.",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Content_Access"
+      },
+      {
+        "apiName": "Partner_Tier__c",
+        "label": "Partner Tier",
+        "description": "Partner tier allowed by the content access entry.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Region__c",
+        "label": "Region",
+        "description": "Region allowed by the content access entry.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      }
+    ],
+    "objectPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "objectApiName": "Partner_Content_Access__c",
+        "allowRead": true,
+        "allowCreate": true,
+        "allowEdit": true,
+        "allowDelete": false,
+        "viewAllRecords": false,
+        "modifyAllRecords": false
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Access_Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "ContentDocumentId__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Content_Category__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Tier__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Region__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]

@@ -20,6 +20,7 @@ public with sharing class CustomerAccountSelector {
         Is_Partner__c = FALSE
         AND (Name = :companyName
         OR Website LIKE :websitePattern)
+      WITH USER_MODE
       LIMIT 10
     ];
   }
@@ -31,6 +32,7 @@ public with sharing class CustomerAccountSelector {
       SELECT Id, Name, Is_Partner__c
       FROM Account
       WHERE Id = :accountId AND Is_Partner__c = FALSE
+      WITH USER_MODE
       LIMIT 1
     ];
 

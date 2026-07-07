@@ -16,6 +16,7 @@ public with sharing class DealReviewSelector {
         Submitted_On__c
       FROM Deal_Registration__c
       WHERE Status__c IN ('Submitted', 'Under Review', 'Approved')
+      WITH USER_MODE
       ORDER BY Submitted_On__c ASC NULLS LAST, CreatedDate ASC
       LIMIT 500
     ];
@@ -49,6 +50,7 @@ public with sharing class DealReviewSelector {
         Notes__c
       FROM Deal_Registration__c
       WHERE Id = :dealId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -83,6 +85,7 @@ public with sharing class DealReviewSelector {
         Customer_Account__c = :customerAccountId
         AND Id != :currentDealId
         AND Status__c IN ('Submitted', 'Under Review', 'Approved')
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 50
     ];

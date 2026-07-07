@@ -1,0 +1,382 @@
+[
+  {
+    "apiName": "Partner_Application__c",
+    "label": "Partner Application",
+    "pluralLabel": "Partner Applications",
+    "sharingModel": "Private",
+    "defaultFieldPermissionSet": "Partner_Sync_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Application Name",
+    "fields": [
+      {
+        "apiName": "Application_Number__c",
+        "label": "Application Number",
+        "type": "AutoNumber",
+        "externalId": false,
+        "displayFormat": "PA-{000000}"
+      },
+      {
+        "apiName": "Application_Status__c",
+        "label": "Application Status",
+        "description": "Current review status of the partner application.",
+        "type": "Picklist",
+        "required": false,
+        "values": ["Draft", "Submitted", "Under Review", "Approved", "Rejected"]
+      },
+      {
+        "apiName": "Approval_Date__c",
+        "label": "Approval Date",
+        "description": "Date when the partner application was approved.",
+        "type": "Date",
+        "required": false
+      },
+      {
+        "apiName": "Approval_Notes__c",
+        "label": "Approval Notes",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Assigned_Reviewer__c",
+        "label": "Assigned Reviewer",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "User",
+        "relationshipName": "Reviewed_Partner_Applications"
+      },
+      {
+        "apiName": "Business_Email__c",
+        "label": "Business Email",
+        "type": "Email",
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Company_Name__c",
+        "label": "Company Name",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Country__c",
+        "label": "Country",
+        "description": "Country where the prospective partner is based.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Created_Account__c",
+        "label": "Created Account",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Account",
+        "relationshipName": "Created_Partner_Applications"
+      },
+      {
+        "apiName": "Created_Contact__c",
+        "label": "Created Contact",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Contact",
+        "relationshipName": "Created_Partner_Applications"
+      },
+      {
+        "apiName": "Decision_By__c",
+        "label": "Decision By",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "User",
+        "relationshipName": "Decided_Partner_Applications"
+      },
+      {
+        "apiName": "Decision_On__c",
+        "label": "Decision On",
+        "type": "DateTime",
+        "required": false
+      },
+      {
+        "apiName": "Decision__c",
+        "label": "Decision",
+        "type": "Picklist",
+        "required": false,
+        "values": ["Pending", "Approved", "Rejected"]
+      },
+      {
+        "apiName": "Duplicate_Check_Key__c",
+        "label": "Duplicate Check Key",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": true
+      },
+      {
+        "apiName": "Normalized_Company_Name__c",
+        "label": "Normalized Company Name",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Partner_Type__c",
+        "label": "Partner Type",
+        "type": "Picklist",
+        "required": false,
+        "values": ["Distributor", "Reseller", "Agent", "Dealer", "Referral"]
+      },
+      {
+        "apiName": "Phone__c",
+        "label": "Phone",
+        "description": "Phone number for the partner applicant.",
+        "type": "Phone",
+        "required": false
+      },
+      {
+        "apiName": "Region__c",
+        "label": "Region",
+        "description": "Region where the prospective partner operates.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Rejection_Reason__c",
+        "label": "Rejection Reason",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      },
+      {
+        "apiName": "Requested_Tier__c",
+        "label": "Requested Tier",
+        "description": "Partner tier requested by the applicant.",
+        "type": "Picklist",
+        "required": false,
+        "values": ["Silver", "Gold", "Platinum", "Strategic"]
+      },
+      {
+        "apiName": "Source__c",
+        "label": "Source",
+        "description": "Source that generated the partner application.",
+        "type": "Picklist",
+        "required": false,
+        "values": [
+          "Website",
+          "Referral",
+          "Event",
+          "Campaign",
+          "Partner",
+          "Other"
+        ]
+      },
+      {
+        "apiName": "Submitted_By_Contact_Name__c",
+        "label": "Submitted By Contact Name",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Submitted_By_Email__c",
+        "label": "Submitted By Email",
+        "type": "Email",
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Submitted_On__c",
+        "label": "Submitted On",
+        "type": "DateTime",
+        "required": false
+      },
+      {
+        "apiName": "Website__c",
+        "label": "Website",
+        "description": "Website for the prospective partner company.",
+        "type": "Url",
+        "required": false
+      }
+    ],
+    "objectPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "objectApiName": "Partner_Application__c",
+        "allowRead": true,
+        "allowCreate": true,
+        "allowEdit": true,
+        "allowDelete": false,
+        "viewAllRecords": false,
+        "modifyAllRecords": false
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Application_Number__c",
+        "readable": true,
+        "editable": false
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Application_Status__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Approval_Date__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Approval_Notes__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Assigned_Reviewer__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Business_Email__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Company_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Country__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Created_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Created_Contact__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Decision_By__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Decision_On__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Decision__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Duplicate_Check_Key__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Normalized_Company_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Partner_Type__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Phone__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Region__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Rejection_Reason__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Requested_Tier__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Source__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Submitted_By_Contact_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Submitted_By_Email__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Submitted_On__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "field": "Website__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]

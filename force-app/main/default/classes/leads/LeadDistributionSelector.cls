@@ -21,6 +21,7 @@ public with sharing class LeadDistributionSelector {
         Converted_Deal__c
       FROM Lead
       WHERE Id = :leadId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -53,6 +54,7 @@ public with sharing class LeadDistributionSelector {
         Converted_Deal__c
       FROM Lead
       WHERE Id = :leadId AND Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -83,6 +85,7 @@ public with sharing class LeadDistributionSelector {
       WHERE
         Partner_Account__c = :partnerAccountId
         AND Lead_Distribution_Status__c IN ('Assigned', 'Accepted', 'Converted')
+      WITH USER_MODE
       ORDER BY Assigned_Date__c DESC
       LIMIT 200
     ];

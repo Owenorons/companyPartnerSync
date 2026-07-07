@@ -1,0 +1,10 @@
+[
+  {
+    "apiName": "Approval_Routing_Config__mdt",
+    "label": "Approval Routing Config",
+    "pluralLabel": "Approval Routing Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Approval Routing Config Name",
+    "fields": []
+  }
+]

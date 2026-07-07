@@ -18,6 +18,7 @@ public with sharing class DealRegistrationSelector {
         Opportunity__r.StageName
       FROM Deal_Registration__c
       WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 200
     ];
@@ -44,6 +45,7 @@ public with sharing class DealRegistrationSelector {
         Notes__c
       FROM Deal_Registration__c
       WHERE Id = :dealId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -73,6 +75,7 @@ public with sharing class DealRegistrationSelector {
         Customer_Account__c = :customerAccountId
         AND Status__c IN ('Submitted', 'Approved')
         AND Id != :currentDealId
+      WITH USER_MODE
       LIMIT 20
     ];
   }

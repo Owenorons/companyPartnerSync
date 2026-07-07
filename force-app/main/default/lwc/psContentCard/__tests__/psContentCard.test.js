@@ -46,4 +46,20 @@ describe("c-ps-content-card", () => {
       contentId: "content-1"
     });
   });
+
+  it("renders safe fallback copy when content is missing", () => {
+    const element = createElement("c-ps-content-card", {
+      is: PsContentCard
+    });
+
+    document.body.appendChild(element);
+
+    expect(element.shadowRoot.querySelector(".category").textContent).toBe(
+      "General"
+    );
+    expect(element.shadowRoot.querySelector("h3").textContent).toBe(
+      "Untitled content"
+    );
+    expect(element.shadowRoot.querySelector("button").disabled).toBe(true);
+  });
 });

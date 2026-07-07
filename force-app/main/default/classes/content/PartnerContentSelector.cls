@@ -18,6 +18,7 @@ public with sharing class PartnerContentSelector {
         Sort_Order__c
       FROM Partner_Content__c
       WHERE Is_Active__c = TRUE
+      WITH USER_MODE
       ORDER BY Sort_Order__c ASC NULLS LAST, Published_Date__c DESC
       LIMIT 500
     ];
@@ -41,6 +42,7 @@ public with sharing class PartnerContentSelector {
         Published_Date__c
       FROM Partner_Content__c
       WHERE Id = :contentId
+      WITH USER_MODE
       LIMIT 1
     ];
 

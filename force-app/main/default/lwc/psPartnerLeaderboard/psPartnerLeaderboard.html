@@ -34,39 +34,59 @@
       </c-ps-dashboard-metric-card>
     </section>
 
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading partner leaderboard"
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
     <section class="leaderboard-table">
       <div class="table-header">
         <h2>Performance Rankings</h2>
       </div>
 
-      <template for:each={partners} for:item="partner">
-        <article key={partner.partnerAccountId} class="partner-row">
-          <div class="rank">#{partner.rank}</div>
+      <template if:true={hasPartners}>
+        <template for:each={partners} for:item="partner">
+          <article key={partner.partnerAccountId} class="partner-row">
+            <div class="rank">#{partner.rank}</div>
 
-          <div class="partner-main">
-            <h3>{partner.partnerName}</h3>
-            <p>{partner.partnerTier}</p>
-          </div>
+            <div class="partner-main">
+              <h3>{partner.partnerName}</h3>
+              <p>{partner.partnerTier}</p>
+            </div>
 
-          <div class="partner-metric">
-            <span>Revenue</span>
-            <strong>{partner.revenueLabel}</strong>
-          </div>
+            <div class="partner-metric">
+              <span>Revenue</span>
+              <strong>{partner.revenueLabel}</strong>
+            </div>
 
-          <div class="partner-metric">
-            <span>Conversion</span>
-            <strong>{partner.conversionLabel}</strong>
-          </div>
+            <div class="partner-metric">
+              <span>Conversion</span>
+              <strong>{partner.conversionLabel}</strong>
+            </div>
 
-          <div class="partner-metric">
-            <span>Won Deals</span>
-            <strong>{partner.wonDeals}</strong>
-          </div>
+            <div class="partner-metric">
+              <span>Won Deals</span>
+              <strong>{partner.wonDeals}</strong>
+            </div>
 
-          <div class="partner-score">
-            <div class="score-ring">{partner.score}</div>
-          </div>
-        </article>
+            <div class="partner-score">
+              <div class="score-ring">{partner.score}</div>
+            </div>
+          </article>
+        </template>
+      </template>
+
+      <template if:false={hasPartners}>
+        <c-ps-empty-state
+          title="No partner rankings"
+          message="Leaderboard data will appear after partner activity is available."
+        >
+        </c-ps-empty-state>
       </template>
     </section>
   </div>

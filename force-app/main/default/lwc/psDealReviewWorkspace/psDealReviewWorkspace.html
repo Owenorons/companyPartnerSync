@@ -28,33 +28,57 @@
       </div>
 
       <div class="slds-var-p-around_medium queue-list">
-        <template for:each={filteredDeals} for:item="deal">
-          <button
-            key={deal.dealId}
-            class={deal.rowClass}
-            data-id={deal.dealId}
-            onclick={handleSelectDeal}
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No deals found"
+            message="Adjust the queue filters or check back later."
           >
-            <div
-              class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasFilteredDeals}>
+          <template for:each={filteredDeals} for:item="deal">
+            <button
+              key={deal.dealId}
+              class={deal.rowClass}
+              data-id={deal.dealId}
+              onclick={handleSelectDeal}
             >
-              <span class="deal-number">{deal.dealNumber}</span>
-              <span class={deal.statusClass}>{deal.status}</span>
-            </div>
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="deal-number">{deal.dealNumber}</span>
+                <span class={deal.statusClass}>{deal.status}</span>
+              </div>
 
-            <h3>{deal.customerName}</h3>
+              <h3>{deal.customerName}</h3>
 
-            <div class="slds-grid_align-spread slds-grid queue-meta">
-              <span>{deal.partnerName}</span>
-              <strong>{deal.formattedValue}</strong>
-            </div>
-          </button>
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>{deal.partnerName}</span>
+                <strong>{deal.formattedValue}</strong>
+              </div>
+            </button>
+          </template>
         </template>
       </div>
     </aside>
 
     <main class="slds-var-p-around_large review-panel">
       <template if:true={selectedDeal}>
+        <template if:true={detailError}>
+          <c-ps-error-panel message={detailError}></c-ps-error-panel>
+        </template>
+
+        <template if:true={loadingDetail}>
+          <c-ps-loading-state
+            message="Loading deal detail"
+          ></c-ps-loading-state>
+        </template>
+
         <section
           class="slds-media_center slds-grid_align-spread slds-grid hero-card"
         >

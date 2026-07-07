@@ -16,6 +16,7 @@ public with sharing class MDFSelector {
         Activity_End_Date__c
       FROM MDF_Request__c
       WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 200
     ];
@@ -39,6 +40,7 @@ public with sharing class MDFSelector {
         Activity_End_Date__c
       FROM MDF_Request__c
       WHERE Status__c IN ('Submitted', 'Under Review')
+      WITH USER_MODE
       ORDER BY CreatedDate ASC
       LIMIT 500
     ];
@@ -70,6 +72,7 @@ public with sharing class MDFSelector {
         Approver__c
       FROM MDF_Request__c
       WHERE Id = :requestId AND Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -104,6 +107,7 @@ public with sharing class MDFSelector {
         Approver__c
       FROM MDF_Request__c
       WHERE Id = :requestId
+      WITH USER_MODE
       LIMIT 1
     ];
 

@@ -17,6 +17,7 @@ public with sharing class AIInsightSelector {
       WHERE
         Partner_Account__c = :partnerAccountId
         AND Status__c IN ('Generated', 'Reviewed', 'Accepted')
+      WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 200
     ];
@@ -29,6 +30,7 @@ public with sharing class AIInsightSelector {
       SELECT Id, Partner_Account__c, Status__c
       FROM AI_Insight__c
       WHERE Id = :insightId
+      WITH USER_MODE
       LIMIT 1
     ];
 

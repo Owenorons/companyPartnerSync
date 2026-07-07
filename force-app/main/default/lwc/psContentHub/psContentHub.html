@@ -29,7 +29,11 @@
       </lightning-combobox>
     </section>
 
-    <template if:true={featuredContent.length}>
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasFeaturedContent}>
       <section class="slds-var-m-top_large featured-section">
         <h2 class="slds-var-m-bottom_medium">Featured</h2>
         <div class="content-grid">
@@ -48,7 +52,7 @@
     <section class="slds-var-m-top_large content-section">
       <h2 class="slds-var-m-bottom_medium">All Content</h2>
 
-      <template if:true={filteredContent.length}>
+      <template if:true={hasFilteredContent}>
         <div class="content-grid">
           <template for:each={filteredContent} for:item="item">
             <c-ps-content-card
@@ -61,7 +65,7 @@
         </div>
       </template>
 
-      <template if:false={filteredContent.length}>
+      <template if:false={hasFilteredContent}>
         <c-ps-empty-state
           title="No content found"
           message="Try changing your search or category filter."

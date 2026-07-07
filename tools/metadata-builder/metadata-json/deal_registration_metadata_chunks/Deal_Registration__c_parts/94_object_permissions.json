@@ -1,0 +1,20 @@
+[
+  {
+    "apiName": "Deal_Registration__c",
+    "label": "Deal Registration",
+    "pluralLabel": "Deal Registrations",
+    "skipObjectCreation": true,
+    "objectPermissions": [
+      {
+        "permissionSet": "Partner_Sync_Admin",
+        "objectApiName": "Deal_Registration__c",
+        "allowRead": true,
+        "allowCreate": true,
+        "allowEdit": true,
+        "allowDelete": false,
+        "viewAllRecords": false,
+        "modifyAllRecords": false
+      }
+    ]
+  }
+]

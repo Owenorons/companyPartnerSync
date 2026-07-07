@@ -1,0 +1,57 @@
+[
+  {
+    "apiName": "Approval_Rule__mdt",
+    "label": "Approval Rule",
+    "pluralLabel": "Approval Rules",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Approval Rule Name",
+    "fields": [
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the approval rule is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Approver_Role__c",
+        "label": "Approver Role",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Minimum_Amount__c",
+        "label": "Minimum Amount",
+        "type": "Number",
+        "precision": 18,
+        "scale": 2,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Object_Name__c",
+        "label": "Object Name",
+        "description": "Object name that the approval rule applies to.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Rule_Name__c",
+        "label": "Rule Name",
+        "description": "Business name of the approval rule.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      }
+    ]
+  }
+]

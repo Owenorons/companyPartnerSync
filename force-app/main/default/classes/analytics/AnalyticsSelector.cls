@@ -6,6 +6,7 @@ public with sharing class AnalyticsSelector {
       SELECT Id, Lead_Distribution_Status__c
       FROM Lead
       WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       LIMIT 5000
     ];
   }
@@ -19,6 +20,7 @@ public with sharing class AnalyticsSelector {
       SELECT Id, Status__c, Estimated_Revenue__c
       FROM Deal_Registration__c
       WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       LIMIT 5000
     ];
   }
@@ -32,6 +34,7 @@ public with sharing class AnalyticsSelector {
       SELECT Id, Amount, StageName, AccountId, Account.Name, Partner_Account__c
       FROM Opportunity
       WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
       LIMIT 5000
     ];
   }
@@ -43,6 +46,7 @@ public with sharing class AnalyticsSelector {
       SELECT Id, MDF_Annual_Budget__c, MDF_Used__c
       FROM Account
       WHERE Id = :partnerAccountId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -60,6 +64,7 @@ public with sharing class AnalyticsSelector {
       SELECT Id, Name, Partner_Tier__c, Partner_Status__c
       FROM Account
       WHERE Is_Partner__c = TRUE
+      WITH USER_MODE
       LIMIT 1000
     ];
   }
@@ -77,6 +82,7 @@ public with sharing class AnalyticsSelector {
         Partner_Account__r.Name
       FROM Opportunity
       WHERE StageName = 'Closed Won' AND Partner_Account__c != NULL
+      WITH USER_MODE
       LIMIT 10000
     ];
   }

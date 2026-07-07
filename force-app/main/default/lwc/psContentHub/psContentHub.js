@@ -6,20 +6,27 @@ import getDownloadUrl from "@salesforce/apex/PartnerContentController.getDownloa
 export default class PsContentHub extends LightningElement {
   content = [];
   categories = [];
+  error;
   searchTerm = "";
   selectedCategory = "";
 
   @wire(getAvailableContent)
-  wiredContent({ data }) {
+  wiredContent({ data, error }) {
     if (data) {
-      this.content = data;
+      this.content = Array.isArray(data) ? data : [];
+      this.error = undefined;
+    } else if (error) {
+      this.error = this.getErrorMessage(error, "Unable to load content.");
+      this.content = [];
     }
   }
 
   @wire(getCategories)
-  wiredCategories({ data }) {
+  wiredCategories({ data, error }) {
     if (data) {
-      this.categories = data;
+      this.categories = Array.isArray(data) ? data : [];
+    } else if (error) {
+      this.categories = [];
     }
   }
 
@@ -37,8 +44,16 @@ export default class PsContentHub extends LightningElement {
     return this.filteredContent.filter((item) => item.featured);
   }
 
+  get hasFeaturedContent() {
+    return this.featuredContent.length > 0;
+  }
+
+  get hasFilteredContent() {
+    return this.filteredContent.length > 0;
+  }
+
   get filteredContent() {
-    const term = this.searchTerm.toLowerCase();
+    const term = (this.searchTerm || "").trim().toLowerCase();
 
     return this.content.filter((item) => {
       const matchesSearch =
@@ -54,7 +69,7 @@ export default class PsContentHub extends LightningElement {
   }
 
   handleSearch(event) {
-    this.searchTerm = event.target.value;
+    this.searchTerm = event.target.value || "";
   }
 
   handleCategory(event) {
@@ -64,10 +79,22 @@ export default class PsContentHub extends LightningElement {
   async handleDownload(event) {
     const contentId = event.detail.contentId;
 
-    const result = await getDownloadUrl({ contentId });
-
-    if (result?.downloadUrl) {
-      window.open(result.downloadUrl, "_blank");
+    if (!contentId) {
+      return;
     }
+
+    try {
+      const result = await getDownloadUrl({ contentId });
+
+      if (result?.downloadUrl) {
+        window.open(result.downloadUrl, "_blank");
+      }
+    } catch (error) {
+      this.error = this.getErrorMessage(error, "Unable to open content.");
+    }
+  }
+
+  getErrorMessage(error, fallback) {
+    return error?.body?.message || error?.message || fallback;
   }
 }

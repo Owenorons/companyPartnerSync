@@ -20,7 +20,11 @@ export default class PsHomeDashboard extends LightningElement {
   }
 
   get hasAlerts() {
-    return this.dashboard?.alerts?.length > 0;
+    return this.alerts.length > 0;
+  }
+
+  get alerts() {
+    return Array.isArray(this.dashboard?.alerts) ? this.dashboard.alerts : [];
   }
 
   get statusClass() {

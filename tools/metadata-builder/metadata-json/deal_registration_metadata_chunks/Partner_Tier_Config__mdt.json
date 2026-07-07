@@ -1,0 +1,65 @@
+[
+  {
+    "apiName": "Partner_Tier_Config__mdt",
+    "label": "Partner Tier Config",
+    "pluralLabel": "Partner Tier Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Tier Config Name",
+    "fields": [
+      {
+        "apiName": "Analytics_Access_Level__c",
+        "label": "Analytics Access Level",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Badge_Eligibility__c",
+        "label": "Badge Eligibility",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Can_Access_Premium_Content__c",
+        "label": "Can Access Premium Content",
+        "type": "Checkbox",
+        "defaultValue": "false"
+      },
+      {
+        "apiName": "Deal_Protection_Days__c",
+        "label": "Deal Protection Days",
+        "type": "Number",
+        "precision": 18,
+        "scale": 0,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Max_MDF_Budget__c",
+        "label": "Max MDF Budget",
+        "type": "Number",
+        "precision": 18,
+        "scale": 2,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Tier_Name__c",
+        "label": "Tier Name",
+        "description": "Partner tier governed by the configuration.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      }
+    ]
+  }
+]

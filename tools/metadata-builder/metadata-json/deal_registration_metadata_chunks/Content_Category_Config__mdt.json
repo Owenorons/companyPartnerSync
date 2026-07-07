@@ -1,0 +1,10 @@
+[
+  {
+    "apiName": "Content_Category_Config__mdt",
+    "label": "Content Category Config",
+    "pluralLabel": "Content Category Configs",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Content Category Config Name",
+    "fields": []
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "apiName": "Webhook_Endpoint__mdt",
+    "label": "Webhook Endpoint",
+    "pluralLabel": "Webhook Endpoints",
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Webhook Endpoint Name",
+    "fields": [
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "description": "Indicates whether the webhook endpoint is active.",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Endpoint_Name__c",
+        "label": "Endpoint Name",
+        "description": "Business name of the webhook endpoint.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Events__c",
+        "label": "Events",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Secret_Key__c",
+        "label": "Secret Key",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "URL__c",
+        "label": "URL",
+        "description": "Webhook endpoint URL.",
+        "type": "Url",
+        "required": false
+      }
+    ]
+  }
+]

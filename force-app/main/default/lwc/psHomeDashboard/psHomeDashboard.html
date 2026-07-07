@@ -112,7 +112,7 @@
           <h2 class="slds-var-m-bottom_medium">Recommended Actions</h2>
 
           <template if:true={hasAlerts}>
-            <template for:each={dashboard.alerts} for:item="alert">
+            <template for:each={alerts} for:item="alert">
               <div
                 key={alert}
                 class="slds-var-m-bottom_x-small slds-media_center slds-grid alert-row"

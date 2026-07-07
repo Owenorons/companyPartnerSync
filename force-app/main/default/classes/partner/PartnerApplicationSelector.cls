@@ -12,6 +12,7 @@ public with sharing class PartnerApplicationSelector {
         Application_Status__c IN ('Submitted', 'Under Review', 'Approved')
         AND (Normalized_Company_Name__c = :normalizedCompanyName
         OR Business_Email__c = :businessEmail)
+      WITH USER_MODE
       LIMIT 10
     ];
   }
@@ -40,6 +41,7 @@ public with sharing class PartnerApplicationSelector {
         Created_Contact__c
       FROM Partner_Application__c
       WHERE Id = :applicationId
+      WITH USER_MODE
       LIMIT 1
     ];
 
@@ -66,6 +68,7 @@ public with sharing class PartnerApplicationSelector {
         Assigned_Reviewer__c
       FROM Partner_Application__c
       WHERE Application_Status__c IN ('Submitted', 'Under Review')
+      WITH USER_MODE
       ORDER BY Submitted_On__c ASC NULLS LAST, CreatedDate ASC
       LIMIT 500
     ];
