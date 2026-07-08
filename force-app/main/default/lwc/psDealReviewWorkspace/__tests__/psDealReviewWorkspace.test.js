@@ -50,7 +50,11 @@ describe("c-ps-deal-review-workspace", () => {
       estimatedRevenue: 25000,
       status: "Submitted",
       conflictStatus: "No Conflict",
-      notes: "Qualified opportunity"
+      notes: "Qualified opportunity",
+      riskScore: 67,
+      riskLevel: "Medium",
+      riskSummary: "Risk is based on submitted deal data.",
+      riskRecommendation: "Review submitted evidence."
     });
 
     const element = createElement("c-ps-deal-review-workspace", {
@@ -82,6 +86,12 @@ describe("c-ps-deal-review-workspace", () => {
     expect(
       element.shadowRoot.querySelector(".notes-body").textContent
     ).toContain("Qualified opportunity");
+    expect(element.shadowRoot.querySelector(".risk-score").textContent).toBe(
+      "67"
+    );
+    expect(element.shadowRoot.querySelector(".risk-label").textContent).toBe(
+      "Medium Risk"
+    );
   });
 
   it("submits an approve decision for the selected deal", async () => {
@@ -182,5 +192,47 @@ describe("c-ps-deal-review-workspace", () => {
         rejectionReason: "Insufficient qualification evidence."
       })
     });
+  });
+
+  it("renders rejected deals as read-only with the backend rejection reason", async () => {
+    getReviewDetail.mockResolvedValue({
+      dealId: "a02xx0000000002",
+      customerName: "Beta",
+      partnerName: "South Partner",
+      status: "Rejected",
+      conflictStatus: "Potential Conflict",
+      rejectionReason: "Customer already protected by another partner.",
+      riskScore: 88,
+      riskLevel: "High",
+      riskSummary: "Risk is based on submitted deal data.",
+      riskRecommendation: "Customer already protected by another partner."
+    });
+
+    const element = createElement("c-ps-deal-review-workspace", {
+      is: PsDealReviewWorkspace
+    });
+
+    document.body.appendChild(element);
+
+    getReviewQueue.emit([
+      {
+        dealId: "a02xx0000000002",
+        customerName: "Beta",
+        partnerName: "South Partner",
+        status: "Rejected",
+        conflictStatus: "Potential Conflict"
+      }
+    ]);
+    await flushPromises();
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".approve")).toBeNull();
+    expect(element.shadowRoot.querySelector(".reject")).toBeNull();
+    expect(
+      element.shadowRoot.querySelector(".decision-state").textContent
+    ).toContain("Rejected");
+    expect(element.shadowRoot.textContent).toContain(
+      "Customer already protected by another partner."
+    );
   });
 });

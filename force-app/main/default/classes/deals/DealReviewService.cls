@@ -38,8 +38,10 @@ public with sharing class DealReviewService {
     );
 
     if (request.decision == 'Approved') {
+      assertCanFinalize(record);
       approve(record, request);
     } else if (request.decision == 'Rejected') {
+      assertCanFinalize(record);
       reject(record, request);
     } else if (request.decision == 'Conflict Resolved') {
       resolveConflict(record, request);
@@ -53,6 +55,14 @@ public with sharing class DealReviewService {
       'DealReviewService',
       'Deal review decision processed. DealId=' + record.Id
     );
+  }
+
+  private static void assertCanFinalize(Deal_Registration__c record) {
+    if (record.Status__c != 'Submitted' && record.Status__c != 'Under Review') {
+      throw new PartnerSyncHandledException(
+        'Only submitted or under review deals can be approved or rejected.'
+      );
+    }
   }
 
   private static void approve(

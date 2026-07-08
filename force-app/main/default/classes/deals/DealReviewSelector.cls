@@ -15,7 +15,7 @@ public with sharing class DealReviewSelector {
         Protection_End_Date__c,
         Submitted_On__c
       FROM Deal_Registration__c
-      WHERE Status__c IN ('Submitted', 'Under Review', 'Approved')
+      WHERE Status__c IN ('Submitted', 'Under Review', 'Approved', 'Rejected')
       WITH USER_MODE
       ORDER BY Submitted_On__c ASC NULLS LAST, CreatedDate ASC
       LIMIT 500

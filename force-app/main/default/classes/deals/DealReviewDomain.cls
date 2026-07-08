@@ -60,11 +60,28 @@ public with sharing class DealReviewDomain {
     dto.protectionEndDate = record.Protection_End_Date__c;
     dto.submittedOn = record.Submitted_On__c;
 
+    dto.approvalNotes = record.Approval_Notes__c;
+    dto.rejectionReason = record.Rejection_Reason__c;
+    dto.conflictResolutionNotes = record.Conflict_Resolution_Notes__c;
+
     dto.conflicts = new List<DealConflictDetailDTO>();
 
     for (Deal_Registration__c conflict : conflicts) {
       dto.conflicts.add(toConflictDTO(conflict));
     }
+
+    dto.riskScore = DealRiskScoringService.score(record, conflicts);
+    dto.riskLevel = DealRiskScoringService.level(dto.riskScore);
+    dto.riskSummary = DealRiskScoringService.summary(
+      record,
+      conflicts,
+      dto.riskScore
+    );
+    dto.riskRecommendation = DealRiskScoringService.recommendation(
+      record,
+      conflicts,
+      dto.riskScore
+    );
 
     return dto;
   }

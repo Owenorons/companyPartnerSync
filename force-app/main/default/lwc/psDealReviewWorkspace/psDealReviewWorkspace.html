@@ -93,11 +93,17 @@
             </div>
           </div>
 
-          <div class="slds-grid hero-actions">
-            <button class="approve" onclick={handleApprove}>Approve</button>
+          <template if:true={selectedDeal.isReviewable}>
+            <div class="slds-grid hero-actions">
+              <button class="approve" onclick={handleApprove}>Approve</button>
 
-            <button class="reject" onclick={handleReject}>Reject</button>
-          </div>
+              <button class="reject" onclick={handleReject}>Reject</button>
+            </div>
+          </template>
+
+          <template if:false={selectedDeal.isReviewable}>
+            <div class="decision-state">{selectedDeal.status}</div>
+          </template>
         </section>
 
         <section class="slds-var-m-top_large detail-grid">
@@ -120,26 +126,75 @@
               <span>Submitted</span>
               <strong>{selectedDeal.createdDateLabel}</strong>
             </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Related Registrations</span>
+              <strong>{selectedDeal.conflictCount}</strong>
+            </div>
+
+            <template if:true={selectedDeal.hasConflicts}>
+              <div class="slds-var-m-top_medium conflict-list">
+                <template for:each={selectedDeal.conflicts} for:item="conflict">
+                  <div key={conflict.dealId} class="conflict-row">
+                    <div>
+                      <strong>{conflict.dealNumber}</strong>
+                      <span>{conflict.partnerName}</span>
+                    </div>
+                    <div>
+                      <span>{conflict.status}</span>
+                      <strong>{conflict.formattedValue}</strong>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
           </article>
 
           <article class="panel-card">
             <h3 class="slds-var-m-bottom_medium">AI Deal Risk</h3>
 
-            <div class="risk-score">{selectedDeal.aiRiskScore}</div>
+            <div class="risk-score">{selectedDeal.riskScore}</div>
 
-            <p class="risk-label">Risk Score</p>
+            <p class="risk-label">{selectedDeal.riskLevel} Risk</p>
 
             <div
               class="slds-var-m-top_medium slds-var-p-around_medium risk-summary"
             >
-              {selectedDeal.aiSummary}
+              {selectedDeal.riskSummary}
             </div>
 
             <div class="slds-var-m-top_medium recommendation">
               <strong>Recommendation</strong>
-              <p>{selectedDeal.aiRecommendation}</p>
+              <p>{selectedDeal.riskRecommendation}</p>
             </div>
           </article>
+
+          <template if:true={selectedDeal.showRejectionReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Rejection Reason</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedDeal.rejectionReason}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedDeal.showApprovalNotes}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Approval Notes</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedDeal.approvalNotes}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedDeal.showConflictResolutionNotes}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Conflict Resolution</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedDeal.conflictResolutionNotes}
+              </div>
+            </article>
+          </template>
 
           <article class="panel-card full-width">
             <h3 class="slds-var-m-bottom_medium">Deal Notes</h3>

@@ -14,8 +14,11 @@ const STATUS_OPTIONS = [
 
 const CONFLICT_OPTIONS = [
   { label: "All Conflicts", value: "" },
+  { label: "None", value: "None" },
   { label: "No Conflict", value: "No Conflict" },
   { label: "Potential Conflict", value: "Potential Conflict" },
+  { label: "Confirmed Conflict", value: "Confirmed Conflict" },
+  { label: "Resolved", value: "Resolved" },
   { label: "Conflict Resolved", value: "Conflict Resolved" }
 ];
 
@@ -211,42 +214,34 @@ export default class PsDealReviewWorkspace extends LightningElement {
   }
 
   toDetailViewModel(deal = {}) {
+    const conflicts = (deal.conflicts || []).map((conflict) => ({
+      ...conflict,
+      formattedValue: this.formatCurrency(conflict.estimatedRevenue),
+      protectionEndLabel: this.formatDate(conflict.protectionEndDate)
+    }));
+
     return {
       ...this.toQueueViewModel(deal),
       stage: deal.implementationTimeline || "Review",
       notes: deal.notes || "No notes provided.",
-      aiRiskScore: this.getRiskScore(deal),
-      aiSummary: this.getRiskSummary(deal),
-      aiRecommendation: this.getRecommendation(deal)
+      conflicts,
+      conflictCount: conflicts.length,
+      hasConflicts: conflicts.length > 0,
+      isReviewable:
+        deal.status === "Submitted" || deal.status === "Under Review",
+      showRejectionReason:
+        deal.status === "Rejected" && Boolean(deal.rejectionReason),
+      showApprovalNotes: Boolean(deal.approvalNotes),
+      showConflictResolutionNotes: Boolean(deal.conflictResolutionNotes),
+      riskScore: deal.riskScore ?? 0,
+      riskLevel: deal.riskLevel || "Not calculated",
+      riskSummary:
+        deal.riskSummary ||
+        "Risk has not been calculated for this deal registration.",
+      riskRecommendation:
+        deal.riskRecommendation ||
+        "Review the submitted deal details before making a decision."
     };
-  }
-
-  getRiskScore(deal) {
-    if (deal.conflictStatus === "Potential Conflict") {
-      return 82;
-    }
-
-    if (deal.status === "Rejected") {
-      return 74;
-    }
-
-    return 28;
-  }
-
-  getRiskSummary(deal) {
-    if (deal.conflictStatus === "Potential Conflict") {
-      return "Potential customer or account overlap requires reviewer attention.";
-    }
-
-    return "No material conflict signals are present in the current review data.";
-  }
-
-  getRecommendation(deal) {
-    if (deal.conflictStatus === "Potential Conflict") {
-      return "Review related registrations before approving protection.";
-    }
-
-    return "Proceed based on qualification, partner fit, and submitted evidence.";
   }
 
   formatCurrency(value) {
@@ -292,13 +287,18 @@ export default class PsDealReviewWorkspace extends LightningElement {
 
   getConflictClass(conflictStatus) {
     if (
+      conflictStatus === "None" ||
       conflictStatus === "No Conflict" ||
+      conflictStatus === "Resolved" ||
       conflictStatus === "Conflict Resolved"
     ) {
       return "ps-badge ps-badge-success";
     }
 
-    if (conflictStatus === "Potential Conflict") {
+    if (
+      conflictStatus === "Potential Conflict" ||
+      conflictStatus === "Confirmed Conflict"
+    ) {
       return "ps-badge ps-badge-danger";
     }
 

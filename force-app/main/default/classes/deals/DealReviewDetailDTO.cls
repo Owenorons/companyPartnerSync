@@ -41,5 +41,21 @@ public with sharing class DealReviewDetailDTO {
   public Datetime submittedOn;
 
   @AuraEnabled
+  public String approvalNotes;
+  @AuraEnabled
+  public String rejectionReason;
+  @AuraEnabled
+  public String conflictResolutionNotes;
+
+  @AuraEnabled
+  public Decimal riskScore;
+  @AuraEnabled
+  public String riskLevel;
+  @AuraEnabled
+  public String riskSummary;
+  @AuraEnabled
+  public String riskRecommendation;
+
+  @AuraEnabled
   public List<DealConflictDetailDTO> conflicts;
 }
