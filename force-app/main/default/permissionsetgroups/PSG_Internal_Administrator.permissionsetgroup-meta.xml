@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Full PartnerSync administration: application configuration, AI provider governance, content management, analytics, and MDF review.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Internal Administrator</label>
+    <permissionSets>psync__PartnerSync_AI_Admin</permissionSets>
+    <permissionSets>psync__PartnerSync_Analytics_User</permissionSets>
+    <permissionSets>psync__PartnerSync_Content_Admin</permissionSets>
+    <permissionSets>psync__PartnerSync_Internal_Admin</permissionSets>
+    <permissionSets>psync__PartnerSync_MDF_Reviewer</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

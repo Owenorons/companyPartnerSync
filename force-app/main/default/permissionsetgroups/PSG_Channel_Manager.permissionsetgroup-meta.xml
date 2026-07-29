@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Internal channel manager persona: deal review, MDF approvals, content management, analytics, and AI copilot.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Channel Manager</label>
+    <permissionSets>psync__PartnerSync_AI_User</permissionSets>
+    <permissionSets>psync__PartnerSync_Analytics_User</permissionSets>
+    <permissionSets>psync__PartnerSync_Channel_Manager</permissionSets>
+    <permissionSets>psync__PartnerSync_Content_Admin</permissionSets>
+    <permissionSets>psync__PartnerSync_MDF_Reviewer</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>
