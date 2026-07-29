@@ -1,3 +1,9 @@
+/*
+ * Writes immutable audit trail entries for partner-visible actions (deal
+ * decisions, content downloads, MDF approvals, etc.). This is the single
+ * write path into Audit_Log__c — build the request via AuditFactory, then
+ * call log() here.
+ */
 public with sharing class AuditService {
   public static void log(AuditLogRequestDTO request) {
     if (request == null) {
@@ -5,6 +11,11 @@ public with sharing class AuditService {
     }
 
     try {
+      // Audit logging must never break the operation it's recording (e.g.
+      // a deal submission shouldn't fail because the audit insert did) —
+      // any failure here is caught and logged, never rethrown to the caller.
+      SecurityUtil.assertCreateable(Audit_Log__c.SObjectType);
+
       Audit_Log__c audit = new Audit_Log__c();
 
       audit.Audit_Timestamp__c = System.now();
@@ -39,12 +50,17 @@ public with sharing class AuditService {
 
       audit.Performed_By_Type__c = determineActorType();
 
-      insert audit;
+      List<SObject> sanitized = SecurityUtil.stripForCreate(
+        new List<SObject>{ audit }
+      );
+      Database.insert(sanitized, AccessLevel.USER_MODE);
     } catch (Exception ex) {
       LoggingService.error('AuditService', 'Unable to create audit log.', ex);
     }
   }
 
+  // Distinguishes internal (employee) actors from partner/community actors
+  // for audit reporting; community users are never "internal" here.
   private static String determineActorType() {
     if (PartnerAccessService.isInternalUser()) {
       return 'Internal';

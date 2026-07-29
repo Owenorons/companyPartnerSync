@@ -1,7 +1,19 @@
+/*
+ * Partner-facing MDF write/read path: submits new requests (with tenant
+ * and permission gating) and lists the caller's own requests/budget.
+ * Decisioning is handled separately by MDFApprovalService, which is
+ * internal-reviewer-only.
+ */
 public with sharing class MDFService {
   public static void submitRequest(MDFRequestDTO request) {
     if (!TenantConfigService.isMdfEnabled()) {
       throw new PartnerSyncHandledException('MDF is disabled.');
+    }
+
+    if (!PartnerAccessService.canSubmitMDF()) {
+      throw new PartnerSyncHandledException(
+        'You do not have permission to submit MDF requests.'
+      );
     }
 
     SecurityUtil.assertCreateable(MDF_Request__c.SObjectType);
@@ -33,6 +45,15 @@ public with sharing class MDFService {
     audit.partnerContactId = contact.Id;
 
     AuditService.log(audit);
+
+    PlatformEventPublisherService.publish(
+      'MDFSubmitted',
+      record.Id,
+      'MDF_Request__c',
+      partnerAccountId,
+      'MDF request submitted for review.',
+      'Info'
+    );
 
     notifyInternalReviewers(record);
   }

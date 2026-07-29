@@ -1,3 +1,9 @@
+/*
+ * Domain layer for the assignment/decision half of the lead lifecycle:
+ * validates assignment and accept/reject requests, and maps a Lead to its
+ * partner-facing DTO. LeadConversionDomain is the counterpart for the later
+ * step of turning an accepted lead into an Opportunity/Deal Registration.
+ */
 public with sharing class LeadDistributionDomain {
   public static void validateAssignment(LeadAssignmentRequestDTO request) {
     if (request == null) {

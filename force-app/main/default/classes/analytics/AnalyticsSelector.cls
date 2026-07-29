@@ -1,3 +1,9 @@
+/*
+ * Selector layer for analytics: all SOQL backing KPI, leaderboard, and
+ * customer-revenue calculations lives here, each query explicitly enforcing
+ * WITH USER_MODE / readable checks so AnalyticsService and AnalyticsDomain
+ * never touch raw queries.
+ */
 public with sharing class AnalyticsSelector {
   public static List<Lead> selectPartnerLeads(Id partnerAccountId) {
     SecurityUtil.assertReadable(Lead.SObjectType);
@@ -81,6 +87,8 @@ public with sharing class AnalyticsSelector {
         Partner_Account__c,
         Partner_Account__r.Name
       FROM Opportunity
+      // Partner_Account__c != NULL excludes direct (non-channel) deals so
+      // executive customer-revenue reporting only reflects partner-sourced business.
       WHERE StageName = 'Closed Won' AND Partner_Account__c != NULL
       WITH USER_MODE
       LIMIT 10000

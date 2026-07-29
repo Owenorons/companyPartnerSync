@@ -1,3 +1,9 @@
+/*
+ * Service layer for the Partner Content Hub: partner browsing (tenant-flag
+ * gated, visibility filtered per PartnerContentDomain), admin CRUD (gated on
+ * assertCanManageContent), and download issuance (gated on
+ * assertPartnerAccessToContent, with usage logging + audit trail).
+ */
 public with sharing class PartnerContentService {
   public static List<PartnerContentDTO> getAvailableContent() {
     if (!TenantConfigService.isContentEnabled()) {
@@ -23,6 +29,56 @@ public with sharing class PartnerContentService {
     return results;
   }
 
+  public static List<PartnerContentCategoryDTO> getCategories() {
+    List<PartnerContentCategoryDTO> results = new List<PartnerContentCategoryDTO>();
+
+    Schema.DescribeFieldResult categoryField = Partner_Content__c.Category__c.getDescribe();
+    List<Schema.PicklistEntry> entries = categoryField.getPicklistValues();
+
+    for (Schema.PicklistEntry entry : entries) {
+      if (!entry.isActive()) {
+        continue;
+      }
+
+      PartnerContentCategoryDTO dto = new PartnerContentCategoryDTO();
+      dto.label = entry.getLabel();
+      dto.value = entry.getValue();
+      results.add(dto);
+    }
+
+    return results;
+  }
+
+  public static List<PartnerContentAdminDTO> getAllContentForAdmin() {
+    PartnerPermissionService.assertCanManageContent();
+
+    List<PartnerContentAdminDTO> results = new List<PartnerContentAdminDTO>();
+
+    List<Partner_Content__c> records = PartnerContentSelector.selectAllForAdmin();
+
+    for (Partner_Content__c record : records) {
+      results.add(PartnerContentDomain.toAdminDTO(record));
+    }
+
+    return results;
+  }
+
+  public static PartnerContentAdminDTO saveContent(PartnerContentAdminDTO dto) {
+    PartnerPermissionService.assertCanManageContent();
+    PartnerContentDomain.validateAdminSave(dto);
+
+    Partner_Content__c content = PartnerContentSelector.selectById(
+      dto.contentId
+    );
+
+    PartnerContentDomain.applyAdminUpdate(content, dto);
+
+    SecurityUtil.assertUpdateable(Partner_Content__c.SObjectType);
+    update SecurityUtil.stripForUpdate(new List<SObject>{ content });
+
+    return PartnerContentDomain.toAdminDTO(content);
+  }
+
   public static PartnerContentDownloadDTO getDownloadUrl(Id contentId) {
     if (!TenantConfigService.isContentEnabled()) {
       throw new PartnerSyncHandledException('Content Hub is disabled.');
@@ -31,15 +87,9 @@ public with sharing class PartnerContentService {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
     Contact contact = PartnerAccessService.getCurrentPartnerContact();
 
-    Account partner = PartnerContentSelector.selectPartnerVisibilityContext(
-      partnerAccountId
-    );
+    PartnerRecordAccessService.assertPartnerAccessToContent(contentId);
 
     Partner_Content__c content = PartnerContentSelector.selectById(contentId);
-
-    if (!PartnerContentDomain.isVisibleToPartner(content, partner)) {
-      throw new PartnerSyncHandledException('Content not accessible.');
-    }
 
     if (String.isBlank(content.Content_Document_Id__c)) {
       throw new PartnerSyncHandledException(
@@ -68,6 +118,10 @@ public with sharing class PartnerContentService {
   }
 
   private static String buildDownloadUrl(String contentDocumentId) {
+    // Not a signed/expiring link — it's the standard ContentDocument
+    // download servlet path, which relies on the requesting user's own
+    // session auth. assertPartnerAccessToContent() above is what actually
+    // gates access; this URL alone grants nothing.
     return URL.getOrgDomainUrl().toExternalForm() +
       '/sfc/servlet.shepherd/document/download/' +
       EncodingUtil.urlEncode(contentDocumentId, 'UTF-8');
@@ -79,6 +133,9 @@ public with sharing class PartnerContentService {
     Id contentId,
     String action
   ) {
+    // Usage logging is best-effort: silently skip rather than throw if the
+    // running user/profile can't create Content_Usage_Log__c, so a missing
+    // permission never blocks the actual download.
     if (!Schema.sObjectType.Content_Usage_Log__c.isCreateable()) {
       return;
     }

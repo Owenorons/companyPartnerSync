@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Active__c</fullName>
     <defaultValue>true</defaultValue>
-    <description
-  >Indicates whether the lead distribution rule is active.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Active</label>
     <type>Checkbox</type>

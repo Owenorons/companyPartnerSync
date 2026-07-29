@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>PartnerSync Internal Dashboard</masterLabel>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightningCommunity__Default">
+            <property
+        name="dealReviewTabName"
+        type="String"
+        default="Deal_Review"
+        label="Deal Review tab API name"
+        description="Internal app tab/page API name the Review Deals quick action navigates to"
+      />
+            <property
+        name="mdfReviewTabName"
+        type="String"
+        default="MDF_Review"
+        label="MDF Review tab API name"
+        description="Internal app tab/page API name the Review MDF quick action navigates to"
+      />
+            <property
+        name="notificationsTabName"
+        type="String"
+        default="Notification_Center"
+        label="Notification Center tab API name"
+        description="Internal app tab/page API name the Notifications quick action navigates to"
+      />
+            <property
+        name="contentAdminTabName"
+        type="String"
+        default="Content_Administration"
+        label="Content Administration tab API name"
+        description="Internal app tab/page API name the Manage Content quick action navigates to"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,3 +1,8 @@
+/*
+ * Builds AuditLogRequestDTO instances with consistent severity/status
+ * conventions (Info/Success vs. Error/Failed) so callers across the codebase
+ * don't hand-roll inconsistent audit payloads. Pair with AuditService.log().
+ */
 public with sharing class AuditFactory {
   public static AuditLogRequestDTO createSuccess(
     String objectName,

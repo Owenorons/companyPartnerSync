@@ -2,7 +2,7 @@
   display: grid;
   place-items: center;
 
-  padding: 4rem var(--lwc-varSpacingXLarge, 2rem);
+  padding: 4rem 2rem;
 
   color: var(--ps-color-text-muted);
 }
@@ -13,7 +13,7 @@
 
   border-radius: 999px;
 
-  border: var(--lwc-spacingXxSmall, 4px) solid #dbeafe;
+  border: 0.2rem solid var(--ps-color-border);
   border-top-color: var(--ps-color-primary);
 
   animation: spin 0.7s linear infinite;
@@ -26,5 +26,6 @@
 }
 
 .loading-shell p {
-  font-weight: var(--lwc-fontWeightBold, 700);
+  font-family: var(--ps-font-mono);
+  font-size: 0.8rem;
 }

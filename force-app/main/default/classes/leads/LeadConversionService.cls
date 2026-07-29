@@ -1,3 +1,9 @@
+/*
+ * Orchestrates converting an accepted Lead into an Opportunity and Deal
+ * Registration. This is the "conversion" half of the lead lifecycle — it
+ * only operates on leads that have already been through the assignment
+ * (LeadDistributionService) and acceptance (LeadDecisionService) steps.
+ */
 public with sharing class LeadConversionService {
   public static LeadConversionResultDTO convertLead(
     LeadConversionRequestDTO request
@@ -14,13 +20,13 @@ public with sharing class LeadConversionService {
 
     SecurityUtil.assertUpdateable(Lead.SObjectType);
 
-    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+    PartnerRecordAccessService.assertPartnerAccessToLead(request.leadId);
 
-    Lead lead = LeadDistributionSelector.selectPartnerLeadById(
-      request.leadId,
-      partnerAccountId
-    );
+    Lead lead = LeadDistributionSelector.selectInternalLead(request.leadId);
 
+    // Conversion requires the partner to have already accepted the lead via
+    // LeadDecisionService; this blocks internal admins from converting a
+    // lead the partner hasn't (or has explicitly declined to) sign off on.
     if (lead.Lead_Distribution_Status__c != 'Accepted') {
       throw new PartnerSyncHandledException(
         'Only accepted leads can be converted.'
@@ -41,7 +47,7 @@ public with sharing class LeadConversionService {
       new List<SObject>{ opportunity }
     );
 
-    insert sanitizedOpportunities;
+    Database.insert(sanitizedOpportunities, AccessLevel.USER_MODE);
 
     Opportunity insertedOpportunity = (Opportunity) sanitizedOpportunities[0];
 
@@ -60,11 +66,24 @@ public with sharing class LeadConversionService {
       dealRequest
     );
 
+    // Only flip the lead to 'Converted' after the Opportunity and Deal
+    // Registration above have already committed, so a failure earlier in
+    // this method leaves the lead 'Accepted' (safe to retry) instead of
+    // marking it converted without the records that should back that up.
     lead.Converted_Deal__c = deal.Id;
 
     lead.Lead_Distribution_Status__c = 'Converted';
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ lead });
+
+    PlatformEventPublisherService.publish(
+      'LeadConverted',
+      lead.Id,
+      'Lead',
+      lead.Partner_Account__c,
+      'Lead converted to a deal registration.',
+      'Info'
+    );
 
     LoggingService.info(
       'LeadConversionService',

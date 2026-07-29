@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Can_Submit_MDF__c</fullName>
     <defaultValue>false</defaultValue>
-    <description
-  >Indicates whether the partner contact can submit MDF requests.</description>
     <label>Can Submit MDF</label>
     <trackFeedHistory>false</trackFeedHistory>
     <type>Checkbox</type>

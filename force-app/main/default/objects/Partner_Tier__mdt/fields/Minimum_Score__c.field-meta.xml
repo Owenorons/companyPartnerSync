@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Minimum_Score__c</fullName>
-    <description
-  >Minimum score required to qualify for the partner tier.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Minimum Score</label>

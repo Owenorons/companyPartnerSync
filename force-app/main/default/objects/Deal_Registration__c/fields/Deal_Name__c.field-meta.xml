@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Deal_Name__c</fullName>
-    <description
-  >Partner-provided name or title for the registered deal.</description>
     <externalId>false</externalId>
     <label>Deal Name</label>
     <length>255</length>

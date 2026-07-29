@@ -3,6 +3,6 @@
     <fullName>Accepted_Date__c</fullName>
     <label>Accepted Date</label>
     <required>false</required>
-    <trackTrending>false</trackTrending>
+    <trackFeedHistory>false</trackFeedHistory>
     <type>DateTime</type>
 </CustomField>

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Partner_Account__c</fullName>
-    <description
-  >Partner account associated with the content usage event.</description>
     <deleteConstraint>SetNull</deleteConstraint>
     <label>Partner Account</label>
     <referenceTo>Account</referenceTo>
-    <relationshipLabel>Content Usage Logs</relationshipLabel>
     <relationshipName>Content_Usage_Logs</relationshipName>
     <required>false</required>
     <trackTrending>false</trackTrending>

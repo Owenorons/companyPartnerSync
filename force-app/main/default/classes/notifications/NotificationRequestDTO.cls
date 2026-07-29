@@ -1,3 +1,9 @@
+/*
+ * Internal request payload for NotificationService.create() — used by
+ * other server-side services to raise a Partner_Notification__c, not
+ * exposed directly to the LWC layer (contrast PartnerNotificationDTO, the
+ * read-side DTO that is @AuraEnabled).
+ */
 public with sharing class NotificationRequestDTO {
   public Id partnerAccountId;
 

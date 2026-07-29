@@ -1,3 +1,9 @@
+/*
+ * Field-mapping and validation layer for MDF: turns MDFRequestDTO/
+ * MDFDecisionDTO into MDF_Request__c (and back into list/budget DTOs),
+ * and enforces the shape rules a submission or decision must satisfy
+ * before MDFService/MDFApprovalService touch the database.
+ */
 public with sharing class MDFDomain {
   public static void validateSubmit(MDFRequestDTO request) {
     if (request == null) {
@@ -74,6 +80,9 @@ public with sharing class MDFDomain {
     record.Activity_Start_Date__c = request.startDate;
     record.Activity_End_Date__c = request.endDate;
 
+    // roiTarget is the DTO's generic name for the partner's committed
+    // outcome; the only ROI metric this object tracks today is lead
+    // volume, hence the mapping to Expected_Leads__c.
     if (request.roiTarget != null) {
       record.Expected_Leads__c = request.roiTarget;
     }

@@ -1,3 +1,9 @@
+/*
+ * Unit tests for the domain-layer build/validate logic shared by the
+ * registration side (DealRegistrationDomain) and the internal review side
+ * (DealReviewDomain). Kept together because both domains' validation rules
+ * are exercised against the same underlying Deal_Registration__c shape.
+ */
 @IsTest
 private class DealDomainTest {
   @IsTest
@@ -51,6 +57,42 @@ private class DealDomainTest {
     System.assertEquals(partner.Id, record.Partner_Account__c);
     System.assertEquals(25000, record.Estimated_Revenue__c);
     System.assertEquals('Pending Analysis', record.Conflict_Status__c);
+  }
+
+  @IsTest
+  static void buildRecordCopiesSourceLeadFromOpportunity() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    Account customer = PartnerSyncTestDataFactory.customerAccount('Customer');
+    insert new List<Account>{ partner, customer };
+
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    insert contact;
+
+    Lead sourceLead = PartnerSyncTestDataFactory.lead(partner.Id, contact.Id);
+    insert sourceLead;
+
+    Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+      customer.Id,
+      partner.Id,
+      contact.Id
+    );
+    opportunity.Source_Lead__c = sourceLead.Id;
+    insert opportunity;
+
+    DealRegistrationRequestDTO request = new DealRegistrationRequestDTO();
+    request.opportunityId = opportunity.Id;
+    request.estimatedRevenue = 25000;
+
+    Deal_Registration__c record = DealRegistrationDomain.buildRecord(
+      opportunity,
+      request
+    );
+
+    System.assertEquals(
+      sourceLead.Id,
+      record.Source_Lead__c,
+      'A deal registered against an opportunity that came from a lead should carry that lineage.'
+    );
   }
 
   @IsTest

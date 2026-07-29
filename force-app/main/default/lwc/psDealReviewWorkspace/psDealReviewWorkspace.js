@@ -99,6 +99,14 @@ export default class PsDealReviewWorkspace extends LightningElement {
     return !this.rejectionReason.trim();
   }
 
+  get showNoDecisionPermission() {
+    return Boolean(
+      this.selectedDeal?.isReviewable &&
+      !this.selectedDeal?.canApprove &&
+      !this.selectedDeal?.canReject
+    );
+  }
+
   handleSearch(event) {
     this.searchTerm = event.target.value || "";
   }
@@ -229,12 +237,20 @@ export default class PsDealReviewWorkspace extends LightningElement {
       hasConflicts: conflicts.length > 0,
       isReviewable:
         deal.status === "Submitted" || deal.status === "Under Review",
+      isStamped: deal.status === "Approved" || deal.status === "Rejected",
+      stampClass: deal.status === "Approved" ? "stamp" : "stamp bad",
+      canApprove: Boolean(deal.canApprove),
+      canReject: Boolean(deal.canReject),
       showRejectionReason:
         deal.status === "Rejected" && Boolean(deal.rejectionReason),
       showApprovalNotes: Boolean(deal.approvalNotes),
       showConflictResolutionNotes: Boolean(deal.conflictResolutionNotes),
       riskScore: deal.riskScore ?? 0,
       riskLevel: deal.riskLevel || "Not calculated",
+      riskScoreClass: `risk-score ${this.getRiskModifier(deal.riskLevel)}`,
+      riskSummaryClass: `slds-var-m-top_medium slds-var-p-around_medium risk-summary ${this.getRiskModifier(
+        deal.riskLevel
+      )}`,
       riskSummary:
         deal.riskSummary ||
         "Risk has not been calculated for this deal registration.",
@@ -303,6 +319,22 @@ export default class PsDealReviewWorkspace extends LightningElement {
     }
 
     return "ps-badge ps-badge-info";
+  }
+
+  getRiskModifier(riskLevel) {
+    if (riskLevel === "High") {
+      return "risk-high";
+    }
+
+    if (riskLevel === "Medium") {
+      return "risk-medium";
+    }
+
+    if (riskLevel === "Low") {
+      return "risk-low";
+    }
+
+    return "risk-unknown";
   }
 
   getErrorMessage(error, fallback) {

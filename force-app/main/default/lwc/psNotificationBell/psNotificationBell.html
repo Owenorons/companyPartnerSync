@@ -1,1 +1,26 @@
-<template> </template>
+<template>
+  <div class="slds-is-relative bell-wrapper">
+    <button
+      class="slds-is-relative bell-button"
+      onclick={togglePanel}
+      aria-label="Notifications"
+    >
+      <lightning-icon
+        icon-name="utility:notification"
+        size="small"
+      ></lightning-icon>
+
+      <template if:true={hasUnread}>
+        <span class="slds-is-absolute badge">{unreadCount}</span>
+      </template>
+    </button>
+
+    <template if:true={open}>
+      <c-ps-drawer title="Notifications" position="right" onclose={closePanel}>
+        <c-ps-notification-center
+          refresh-token={refreshToken}
+        ></c-ps-notification-center>
+      </c-ps-drawer>
+    </template>
+  </div>
+</template>

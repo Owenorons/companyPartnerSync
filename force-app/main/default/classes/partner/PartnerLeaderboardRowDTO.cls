@@ -1,3 +1,8 @@
+/*
+ * One row of the partner leaderboard view — pre-aggregated performance
+ * numbers for a single partner account, ready for direct display without
+ * further client-side computation.
+ */
 public with sharing class PartnerLeaderboardRowDTO {
   @AuraEnabled
   public Id partnerAccountId;

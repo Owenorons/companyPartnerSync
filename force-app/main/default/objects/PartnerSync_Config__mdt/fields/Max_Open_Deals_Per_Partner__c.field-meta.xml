@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Max_Open_Deals_Per_Partner__c</fullName>
-    <description
-  >Maximum number of open deal registrations allowed per partner.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Max Open Deals Per Partner</label>

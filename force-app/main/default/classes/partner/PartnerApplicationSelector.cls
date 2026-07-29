@@ -1,3 +1,9 @@
+/*
+ * Query layer for Partner_Application__c across the onboarding flow:
+ * duplicate detection at submit time, the reviewer queue, and single-record
+ * lookups for detail/decision. Each method selects only the columns its
+ * specific caller needs rather than one shared "full record" query.
+ */
 public with sharing class PartnerApplicationSelector {
   public static List<Partner_Application__c> findPotentialDuplicates(
     String normalizedCompanyName,
@@ -24,6 +30,7 @@ public with sharing class PartnerApplicationSelector {
       SELECT
         Id,
         Name,
+        Application_Number__c,
         Company_Name__c,
         Business_Email__c,
         Phone__c,
@@ -37,6 +44,8 @@ public with sharing class PartnerApplicationSelector {
         Application_Status__c,
         Decision__c,
         Rejection_Reason__c,
+        Approval_Notes__c,
+        Submitted_On__c,
         Created_Account__c,
         Created_Contact__c
       FROM Partner_Application__c
@@ -58,7 +67,7 @@ public with sharing class PartnerApplicationSelector {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 
     List<Partner_Application__c> rows = [
-      SELECT Id, Name, Application_Status__c
+      SELECT Id, Name, Application_Number__c, Application_Status__c
       FROM Partner_Application__c
       WHERE Id = :applicationId
       WITH USER_MODE
@@ -79,6 +88,7 @@ public with sharing class PartnerApplicationSelector {
       SELECT
         Id,
         Name,
+        Application_Number__c,
         Company_Name__c,
         Business_Email__c,
         Requested_Tier__c,

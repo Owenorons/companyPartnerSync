@@ -1,7 +1,17 @@
+/*
+ * Selector layer for the internal review workflow. Deliberately not scoped
+ * to a single partner account — reviewers need visibility across all
+ * partners' deals, so authorization here is enforced by
+ * PartnerPermissionService in the service layer (assertCanViewAllDeals /
+ * assertCanReviewDeals), not by a WHERE-clause partner filter. Compare to
+ * DealRegistrationSelector, which is intentionally scoped per partner.
+ */
 public with sharing class DealReviewSelector {
   public static List<Deal_Registration__c> selectReviewQueue() {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
+    // Oldest submissions first (FIFO) so the queue surfaces the deals
+    // that have been waiting longest for a decision.
     return [
       SELECT
         Id,
@@ -71,6 +81,10 @@ public with sharing class DealReviewSelector {
       return new List<Deal_Registration__c>();
     }
 
+    // Includes 'Under Review', unlike DealRegistrationSelector
+    // .findConflictingDeals — by the time a deal reaches this screen, other
+    // deals on the same customer account may themselves be mid-review, and
+    // those still count as live conflicts.
     return [
       SELECT
         Id,

@@ -1,18 +1,18 @@
 .error-shell {
-  background: var(--slds-g-color-error-container-1, #fef2f2);
-  color: var(--slds-g-color-error-base-50, #991b1b);
-
-  border: var(--slds-g-sizing-border-1, var(--lwc-borderWidthThin, 1px)) solid
-    var(--slds-g-color-error-container-2, #fecaca);
-  border-radius: var(--slds-g-radius-border-2, 0.5rem);
-
-  padding: var(--slds-g-spacing-3, var(--lwc-spacingMedium, 1rem));
+  background: var(--ps-color-danger-bg);
+  color: var(--ps-color-danger);
+  border-left: 2px solid var(--ps-color-danger);
+  padding: 1rem;
 }
 
 .error-shell h2 {
-  font-weight: var(--slds-g-font-weight-bold, var(--lwc-fontWeightBold, 700));
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .error-shell p {
-  margin-top: var(--slds-g-spacing-1, var(--lwc-spacingXxSmall, 0.25rem));
+  margin-top: var(--slds-g-spacing-1, 0.25rem);
 }

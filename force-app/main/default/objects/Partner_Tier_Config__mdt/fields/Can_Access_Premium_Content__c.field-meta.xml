@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Can_Access_Premium_Content__c</fullName>
     <defaultValue>false</defaultValue>
-    <description
-  >Indicates whether partners in this tier can access premium content.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Can Access Premium Content</label>
     <type>Checkbox</type>

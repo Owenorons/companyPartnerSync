@@ -1,3 +1,7 @@
+/*
+ * Best-effort audit trail for lead distribution actions (assign/accept/
+ * reject), writing to Lead_Distribution_Log__c.
+ */
 public with sharing class LeadDistributionLogService {
   public static void logAction(
     Id leadId,
@@ -7,6 +11,9 @@ public with sharing class LeadDistributionLogService {
     String status,
     String notes
   ) {
+    // Logging must never block the actual lead assignment/decision it's
+    // recording, so a missing FLS grant is treated as a soft skip (warn +
+    // return) rather than an exception.
     if (!Schema.sObjectType.Lead_Distribution_Log__c.isCreateable()) {
       LoggingService.warn(
         'LeadDistributionLogService',
@@ -15,6 +22,9 @@ public with sharing class LeadDistributionLogService {
       return;
     }
 
+    // Same reasoning as above: any other insert failure here is caught and
+    // logged rather than propagated, so a logging problem can't fail the
+    // caller's primary operation.
     try {
       Lead_Distribution_Log__c log = new Lead_Distribution_Log__c();
       log.Lead__c = leadId;

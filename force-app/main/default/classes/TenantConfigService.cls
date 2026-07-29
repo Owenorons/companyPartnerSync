@@ -1,3 +1,12 @@
+/*
+ * Reads the single 'Default' Tenant_Config__mdt record to gate feature
+ * modules (Deals, Leads, MDF, etc.) and expose org-wide tunables like SLA
+ * hours. Caches the custom metadata record in a static variable for the
+ * transaction, since Tenant_Config__mdt.getInstance() is called from many
+ * places per request and metadata records don't change mid-transaction.
+ * clearCacheForTest()/setConfigForTest() exist because static state persists
+ * across test methods within the same test class run unless reset.
+ */
 public with sharing class TenantConfigService {
   private static Tenant_Config__mdt cachedConfig;
 
@@ -59,6 +68,10 @@ public with sharing class TenantConfigService {
 
   public static void clearCacheForTest() {
     cachedConfig = null;
+  }
+
+  public static void setConfigForTest(Tenant_Config__mdt config) {
+    cachedConfig = config;
   }
 
   private static Boolean getBoolean(Boolean value) {

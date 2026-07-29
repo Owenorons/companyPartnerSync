@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Is_Read__c</fullName>
     <defaultValue>false</defaultValue>
-    <description
-  >Indicates whether the recipient has read the notification.</description>
     <label>Is Read</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

@@ -59,4 +59,52 @@ describe("c-ps-home-dashboard", () => {
     ]);
     expect(buttons.every((button) => button.type === "button")).toBe(true);
   });
+
+  it("renders each alert as a list item when alerts exist", async () => {
+    const element = createElement("c-ps-home-dashboard", {
+      is: PsHomeDashboard
+    });
+
+    document.body.appendChild(element);
+
+    getDashboard.emit({
+      partnerName: "Acme",
+      partnerStatus: "Active",
+      partnerTier: "Gold",
+      openDealCount: 2,
+      assignedLeadCount: 3,
+      openMdfCount: 1,
+      alerts: ["2 leads are awaiting your response."]
+    });
+    await flushPromises();
+
+    const alertRows = element.shadowRoot.querySelectorAll(".alert-row");
+    expect(alertRows).toHaveLength(1);
+    expect(alertRows[0].textContent).toContain(
+      "2 leads are awaiting your response."
+    );
+    expect(element.shadowRoot.querySelector("c-ps-empty-state")).toBeNull();
+  });
+
+  it("shows the empty state when there are no alerts", async () => {
+    const element = createElement("c-ps-home-dashboard", {
+      is: PsHomeDashboard
+    });
+
+    document.body.appendChild(element);
+
+    getDashboard.emit({
+      partnerName: "Acme",
+      partnerStatus: "Active",
+      partnerTier: "Gold",
+      openDealCount: 2,
+      assignedLeadCount: 3,
+      openMdfCount: 1,
+      alerts: []
+    });
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector("c-ps-empty-state")).not.toBeNull();
+    expect(element.shadowRoot.querySelector(".alert-row")).toBeNull();
+  });
 });

@@ -1,0 +1,84 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+.ps-card {
+  background: var(--ps-color-card);
+  border: 1px solid var(--ps-color-border);
+}
+
+.provider-table {
+  margin-top: 1.5rem;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1.2fr 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:not(.table-header):nth-child(even) {
+  background: var(--ps-color-bg);
+}
+
+.table-row:not(.table-header):hover {
+  background: color-mix(
+    in srgb,
+    var(--ps-color-primary) 6%,
+    var(--ps-color-card)
+  );
+}
+
+.table-header {
+  font-family: var(--ps-font-mono);
+  color: var(--ps-color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cell-title {
+  font-family: var(--ps-font-display);
+  font-size: 1rem;
+  color: var(--ps-color-text);
+}
+
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+}

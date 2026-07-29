@@ -1,0 +1,68 @@
+<template>
+  <nav class="nav-menu" aria-label="Site navigation">
+    <button
+      class="hamburger-toggle"
+      type="button"
+      aria-expanded={showHamburgerMenu}
+      aria-label={toggleLabel}
+      title={toggleLabel}
+      onclick={handleHamburgerMenuToggle}
+    >
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+
+    <template if:true={hasMenuItems}>
+      <ul class={navClass}>
+        <template for:each={displayMenuItems} for:item="item">
+          <li key={item.id} class={item.itemClass}>
+            <c-nav-menu-items
+              item={item}
+              onnavigation={handleItemNavigation}
+            ></c-nav-menu-items>
+
+            <template if:true={item.hasChildren}>
+              <lightning-button-icon
+                class="submenu-toggle"
+                icon-name="utility:chevrondown"
+                variant="bare"
+                size="small"
+                data-id={item.id}
+                alternative-text="Toggle submenu"
+                onclick={handleSubmenuToggle}
+              >
+              </lightning-button-icon>
+
+              <ul class="nav-submenu">
+                <template for:each={item.children} for:item="child">
+                  <li key={child.id} class="nav-subitem">
+                    <c-nav-menu-items
+                      item={child}
+                      variant="submenu"
+                      onnavigation={handleItemNavigation}
+                    ></c-nav-menu-items>
+                  </li>
+                </template>
+              </ul>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template if:true={hasButton}>
+      <lightning-button
+        class="nav-cta"
+        variant="brand"
+        label={buttonLabel}
+        onclick={handleClick}
+      >
+      </lightning-button>
+    </template>
+
+    <template if:true={error}>
+      <p class="nav-error">{error}</p>
+    </template>
+  </nav>
+</template>

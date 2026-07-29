@@ -1,1 +1,67 @@
-<template> </template>
+<template>
+  <div class="ps-notification-center">
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading notifications..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasNotifications}>
+      <ul class="note-list">
+        <template for:each={notes} for:item="note">
+          <li key={note.notificationId} class="note-item">
+            <button
+              type="button"
+              class={note.rowClass}
+              data-id={note.notificationId}
+              aria-label={note.title}
+              onclick={handleMarkAsRead}
+            >
+              <span class="note-dot"></span>
+
+              <span class="note-body">
+                <span class="note-top">
+                  <span class="note-title">{note.title}</span>
+                  <template if:true={note.isHighPriority}>
+                    <c-ps-status-badge
+                      label="High"
+                      variant="warning"
+                      size="sm"
+                    ></c-ps-status-badge>
+                  </template>
+                </span>
+
+                <span class="note-message">{note.message}</span>
+                <span class="note-time">{note.relativeLabel}</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="note-dismiss"
+              data-id={note.notificationId}
+              onclick={handleDismiss}
+              aria-label="Dismiss notification"
+            >
+              &times;
+            </button>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template if:false={hasNotifications}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="You're all caught up"
+          message="New notifications will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Professional</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Enable_AI__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Analytics__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_MDF__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Webhooks__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Max_AI_Requests__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Max_Deals_Per_Month__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Max_MDF_Requests__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Max_Partners__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Tier_Name__c</field>
+        <value xsi:type="xsd:string">Professional</value>
+    </values>
+</CustomMetadata>

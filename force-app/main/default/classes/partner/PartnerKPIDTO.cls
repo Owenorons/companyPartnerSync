@@ -1,3 +1,8 @@
+/*
+ * Aggregate KPI numbers for a single partner's dashboard summary tile
+ * (leads, deals, revenue, MDF budget) — all pre-computed rates and totals,
+ * not raw records.
+ */
 public with sharing class PartnerKPIDTO {
   @AuraEnabled
   public Integer totalLeads;

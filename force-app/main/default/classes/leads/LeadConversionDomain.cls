@@ -1,3 +1,10 @@
+/*
+ * Domain layer for LeadConversionService: validates a conversion request and
+ * shapes the resulting Opportunity/result DTO. Handles the "turn an accepted
+ * lead into partner-visible deal records" step — LeadDistributionDomain
+ * covers the earlier assignment/accept/reject validation and status mapping,
+ * not conversion.
+ */
 public with sharing class LeadConversionDomain {
   public static void validate(LeadConversionRequestDTO request) {
     if (request == null) {
@@ -48,6 +55,9 @@ public with sharing class LeadConversionDomain {
 
     opportunity.Source_Lead__c = lead.Id;
 
+    // 'Pending Registration' reflects that LeadConversionService creates the
+    // Deal_Registration__c record immediately after this Opportunity insert;
+    // this status is a placeholder, not a terminal state.
     opportunity.Partner_Deal_Status__c = 'Pending Registration';
 
     return opportunity;

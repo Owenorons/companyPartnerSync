@@ -1,10 +1,20 @@
+/*
+ * Routes a Lead to a partner account/contact and starts its SLA clock — the
+ * first step of the lead lifecycle, upstream of LeadDecisionService
+ * (accept/reject) and LeadConversionService (conversion to a deal). This
+ * class assigns leads; it never converts them into Opportunity/Deal
+ * Registration records.
+ */
 public with sharing class LeadDistributionService {
   public static void assignLeadToPartner(LeadAssignmentRequestDTO request) {
     if (!TenantConfigService.isLeadsEnabled()) {
       throw new PartnerSyncHandledException('Lead distribution is disabled.');
     }
 
-    PartnerAccessService.assertInternalUser();
+    // Assignment is gated by a dedicated internal-only permission set, not
+    // just Lead update access — otherwise anyone with generic Lead edit
+    // rights could reroute leads across partner territories.
+    PartnerPermissionService.assertCanAssignLeads();
 
     LeadDistributionDomain.validateAssignment(request);
 

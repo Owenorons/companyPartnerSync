@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Navigation Menu</masterLabel>
+    <description>Custom Navigation Menu</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+        name="menuName"
+        type="String"
+        datasource="apex://NavigationPickList"
+        label="Navigation Menu Name"
+        description="The name of the Navigation Menu Linkset, which can be configured in Settings > Navigation"
+      />
+            <property
+        name="buttonLabel"
+        type="String"
+        label="Button Label"
+        description="Optional call-to-action button label shown after the menu. Leave blank to hide the button."
+      />
+            <property
+        name="buttonRedirectPageAPIName"
+        type="String"
+        label="Button Redirect Page Name"
+        description="Experience Builder page API name the call-to-action button navigates to"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

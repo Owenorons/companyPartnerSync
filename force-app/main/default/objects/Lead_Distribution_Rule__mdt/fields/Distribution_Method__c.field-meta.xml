@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Distribution_Method__c</fullName>
+    <description>Top-level routing strategy this rule applies.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Distribution Method</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Territory</fullName>
+                <default>false</default>
+                <label>Territory</label>
+            </value>
+            <value>
+                <fullName>Product Specialization</fullName>
+                <default>false</default>
+                <label>Product Specialization</label>
+            </value>
+            <value>
+                <fullName>Partner Tier</fullName>
+                <default>false</default>
+                <label>Partner Tier</label>
+            </value>
+            <value>
+                <fullName>Round Robin</fullName>
+                <default>false</default>
+                <label>Round Robin</label>
+            </value>
+            <value>
+                <fullName>AI Recommendation</fullName>
+                <default>false</default>
+                <label>AI Recommendation</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,3 +1,10 @@
+/*
+ * Domain layer for the internal review/decision workflow: maps queried
+ * Deal_Registration__c rows (plus their conflicting siblings) into review
+ * DTOs, and validates a reviewer's decision. The internal-review
+ * counterpart to DealRegistrationDomain, which builds/maps the record on
+ * the partner-submission side before any review has happened.
+ */
 public with sharing class DealReviewDomain {
   public static DealReviewListDTO toListDTO(Deal_Registration__c record) {
     DealReviewListDTO dto = new DealReviewListDTO();
@@ -5,6 +12,9 @@ public with sharing class DealReviewDomain {
     dto.dealId = record.Id;
     dto.dealNumber = record.Name;
 
+    // WITH USER_MODE queries don't throw on an inaccessible parent lookup —
+    // the relationship just comes back null. Guarding here avoids a null
+    // pointer if the running user can't see the related Account.
     dto.customerName = record.Customer_Account__r == null
       ? null
       : record.Customer_Account__r.Name;

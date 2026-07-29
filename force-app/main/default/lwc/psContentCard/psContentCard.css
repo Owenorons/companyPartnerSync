@@ -1,19 +1,20 @@
+:host {
+  display: block;
+}
+
 .content-card {
-  background: var(--lwc-colorBackgroundLight, #ffffff);
-  border: 1px solid #e5e7eb;
-  border-radius: 1.25rem;
-  padding: var(--lwc-squareIconUtilityMedium, 1.25rem);
-  box-shadow: var(--lwc-spacingNone, 0) 10px 30px rgba(15, 23, 42, 0.06);
+  background: var(--ps-color-card);
+  padding: 1.1rem;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 1rem;
 }
 
 .icon {
-  height: var(--lwc-spacingXxLarge, 3rem);
-  border-radius: var(--lwc-varSpacingMedium, 1rem);
-  background: #ede9fe;
-  color: #6d28d9;
+  height: 2.5rem;
+  width: 2.5rem;
+  border: 1px solid var(--ps-color-border);
+  color: var(--ps-color-text-muted);
 }
 
 .top-row {
@@ -22,40 +23,49 @@
 
 .category,
 .featured {
-  font-size: 0.7rem;
-  font-weight: 900;
-  border-radius: 999px;
-  padding: 0.2rem 0.55rem;
+  font-family: var(--ps-font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0;
+  border-bottom: 2px solid currentColor;
 }
 
 .category {
-  background: #f1f5f9;
-  color: #475569;
+  color: var(--ps-color-primary);
 }
 
 .featured {
-  background: #fef3c7;
-  color: #92400e;
+  color: var(--ps-color-tier-gold);
 }
 
 h3 {
-  color: #0f172a;
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
   font-size: 1.05rem;
-  font-weight: 900;
+  font-weight: 400;
 }
 
 p {
-  color: #64748b;
-
-  min-height: var(--lwc-varSpacingXxLarge, 3rem);
+  color: var(--ps-color-text-muted);
+  min-height: 3rem;
 }
 
 button {
-  border: none;
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-weight: 900;
-  border-radius: 0.8rem;
-  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--ps-color-text);
+  background: transparent;
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  font-size: 0.68rem;
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--ps-color-primary);
+  color: var(--ps-color-primary);
 }

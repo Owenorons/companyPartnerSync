@@ -1,0 +1,146 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Partner Program</p>
+        <h1>Apply to Become a Partner</h1>
+        <p>
+          Tell us about your company and requested tier — we'll follow up on
+          your application.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={result}>
+      <div class="ps-card success-card">
+        <h2>Application submitted</h2>
+        <p class="slds-var-m-top_x-small">
+          {result.applicationNumber} is now
+          <strong>{result.status}</strong>. We'll be in touch soon.
+        </p>
+      </div>
+    </template>
+
+    <template if:false={result}>
+      <form class="application-form" onsubmit={handleSubmit}>
+        <fieldset class="reg-fieldset">
+          <legend>Company</legend>
+          <lightning-input
+            name="companyName"
+            label="Company Name"
+            value={companyName}
+            onchange={handleFieldChange}
+            required
+          >
+          </lightning-input>
+
+          <lightning-input
+            name="website"
+            label="Website"
+            type="url"
+            value={website}
+            onchange={handleFieldChange}
+          >
+          </lightning-input>
+
+          <div class="slds-grid slds-wrap field-row">
+            <lightning-input
+              name="country"
+              label="Country"
+              value={country}
+              onchange={handleFieldChange}
+            >
+            </lightning-input>
+
+            <lightning-input
+              name="region"
+              label="Region"
+              value={region}
+              onchange={handleFieldChange}
+            >
+            </lightning-input>
+          </div>
+        </fieldset>
+
+        <fieldset class="reg-fieldset">
+          <legend>Partnership</legend>
+          <lightning-combobox
+            name="requestedTier"
+            label="Requested Tier"
+            placeholder="Select a tier"
+            value={requestedTier}
+            options={tierOptions}
+            onchange={handleComboboxChange}
+            required
+          >
+          </lightning-combobox>
+
+          <lightning-combobox
+            name="partnerType"
+            label="Partner Type"
+            placeholder="Select a partner type"
+            value={partnerType}
+            options={partnerTypeOptions}
+            onchange={handleComboboxChange}
+            required
+          >
+          </lightning-combobox>
+        </fieldset>
+
+        <fieldset class="reg-fieldset">
+          <legend>Contact</legend>
+          <lightning-input
+            name="submittedByContactName"
+            label="Your Name"
+            value={submittedByContactName}
+            onchange={handleFieldChange}
+          >
+          </lightning-input>
+
+          <div class="slds-grid slds-wrap field-row">
+            <lightning-input
+              name="submittedByEmail"
+              label="Your Email"
+              type="email"
+              value={submittedByEmail}
+              onchange={handleFieldChange}
+              required
+            >
+            </lightning-input>
+
+            <lightning-input
+              name="phone"
+              label="Phone"
+              type="tel"
+              value={phone}
+              onchange={handleFieldChange}
+            >
+            </lightning-input>
+          </div>
+
+          <lightning-input
+            name="businessEmail"
+            label="Business Email"
+            type="email"
+            value={businessEmail}
+            onchange={handleFieldChange}
+            required
+          >
+          </lightning-input>
+        </fieldset>
+
+        <lightning-button
+          type="submit"
+          variant="brand"
+          label="Submit Application"
+          disabled={isSubmitDisabled}
+        >
+        </lightning-button>
+      </form>
+    </template>
+  </div>
+</template>

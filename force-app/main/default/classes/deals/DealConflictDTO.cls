@@ -1,3 +1,6 @@
+/**
+ * DTO for deal conflict information.
+ */
 public with sharing class DealConflictDTO {
   @AuraEnabled
   public Boolean hasConflict;

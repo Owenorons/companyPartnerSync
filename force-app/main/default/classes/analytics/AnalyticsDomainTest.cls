@@ -1,3 +1,8 @@
+/*
+ * Unit tests for AnalyticsDomain's pure calculation methods. Exercises the
+ * KPI aggregation and leaderboard scoring math directly against in-memory
+ * SObjects, without inserting records or asserting permissions.
+ */
 @IsTest
 private class AnalyticsDomainTest {
   @IsTest

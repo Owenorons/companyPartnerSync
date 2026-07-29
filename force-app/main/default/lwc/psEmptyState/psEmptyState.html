@@ -1,16 +1,18 @@
 <template>
-  <div class="slds-text-align_center empty-shell">
-    <lightning-icon icon-name={iconName} size="large"> </lightning-icon>
+  <div class="slds-text-align_center empty-shell" part="panel">
+    <lightning-icon icon-name={iconName} size="large" part="icon">
+    </lightning-icon>
 
-    <h2 class="slds-var-m-top_medium">{title}</h2>
+    <h2 class="slds-var-m-top_medium" part="title">{title}</h2>
 
-    <p class="slds-var-m-top_x-small">{message}</p>
+    <p class="slds-var-m-top_x-small" part="message">{message}</p>
 
     <template if:true={buttonLabel}>
       <lightning-button
         label={buttonLabel}
         onclick={handleClick}
         variant="brand"
+        part="action"
       >
       </lightning-button>
     </template>

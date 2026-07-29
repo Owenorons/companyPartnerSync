@@ -60,17 +60,22 @@ export default class PsPartnerLeaderboard extends LightningElement {
     const conversionRate = Number(partner.conversionRate || 0);
     const score = Number(partner.score || 0);
 
+    const partnerTier = partner.partnerTier || "Unassigned";
+    const tierModifier = partnerTier.toLowerCase();
+
     return {
       ...partner,
       partnerAccountId: partner.partnerAccountId || `partner-${index}`,
       partnerName: partner.partnerName || "Unnamed partner",
-      partnerTier: partner.partnerTier || "Unassigned",
+      partnerTier,
       wonDeals: partner.wonDeals || 0,
       revenue,
       numericScore: score,
       score: Math.round(score),
       revenueLabel: this.formatCurrency(revenue),
-      conversionLabel: this.formatPercent(conversionRate)
+      conversionLabel: this.formatPercent(conversionRate),
+      medallionClass: `medallion medallion-${tierModifier}`,
+      tierChipClass: `tier-chip tier-${tierModifier}`
     };
   }
 

@@ -1,0 +1,113 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+.ps-card {
+  background: var(--ps-color-card);
+  border: 1px solid var(--ps-color-border);
+}
+
+.application-form {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 42rem;
+}
+
+.reg-fieldset {
+  border: 1px solid var(--ps-color-border);
+  padding: 1.1rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.reg-fieldset legend {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ps-color-primary);
+  padding: 0 0.4rem;
+}
+
+.field-row {
+  gap: 1.1rem;
+}
+
+.field-row lightning-input {
+  flex: 1 1 12rem;
+}
+
+/* Ledger-styled controls — sharp corners, muted border, ink-accent focus
+   instead of the default SLDS rounded/blue-glow look, matching the "ctrl"
+   boxes in the Registry wireframe. */
+lightning-input,
+lightning-combobox {
+  --slds-c-input-radius-border: var(--ps-radius-xs, 0.15rem);
+  --slds-c-input-color-border: var(--ps-color-border);
+  --slds-c-input-color-border-focus: var(--ps-color-primary);
+  --slds-c-input-shadow-focus: none;
+  --slds-c-input-text-color: var(--ps-color-text);
+  --slds-c-combobox-radius-border: var(--ps-radius-xs, 0.15rem);
+  --slds-c-combobox-color-border: var(--ps-color-border);
+  --slds-c-combobox-color-border-focus: var(--ps-color-primary);
+  --slds-c-combobox-shadow-focus: none;
+  --slds-c-combobox-text-color: var(--ps-color-text);
+}
+
+/* The one lightning-button in this form: Submit Application. Force the
+   ledger ink accent regardless of the org's Theme Panel brand color, so it
+   stays visually consistent with the rest of the Registry system. */
+lightning-button {
+  --slds-c-button-radius-border: var(--ps-radius-sm, 0.2rem);
+  --slds-c-button-brand-color-background: var(--ps-color-primary);
+  --slds-c-button-brand-color-background-hover: var(--ps-color-primary-dark);
+  --slds-c-button-brand-color-border: var(--ps-color-primary);
+  --slds-c-button-font-weight: 600;
+}
+
+.success-card {
+  margin-top: 1.5rem;
+  max-width: 32rem;
+  padding: 1.5rem;
+}
+
+.success-card h2 {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.success-card p {
+  color: var(--ps-color-text-muted);
+}

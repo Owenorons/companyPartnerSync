@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Action_Label__c</fullName>
-    <label>Action Label</label>
     <externalId>false</externalId>
+    <label>Action Label</label>
     <length>255</length>
     <required>false</required>
     <trackTrending>false</trackTrending>

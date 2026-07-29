@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Tier_Name__c</fullName>
-    <description
-  >Partner tier name, such as Bronze, Silver, Gold, Platinum, or Elite.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Tier Name</label>

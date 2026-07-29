@@ -1,6 +1,19 @@
+/*
+ * Enforces MDF review/decision rules: who may approve vs. reject, budget
+ * ceilings on approval, and side effects (audit log, platform event) once
+ * a decision is recorded. Sits alongside MDFService (submission) and
+ * MDFDomain (field mapping/validation) as the write path for the review
+ * step.
+ */
 public with sharing class MDFApprovalService {
   public static void processDecision(MDFDecisionDTO request) {
-    PartnerPermissionService.assertCanApproveMdf();
+    // Approve and reject are gated by separate permissions so a reviewer
+    // can be granted one without the other (e.g. reject-only triage).
+    if (request != null && request.decision == 'Approved') {
+      PartnerPermissionService.assertCanApproveMdf();
+    } else {
+      PartnerPermissionService.assertCanRejectMdf();
+    }
 
     MDFDomain.validateDecision(request);
 
@@ -10,6 +23,9 @@ public with sharing class MDFApprovalService {
       request.requestId
     );
 
+    // Guards against re-deciding a request that was already approved/
+    // rejected (e.g. a stale UI or double-submit), which would otherwise
+    // double-count against the partner's MDF budget on re-approval.
     if (record.Status__c != 'Submitted' && record.Status__c != 'Under Review') {
       throw new PartnerSyncHandledException(
         'Only submitted or under review MDF requests can be decided.'
@@ -33,6 +49,17 @@ public with sharing class MDFApprovalService {
     audit.partnerAccountId = record.Partner_Account__c;
 
     AuditService.log(audit);
+
+    if (request.decision == 'Approved') {
+      PlatformEventPublisherService.publish(
+        'MDFApproved',
+        record.Id,
+        'MDF_Request__c',
+        record.Partner_Account__c,
+        'MDF request approved.',
+        'Info'
+      );
+    }
   }
 
   private static void approve(MDF_Request__c record, MDFDecisionDTO request) {
@@ -46,7 +73,10 @@ public with sharing class MDFApprovalService {
     Decimal used = partner.MDF_Used__c == null ? 0 : partner.MDF_Used__c;
     Decimal newUsed = used + request.approvedAmount;
 
-    if (newUsed > budget) {
+    // Budget ceiling is a soft block: PartnerSync_Approval_Override lets a
+    // senior reviewer approve past the annual budget for exceptional
+    // cases, rather than requiring a budget increase first.
+    if (newUsed > budget && !PartnerPermissionService.canOverrideMdfBudget()) {
       throw new PartnerSyncHandledException('Partner MDF budget exceeded.');
     }
 

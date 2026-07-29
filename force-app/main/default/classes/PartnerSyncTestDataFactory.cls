@@ -1,3 +1,10 @@
+/*
+ * Shared builder of unsaved sObjects (not yet inserted) for test setup
+ * across the PartnerSync domain packages. Kept in the top-level classes
+ * folder rather than a subpackage since almost every domain's tests depend
+ * on it; each method fills only the fields required to satisfy validation
+ * rules / required fields, leaving callers free to override before insert.
+ */
 @IsTest
 public class PartnerSyncTestDataFactory {
   public static Account partnerAccount(String name) {

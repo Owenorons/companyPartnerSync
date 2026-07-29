@@ -1,3 +1,9 @@
+/*
+ * Row shape for the internal review queue, spanning all partners (see
+ * DealReviewSelector.selectReviewQueue). Compare to
+ * DealRegistrationListDTO, the equivalent row shape scoped to a single
+ * partner's own deals.
+ */
 public with sharing class DealReviewListDTO {
   @AuraEnabled
   public Id dealId;

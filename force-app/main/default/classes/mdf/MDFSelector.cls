@@ -1,3 +1,10 @@
+/*
+ * Selector layer for MDF_Request__c and its related partner budget
+ * fields. Queries are split by audience: selectMyRequests/selectForPartner
+ * scope to the caller's own partner account, while selectReviewQueue/
+ * selectForInternalReview additionally assert the internal MDF-review
+ * permission before returning records outside that scope.
+ */
 public with sharing class MDFSelector {
   public static List<MDF_Request__c> selectMyRequests(Id partnerAccountId) {
     SecurityUtil.assertReadable(MDF_Request__c.SObjectType);
@@ -23,7 +30,7 @@ public with sharing class MDFSelector {
   }
 
   public static List<MDF_Request__c> selectReviewQueue() {
-    PartnerPermissionService.assertCanApproveMdf();
+    PartnerPermissionService.assertCanViewAllMdf();
     SecurityUtil.assertReadable(MDF_Request__c.SObjectType);
 
     return [
@@ -102,7 +109,7 @@ public with sharing class MDFSelector {
   }
 
   public static MDF_Request__c selectForInternalReview(Id requestId) {
-    PartnerPermissionService.assertCanApproveMdf();
+    PartnerPermissionService.assertCanViewAllMdf();
     SecurityUtil.assertReadable(MDF_Request__c.SObjectType);
 
     List<MDF_Request__c> rows = [

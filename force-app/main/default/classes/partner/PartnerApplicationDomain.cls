@@ -1,3 +1,9 @@
+/*
+ * Validation and shaping logic for Partner_Application__c: submission-time
+ * validation, building the initial record, and mapping the sObject to each
+ * of the three DTO shapes the UI needs (result/list/detail). No DML or
+ * queries here — PartnerApplicationService owns persistence.
+ */
 public with sharing class PartnerApplicationDomain {
   public static void validateForSubmit(PartnerApplicationRequestDTO request) {
     if (request == null) {
@@ -27,6 +33,10 @@ public with sharing class PartnerApplicationDomain {
     }
   }
 
+  // Stripped to lowercase alphanumeric only so duplicate detection catches
+  // the same company submitted with different spacing/punctuation/casing
+  // ("Acme, Inc." vs "acme inc" vs "ACME INC.") rather than requiring an
+  // exact string match.
   public static String normalizeCompanyName(String value) {
     if (String.isBlank(value)) {
       return null;
@@ -43,6 +53,7 @@ public with sharing class PartnerApplicationDomain {
     String normalizedCompanyName = normalizeCompanyName(request.companyName);
 
     Partner_Application__c record = new Partner_Application__c();
+    record.Name = request.companyName.trim();
     record.Company_Name__c = request.companyName.trim();
     record.Business_Email__c = normalizeEmail(request.businessEmail);
     record.Phone__c = String.isBlank(request.phone)
@@ -82,8 +93,52 @@ public with sharing class PartnerApplicationDomain {
   ) {
     PartnerApplicationResultDTO dto = new PartnerApplicationResultDTO();
     dto.applicationId = record.Id;
-    dto.applicationNumber = record.Name;
+    dto.applicationNumber = record.Application_Number__c;
     dto.status = record.Application_Status__c;
+    return dto;
+  }
+
+  public static PartnerApplicationListDTO toListDTO(
+    Partner_Application__c record
+  ) {
+    PartnerApplicationListDTO dto = new PartnerApplicationListDTO();
+    dto.applicationId = record.Id;
+    dto.applicationNumber = record.Application_Number__c;
+    dto.companyName = record.Company_Name__c;
+    dto.requestedTier = record.Requested_Tier__c;
+    dto.partnerType = record.Partner_Type__c;
+    dto.status = record.Application_Status__c;
+    dto.submittedOn = record.Submitted_On__c;
+    return dto;
+  }
+
+  public static PartnerApplicationDetailDTO toDetailDTO(
+    Partner_Application__c record
+  ) {
+    PartnerApplicationDetailDTO dto = new PartnerApplicationDetailDTO();
+    dto.applicationId = record.Id;
+    dto.applicationNumber = record.Application_Number__c;
+    dto.companyName = record.Company_Name__c;
+    dto.businessEmail = record.Business_Email__c;
+    dto.phone = record.Phone__c;
+    dto.website = record.Website__c;
+    dto.country = record.Country__c;
+    dto.region = record.Region__c;
+    dto.requestedTier = record.Requested_Tier__c;
+    dto.partnerType = record.Partner_Type__c;
+    dto.submittedByContactName = record.Submitted_By_Contact_Name__c;
+    dto.submittedByEmail = record.Submitted_By_Email__c;
+    dto.status = record.Application_Status__c;
+    dto.decision = record.Decision__c;
+    dto.rejectionReason = record.Rejection_Reason__c;
+    dto.approvalNotes = record.Approval_Notes__c;
+    dto.submittedOn = record.Submitted_On__c;
+    dto.createdAccountId = record.Created_Account__c;
+    dto.createdContactId = record.Created_Contact__c;
+    dto.isReviewable =
+      record.Application_Status__c == 'Submitted' ||
+      record.Application_Status__c == 'Under Review';
+    dto.canDecide = PartnerPermissionService.canApprovePartnerApplications();
     return dto;
   }
 

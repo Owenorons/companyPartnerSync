@@ -1,3 +1,10 @@
+/*
+ * Selector layer for Partner_Notification__c, used by both the query side
+ * (NotificationQueryService) and the update side (NotificationUpdateService).
+ * selectAccessibleNotification() is the one non-CRUD query here — it scopes
+ * a record to a specific partner account + user for access checks rather
+ * than plain retrieval.
+ */
 public with sharing class NotificationSelector {
   public static List<Partner_Notification__c> selectMyActiveNotifications(
     Id userId

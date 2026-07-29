@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>PartnerSync Footer</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__AppPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default,lightning__AppPage">
+            <property
+        name="companyName"
+        type="String"
+        default="PartnerSync"
+        label="Company Name"
+        description="Shown in the copyright line, e.g. '© 2026 {Company Name}. All rights reserved.'"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

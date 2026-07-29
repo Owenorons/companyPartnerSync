@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Opportunity__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
-    <description
-  >Opportunity created from or linked to this deal registration.</description>
     <label>Opportunity</label>
     <referenceTo>Opportunity</referenceTo>
     <relationshipName>Deal_Registrations</relationshipName>

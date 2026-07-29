@@ -15,21 +15,15 @@
       <c-ps-dashboard-metric-card
         label="Total Partner Revenue"
         value={totalRevenueLabel}
-        tone="blue"
       >
       </c-ps-dashboard-metric-card>
 
-      <c-ps-dashboard-metric-card
-        label="Closed Won Deals"
-        value={wonDeals}
-        tone="green"
-      >
+      <c-ps-dashboard-metric-card label="Closed Won Deals" value={wonDeals}>
       </c-ps-dashboard-metric-card>
 
       <c-ps-dashboard-metric-card
         label="Active Partners"
         value={activePartners}
-        tone="purple"
       >
       </c-ps-dashboard-metric-card>
     </section>
@@ -52,11 +46,13 @@
       <template if:true={hasPartners}>
         <template for:each={partners} for:item="partner">
           <article key={partner.partnerAccountId} class="partner-row">
-            <div class="rank">#{partner.rank}</div>
+            <div class="rank-num">{partner.rank}</div>
+
+            <div class={partner.medallionClass}>{partner.score}</div>
 
             <div class="partner-main">
               <h3>{partner.partnerName}</h3>
-              <p>{partner.partnerTier}</p>
+              <span class={partner.tierChipClass}>{partner.partnerTier}</span>
             </div>
 
             <div class="partner-metric">
@@ -72,10 +68,6 @@
             <div class="partner-metric">
               <span>Won Deals</span>
               <strong>{partner.wonDeals}</strong>
-            </div>
-
-            <div class="partner-score">
-              <div class="score-ring">{partner.score}</div>
             </div>
           </article>
         </template>

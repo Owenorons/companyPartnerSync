@@ -1,3 +1,8 @@
+/*
+ * Inbound submission payload for a brand-new partner application — the raw
+ * form data before any record (Account/Contact/Partner_Application__c) has
+ * been created for it.
+ */
 public with sharing class PartnerApplicationRequestDTO {
   @AuraEnabled
   public String companyName;

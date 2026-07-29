@@ -1,3 +1,9 @@
+/*
+ * Selector layer for Account records that represent customers rather than
+ * partners. Every query here is hard-scoped to Is_Partner__c = FALSE so
+ * partner accounts can never be matched or returned as a "customer" during
+ * lead conversion / deal registration flows.
+ */
 public with sharing class CustomerAccountSelector {
   public static List<Account> findCustomerAccounts(
     String companyName,
@@ -9,6 +15,9 @@ public with sharing class CustomerAccountSelector {
       return new List<Account>();
     }
 
+    // A null bind var on LIKE is valid SOQL that simply matches nothing,
+    // rather than throwing or matching everything, so leaving this null when
+    // emailDomain is blank safely falls back to the Name match alone.
     String websitePattern = String.isBlank(emailDomain)
       ? null
       : '%' + emailDomain + '%';

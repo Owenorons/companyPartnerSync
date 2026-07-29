@@ -11,8 +11,48 @@
         <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
+        <field>Deal_Expiry_Days__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
         <field>Description__c</field>
         <value xsi:type="xsd:string">AI Daily Request Limit allowed</value>
+    </values>
+    <values>
+        <field>Edition__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Enable_AI__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Analytics__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Content__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Deals__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Leads__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_MDF__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Enable_Onboarding__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Lead_SLA_Hours__c</field>
+        <value xsi:nil="true" />
     </values>
     <values>
         <field>Setting_Name__c</field>

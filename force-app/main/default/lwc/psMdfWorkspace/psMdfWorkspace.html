@@ -1,12 +1,16 @@
 <template>
   <div class="ps-page">
-    <section class="page-header mdf-header">
+    <section class="page-header">
       <div>
         <p class="eyebrow">Partner Funding</p>
         <h1>MDF Workspace</h1>
         <p>Request marketing development funds and track approval status.</p>
       </div>
     </section>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
 
     <div class="workspace-grid">
       <c-ps-mdf-budget-card budget={budget}></c-ps-mdf-budget-card>

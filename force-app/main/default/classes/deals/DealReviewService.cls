@@ -1,6 +1,13 @@
+/*
+ * Orchestrates the internal review/decision workflow (approve, reject,
+ * resolve conflict, extend protection) for a deal already created by
+ * DealRegistrationService. Layers a permission check (assertCanDecide) on
+ * top of a record-state check (assertCanFinalize) before mutating status —
+ * see the comment on assertCanFinalize for why both are needed.
+ */
 public with sharing class DealReviewService {
   public static List<DealReviewListDTO> getReviewQueue() {
-    PartnerAccessService.assertInternalUser();
+    PartnerPermissionService.assertCanViewAllDeals();
 
     List<DealReviewListDTO> results = new List<DealReviewListDTO>();
 
@@ -12,7 +19,7 @@ public with sharing class DealReviewService {
   }
 
   public static DealReviewDetailDTO getReviewDetail(Id dealId) {
-    PartnerAccessService.assertInternalUser();
+    PartnerPermissionService.assertCanViewAllDeals();
 
     Deal_Registration__c record = DealReviewSelector.selectForInternalReview(
       dealId
@@ -23,11 +30,17 @@ public with sharing class DealReviewService {
       record.Id
     );
 
-    return DealReviewDomain.toDetailDTO(record, conflicts);
+    DealReviewDetailDTO dto = DealReviewDomain.toDetailDTO(record, conflicts);
+
+    dto.canApprove = PartnerPermissionService.canApproveDeal();
+    dto.canReject = PartnerPermissionService.canRejectDeal();
+    dto.canResolveConflict = PartnerPermissionService.canResolveDealConflict();
+
+    return dto;
   }
 
   public static void processDecision(DealReviewDecisionDTO request) {
-    PartnerAccessService.assertInternalUser();
+    assertCanDecide(request.decision);
 
     DealReviewDomain.validateDecision(request);
 
@@ -51,12 +64,40 @@ public with sharing class DealReviewService {
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ record });
 
+    if (request.decision == 'Approved') {
+      PlatformEventPublisherService.publish(
+        'DealApproved',
+        record.Id,
+        'Deal_Registration__c',
+        record.Partner_Account__c,
+        'Deal registration approved.',
+        'Info'
+      );
+    }
+
     LoggingService.info(
       'DealReviewService',
       'Deal review decision processed. DealId=' + record.Id
     );
   }
 
+  private static void assertCanDecide(String decision) {
+    if (decision == 'Approved' || decision == 'Protection Extended') {
+      PartnerPermissionService.assertCanApproveDeal();
+    } else if (decision == 'Rejected') {
+      PartnerPermissionService.assertCanRejectDeal();
+    } else if (decision == 'Conflict Resolved') {
+      PartnerPermissionService.assertCanResolveDealConflict();
+    } else {
+      PartnerPermissionService.assertCanReviewDeals();
+    }
+  }
+
+  // Permission (assertCanDecide) says the user is allowed to approve/reject
+  // in general; this separately guards against re-deciding a deal that's
+  // already Approved/Rejected — a permission check alone wouldn't catch a
+  // stale UI resubmitting a decision on a deal that moved on in the
+  // meantime.
   private static void assertCanFinalize(Deal_Registration__c record) {
     if (record.Status__c != 'Submitted' && record.Status__c != 'Under Review') {
       throw new PartnerSyncHandledException(
@@ -76,6 +117,9 @@ public with sharing class DealReviewService {
     //         : 'No Conflict';
 
     record.Protection_Start_Date__c = Date.today();
+    // Protection window length is tenant-configurable (defaults to 30 days
+    // if unset) rather than hardcoded, so different tenants can run
+    // different deal-protection policies.
     record.Protection_End_Date__c = Date.today()
       .addDays(TenantConfigService.getDealExpiryDays());
 
@@ -111,6 +155,9 @@ public with sharing class DealReviewService {
     Deal_Registration__c record,
     DealReviewDecisionDTO request
   ) {
+    // Extends from the existing end date (not from today) when one is
+    // already set, so a second extension stacks on top of the first
+    // instead of resetting the protection window's clock.
     Date baseDate = record.Protection_End_Date__c == null
       ? Date.today()
       : record.Protection_End_Date__c;

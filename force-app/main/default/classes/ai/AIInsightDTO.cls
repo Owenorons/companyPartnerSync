@@ -1,3 +1,8 @@
+/*
+ * DTO carrying a generated AI_Insight__c record to the LWC layer, used by
+ * both the internal admin insight UI and the partner-facing insight and
+ * next-best-action components.
+ */
 public with sharing class AIInsightDTO {
   @AuraEnabled
   public Id insightId;

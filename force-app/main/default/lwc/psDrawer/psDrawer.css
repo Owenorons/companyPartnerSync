@@ -1,0 +1,60 @@
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 9000;
+  display: flex;
+}
+
+.drawer-panel {
+  height: 100%;
+  width: 100%;
+  max-width: 26rem;
+  background: var(--ps-color-card);
+  box-shadow: var(--ps-shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-right {
+  margin-left: auto;
+}
+
+.drawer-left {
+  margin-right: auto;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.drawer-header h2 {
+  font-family: var(--ps-font-display);
+  font-size: var(--ps-font-lg);
+  font-weight: 400;
+  color: var(--ps-color-text);
+  margin: 0;
+}
+
+.drawer-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.drawer-footer:empty {
+  display: none;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--ps-color-border);
+}

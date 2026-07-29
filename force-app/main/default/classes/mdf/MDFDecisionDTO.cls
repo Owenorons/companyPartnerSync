@@ -1,3 +1,7 @@
+/*
+ * DTO carrying an internal reviewer's approve/reject decision (amount,
+ * notes, rejection reason) from the LWC layer into MDFApprovalService.
+ */
 public with sharing class MDFDecisionDTO {
   @AuraEnabled
   public Id requestId;

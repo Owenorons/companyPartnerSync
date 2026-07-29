@@ -1,3 +1,8 @@
+/*
+ * Verifies MDFDomain's validation and mapping: rejects a non-positive
+ * requested amount, maps a submitted DTO onto MDF_Request__c fields, and
+ * computes remaining budget correctly from annual/used amounts.
+ */
 @IsTest
 private class MDFDomainTest {
   @IsTest

@@ -1,3 +1,8 @@
+/*
+ * Selector layer for AI_Insight__c. selectPartnerInsights() backs the
+ * partner-facing surfaces (portal insight list, next best actions) and
+ * deliberately excludes Draft insights - see the status filter below.
+ */
 public with sharing class AIInsightSelector {
   public static List<AI_Insight__c> selectPartnerInsights(Id partnerAccountId) {
     SecurityUtil.assertReadable(AI_Insight__c.SObjectType);
@@ -16,6 +21,8 @@ public with sharing class AIInsightSelector {
       FROM AI_Insight__c
       WHERE
         Partner_Account__c = :partnerAccountId
+        // Draft = a failed generation (see AIInsightGeneratorService);
+        // partners should never see a raw provider error in their list.
         AND Status__c IN ('Generated', 'Reviewed', 'Accepted')
       WITH USER_MODE
       ORDER BY CreatedDate DESC

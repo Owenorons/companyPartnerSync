@@ -1,0 +1,14 @@
+<template>
+  <a
+    class={linkClass}
+    href={href}
+    title={item.label}
+    aria-current={ariaCurrent}
+    onclick={handleClick}
+  >
+    {item.label}
+    <template if:true={hasChildren}>
+      <span class="caret" aria-hidden="true">▾</span>
+    </template>
+  </a>
+</template>

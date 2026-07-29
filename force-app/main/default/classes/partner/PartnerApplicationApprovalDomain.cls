@@ -1,3 +1,9 @@
+/*
+ * Domain logic for turning an approved Partner_Application__c into the
+ * Account/Contact pair that represents the partner going forward, plus
+ * validation of the reviewer's approve/reject decision payload. Pure
+ * builders/validators only — no DML, no queries.
+ */
 public with sharing class PartnerApplicationApprovalDomain {
   public static void validateDecision(PartnerApprovalRequestDTO request) {
     if (request == null || request.applicationId == null) {

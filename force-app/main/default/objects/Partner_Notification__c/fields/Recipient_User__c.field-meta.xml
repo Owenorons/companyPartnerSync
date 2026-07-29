@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Recipient_User__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
-    <description
-  >User who should receive or has received the notification.</description>
     <label>Recipient User</label>
     <referenceTo>User</referenceTo>
     <relationshipName>Partner_Notifications</relationshipName>

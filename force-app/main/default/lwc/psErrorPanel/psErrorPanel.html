@@ -1,15 +1,16 @@
 <template>
-  <div class="error-shell slds-grid">
+  <div class="error-shell slds-grid" part="panel">
     <lightning-icon
       class="slds-shrink-none slds-var-m-right_medium"
       icon-name="utility:error"
       size="small"
+      part="icon"
     >
     </lightning-icon>
 
     <div>
-      <h2>Something went wrong</h2>
-      <p>{message}</p>
+      <h2 part="title">Something went wrong</h2>
+      <p part="message">{message}</p>
     </div>
   </div>
 </template>

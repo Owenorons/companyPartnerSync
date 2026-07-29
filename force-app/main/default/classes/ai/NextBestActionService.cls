@@ -1,3 +1,7 @@
+/*
+ * Turns a partner's AI_Insight__c records into a short, prioritized list
+ * of next-best-action recommendations for the partner portal.
+ */
 public with sharing class NextBestActionService {
   public static List<NextBestActionDTO> getMyActions() {
     if (!TenantConfigService.isAiEnabled()) {
@@ -26,6 +30,8 @@ public with sharing class NextBestActionService {
       action.priority = getPriority(insight.Confidence__c);
       actions.add(action);
 
+      // Capped at 5 by product decision, not a query/governor limit -
+      // keeps the partner-facing widget from turning into a long backlog.
       if (actions.size() == 5) {
         break;
       }

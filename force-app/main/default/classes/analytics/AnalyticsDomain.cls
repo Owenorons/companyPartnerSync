@@ -1,3 +1,9 @@
+/*
+ * Pure calculation layer for partner analytics: takes already-queried
+ * SObjects/DTOs and derives KPI and leaderboard figures. Deliberately has
+ * no SOQL, sharing, or permission logic so the math can be unit tested
+ * without inserting records or running as a particular user.
+ */
 public with sharing class AnalyticsDomain {
   public static PartnerKPIDTO calculatePartnerKPI(
     List<Lead> leads,
@@ -100,6 +106,9 @@ public with sharing class AnalyticsDomain {
     dto.revenue = kpi.totalRevenue;
     dto.conversionRate = kpi.dealWinRate;
 
+    // Leaderboard score is a weighted blend (weights sum to 100) chosen so
+    // deal win rate matters most and MDF utilisation least; adjust weights
+    // here, not at call sites, if the ranking formula changes.
     dto.score =
       (kpi.leadAcceptanceRate * 25) +
       (kpi.leadConversionRate * 25) +

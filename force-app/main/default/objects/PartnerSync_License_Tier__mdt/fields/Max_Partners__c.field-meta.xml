@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Max_Partners__c</fullName>
-    <description
-  >Maximum number of partners allowed for the license tier.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Max Partners</label>

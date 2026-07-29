@@ -1,3 +1,7 @@
+/*
+ * DTO for a single MDF request row, used by both the partner's "my
+ * requests" list and the internal review queue.
+ */
 public with sharing class MDFListDTO {
   @AuraEnabled
   public Id requestId;

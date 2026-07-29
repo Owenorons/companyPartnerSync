@@ -1,6 +1,13 @@
+/*
+ * Decisioning logic for an already-submitted partner application: rejects
+ * outright, or approves by creating the partner's Account/Contact pair and
+ * linking them back onto the application. Submission itself is handled by
+ * PartnerApplicationService — this class only covers what happens after a
+ * reviewer decides.
+ */
 public with sharing class PartnerOnboardingService {
   public static void processDecision(PartnerApprovalRequestDTO request) {
-    PartnerAccessService.assertInternalUser();
+    PartnerPermissionService.assertCanApprovePartnerApplications();
 
     PartnerApplicationApprovalDomain.validateDecision(request);
 
@@ -60,7 +67,7 @@ public with sharing class PartnerOnboardingService {
       new List<SObject>{ partnerAccount }
     );
 
-    insert sanitizedAccounts;
+    Database.insert(sanitizedAccounts, AccessLevel.USER_MODE);
 
     Account insertedAccount = (Account) sanitizedAccounts[0];
 
@@ -73,7 +80,7 @@ public with sharing class PartnerOnboardingService {
       new List<SObject>{ partnerContact }
     );
 
-    insert sanitizedContacts;
+    Database.insert(sanitizedContacts, AccessLevel.USER_MODE);
 
     Contact insertedContact = (Contact) sanitizedContacts[0];
 

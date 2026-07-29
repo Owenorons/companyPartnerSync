@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>PartnerSync Deal Registration Form</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__AppPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default,lightning__AppPage">
+            <property
+        name="dealsPageName"
+        type="String"
+        default="My-Deals"
+        label="My Deals page name"
+        description="Experience Builder / App Page API name to navigate to after a successful submission"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

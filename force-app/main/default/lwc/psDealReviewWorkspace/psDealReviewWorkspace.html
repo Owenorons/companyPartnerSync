@@ -95,14 +95,34 @@
 
           <template if:true={selectedDeal.isReviewable}>
             <div class="slds-grid hero-actions">
-              <button class="approve" onclick={handleApprove}>Approve</button>
+              <template if:true={selectedDeal.canApprove}>
+                <button class="approve" onclick={handleApprove}>Approve</button>
+              </template>
 
-              <button class="reject" onclick={handleReject}>Reject</button>
+              <template if:true={selectedDeal.canReject}>
+                <button class="reject" onclick={handleReject}>Reject</button>
+              </template>
             </div>
+
+            <template if:true={showNoDecisionPermission}>
+              <div class="decision-state">
+                You do not have permission to decide this deal.
+              </div>
+            </template>
           </template>
 
           <template if:false={selectedDeal.isReviewable}>
-            <div class="decision-state">{selectedDeal.status}</div>
+            <template if:true={selectedDeal.isStamped}>
+              <div class="stamp-wrap">
+                <span class={selectedDeal.stampClass}
+                  >{selectedDeal.status}</span
+                >
+              </div>
+            </template>
+
+            <template if:false={selectedDeal.isStamped}>
+              <div class="decision-state">{selectedDeal.status}</div>
+            </template>
           </template>
         </section>
 
@@ -153,13 +173,13 @@
           <article class="panel-card">
             <h3 class="slds-var-m-bottom_medium">AI Deal Risk</h3>
 
-            <div class="risk-score">{selectedDeal.riskScore}</div>
+            <div class={selectedDeal.riskScoreClass}>
+              {selectedDeal.riskScore}
+            </div>
 
             <p class="risk-label">{selectedDeal.riskLevel} Risk</p>
 
-            <div
-              class="slds-var-m-top_medium slds-var-p-around_medium risk-summary"
-            >
+            <div class={selectedDeal.riskSummaryClass}>
               {selectedDeal.riskSummary}
             </div>
 

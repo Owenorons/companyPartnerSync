@@ -1,0 +1,140 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Deal Registration</p>
+        <h1>Register Deal</h1>
+        <p>
+          Register an eligible opportunity to protect it and get it reviewed by
+          our deal desk.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading eligible opportunities..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={result}>
+      <div class="ps-card slds-var-p-around_large success-card">
+        <h2>Deal registration submitted</h2>
+        <p class="slds-var-m-top_x-small">
+          {result.dealRegistrationNumber} is now
+          <strong>{result.status}</strong>.
+        </p>
+        <lightning-button
+          class="slds-var-m-top_medium"
+          variant="brand"
+          label="View My Deals"
+          onclick={handleViewDeals}
+        >
+        </lightning-button>
+      </div>
+    </template>
+
+    <template if:false={result}>
+      <template if:false={loading}>
+        <template if:true={hasOpportunities}>
+          <form class="deal-form" onsubmit={handleSubmit}>
+            <fieldset class="reg-fieldset">
+              <legend>Opportunity</legend>
+              <lightning-combobox
+                name="selectedOpportunityId"
+                label="Opportunity"
+                placeholder="Select an eligible opportunity"
+                value={selectedOpportunityId}
+                options={opportunityOptions}
+                onchange={handleOpportunityChange}
+                required
+              >
+              </lightning-combobox>
+            </fieldset>
+
+            <fieldset class="reg-fieldset">
+              <legend>Deal Economics</legend>
+              <div class="slds-grid slds-wrap field-row">
+                <lightning-input
+                  name="estimatedRevenue"
+                  label="Estimated Revenue"
+                  type="number"
+                  formatter="currency"
+                  min="0"
+                  value={estimatedRevenue}
+                  onchange={handleFieldChange}
+                  required
+                >
+                </lightning-input>
+
+                <lightning-input
+                  name="estimatedCloseDate"
+                  label="Estimated Close Date"
+                  type="date"
+                  value={estimatedCloseDate}
+                  onchange={handleFieldChange}
+                >
+                </lightning-input>
+              </div>
+
+              <lightning-input
+                name="implementationTimeline"
+                label="Implementation Timeline"
+                value={implementationTimeline}
+                onchange={handleFieldChange}
+              >
+              </lightning-input>
+            </fieldset>
+
+            <fieldset class="reg-fieldset">
+              <legend>Context</legend>
+              <lightning-textarea
+                name="businessProblem"
+                label="Business Problem"
+                value={businessProblem}
+                onchange={handleFieldChange}
+              >
+              </lightning-textarea>
+
+              <lightning-textarea
+                name="proposedSolution"
+                label="Proposed Solution"
+                value={proposedSolution}
+                onchange={handleFieldChange}
+              >
+              </lightning-textarea>
+
+              <lightning-textarea
+                name="notes"
+                label="Notes"
+                value={notes}
+                onchange={handleFieldChange}
+              >
+              </lightning-textarea>
+            </fieldset>
+
+            <lightning-button
+              type="submit"
+              variant="brand"
+              label="Submit Registration"
+              disabled={isSubmitDisabled}
+            >
+            </lightning-button>
+          </form>
+        </template>
+
+        <template if:false={hasOpportunities}>
+          <c-ps-empty-state
+            title="No eligible opportunities"
+            message="Every opportunity tied to your partner account is already registered, or none exist yet."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

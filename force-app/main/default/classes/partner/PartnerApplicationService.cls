@@ -1,3 +1,10 @@
+/*
+ * Application-layer orchestration for the partner onboarding flow: submit a
+ * new application, list pending ones, and view a single application's
+ * detail. Validation/shaping logic lives in PartnerApplicationDomain and
+ * PartnerApplicationSelector; this class sequences those calls and owns the
+ * feature-flag/duplicate/permission gates around them.
+ */
 public with sharing class PartnerApplicationService {
   public static PartnerApplicationResultDTO submitApplication(
     PartnerApplicationRequestDTO request
@@ -39,10 +46,13 @@ public with sharing class PartnerApplicationService {
       new List<SObject>{ record }
     );
 
-    insert sanitized;
+    Database.insert(sanitized, AccessLevel.USER_MODE);
 
     Partner_Application__c insertedRecord = (Partner_Application__c) sanitized[0];
 
+    // Re-query rather than reuse the DML result: fields like the
+    // auto-number Application_Number__c are only populated by the platform
+    // after insert and aren't reflected on the in-memory sObject.
     insertedRecord = PartnerApplicationSelector.selectSubmissionResultById(
       insertedRecord.Id
     );
@@ -55,17 +65,29 @@ public with sharing class PartnerApplicationService {
     return PartnerApplicationDomain.toResultDTO(insertedRecord);
   }
 
-  public static List<PartnerApplicationResultDTO> getPendingApplications() {
-    PartnerAccessService.assertInternalUser();
+  public static List<PartnerApplicationListDTO> getPendingApplications() {
+    PartnerPermissionService.assertCanApprovePartnerApplications();
 
-    List<PartnerApplicationResultDTO> results = new List<PartnerApplicationResultDTO>();
+    List<PartnerApplicationListDTO> results = new List<PartnerApplicationListDTO>();
 
     for (
       Partner_Application__c application : PartnerApplicationSelector.selectPendingApplications()
     ) {
-      results.add(PartnerApplicationDomain.toResultDTO(application));
+      results.add(PartnerApplicationDomain.toListDTO(application));
     }
 
     return results;
+  }
+
+  public static PartnerApplicationDetailDTO getApplicationDetail(
+    Id applicationId
+  ) {
+    PartnerPermissionService.assertCanApprovePartnerApplications();
+
+    Partner_Application__c application = PartnerApplicationSelector.selectById(
+      applicationId
+    );
+
+    return PartnerApplicationDomain.toDetailDTO(application);
   }
 }

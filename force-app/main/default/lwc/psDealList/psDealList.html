@@ -30,32 +30,22 @@
         <template for:each={deals} for:item="deal">
           <article key={deal.dealId} class="deal-card">
             <div class="deal-top">
-              <div>
-                <p class="deal-number">{deal.dealNumber}</p>
-                <h2>{deal.customerName}</h2>
-              </div>
-              <span class={deal.badgeClass}>{deal.status}</span>
-            </div>
-
-            <div class="deal-meta">
-              <div>
-                <span>Value</span>
-                <strong>{deal.formattedValue}</strong>
-              </div>
-              <div>
-                <span>Stage</span>
-                <strong>{deal.stage}</strong>
-              </div>
-              <div>
-                <span>Protection Ends</span>
-                <strong>{deal.protectionEndLabel}</strong>
-              </div>
+              <span class="deal-number">{deal.dealNumber}</span>
+              <h2>{deal.customerName}</h2>
+              <c-ps-status-badge
+                label={deal.status}
+                variant={deal.badgeVariant}
+              ></c-ps-status-badge>
+              <strong class="deal-value">{deal.formattedValue}</strong>
             </div>
 
             <div class="deal-footer">
-              <span class="conflict">{deal.conflictStatus}</span>
+              <span class="deal-sub">
+                {deal.stage} &middot; Protection ends {deal.protectionEndLabel}
+                &middot; {deal.conflictStatus}
+              </span>
               <button data-id={deal.dealId} onclick={handleOpenDeal}>
-                View Details
+                View
               </button>
             </div>
           </article>

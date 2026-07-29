@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>PartnerSync Navbar</masterLabel>
+    <description
+  >Bundles the logo, primary navigation menu, and notification bell into a single header component.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+        name="logoUrl"
+        type="String"
+        label="Logo Image URL"
+        description="URL or static resource path to the logo image, e.g. /resource/PartnerSync_Logo. Leave blank to show the text wordmark instead."
+      />
+            <property
+        name="wordmark"
+        type="String"
+        default="PartnerSync"
+        label="Wordmark Text"
+        description="Text shown when no logo image is set, and used as the logo link's accessible label either way"
+      />
+            <property
+        name="homePageName"
+        type="String"
+        default="Home"
+        label="Home Page Name"
+        description="Experience Builder page API name the logo links to. Leave blank to make the logo non-clickable."
+      />
+            <property
+        name="menuName"
+        type="String"
+        datasource="apex://NavigationPickList"
+        label="Navigation Menu Name"
+        description="The name of the Navigation Menu Linkset, which can be configured in Settings > Navigation"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

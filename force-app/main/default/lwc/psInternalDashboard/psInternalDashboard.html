@@ -1,0 +1,134 @@
+<template>
+  <div class="ps-page">
+    <template if:true={loading}>
+      <div class="page-shell">
+        <c-ps-loading-state
+          message="Loading your internal workspace..."
+        ></c-ps-loading-state>
+      </div>
+    </template>
+
+    <template if:true={error}>
+      <div class="page-shell">
+        <c-ps-error-panel message={error}></c-ps-error-panel>
+      </div>
+    </template>
+
+    <template if:true={dashboard}>
+      <section class="hero">
+        <div class="page-shell hero-inner">
+          <div class="hero-text">
+            <p class="eyebrow">PartnerSync Internal</p>
+            <h1>Welcome back, {dashboard.userName}</h1>
+            <p class="subtitle">
+              Review deal registrations, MDF requests, and partner notifications
+              from one workspace.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-shell">
+        <section class="metrics-grid">
+          <c-ps-dashboard-metric-card
+            label="Pending Deal Reviews"
+            value={dashboard.pendingDealReviewCount}
+            icon-name="utility:opportunity"
+            icon-alternative-text="Pending Deal Reviews"
+          >
+          </c-ps-dashboard-metric-card>
+
+          <c-ps-dashboard-metric-card
+            label="Pending MDF Reviews"
+            value={dashboard.pendingMdfReviewCount}
+            icon-name="utility:money"
+            icon-alternative-text="Pending MDF Reviews"
+          >
+          </c-ps-dashboard-metric-card>
+
+          <c-ps-dashboard-metric-card
+            label="Unread Notifications"
+            value={dashboard.unreadNotificationCount}
+            icon-name="utility:notification"
+            icon-alternative-text="Unread Notifications"
+          >
+          </c-ps-dashboard-metric-card>
+        </section>
+
+        <section class="workspace-grid">
+          <div class="ps-card quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+              <lightning-button
+                type="button"
+                class="action-button"
+                label="Review Deals"
+                icon-name="utility:opportunity"
+                title="Review Deals"
+                onclick={handleDealReview}
+              >
+              </lightning-button>
+
+              <lightning-button
+                type="button"
+                class="action-button"
+                label="Review MDF"
+                icon-name="utility:money"
+                title="Review MDF"
+                onclick={handleMdfReview}
+              >
+              </lightning-button>
+
+              <lightning-button
+                type="button"
+                class="action-button"
+                label="Notifications"
+                icon-name="utility:notification"
+                title="Notifications"
+                onclick={handleNotifications}
+              >
+              </lightning-button>
+
+              <lightning-button
+                type="button"
+                class="action-button"
+                label="Manage Content"
+                icon-name="utility:file"
+                title="Manage Content"
+                onclick={handleContentAdmin}
+              >
+              </lightning-button>
+            </div>
+          </div>
+
+          <div class="ps-card alerts">
+            <h2>Recommended Actions</h2>
+
+            <template if:true={hasAlerts}>
+              <ul class="alert-list">
+                <template for:each={alerts} for:item="alert">
+                  <li key={alert} class="alert-row">
+                    <lightning-icon
+                      icon-name="utility:info"
+                      alternative-text="Recommended action"
+                      size="x-small"
+                    ></lightning-icon>
+                    <span>{alert}</span>
+                  </li>
+                </template>
+              </ul>
+            </template>
+
+            <template if:false={hasAlerts}>
+              <c-ps-empty-state
+                title="All clear"
+                message="No urgent internal actions right now."
+              >
+              </c-ps-empty-state>
+            </template>
+          </div>
+        </section>
+      </div>
+    </template>
+  </div>
+</template>

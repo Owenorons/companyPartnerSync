@@ -1,3 +1,9 @@
+/*
+ * Read side of the in-app notification pipeline: maps a user's active
+ * Partner_Notification__c records to the LWC-facing DTO and computes the
+ * unread badge count. NotificationUpdateService is the write side
+ * (mark-read/dismiss); NotificationService is where notifications originate.
+ */
 public with sharing class NotificationQueryService {
   public static List<PartnerNotificationDTO> getMyNotifications() {
     Id userId = UserInfo.getUserId();

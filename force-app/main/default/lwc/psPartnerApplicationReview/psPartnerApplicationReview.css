@@ -1,0 +1,249 @@
+:host {
+  display: block;
+}
+
+.workspace-shell {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: 100vh;
+  background: var(--ps-color-bg);
+}
+
+.sidebar {
+  border-right: 1px solid var(--ps-color-border);
+  background: var(--ps-color-card);
+}
+
+.sidebar-header {
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin-top: 0.4rem;
+  color: var(--ps-color-text);
+}
+
+.filter-panel {
+  display: grid;
+  gap: 1rem;
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.queue-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-row {
+  border: none;
+  border-bottom: 1px solid var(--ps-color-border);
+  background: transparent;
+  padding: 0.9rem 0.2rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.queue-row:hover {
+  background: var(--ps-color-bg);
+}
+
+.queue-row.active {
+  border-left: 2px solid var(--ps-color-primary);
+  background: var(--ps-color-bg);
+  padding-left: calc(0.2rem - 2px);
+}
+
+.deal-number {
+  font-family: var(--ps-font-mono);
+  font-size: 0.7rem;
+  color: var(--ps-color-text-muted);
+}
+
+.queue-row h3 {
+  margin-top: 0.5rem;
+  font-family: var(--ps-font-display);
+  font-size: 1rem;
+  color: var(--ps-color-text);
+  font-weight: 400;
+}
+
+.queue-meta {
+  margin-top: 0.6rem;
+  color: var(--ps-color-text-muted);
+  font-family: var(--ps-font-mono);
+  font-size: 0.78rem;
+}
+
+.review-panel {
+  overflow-y: auto;
+}
+
+.hero-card {
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+  color: var(--ps-color-text);
+  padding: 0 0 1.5rem;
+}
+
+.hero-card h2 {
+  font-family: var(--ps-font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  margin-top: 0.4rem;
+}
+
+.hero-meta {
+  gap: 1.25rem;
+  align-items: center;
+  font-family: var(--ps-font-mono);
+  font-size: 0.78rem;
+  color: var(--ps-color-text-muted);
+}
+
+.hero-actions {
+  gap: 0.6rem;
+}
+
+.hero-actions button {
+  border: 1px solid var(--ps-color-text);
+  background: transparent;
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.55rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approve {
+  color: var(--ps-color-success);
+  border-color: var(--ps-color-success) !important;
+}
+
+.reject {
+  color: var(--ps-color-danger);
+  border-color: var(--ps-color-danger) !important;
+}
+
+.decision-state {
+  padding: 0.55rem 1rem;
+  font-family: var(--ps-font-mono);
+  font-size: 0.78rem;
+  color: var(--ps-color-text-muted);
+  border: 1px solid var(--ps-color-border);
+}
+
+/* The stamp — reserved for a decided application, matching Deal Review */
+.stamp-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.stamp {
+  display: inline-block;
+  font-family: var(--ps-font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--ps-color-success);
+  color: var(--ps-color-success);
+  transform: rotate(-4deg);
+}
+
+.stamp.bad {
+  border-color: var(--ps-color-danger);
+  color: var(--ps-color-danger);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--ps-color-border);
+}
+
+.panel-card {
+  background: var(--ps-color-card);
+  padding: 1.25rem;
+  border-left: 1px solid var(--ps-color-border);
+}
+
+.panel-card:first-child {
+  border-left: none;
+}
+
+.full-width {
+  grid-column: span 2;
+  border-left: none;
+  border-top: 1px solid var(--ps-color-border);
+}
+
+.panel-card h3 {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  color: var(--ps-color-text-muted);
+  font-weight: 600;
+}
+
+.status-row {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--ps-color-border);
+  font-family: var(--ps-font-mono);
+  font-size: 0.82rem;
+}
+
+.notes-body {
+  background: var(--ps-color-bg);
+  min-height: 140px;
+  color: var(--ps-color-text);
+}
+
+.empty-state {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--ps-color-text-muted);
+}
+
+/* Tier chip — same vocabulary as Home/Leaderboard */
+.tier-chip {
+  font-family: var(--ps-font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid currentColor;
+}
+
+.tier-chip.tier-silver {
+  color: var(--ps-color-tier-silver);
+}
+
+.tier-chip.tier-gold {
+  color: var(--ps-color-tier-gold);
+}
+
+.tier-chip.tier-platinum {
+  color: var(--ps-color-tier-platinum);
+}
+
+.tier-chip.tier-strategic {
+  color: var(--ps-color-tier-strategic);
+}

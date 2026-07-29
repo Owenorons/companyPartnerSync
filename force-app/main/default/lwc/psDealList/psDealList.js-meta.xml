@@ -8,4 +8,15 @@
         <target>lightningCommunity__Default</target>
         <target>lightning__AppPage</target>
     </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default,lightning__AppPage">
+            <property
+        name="registerDealPageName"
+        type="String"
+        default="Register-Deal"
+        label="Register Deal page name"
+        description="Experience Builder / App Page API name to navigate to when a partner clicks Register Deal"
+      />
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

@@ -1,3 +1,7 @@
+/*
+ * DTO carrying a partner's new MDF request from the LWC layer into
+ * MDFService/MDFDomain for validation and record creation.
+ */
 public with sharing class MDFRequestDTO {
   @AuraEnabled
   public String requestType;

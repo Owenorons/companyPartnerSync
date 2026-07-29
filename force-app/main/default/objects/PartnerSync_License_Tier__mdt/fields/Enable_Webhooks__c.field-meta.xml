@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Enable_Webhooks__c</fullName>
     <defaultValue>false</defaultValue>
-    <description
-  >Indicates whether webhooks are available for the license tier.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Enable Webhooks</label>
     <type>Checkbox</type>

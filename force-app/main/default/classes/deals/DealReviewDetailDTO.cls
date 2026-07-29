@@ -1,3 +1,10 @@
+/*
+ * Full detail shape for the internal review screen: the registration
+ * itself, its competing conflicts (List<DealConflictDetailDTO>), computed
+ * risk fields, and per-decision permission flags. The internal-review
+ * counterpart to DealRegistrationListDTO/DealRegistrationResultDTO, which
+ * are the partner-facing shapes for the same underlying record.
+ */
 public with sharing class DealReviewDetailDTO {
   @AuraEnabled
   public Id dealId;
@@ -58,4 +65,15 @@ public with sharing class DealReviewDetailDTO {
 
   @AuraEnabled
   public List<DealConflictDetailDTO> conflicts;
+
+  // UI gating only — these mirror PartnerPermissionService checks so the
+  // LWC can hide/disable actions, but they are not themselves a security
+  // boundary. DealReviewService re-asserts the same permissions when a
+  // decision is actually submitted.
+  @AuraEnabled
+  public Boolean canApprove;
+  @AuraEnabled
+  public Boolean canReject;
+  @AuraEnabled
+  public Boolean canResolveConflict;
 }

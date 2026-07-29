@@ -1,3 +1,12 @@
+/*
+ * Central CRUD/FLS enforcement helpers used throughout the domain services.
+ * The assert* methods fail fast with a user-facing PartnerSyncHandledException
+ * before a query/DML runs (object- and field-level), while the strip*
+ * methods (Security.stripInaccessible) silently drop inaccessible fields
+ * from records already being written/read. Callers choose one style or the
+ * other depending on whether a permission gap should hard-stop the user or
+ * degrade quietly.
+ */
 public with sharing class SecurityUtil {
   public static void assertReadable(Schema.SObjectType objectType) {
     if (!objectType.getDescribe().isAccessible()) {

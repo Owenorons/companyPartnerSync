@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Enable_Partner_Onboarding__c</fullName>
     <defaultValue>true</defaultValue>
-    <description
-  >Indicates whether partner onboarding functionality is enabled.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Enable Partner Onboarding</label>
     <type>Checkbox</type>

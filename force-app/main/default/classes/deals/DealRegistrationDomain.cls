@@ -1,3 +1,10 @@
+/*
+ * Domain layer for the partner-submitted side of deal registration: builds
+ * a Deal_Registration__c from an Opportunity + the partner's request DTO,
+ * and maps records to their outbound DTOs. This is the registration-side
+ * counterpart to DealReviewDomain, which builds/validates the internal
+ * review-and-decision DTOs after a deal has already been submitted.
+ */
 public with sharing class DealRegistrationDomain {
   public static void validate(DealRegistrationRequestDTO request) {
     if (request == null) {
@@ -23,6 +30,12 @@ public with sharing class DealRegistrationDomain {
 
     record.Opportunity__c = opportunity.Id;
 
+    // Carries lead lineage forward so a deal registered against an
+    // opportunity that originated from a lead can still be traced back to
+    // that lead (source attribution), even though registration is keyed
+    // off the Opportunity, not the Lead.
+    record.Source_Lead__c = opportunity.Source_Lead__c;
+
     record.Customer_Account__c = opportunity.AccountId;
 
     record.Partner_Account__c = opportunity.Partner_Account__c;
@@ -31,6 +44,10 @@ public with sharing class DealRegistrationDomain {
 
     record.Status__c = 'Submitted';
 
+    // Placeholder only: DealRegistrationService.createDealRegistrationInternal
+    // runs DealConflictService.analyze() right after insert (it needs the
+    // record's Id to query for siblings) and overwrites this with the real
+    // conflict outcome before the caller ever sees it.
     record.Conflict_Status__c = 'Pending Analysis';
 
     record.Business_Problem__c = request.businessProblem;

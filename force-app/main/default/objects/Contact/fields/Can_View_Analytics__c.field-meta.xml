@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Can_View_Analytics__c</fullName>
     <defaultValue>false</defaultValue>
-    <description
-  >Indicates whether the partner contact can view partner analytics.</description>
     <label>Can View Analytics</label>
     <trackFeedHistory>false</trackFeedHistory>
     <type>Checkbox</type>

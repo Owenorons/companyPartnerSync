@@ -1,3 +1,11 @@
+/*
+ * Central "can this partner see this specific record" gate. Each
+ * assertPartnerAccessTo* method covers one object type and encapsulates
+ * whatever reachability rule applies to it (ownership match, sharing lookup,
+ * or delegating to a selector that already scopes to the partner) —
+ * internal users are always exempt. Callers use this instead of
+ * re-implementing the visibility check per object.
+ */
 public with sharing class PartnerRecordAccessService {
   public static void assertPartnerAccessToAccount(Id partnerAccountId) {
     if (PartnerAccessService.isInternalUser()) {
@@ -15,24 +23,13 @@ public with sharing class PartnerRecordAccessService {
   }
 
   public static void assertPartnerAccessToLead(Id leadId) {
-    if (PartnerAccessService.isInternalUser()) {
-      return;
+    if (!PartnerAccessService.canViewLead(leadId)) {
+      throw new PartnerSyncHandledException('Lead not accessible.');
     }
-
-    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
-
-    LeadDistributionSelector.selectPartnerLeadById(leadId, partnerAccountId);
   }
 
   public static void assertPartnerAccessToDeal(Id dealId) {
-    if (PartnerAccessService.isInternalUser()) {
-      return;
-    }
-
-    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
-    Deal_Registration__c deal = DealRegistrationSelector.selectById(dealId);
-
-    if (deal.Partner_Account__c != partnerAccountId) {
+    if (!PartnerAccessService.canViewDeal(dealId)) {
       throw new PartnerSyncHandledException('Deal not accessible.');
     }
   }
@@ -63,18 +60,7 @@ public with sharing class PartnerRecordAccessService {
   }
 
   public static void assertPartnerAccessToContent(Id contentId) {
-    if (PartnerAccessService.isInternalUser()) {
-      return;
-    }
-
-    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
-    Account partner = PartnerContentSelector.selectPartnerVisibilityContext(
-      partnerAccountId
-    );
-
-    Partner_Content__c content = PartnerContentSelector.selectById(contentId);
-
-    if (!PartnerContentDomain.isVisibleToPartner(content, partner)) {
+    if (!PartnerAccessService.canAccessContent(contentId)) {
       throw new PartnerSyncHandledException('Content not accessible.');
     }
   }

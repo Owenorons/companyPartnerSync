@@ -1,9 +1,18 @@
+/*
+ * Write side of notification creation: turns a NotificationRequestDTO into
+ * a Partner_Notification__c and fires the corresponding platform event.
+ * Called internally by other domains (deals, MDF, leads, etc.) to raise a
+ * notification, not called directly from the LWC layer.
+ */
 public with sharing class NotificationService {
   public static void create(NotificationRequestDTO request) {
     if (request == null) {
       return;
     }
 
+    // Notification creation is a side effect of some other business
+    // operation (deal approval, lead assignment, etc.); a failure here must
+    // never fail that operation, so every exception is caught and logged.
     try {
       SecurityUtil.assertCreateable(Partner_Notification__c.SObjectType);
 
@@ -37,7 +46,15 @@ public with sharing class NotificationService {
 
       notification.Is_Read__c = false;
 
-      insert SecurityUtil.stripForCreate(new List<SObject>{ notification });
+      List<SObject> sanitized = SecurityUtil.stripForCreate(
+        new List<SObject>{ notification }
+      );
+
+      Database.insert(sanitized, AccessLevel.USER_MODE);
+
+      PlatformEventPublisherService.publishNotificationCreated(
+        (Partner_Notification__c) sanitized[0]
+      );
     } catch (Exception ex) {
       LoggingService.error(
         'NotificationService',

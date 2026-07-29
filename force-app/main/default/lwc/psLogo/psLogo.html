@@ -1,0 +1,16 @@
+<template>
+  <a
+    class={linkClass}
+    href="#"
+    aria-label={wordmark}
+    tabindex="0"
+    onclick={handleClick}
+  >
+    <template if:true={hasImage}>
+      <img src={logoUrl} alt="" class="logo-image" aria-hidden="true" />
+    </template>
+    <template if:false={hasImage}>
+      <span class="logo-wordmark">{wordmark}</span>
+    </template>
+  </a>
+</template>

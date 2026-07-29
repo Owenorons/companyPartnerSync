@@ -1,3 +1,8 @@
+/*
+ * Aura-enabled entry point for the partner portal's AI surfaces (insight
+ * list, next best actions). AIInsightController is the equivalent
+ * surface for internal/admin users.
+ */
 public with sharing class PartnerAIController {
   @AuraEnabled(cacheable=true)
   public static List<AIInsightDTO> getMyInsights() {

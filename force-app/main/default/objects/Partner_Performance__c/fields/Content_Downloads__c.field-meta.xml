@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Content_Downloads__c</fullName>
-    <description
-  >Number of content downloads attributed to the partner during the period.</description>
     <externalId>false</externalId>
     <label>Content Downloads</label>
     <precision>18</precision>

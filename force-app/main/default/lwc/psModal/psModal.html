@@ -1,1 +1,34 @@
-<template> </template>
+<template>
+  <section
+    class="slds-is-fixed slds-var-p-around_large modal-backdrop"
+    onclick={handleBackdropClick}
+    role="presentation"
+  >
+    <div class={panelClass} role="dialog" aria-modal="true" aria-label={title}>
+      <header
+        class="slds-var-p-around_large slds-grid_align-spread slds-grid slds-media_center modal-header"
+      >
+        <h2 class="slds-m-around_none">{title}</h2>
+        <lightning-button-icon
+          class="modal-close"
+          icon-name="utility:close"
+          variant="bare"
+          size="small"
+          alternative-text="Close dialog"
+          title="Close dialog"
+          onclick={handleClose}
+        ></lightning-button-icon>
+      </header>
+
+      <div class="slds-var-p-around_large modal-body">
+        <slot></slot>
+      </div>
+
+      <footer
+        class="slds-var-p-around_large slds-grid slds-grid_align-end modal-footer"
+      >
+        <slot name="footer"></slot>
+      </footer>
+    </div>
+  </section>
+</template>

@@ -1,9 +1,23 @@
+/*
+ * Selector layer for the partner-facing registration flow: opportunity
+ * eligibility, duplicate-registration checks, a partner's own deals, and
+ * the conflict lookup used at submission time. Everything here is scoped
+ * to a single partner account. Compare to DealReviewSelector, which
+ * intentionally has no partner scoping because internal reviewers must see
+ * across all partners.
+ */
 public with sharing class DealRegistrationSelector {
   public static Opportunity selectOpportunityForRegistration(Id opportunityId) {
     SecurityUtil.assertReadable(Opportunity.SObjectType);
 
     List<Opportunity> rows = [
-      SELECT Id, AccountId, Partner_Account__c, Partner_Contact__c, StageName
+      SELECT
+        Id,
+        AccountId,
+        Partner_Account__c,
+        Partner_Contact__c,
+        StageName,
+        Source_Lead__c
       FROM Opportunity
       WHERE Id = :opportunityId
       WITH USER_MODE
@@ -15,6 +29,49 @@ public with sharing class DealRegistrationSelector {
     }
 
     return rows[0];
+  }
+
+  public static List<Opportunity> selectEligibleOpportunitiesForPartner(
+    Id partnerAccountId
+  ) {
+    SecurityUtil.assertReadable(Opportunity.SObjectType);
+    SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
+
+    Set<Id> registeredOpportunityIds = new Set<Id>();
+
+    for (Deal_Registration__c registration : [
+      SELECT Opportunity__c
+      FROM Deal_Registration__c
+      WHERE Partner_Account__c = :partnerAccountId AND Opportunity__c != NULL
+      WITH USER_MODE
+    ]) {
+      registeredOpportunityIds.add(registration.Opportunity__c);
+    }
+
+    return [
+      SELECT Id, Name, StageName, Amount, CloseDate
+      FROM Opportunity
+      WHERE
+        Partner_Account__c = :partnerAccountId
+        AND Id NOT IN :registeredOpportunityIds
+      WITH USER_MODE
+      ORDER BY CloseDate ASC
+      LIMIT 100
+    ];
+  }
+
+  public static Boolean hasExistingRegistration(Id opportunityId) {
+    SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
+
+    List<Deal_Registration__c> existing = [
+      SELECT Id
+      FROM Deal_Registration__c
+      WHERE Opportunity__c = :opportunityId
+      WITH USER_MODE
+      LIMIT 1
+    ];
+
+    return !existing.isEmpty();
   }
 
   public static List<Deal_Registration__c> selectPartnerDeals(
@@ -80,6 +137,11 @@ public with sharing class DealRegistrationSelector {
   ) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
+    // Only 'Submitted' and 'Approved' are checked here: this runs on the
+    // just-inserted record before it can ever be 'Under Review', so that
+    // status can't exist yet for the deal being analyzed. DealReviewSelector
+    // .selectConflictsForDeal also includes 'Under Review' because it runs
+    // later, once other deals may already be mid-review.
     return [
       SELECT
         Id,

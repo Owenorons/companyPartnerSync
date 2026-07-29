@@ -1,3 +1,7 @@
+/*
+ * Test coverage for AIInsightDomain.toDTO, confirming field mapping from
+ * AI_Insight__c onto AIInsightDTO.
+ */
 @IsTest
 private class AIInsightDomainTest {
   @IsTest

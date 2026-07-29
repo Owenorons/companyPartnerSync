@@ -3,6 +3,6 @@
     <fullName>SLA_Deadline__c</fullName>
     <label>SLA Deadline</label>
     <required>false</required>
-    <trackTrending>false</trackTrending>
+    <trackFeedHistory>false</trackFeedHistory>
     <type>DateTime</type>
 </CustomField>

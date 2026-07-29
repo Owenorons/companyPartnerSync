@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Occurred_On__c</fullName>
+    <description>Timestamp the underlying business event occurred.</description>
+    <isFilteringDisabled>false</isFilteringDisabled>
+    <isNameField>false</isNameField>
+    <isSortingDisabled>false</isSortingDisabled>
+    <label>Occurred On</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

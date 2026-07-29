@@ -1,3 +1,9 @@
+/*
+ * Row shape for a partner's own "My Deals" list. Scoped to a single
+ * partner's registrations (see DealRegistrationSelector.selectPartnerDeals);
+ * compare to DealReviewListDTO, the equivalent row shape used by internal
+ * reviewers to see deals across all partners.
+ */
 public with sharing class DealRegistrationListDTO {
   @AuraEnabled
   public Id dealId;

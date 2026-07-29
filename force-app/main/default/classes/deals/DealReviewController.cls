@@ -1,3 +1,10 @@
+/*
+ * Aura-enabled entry point for the internal deal review/approval LWC
+ * (queue, detail, decision). Thin wrapper only: delegates to
+ * DealReviewService and translates handled exceptions into
+ * AuraHandledException. Compare to DealRegistrationController, the
+ * equivalent entry point for the partner-facing submission flow.
+ */
 public with sharing class DealReviewController {
   @AuraEnabled(cacheable=true)
   public static List<DealReviewListDTO> getReviewQueue() {

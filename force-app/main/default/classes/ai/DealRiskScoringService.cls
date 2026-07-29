@@ -1,5 +1,12 @@
+/*
+ * Rules-based (non-LLM) deal risk scoring engine ("AI Engine 2"): scores
+ * a Deal_Registration__c from 0-100 using conflict status/count,
+ * revenue, close-date proximity, and qualification completeness, then
+ * buckets the score into Low/Medium/High via level(). No AIProvider
+ * callout is involved despite the "AI Engine" naming used elsewhere.
+ */
 public with sharing class DealRiskScoringService {
-  /* AI Engine 2 
+  /* AI Engine 2
 
   Purpose: Probability deal fails
 Inputs:
@@ -76,6 +83,9 @@ High
   }
 
   public static String level(Decimal score) {
+    // Cutoffs mirror the point allocations in score() above - if those
+    // weights change, revisit these thresholds or High/Medium/Low will
+    // drift out of sync with the underlying point scale.
     if (score >= 70) {
       return 'High';
     }

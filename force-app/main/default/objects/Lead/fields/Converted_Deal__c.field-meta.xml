@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-  <fullName>Converted_Deal__c</fullName>
-  <deleteConstraint>SetNull</deleteConstraint>
-  <description
+    <fullName>Converted_Deal__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
   >Deal registration created when a distributed partner lead is converted.</description>
-  <label>Converted Deal</label>
-  <referenceTo>Deal_Registration__c</referenceTo>
-  <relationshipLabel>Converted Leads</relationshipLabel>
-  <relationshipName>Converted_Leads</relationshipName>
-  <required>false</required>
-  <trackTrending>false</trackTrending>
-  <type>Lookup</type>
+    <label>Converted Deal</label>
+    <referenceTo>Deal_Registration__c</referenceTo>
+    <relationshipName>Converted_Leads</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Lookup</type>
 </CustomField>

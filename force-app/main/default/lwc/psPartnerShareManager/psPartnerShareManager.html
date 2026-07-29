@@ -1,0 +1,107 @@
+<template>
+  <template if:true={isSupportedObject}>
+    <div class="share-manager">
+      <div class="panel-header">
+        <span class="eyebrow">Partner Access</span>
+        <lightning-button
+          variant="neutral"
+          label={toggleButtonLabel}
+          onclick={handleToggleForm}
+        ></lightning-button>
+      </div>
+
+      <template if:true={error}>
+        <p class="error-text">{error}</p>
+      </template>
+
+      <template if:true={showForm}>
+        <div class="grant-form">
+          <lightning-record-picker
+            label="Partner Account"
+            placeholder="Search partner accounts..."
+            object-api-name="Account"
+            filter={partnerAccountFilter}
+            onchange={handlePartnerAccountChange}
+          ></lightning-record-picker>
+
+          <lightning-combobox
+            label="Access Level"
+            value={accessLevel}
+            options={accessLevelOptions}
+            onchange={handleAccessLevelChange}
+          ></lightning-combobox>
+
+          <lightning-textarea
+            label="Reason"
+            value={shareReason}
+            onchange={handleShareReasonChange}
+          ></lightning-textarea>
+
+          <lightning-input
+            type="date"
+            label="Expiry Date (optional)"
+            onchange={handleExpiryDateChange}
+          ></lightning-input>
+
+          <template if:true={formError}>
+            <p class="error-text">{formError}</p>
+          </template>
+
+          <lightning-button
+            class="grant-button"
+            variant="brand"
+            label="Grant Access"
+            disabled={isGrantDisabled}
+            onclick={handleGrant}
+          ></lightning-button>
+        </div>
+      </template>
+
+      <template if:true={hasShares}>
+        <ul class="share-list">
+          <template for:each={shares} for:item="share">
+            <li key={share.shareId} class="share-row">
+              <div class="share-main">
+                <span class="partner-name">{share.partnerAccountName}</span>
+                <c-ps-status-badge
+                  label={share.accessLevel}
+                  variant="info"
+                  size="sm"
+                ></c-ps-status-badge>
+              </div>
+              <p class="share-reason">{share.shareReason}</p>
+              <div class="share-meta">
+                <span
+                  >Granted by {share.grantedByName} on
+                  {share.grantedOnLabel}</span
+                >
+                <span>Expires: {share.expiryLabel}</span>
+              </div>
+              <lightning-button
+                class="revoke-button"
+                variant="destructive-text"
+                label="Revoke"
+                data-id={share.shareId}
+                onclick={handleRevoke}
+              ></lightning-button>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template if:false={hasShares}>
+        <p class="empty-state">
+          No active partner access grants for this record.
+        </p>
+      </template>
+    </div>
+  </template>
+
+  <template if:false={isSupportedObject}>
+    <div class="share-manager">
+      <p class="empty-state">
+        Partner access sharing is not available for this object.
+      </p>
+    </div>
+  </template>
+</template>

@@ -1,3 +1,8 @@
+/*
+ * Unit tests for PartnerContentDomain's visibility rules and DTO mapping,
+ * covering the "All Partners" and "Restricted" (tier/type-matched)
+ * visibility branches.
+ */
 @IsTest
 private class PartnerContentDomainTest {
   @IsTest

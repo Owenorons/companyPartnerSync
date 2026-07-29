@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Approval Override</label>
+    <description
+  >Add-on escalation authority. Assign alongside PartnerSync_MDF_Reviewer or PartnerSync_Internal_Admin to allow approving an MDF request that exceeds the partner's remaining annual budget. Grants no object access on its own.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Override_MDF_Budget</name>
+    </customPermissions>
+</PermissionSet>

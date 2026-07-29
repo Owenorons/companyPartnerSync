@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Assign_To_User_Id__c</fullName>
-    <description
-  >User Id or logical key used when assignment method targets a fixed owner.</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Assign To User Id</label>

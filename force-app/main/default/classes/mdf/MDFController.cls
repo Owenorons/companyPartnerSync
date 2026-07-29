@@ -1,3 +1,9 @@
+/*
+ * Aura/LWC entry point for MDF: submission, the partner's own requests
+ * and budget, the internal review queue, and decisions. Thin boundary
+ * only — all rules live in MDFService/MDFApprovalService/MDFSelector;
+ * this class just translates exceptions into AuraHandledException.
+ */
 public with sharing class MDFController {
   @AuraEnabled
   public static void submitRequest(MDFRequestDTO request) {

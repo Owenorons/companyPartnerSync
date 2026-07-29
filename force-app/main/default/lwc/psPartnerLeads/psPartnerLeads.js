@@ -3,6 +3,8 @@ import { refreshApex } from "@salesforce/apex";
 import getMyLeads from "@salesforce/apex/LeadDistributionController.getMyLeads";
 import processDecision from "@salesforce/apex/LeadDistributionController.processDecision";
 
+const HOUR = 60 * 60 * 1000;
+
 export default class PsPartnerLeads extends LightningElement {
   leads = [];
   error;
@@ -17,8 +19,9 @@ export default class PsPartnerLeads extends LightningElement {
     if (result.data) {
       this.leads = result.data.map((lead) => ({
         ...lead,
-        badgeClass: this.getBadgeClass(lead.status),
+        badgeVariant: this.getBadgeVariant(lead.status),
         slaLabel: this.formatDateTime(lead.slaDeadline),
+        slaVariant: this.getSlaVariant(lead.slaDeadline, lead.status),
         canRespond: lead.status === "Assigned",
         canConvert: lead.status === "Accepted"
       }));
@@ -76,15 +79,34 @@ export default class PsPartnerLeads extends LightningElement {
     }).format(new Date(value));
   }
 
-  getBadgeClass(status) {
+  getBadgeVariant(status) {
     if (status === "Accepted" || status === "Converted") {
-      return "badge badge-success";
+      return "success";
     }
 
     if (status === "Rejected" || status === "Expired") {
-      return "badge badge-danger";
+      return "danger";
     }
 
-    return "badge badge-warning";
+    return "warning";
+  }
+
+  getSlaVariant(slaDeadline, status) {
+    if (status !== "Assigned" || !slaDeadline) {
+      return "info";
+    }
+
+    const hoursRemaining =
+      (new Date(slaDeadline).getTime() - Date.now()) / HOUR;
+
+    if (hoursRemaining <= 2) {
+      return "danger";
+    }
+
+    if (hoursRemaining <= 24) {
+      return "warning";
+    }
+
+    return "info";
   }
 }

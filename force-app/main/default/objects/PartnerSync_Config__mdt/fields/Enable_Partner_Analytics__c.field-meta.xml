@@ -2,8 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Enable_Partner_Analytics__c</fullName>
     <defaultValue>true</defaultValue>
-    <description
-  >Indicates whether partner analytics functionality is enabled.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Enable Partner Analytics</label>
     <type>Checkbox</type>

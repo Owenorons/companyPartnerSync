@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.ps-navbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--ps-color-card, #ffffff);
+  border-bottom: 1px solid var(--ps-color-border, #e5e7eb);
+}
+
+.navbar-menu {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .ps-navbar {
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+  }
+}

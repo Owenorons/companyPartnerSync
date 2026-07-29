@@ -1,3 +1,9 @@
+/*
+ * Aura controller surface for the lead distribution flows: assigning a lead
+ * to a partner, listing a partner's leads, and processing accept/reject
+ * decisions. Pure pass-through/exception-translation layer over
+ * LeadDistributionService and LeadDecisionService — no business logic here.
+ */
 public with sharing class LeadDistributionController {
   @AuraEnabled
   public static void assignLeadToPartner(LeadAssignmentRequestDTO request) {

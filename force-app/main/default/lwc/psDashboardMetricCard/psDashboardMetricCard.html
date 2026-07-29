@@ -1,7 +1,8 @@
 <template>
-  <div class={cardClass}>
+  <div class={cardClass} part="card">
     <div
       class="slds-grid_align-center slds-media_center slds-grid slds-max-large-size_xxx-small icon-wrap"
+      part="icon"
     >
       <lightning-icon
         icon-name={iconName}
@@ -12,8 +13,8 @@
     </div>
 
     <div>
-      <p class="label">{label}</p>
-      <p class="value">{value}</p>
+      <p class="label" part="label">{label}</p>
+      <p class="value" part="value">{value}</p>
     </div>
   </div>
 </template>

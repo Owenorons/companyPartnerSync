@@ -1,3 +1,10 @@
+/*
+ * Handles a partner's Accept/Reject decision on an already-assigned Lead.
+ * Sits between LeadDistributionService (initial routing to a partner) and
+ * LeadConversionService (turning an accepted lead into deal records) —
+ * this class only ever moves a lead's status, it never creates Opportunity
+ * or Deal Registration data.
+ */
 public with sharing class LeadDecisionService {
   public static void processDecision(LeadDecisionRequestDTO request) {
     if (!TenantConfigService.isLeadsEnabled()) {
@@ -8,12 +15,9 @@ public with sharing class LeadDecisionService {
 
     SecurityUtil.assertUpdateable(Lead.SObjectType);
 
-    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+    PartnerRecordAccessService.assertPartnerAccessToLead(request.leadId);
 
-    Lead lead = LeadDistributionSelector.selectPartnerLeadById(
-      request.leadId,
-      partnerAccountId
-    );
+    Lead lead = LeadDistributionSelector.selectInternalLead(request.leadId);
 
     if (lead.Lead_Distribution_Status__c != 'Assigned') {
       throw new PartnerSyncHandledException(
@@ -41,6 +45,20 @@ public with sharing class LeadDecisionService {
       lead.Lead_Distribution_Status__c,
       request.notes
     );
+
+    // Only acceptance publishes a platform event — a rejection has no
+    // downstream listeners (nothing else in the system reacts to it), so
+    // firing an event for it would just be noise.
+    if (request.decision == 'Accepted') {
+      PlatformEventPublisherService.publish(
+        'LeadAccepted',
+        lead.Id,
+        'Lead',
+        lead.Partner_Account__c,
+        'Partner accepted an assigned lead.',
+        'Info'
+      );
+    }
 
     LoggingService.info(
       'LeadDecisionService',

@@ -1,3 +1,9 @@
+/*
+ * Generic success/failure envelope for callers that need a uniform shape
+ * regardless of payload type (data is untyped Object). Prefer a specific
+ * DTO when the shape is known ahead of time; use ok()/fail() rather than
+ * constructing directly so success and errors stay in sync.
+ */
 public with sharing class PartnerSyncResponseDTO {
   @AuraEnabled
   public Boolean success;

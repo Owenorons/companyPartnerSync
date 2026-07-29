@@ -1,0 +1,238 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Onboarding</p>
+        <h1>Partner Applications</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium filter-panel">
+        <lightning-input type="search" label="Search" onchange={handleSearch}>
+        </lightning-input>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No pending applications"
+            message="New partner applications will appear here for review."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasFilteredApplications}>
+          <template for:each={filteredApplications} for:item="application">
+            <button
+              key={application.applicationId}
+              class={application.rowClass}
+              data-id={application.applicationId}
+              onclick={handleSelectApplication}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="deal-number">{application.applicationNumber}</span>
+                <span class={application.tierChipClass}
+                  >{application.requestedTier}</span
+                >
+              </div>
+
+              <h3>{application.companyName}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>{application.partnerType}</span>
+                <strong>{application.status}</strong>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedApplication}>
+        <template if:true={detailError}>
+          <c-ps-error-panel message={detailError}></c-ps-error-panel>
+        </template>
+
+        <template if:true={loadingDetail}>
+          <c-ps-loading-state
+            message="Loading application detail"
+          ></c-ps-loading-state>
+        </template>
+
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">Partner Application</p>
+            <h2>{selectedApplication.companyName}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span>{selectedApplication.applicationNumber}</span>
+              <span class={selectedApplication.tierChipClass}
+                >{selectedApplication.requestedTier}</span
+              >
+              <span>{selectedApplication.partnerType}</span>
+            </div>
+          </div>
+
+          <template if:true={selectedApplication.isReviewable}>
+            <template if:true={selectedApplication.canDecide}>
+              <div class="slds-grid hero-actions">
+                <button class="approve" onclick={handleApprove}>Approve</button>
+                <button class="reject" onclick={handleReject}>Reject</button>
+              </div>
+            </template>
+
+            <template if:true={showNoDecisionPermission}>
+              <div class="decision-state">
+                You do not have permission to decide this application.
+              </div>
+            </template>
+          </template>
+
+          <template if:false={selectedApplication.isReviewable}>
+            <template if:true={selectedApplication.isStamped}>
+              <div class="stamp-wrap">
+                <span class={selectedApplication.stampClass}
+                  >{selectedApplication.status}</span
+                >
+              </div>
+            </template>
+
+            <template if:false={selectedApplication.isStamped}>
+              <div class="decision-state">{selectedApplication.status}</div>
+            </template>
+          </template>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Company Details</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Website</span>
+              <strong>{selectedApplication.website}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Country</span>
+              <strong>{selectedApplication.country}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Region</span>
+              <strong>{selectedApplication.region}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Business Email</span>
+              <strong>{selectedApplication.businessEmail}</strong>
+            </div>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Submitted By</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Name</span>
+              <strong>{selectedApplication.submittedByContactName}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Email</span>
+              <strong>{selectedApplication.submittedByEmail}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Phone</span>
+              <strong>{selectedApplication.phone}</strong>
+            </div>
+          </article>
+
+          <template if:true={selectedApplication.rejectionReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Rejection Reason</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedApplication.rejectionReason}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedApplication.approvalNotes}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Approval Notes</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedApplication.approvalNotes}
+              </div>
+            </article>
+          </template>
+        </section>
+      </template>
+
+      <template if:false={selectedApplication}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:company" size="large">
+          </lightning-icon>
+
+          <h2>Select an application</h2>
+
+          <p>Choose an application from the queue to begin review.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+
+  <template if:true={showRejectDialog}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="reject-dialog-heading"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="reject-dialog-heading" class="slds-modal__title">
+            Reject Application
+          </h2>
+        </header>
+
+        <div class="slds-modal__content slds-var-p-around_medium">
+          <lightning-textarea
+            label="Rejection reason"
+            value={rejectionReason}
+            required
+            onchange={handleRejectionReasonChange}
+          >
+          </lightning-textarea>
+        </div>
+
+        <footer class="slds-modal__footer">
+          <lightning-button
+            variant="neutral"
+            label="Cancel"
+            onclick={handleCancelReject}
+          >
+          </lightning-button>
+
+          <lightning-button
+            class="slds-var-m-left_small"
+            variant="destructive"
+            label="Reject"
+            disabled={isRejectDisabled}
+            onclick={handleConfirmReject}
+          >
+          </lightning-button>
+        </footer>
+      </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>

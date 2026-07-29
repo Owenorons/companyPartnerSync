@@ -92,6 +92,12 @@ describe("c-ps-deal-review-workspace", () => {
     expect(element.shadowRoot.querySelector(".risk-label").textContent).toBe(
       "Medium Risk"
     );
+    expect(element.shadowRoot.querySelector(".risk-score").className).toBe(
+      "risk-score risk-medium"
+    );
+    expect(element.shadowRoot.querySelector(".risk-summary").className).toBe(
+      "slds-var-m-top_medium slds-var-p-around_medium risk-summary risk-medium"
+    );
   });
 
   it("submits an approve decision for the selected deal", async () => {
@@ -100,7 +106,9 @@ describe("c-ps-deal-review-workspace", () => {
       customerName: "Acme",
       partnerName: "North Partner",
       status: "Submitted",
-      conflictStatus: "No Conflict"
+      conflictStatus: "No Conflict",
+      canApprove: true,
+      canReject: true
     });
     processDecision.mockResolvedValue();
 
@@ -139,7 +147,9 @@ describe("c-ps-deal-review-workspace", () => {
       customerName: "Acme",
       partnerName: "North Partner",
       status: "Submitted",
-      conflictStatus: "No Conflict"
+      conflictStatus: "No Conflict",
+      canApprove: true,
+      canReject: true
     });
     processDecision.mockResolvedValue();
 
@@ -228,11 +238,48 @@ describe("c-ps-deal-review-workspace", () => {
 
     expect(element.shadowRoot.querySelector(".approve")).toBeNull();
     expect(element.shadowRoot.querySelector(".reject")).toBeNull();
-    expect(
-      element.shadowRoot.querySelector(".decision-state").textContent
-    ).toContain("Rejected");
+    expect(element.shadowRoot.querySelector(".decision-state")).toBeNull();
+    expect(element.shadowRoot.querySelector(".stamp").textContent).toBe(
+      "Rejected"
+    );
     expect(element.shadowRoot.textContent).toContain(
       "Customer already protected by another partner."
     );
+  });
+
+  it("hides approve/reject buttons for a viewer without decision permission", async () => {
+    getReviewDetail.mockResolvedValue({
+      dealId: "a02xx0000000003",
+      customerName: "Gamma",
+      partnerName: "East Partner",
+      status: "Submitted",
+      conflictStatus: "No Conflict",
+      canApprove: false,
+      canReject: false
+    });
+
+    const element = createElement("c-ps-deal-review-workspace", {
+      is: PsDealReviewWorkspace
+    });
+
+    document.body.appendChild(element);
+
+    getReviewQueue.emit([
+      {
+        dealId: "a02xx0000000003",
+        customerName: "Gamma",
+        partnerName: "East Partner",
+        status: "Submitted",
+        conflictStatus: "No Conflict"
+      }
+    ]);
+    await flushPromises();
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".approve")).toBeNull();
+    expect(element.shadowRoot.querySelector(".reject")).toBeNull();
+    expect(
+      element.shadowRoot.querySelector(".decision-state").textContent
+    ).toContain("You do not have permission to decide this deal.");
   });
 });

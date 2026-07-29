@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>MDF_Annual_Budget__c</fullName>
-    <description
-  >Annual MDF budget allocated to the partner company.</description>
     <label>MDF Annual Budget</label>
     <precision>18</precision>
     <required>false</required>

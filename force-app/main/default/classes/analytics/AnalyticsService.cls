@@ -1,3 +1,11 @@
+/*
+ * Service layer for partner analytics. Orchestrates AnalyticsSelector +
+ * AnalyticsDomain and is where permission gating is decided: getMyKPI is
+ * self-service (a partner viewing their own account) so it only checks the
+ * tenant feature flag, while the leaderboard and cross-partner revenue
+ * views expose other partners' data and require the executive-analytics
+ * permission.
+ */
 public with sharing class AnalyticsService {
   public static PartnerKPIDTO getMyKPI() {
     if (!TenantConfigService.isAnalyticsEnabled()) {
@@ -10,7 +18,9 @@ public with sharing class AnalyticsService {
   }
 
   public static List<PartnerLeaderboardRowDTO> getPartnerLeaderboard() {
-    PartnerPermissionService.assertCanAccessInternalAnalytics();
+    // Cross-partner view, so gate on the executive permission rather than
+    // the self-service tenant flag used by getMyKPI.
+    PartnerPermissionService.assertCanViewExecutiveAnalytics();
 
     List<PartnerLeaderboardRowDTO> results = new List<PartnerLeaderboardRowDTO>();
 
@@ -24,7 +34,7 @@ public with sharing class AnalyticsService {
   }
 
   public static List<CustomerRevenueDTO> getCustomerRevenue() {
-    PartnerPermissionService.assertCanAccessInternalAnalytics();
+    PartnerPermissionService.assertCanViewExecutiveAnalytics();
 
     Map<String, CustomerRevenueDTO> grouped = new Map<String, CustomerRevenueDTO>();
 

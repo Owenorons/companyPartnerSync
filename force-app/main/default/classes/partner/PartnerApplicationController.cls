@@ -1,3 +1,9 @@
+/*
+ * Aura-enabled entry points for the partner application flow (submit /
+ * list pending / view detail). Thin adapter layer only — all logic lives in
+ * PartnerApplicationService; this class just maps its exceptions to what
+ * the LWC layer is allowed to see.
+ */
 public with sharing class PartnerApplicationController {
   @AuraEnabled
   public static PartnerApplicationResultDTO submitApplication(
@@ -21,7 +27,7 @@ public with sharing class PartnerApplicationController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static List<PartnerApplicationResultDTO> getPendingApplications() {
+  public static List<PartnerApplicationListDTO> getPendingApplications() {
     try {
       return PartnerApplicationService.getPendingApplications();
     } catch (PartnerSyncHandledException ex) {
@@ -34,6 +40,25 @@ public with sharing class PartnerApplicationController {
       );
 
       throw new AuraHandledException('Unable to load pending applications.');
+    }
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static PartnerApplicationDetailDTO getApplicationDetail(
+    Id applicationId
+  ) {
+    try {
+      return PartnerApplicationService.getApplicationDetail(applicationId);
+    } catch (PartnerSyncHandledException ex) {
+      throw new AuraHandledException(ex.getMessage());
+    } catch (Exception ex) {
+      LoggingService.error(
+        'PartnerApplicationController',
+        'Unable to load application detail.',
+        ex
+      );
+
+      throw new AuraHandledException('Unable to load application detail.');
     }
   }
 }

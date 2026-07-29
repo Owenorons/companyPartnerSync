@@ -1,3 +1,7 @@
+/*
+ * Aggregated revenue row (customer x partner) surfaced to analytics
+ * dashboards in the LWC layer. Purely a data-transfer shape; no behavior.
+ */
 public with sharing class CustomerRevenueDTO {
   @AuraEnabled
   public Id customerAccountId;

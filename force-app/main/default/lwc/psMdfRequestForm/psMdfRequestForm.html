@@ -5,6 +5,16 @@
       <h2>Request MDF</h2>
     </div>
 
+    <lightning-combobox
+      name="requestType"
+      label="Request Type"
+      value={requestType}
+      options={requestTypeOptions}
+      onchange={handleRequestTypeChange}
+      required
+    >
+    </lightning-combobox>
+
     <lightning-input
       name="campaignName"
       label="Campaign Name"
@@ -26,11 +36,10 @@
     </lightning-input>
 
     <lightning-textarea
-      name="businessJustification"
-      label="Business Justification"
-      value={businessJustification}
+      name="campaignDescription"
+      label="Campaign Description"
+      value={campaignDescription}
       onchange={handleChange}
-      required
     >
     </lightning-textarea>
 

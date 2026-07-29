@@ -1,0 +1,72 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">AI Administration</p>
+        <h1>AI Providers</h1>
+        <p>
+          Review configured AI providers and verify their connections are
+          healthy.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading AI providers..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <template if:true={hasProviders}>
+        <div class="ps-card provider-table">
+          <div class="table-header table-row">
+            <span>Provider</span>
+            <span>Type</span>
+            <span>Config Status</span>
+            <span>Connection</span>
+            <span>Last Tested</span>
+            <span></span>
+          </div>
+
+          <template for:each={rows} for:item="row">
+            <div key={row.developerName} class="table-row">
+              <span class="cell-title">{row.providerName}</span>
+              <span>{row.providerType}</span>
+              <c-ps-status-badge
+                label={row.activeLabel}
+                variant={row.activeVariant}
+              ></c-ps-status-badge>
+              <c-ps-status-badge
+                label={row.connectionStatus}
+                variant={row.statusVariant}
+              ></c-ps-status-badge>
+              <span>{row.lastTestDate}</span>
+              <span class="row-actions">
+                <lightning-button
+                  label="Test Connection"
+                  data-name={row.developerName}
+                  disabled={row.isTesting}
+                  onclick={handleTestConnection}
+                >
+                </lightning-button>
+              </span>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasProviders}>
+        <c-ps-empty-state
+          title="No AI providers configured"
+          message="Add an AI_Provider_Config__mdt record to configure a provider."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>
