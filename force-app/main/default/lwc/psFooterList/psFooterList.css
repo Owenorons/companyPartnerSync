@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.footer-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

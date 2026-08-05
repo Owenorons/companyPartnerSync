@@ -6,13 +6,13 @@
  */
 public with sharing class PartnerSyncResponseDTO {
   @AuraEnabled
-  public Boolean success;
+  public Boolean success { get; set; }
   @AuraEnabled
-  public String message;
+  public String message { get; set; }
   @AuraEnabled
-  public Object data;
+  public Object data { get; set; }
   @AuraEnabled
-  public List<String> errors;
+  public List<String> errors { get; set; }
 
   public PartnerSyncResponseDTO() {
     this.errors = new List<String>();

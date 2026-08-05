@@ -61,4 +61,20 @@ public with sharing class PartnerApplicationController {
       throw new AuraHandledException('Unable to load application detail.');
     }
   }
+
+  @AuraEnabled
+  public static void claimApplication(Id applicationId) {
+    try {
+      PartnerApplicationService.claimApplication(applicationId);
+    } catch (PartnerSyncHandledException ex) {
+      throw new AuraHandledException(ex.getMessage());
+    } catch (Exception ex) {
+      LoggingService.error(
+        'PartnerApplicationController',
+        'Unable to claim partner application.',
+        ex
+      );
+      throw new AuraHandledException('Unable to claim partner application.');
+    }
+  }
 }

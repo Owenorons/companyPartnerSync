@@ -46,14 +46,27 @@ public with sharing class PartnerApplicationService {
       new List<SObject>{ record }
     );
 
-    Database.insert(sanitized, AccessLevel.USER_MODE);
+    try {
+      Database.insert(sanitized, AccessLevel.USER_MODE);
+    } catch (DmlException ex) {
+      if (
+        ex.getNumDml() > 0 &&
+        ex.getDmlStatusCode(0) == StatusCode.DUPLICATE_VALUE
+      ) {
+        throw new PartnerSyncHandledException(
+          'A partner application already exists for this company or email.'
+        );
+      }
+
+      throw ex;
+    }
 
     Partner_Application__c insertedRecord = (Partner_Application__c) sanitized[0];
 
     // Re-query rather than reuse the DML result: fields like the
     // auto-number Application_Number__c are only populated by the platform
     // after insert and aren't reflected on the in-memory sObject.
-    insertedRecord = PartnerApplicationSelector.selectSubmissionResultById(
+    insertedRecord = PartnerApplicationSubmissionSelector.selectById(
       insertedRecord.Id
     );
 
@@ -88,6 +101,44 @@ public with sharing class PartnerApplicationService {
       applicationId
     );
 
-    return PartnerApplicationDomain.toDetailDTO(application);
+    PartnerApplicationDetailDTO detail = PartnerApplicationDomain.toDetailDTO(
+      application
+    );
+    detail.potentialMatches = PartnerApplicationMatchSelector.findPotentialMatches(
+      application
+    );
+    detail.hasPotentialMatches = !detail.potentialMatches.isEmpty();
+    return detail;
+  }
+
+  public static void claimApplication(Id applicationId) {
+    PartnerPermissionService.assertCanApprovePartnerApplications();
+    SecurityUtil.assertUpdateable(Partner_Application__c.SObjectType);
+
+    Partner_Application__c application = PartnerApplicationSelector.selectForDecisionById(
+      applicationId
+    );
+
+    if (
+      application.Application_Status__c == 'Approved' ||
+      application.Application_Status__c == 'Rejected'
+    ) {
+      throw new PartnerSyncHandledException(
+        'This application has already been decided.'
+      );
+    }
+
+    if (
+      application.Assigned_Reviewer__c != null &&
+      application.Assigned_Reviewer__c != UserInfo.getUserId()
+    ) {
+      throw new PartnerSyncHandledException(
+        'This application is already assigned to another reviewer.'
+      );
+    }
+
+    application.Assigned_Reviewer__c = UserInfo.getUserId();
+    application.Application_Status__c = 'Under Review';
+    update SecurityUtil.stripForUpdate(new List<SObject>{ application });
   }
 }

@@ -5,17 +5,17 @@
  */
 public with sharing class AIInsightRequestDTO {
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
 
   @AuraEnabled
-  public String relatedObject;
+  public String relatedObject { get; set; }
 
   @AuraEnabled
-  public Id relatedRecordId;
+  public Id relatedRecordId { get; set; }
 
   @AuraEnabled
-  public String insightType;
+  public String insightType { get; set; }
 
   @AuraEnabled
-  public Map<String, Object> contextData;
+  public Map<String, Object> contextData { get; set; }
 }

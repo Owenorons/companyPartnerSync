@@ -5,21 +5,21 @@
  */
 public with sharing class PartnerShareListDTO {
   @AuraEnabled
-  public Id shareId;
+  public Id shareId { get; set; }
   @AuraEnabled
-  public String targetObject;
+  public String targetObject { get; set; }
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
   @AuraEnabled
-  public String partnerAccountName;
+  public String partnerAccountName { get; set; }
   @AuraEnabled
-  public String accessLevel;
+  public String accessLevel { get; set; }
   @AuraEnabled
-  public String shareReason;
+  public String shareReason { get; set; }
   @AuraEnabled
-  public Date expiryDate;
+  public Date expiryDate { get; set; }
   @AuraEnabled
-  public String grantedByName;
+  public String grantedByName { get; set; }
   @AuraEnabled
-  public Datetime grantedOn;
+  public Datetime grantedOn { get; set; }
 }

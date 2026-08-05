@@ -5,51 +5,73 @@
  */
 public with sharing class PartnerApplicationDetailDTO {
   @AuraEnabled
-  public Id applicationId;
+  public Id applicationId { get; set; }
   @AuraEnabled
-  public String applicationNumber;
+  public String applicationNumber { get; set; }
 
   @AuraEnabled
-  public String companyName;
+  public String companyName { get; set; }
   @AuraEnabled
-  public String businessEmail;
+  public String businessEmail { get; set; }
   @AuraEnabled
-  public String phone;
+  public String phone { get; set; }
   @AuraEnabled
-  public String website;
+  public String website { get; set; }
   @AuraEnabled
-  public String country;
+  public String country { get; set; }
   @AuraEnabled
-  public String region;
+  public String region { get; set; }
 
   @AuraEnabled
-  public String requestedTier;
+  public String requestedTier { get; set; }
   @AuraEnabled
-  public String partnerType;
+  public String partnerType { get; set; }
 
   @AuraEnabled
-  public String submittedByContactName;
+  public String submittedByContactName { get; set; }
   @AuraEnabled
-  public String submittedByEmail;
+  public String submittedByEmail { get; set; }
 
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public String decision;
+  public String decision { get; set; }
   @AuraEnabled
-  public String rejectionReason;
+  public String rejectionReason { get; set; }
   @AuraEnabled
-  public String approvalNotes;
+  public String approvalNotes { get; set; }
   @AuraEnabled
-  public Datetime submittedOn;
+  public Datetime submittedOn { get; set; }
+  @AuraEnabled
+  public Id assignedReviewerId { get; set; }
+  @AuraEnabled
+  public String assignedReviewerName { get; set; }
 
   @AuraEnabled
-  public Id createdAccountId;
+  public Id createdAccountId { get; set; }
   @AuraEnabled
-  public Id createdContactId;
+  public Id createdContactId { get; set; }
+  @AuraEnabled
+  public Id provisionedUserId { get; set; }
+  @AuraEnabled
+  public String provisioningStatus { get; set; }
+  @AuraEnabled
+  public String provisioningError { get; set; }
+  @AuraEnabled
+  public Datetime provisionedOn { get; set; }
+  @AuraEnabled
+  public Boolean canRequestProvisioning { get; set; }
 
   @AuraEnabled
-  public Boolean isReviewable;
+  public Boolean isReviewable { get; set; }
   @AuraEnabled
-  public Boolean canDecide;
+  public Boolean canDecide { get; set; }
+  @AuraEnabled
+  public Boolean canClaim { get; set; }
+  @AuraEnabled
+  public Boolean isAssignedToCurrentUser { get; set; }
+  @AuraEnabled
+  public Boolean hasPotentialMatches { get; set; }
+  @AuraEnabled
+  public List<PartnerApplicationMatchDTO> potentialMatches { get; set; }
 }

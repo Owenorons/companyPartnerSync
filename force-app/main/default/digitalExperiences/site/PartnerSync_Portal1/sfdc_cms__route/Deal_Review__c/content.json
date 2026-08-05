@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Deal Review",
+  "contentBody" : {
+    "activeViewId" : "Deal_Review",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-deal-review",
+    "urlPrefix" : "deal-review"
+  },
+  "urlName" : "deal-review"
+}

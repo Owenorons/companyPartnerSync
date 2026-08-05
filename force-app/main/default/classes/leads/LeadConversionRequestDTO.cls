@@ -6,15 +6,15 @@
  */
 public with sharing class LeadConversionRequestDTO {
   @AuraEnabled
-  public Id leadId;
+  public Id leadId { get; set; }
   @AuraEnabled
-  public String opportunityName;
+  public String opportunityName { get; set; }
   @AuraEnabled
-  public Decimal estimatedValue;
+  public Decimal estimatedValue { get; set; }
   @AuraEnabled
-  public Date estimatedCloseDate;
+  public Date estimatedCloseDate { get; set; }
   @AuraEnabled
-  public String stageName;
+  public String stageName { get; set; }
   @AuraEnabled
-  public String notes;
+  public String notes { get; set; }
 }

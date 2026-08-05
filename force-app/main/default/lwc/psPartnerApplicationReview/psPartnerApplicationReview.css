@@ -215,6 +215,16 @@ h1 {
   color: var(--ps-color-text);
 }
 
+.match-warning {
+  border-left: 4px solid var(--ps-color-warning, #ba5d00);
+}
+
+.match-warning .status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .empty-state {
   height: 100%;
   display: grid;

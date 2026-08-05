@@ -4,17 +4,17 @@
  */
 public with sharing class CustomerRevenueDTO {
   @AuraEnabled
-  public Id customerAccountId;
+  public Id customerAccountId { get; set; }
   @AuraEnabled
-  public String customerName;
+  public String customerName { get; set; }
 
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
 
   @AuraEnabled
-  public Decimal revenue;
+  public Decimal revenue { get; set; }
   @AuraEnabled
-  public Integer opportunityCount;
+  public Integer opportunityCount { get; set; }
 }

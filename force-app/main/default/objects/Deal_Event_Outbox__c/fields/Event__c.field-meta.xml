@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Event__c</fullName><label>Event</label><type>MasterDetail</type><referenceTo
+  >Deal_Event__c</referenceTo><relationshipLabel
+  >Outbox Entries</relationshipLabel><relationshipName
+  >Outbox_Entries</relationshipName><reparentableMasterDetail
+  >false</reparentableMasterDetail><writeRequiresMasterRead
+  >false</writeRequiresMasterRead></CustomField>

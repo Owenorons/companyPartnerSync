@@ -4,37 +4,42 @@
   "version": "1.0.0",
   "description": "Salesforce App",
   "scripts": {
-    "lint": "eslint **/{aura,lwc}/**/*.js",
+    "lint": "eslint **/lwc/**/*.js",
     "test": "npm run test:unit",
     "test:unit": "sfdx-lwc-jest",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "security:baseline": "node scripts/ci/check-code-analyzer-baseline.js reports/code-analyzer.sarif",
+    "preview:lwc": "vite --config tools/lwc-preview/vite.config.mjs",
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-    "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check package.json eslint.config.js jest.config.js \".github/**/*.{yml,yaml}\" \"force-app/main/default/classes/**/*.{cls,trigger}\" \"force-app/main/default/lwc/**/*.{js,html,css}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged"
   },
   "devDependencies": {
+    "@lwc/engine-dom": "8.28.2",
     "@lwc/eslint-plugin-lwc": "^3.1.0",
+    "@lwc/rollup-plugin": "^9.3.6",
     "@prettier/plugin-xml": "^3.4.1",
-    "@salesforce/eslint-config-lwc": "^4.0.0",
+    "@salesforce/eslint-config-lwc": "^4.1.2",
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
-    "@salesforce/sfdx-lwc-jest": "^7.0.2",
+    "@salesforce/sfdx-lwc-jest": "7.9.0",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "3.8.3",
-    "prettier-plugin-apex": "^2.2.6"
+    "prettier-plugin-apex": "^2.2.6",
+    "vite": "^8.1.5"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
       "prettier --write"
     ],
-    "**/{aura,lwc}/**/*.js": [
+    "**/lwc/**/*.js": [
       "eslint"
     ],
     "**/lwc/**": [

@@ -4,13 +4,13 @@
  */
 public with sharing class MDFDecisionDTO {
   @AuraEnabled
-  public Id requestId;
+  public Id requestId { get; set; }
   @AuraEnabled
-  public String decision;
+  public String decision { get; set; }
   @AuraEnabled
-  public Decimal approvedAmount;
+  public Decimal approvedAmount { get; set; }
   @AuraEnabled
-  public String decisionNotes;
+  public String decisionNotes { get; set; }
   @AuraEnabled
-  public String rejectionReason;
+  public String rejectionReason { get; set; }
 }

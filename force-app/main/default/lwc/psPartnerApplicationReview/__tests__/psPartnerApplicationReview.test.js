@@ -2,7 +2,21 @@ import { createElement } from "@lwc/engine-dom";
 import PsPartnerApplicationReview from "c/psPartnerApplicationReview";
 import getPendingApplications from "@salesforce/apex/PartnerApplicationController.getPendingApplications";
 import getApplicationDetail from "@salesforce/apex/PartnerApplicationController.getApplicationDetail";
+import claimApplication from "@salesforce/apex/PartnerApplicationController.claimApplication";
 import processDecision from "@salesforce/apex/PartnerApprovalController.processDecision";
+import requestProvisioning from "@salesforce/apex/PartnerApprovalController.requestProvisioning";
+
+jest.mock(
+  "@salesforce/apex/PartnerApprovalController.requestProvisioning",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@salesforce/apex/PartnerApplicationController.claimApplication",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock(
   "@salesforce/apex/PartnerApplicationController.getPendingApplications",
@@ -57,7 +71,12 @@ const DETAIL = {
   rejectionReason: null,
   approvalNotes: null,
   isReviewable: true,
-  canDecide: true
+  canDecide: true,
+  canClaim: false,
+  assignedReviewerId: "005xx0000000001",
+  assignedReviewerName: "Channel Reviewer",
+  hasPotentialMatches: false,
+  potentialMatches: []
 };
 
 describe("c-ps-partner-application-review", () => {
@@ -125,6 +144,76 @@ describe("c-ps-partner-application-review", () => {
         applicationId: "a03xx0000000001",
         decision: "Approved"
       })
+    });
+  });
+
+  it("claims an unassigned submitted application", async () => {
+    getApplicationDetail.mockResolvedValue({
+      ...DETAIL,
+      canClaim: true,
+      canDecide: false,
+      assignedReviewerId: null,
+      assignedReviewerName: null
+    });
+    claimApplication.mockResolvedValue();
+
+    const element = createElement("c-ps-partner-application-review", {
+      is: PsPartnerApplicationReview
+    });
+    document.body.appendChild(element);
+
+    getPendingApplications.emit([LIST_ROW]);
+    await flushPromises();
+    await flushPromises();
+
+    element.shadowRoot.querySelector(".claim").click();
+    await flushPromises();
+
+    expect(claimApplication).toHaveBeenCalledWith({
+      applicationId: "a03xx0000000001"
+    });
+  });
+
+  it("requires acknowledgement before approving potential matches", async () => {
+    getApplicationDetail.mockResolvedValue({
+      ...DETAIL,
+      hasPotentialMatches: true,
+      potentialMatches: [
+        {
+          recordId: "001xx0000000001",
+          recordType: "Account",
+          name: "Acme Logistics",
+          emailOrWebsite: "https://acmelogistics.com",
+          matchReason: "Company name matches"
+        }
+      ]
+    });
+    processDecision.mockResolvedValue();
+
+    const element = createElement("c-ps-partner-application-review", {
+      is: PsPartnerApplicationReview
+    });
+    document.body.appendChild(element);
+    getPendingApplications.emit([LIST_ROW]);
+    await flushPromises();
+    await flushPromises();
+
+    const approveButton = element.shadowRoot.querySelector(".approve");
+    expect(approveButton.disabled).toBe(true);
+
+    const acknowledgement = element.shadowRoot.querySelector(
+      ".match-acknowledgement"
+    );
+    acknowledgement.checked = true;
+    acknowledgement.dispatchEvent(new CustomEvent("change"));
+    await flushPromises();
+
+    expect(approveButton.disabled).toBe(false);
+    approveButton.click();
+    await flushPromises();
+
+    expect(processDecision).toHaveBeenCalledWith({
+      request: expect.objectContaining({ confirmPotentialMatches: true })
     });
   });
 
@@ -196,5 +285,33 @@ describe("c-ps-partner-application-review", () => {
     expect(element.shadowRoot.querySelector(".stamp").textContent).toBe(
       "Approved"
     );
+  });
+
+  it("requests access provisioning for an approved application", async () => {
+    getApplicationDetail.mockResolvedValue({
+      ...DETAIL,
+      status: "Approved",
+      decision: "Approved",
+      isReviewable: false,
+      canDecide: false,
+      canRequestProvisioning: true,
+      provisioningStatus: "Awaiting Partner Enablement"
+    });
+    requestProvisioning.mockResolvedValue();
+
+    const element = createElement("c-ps-partner-application-review", {
+      is: PsPartnerApplicationReview
+    });
+    document.body.appendChild(element);
+    getPendingApplications.emit([LIST_ROW]);
+    await flushPromises();
+    await flushPromises();
+
+    element.shadowRoot.querySelector(".provision").click();
+    await flushPromises();
+
+    expect(requestProvisioning).toHaveBeenCalledWith({
+      applicationId: "a03xx0000000001"
+    });
   });
 });

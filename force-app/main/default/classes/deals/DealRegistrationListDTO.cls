@@ -6,27 +6,27 @@
  */
 public with sharing class DealRegistrationListDTO {
   @AuraEnabled
-  public Id dealId;
+  public Id dealId { get; set; }
   @AuraEnabled
-  public String dealNumber;
+  public String dealNumber { get; set; }
 
   @AuraEnabled
-  public String customerName;
+  public String customerName { get; set; }
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
 
   @AuraEnabled
-  public Decimal dealValue;
+  public Decimal dealValue { get; set; }
   @AuraEnabled
-  public String stage;
+  public String stage { get; set; }
 
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public String conflictStatus;
+  public String conflictStatus { get; set; }
 
   @AuraEnabled
-  public Date protectionEndDate;
+  public Date protectionEndDate { get; set; }
   @AuraEnabled
-  public Datetime createdDate;
+  public Datetime createdDate { get; set; }
 }

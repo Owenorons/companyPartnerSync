@@ -4,9 +4,9 @@
  */
 public with sharing class MDFBudgetDTO {
   @AuraEnabled
-  public Decimal annualBudget;
+  public Decimal annualBudget { get; set; }
   @AuraEnabled
-  public Decimal usedBudget;
+  public Decimal usedBudget { get; set; }
   @AuraEnabled
-  public Decimal remainingBudget;
+  public Decimal remainingBudget { get; set; }
 }

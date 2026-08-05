@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Leaderboard",
+  "contentBody" : {
+    "activeViewId" : "Leaderboard",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-leaderboard",
+    "urlPrefix" : "leaderboard"
+  },
+  "urlName" : "leaderboard"
+}

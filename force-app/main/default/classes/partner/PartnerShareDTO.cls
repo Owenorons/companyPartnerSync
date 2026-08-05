@@ -6,15 +6,15 @@
  */
 public with sharing class PartnerShareDTO {
   @AuraEnabled
-  public Id targetRecordId;
+  public Id targetRecordId { get; set; }
   @AuraEnabled
-  public String targetObject;
+  public String targetObject { get; set; }
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
   @AuraEnabled
-  public String accessLevel;
+  public String accessLevel { get; set; }
   @AuraEnabled
-  public String shareReason;
+  public String shareReason { get; set; }
   @AuraEnabled
-  public Date expiryDate;
+  public Date expiryDate { get; set; }
 }

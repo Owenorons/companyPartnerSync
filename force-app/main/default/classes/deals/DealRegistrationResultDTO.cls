@@ -6,11 +6,11 @@
  */
 public with sharing class DealRegistrationResultDTO {
   @AuraEnabled
-  public Id dealRegistrationId;
+  public Id dealRegistrationId { get; set; }
   @AuraEnabled
-  public String dealRegistrationNumber;
+  public String dealRegistrationNumber { get; set; }
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public String conflictStatus;
+  public String conflictStatus { get; set; }
 }

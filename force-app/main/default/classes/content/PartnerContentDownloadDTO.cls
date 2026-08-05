@@ -4,7 +4,7 @@
  */
 public with sharing class PartnerContentDownloadDTO {
   @AuraEnabled
-  public Id contentId;
+  public Id contentId { get; set; }
   @AuraEnabled
-  public String downloadUrl;
+  public String downloadUrl { get; set; }
 }

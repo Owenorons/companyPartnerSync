@@ -55,6 +55,10 @@
         <value xsi:type="xsd:double">48.0</value>
     </values>
     <values>
+        <field>Max_Open_Deals_Per_Partner__c</field>
+        <value xsi:type="xsd:double">50.0</value>
+    </values>
+    <values>
         <field>Setting_Name__c</field>
         <value xsi:nil="true" />
     </values>

@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Partner Portal",
+  "contentBody" : {
+    "activeViewId" : "Partner_Portal",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-partner-portal",
+    "urlPrefix" : "partner-portal"
+  },
+  "urlName" : "partner-portal"
+}

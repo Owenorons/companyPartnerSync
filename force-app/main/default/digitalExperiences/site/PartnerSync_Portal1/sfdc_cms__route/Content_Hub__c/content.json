@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Content Hub",
+  "contentBody" : {
+    "activeViewId" : "Content_Hub",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-content-hub",
+    "urlPrefix" : "content-hub"
+  },
+  "urlName" : "content-hub"
+}

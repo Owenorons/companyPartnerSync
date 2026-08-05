@@ -6,17 +6,17 @@
  */
 public with sharing class PartnerDashboardDTO {
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
   @AuraEnabled
-  public String partnerStatus;
+  public String partnerStatus { get; set; }
   @AuraEnabled
-  public String partnerTier;
+  public String partnerTier { get; set; }
   @AuraEnabled
-  public Integer openDealCount;
+  public Integer openDealCount { get; set; }
   @AuraEnabled
-  public Integer assignedLeadCount;
+  public Integer assignedLeadCount { get; set; }
   @AuraEnabled
-  public Integer openMdfCount;
+  public Integer openMdfCount { get; set; }
   @AuraEnabled
-  public List<String> alerts;
+  public List<String> alerts { get; set; }
 }

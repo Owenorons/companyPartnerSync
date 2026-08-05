@@ -7,73 +7,73 @@
  */
 public with sharing class DealReviewDetailDTO {
   @AuraEnabled
-  public Id dealId;
+  public Id dealId { get; set; }
   @AuraEnabled
-  public String dealNumber;
+  public String dealNumber { get; set; }
 
   @AuraEnabled
-  public Id opportunityId;
+  public Id opportunityId { get; set; }
   @AuraEnabled
-  public Id customerAccountId;
+  public Id customerAccountId { get; set; }
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
 
   @AuraEnabled
-  public String customerName;
+  public String customerName { get; set; }
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
 
   @AuraEnabled
-  public Decimal estimatedRevenue;
+  public Decimal estimatedRevenue { get; set; }
   @AuraEnabled
-  public Date estimatedCloseDate;
+  public Date estimatedCloseDate { get; set; }
 
   @AuraEnabled
-  public String businessProblem;
+  public String businessProblem { get; set; }
   @AuraEnabled
-  public String proposedSolution;
+  public String proposedSolution { get; set; }
   @AuraEnabled
-  public String implementationTimeline;
+  public String implementationTimeline { get; set; }
   @AuraEnabled
-  public String notes;
+  public String notes { get; set; }
 
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public String conflictStatus;
+  public String conflictStatus { get; set; }
 
   @AuraEnabled
-  public Date protectionEndDate;
+  public Date protectionEndDate { get; set; }
   @AuraEnabled
-  public Datetime submittedOn;
+  public Datetime submittedOn { get; set; }
 
   @AuraEnabled
-  public String approvalNotes;
+  public String approvalNotes { get; set; }
   @AuraEnabled
-  public String rejectionReason;
+  public String rejectionReason { get; set; }
   @AuraEnabled
-  public String conflictResolutionNotes;
+  public String conflictResolutionNotes { get; set; }
 
   @AuraEnabled
-  public Decimal riskScore;
+  public Decimal riskScore { get; set; }
   @AuraEnabled
-  public String riskLevel;
+  public String riskLevel { get; set; }
   @AuraEnabled
-  public String riskSummary;
+  public String riskSummary { get; set; }
   @AuraEnabled
-  public String riskRecommendation;
+  public String riskRecommendation { get; set; }
 
   @AuraEnabled
-  public List<DealConflictDetailDTO> conflicts;
+  public List<DealConflictDetailDTO> conflicts { get; set; }
 
   // UI gating only — these mirror PartnerPermissionService checks so the
   // LWC can hide/disable actions, but they are not themselves a security
   // boundary. DealReviewService re-asserts the same permissions when a
   // decision is actually submitted.
   @AuraEnabled
-  public Boolean canApprove;
+  public Boolean canApprove { get; set; }
   @AuraEnabled
-  public Boolean canReject;
+  public Boolean canReject { get; set; }
   @AuraEnabled
-  public Boolean canResolveConflict;
+  public Boolean canResolveConflict { get; set; }
 }

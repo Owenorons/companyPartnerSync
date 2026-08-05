@@ -5,9 +5,9 @@
  */
 public with sharing class PartnerApplicationResultDTO {
   @AuraEnabled
-  public Id applicationId;
+  public Id applicationId { get; set; }
   @AuraEnabled
-  public String applicationNumber;
+  public String applicationNumber { get; set; }
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
 }

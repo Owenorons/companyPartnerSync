@@ -6,7 +6,7 @@
  */
 public with sharing class DealReviewDecisionDTO {
   @AuraEnabled
-  public Id dealId;
+  public Id dealId { get; set; }
 
   /*
    * Supported values:
@@ -16,15 +16,15 @@ public with sharing class DealReviewDecisionDTO {
    * Protection Extended
    */
   @AuraEnabled
-  public String decision;
+  public String decision { get; set; }
 
   @AuraEnabled
-  public String approvalNotes;
+  public String approvalNotes { get; set; }
   @AuraEnabled
-  public String rejectionReason;
+  public String rejectionReason { get; set; }
   @AuraEnabled
-  public String conflictResolutionNotes;
+  public String conflictResolutionNotes { get; set; }
 
   @AuraEnabled
-  public Integer protectionExtensionDays;
+  public Integer protectionExtensionDays { get; set; }
 }

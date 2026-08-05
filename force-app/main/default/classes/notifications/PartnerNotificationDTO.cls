@@ -6,26 +6,26 @@
  */
 public with sharing class PartnerNotificationDTO {
   @AuraEnabled
-  public Id notificationId;
+  public Id notificationId { get; set; }
 
   @AuraEnabled
-  public String title;
+  public String title { get; set; }
 
   @AuraEnabled
-  public String message;
+  public String message { get; set; }
 
   @AuraEnabled
-  public String actionLabel;
+  public String actionLabel { get; set; }
 
   @AuraEnabled
-  public String actionUrl;
+  public String actionUrl { get; set; }
 
   @AuraEnabled
-  public String priority;
+  public String priority { get; set; }
 
   @AuraEnabled
-  public Boolean isRead;
+  public Boolean isRead { get; set; }
 
   @AuraEnabled
-  public Datetime createdDate;
+  public Datetime createdDate { get; set; }
 }

@@ -21,4 +21,20 @@ public with sharing class PartnerApprovalController {
       throw new AuraHandledException('Unable to process application decision.');
     }
   }
+
+  @AuraEnabled
+  public static void requestProvisioning(Id applicationId) {
+    try {
+      PartnerUserProvisioningService.requestProvisioning(applicationId);
+    } catch (PartnerSyncHandledException ex) {
+      throw new AuraHandledException(ex.getMessage());
+    } catch (Exception ex) {
+      LoggingService.error(
+        'PartnerApprovalController',
+        'Unable to request partner user provisioning.',
+        ex
+      );
+      throw new AuraHandledException('Unable to request partner access.');
+    }
+  }
 }

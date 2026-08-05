@@ -148,6 +148,7 @@ h1 {
 }
 
 .reject {
+  align-self: flex-end;
   color: var(--ps-color-danger);
   border-color: var(--ps-color-danger) !important;
 }

@@ -6,23 +6,23 @@
  */
 public with sharing class PartnerContentAdminDTO {
   @AuraEnabled
-  public Id contentId;
+  public Id contentId { get; set; }
   @AuraEnabled
-  public String title;
+  public String title { get; set; }
   @AuraEnabled
-  public String description;
+  public String description { get; set; }
   @AuraEnabled
-  public String category;
+  public String category { get; set; }
   @AuraEnabled
-  public Boolean featured;
+  public Boolean featured { get; set; }
   @AuraEnabled
-  public Boolean isActive;
+  public Boolean isActive { get; set; }
   @AuraEnabled
-  public String visibility;
+  public String visibility { get; set; }
   @AuraEnabled
-  public String partnerTier;
+  public String partnerTier { get; set; }
   @AuraEnabled
-  public String partnerType;
+  public String partnerType { get; set; }
   @AuraEnabled
-  public Decimal sortOrder;
+  public Decimal sortOrder { get; set; }
 }

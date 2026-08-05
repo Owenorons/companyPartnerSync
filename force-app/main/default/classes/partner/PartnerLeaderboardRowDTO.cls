@@ -5,25 +5,25 @@
  */
 public with sharing class PartnerLeaderboardRowDTO {
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
   @AuraEnabled
-  public String partnerTier;
+  public String partnerTier { get; set; }
   @AuraEnabled
-  public String partnerStatus;
+  public String partnerStatus { get; set; }
 
   @AuraEnabled
-  public Integer acceptedLeads;
+  public Integer acceptedLeads { get; set; }
   @AuraEnabled
-  public Integer approvedDeals;
+  public Integer approvedDeals { get; set; }
   @AuraEnabled
-  public Integer wonDeals;
+  public Integer wonDeals { get; set; }
 
   @AuraEnabled
-  public Decimal revenue;
+  public Decimal revenue { get; set; }
   @AuraEnabled
-  public Decimal conversionRate;
+  public Decimal conversionRate { get; set; }
   @AuraEnabled
-  public Decimal score;
+  public Decimal score { get; set; }
 }

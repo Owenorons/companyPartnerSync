@@ -17,6 +17,11 @@ function fillRequiredFields(element) {
   const inputs = element.shadowRoot.querySelectorAll("lightning-input");
   const comboboxes = element.shadowRoot.querySelectorAll("lightning-combobox");
 
+  [...inputs, ...comboboxes].forEach((field) => {
+    field.checkValidity = jest.fn(() => true);
+    field.reportValidity = jest.fn();
+  });
+
   const setInputValue = (input, value) => {
     input.value = value;
     input.dispatchEvent(new CustomEvent("change"));

@@ -10,6 +10,12 @@ public with sharing class DealRegistrationService {
   public static DealRegistrationResultDTO createDealRegistration(
     DealRegistrationRequestDTO request
   ) {
+    if (!TenantConfigService.isDealsEnabled()) {
+      throw new PartnerSyncHandledException('Deal registration is disabled.');
+    }
+
+    PartnerAccessService.assertCanSubmitDeal();
+
     DealRegistrationDomain.validate(request);
 
     SecurityUtil.assertCreateable(Deal_Registration__c.SObjectType);
@@ -29,6 +35,19 @@ public with sharing class DealRegistrationService {
     if (DealRegistrationSelector.hasExistingRegistration(opportunity.Id)) {
       throw new PartnerSyncHandledException(
         'This opportunity has already been registered.'
+      );
+    }
+
+    Integer maxOpenDeals = TenantConfigService.getMaxOpenDealsPerPartner();
+
+    if (
+      maxOpenDeals != null &&
+      DealRegistrationSelector.countOpenDealsForPartner(
+        currentPartnerAccountId
+      ) >= maxOpenDeals
+    ) {
+      throw new PartnerSyncHandledException(
+        'This partner has reached the maximum number of open deal registrations.'
       );
     }
 

@@ -6,13 +6,13 @@
  */
 public with sharing class EligibleOpportunityDTO {
   @AuraEnabled
-  public Id opportunityId;
+  public Id opportunityId { get; set; }
   @AuraEnabled
-  public String name;
+  public String name { get; set; }
   @AuraEnabled
-  public String stageName;
+  public String stageName { get; set; }
   @AuraEnabled
-  public Decimal amount;
+  public Decimal amount { get; set; }
   @AuraEnabled
-  public Date closeDate;
+  public Date closeDate { get; set; }
 }

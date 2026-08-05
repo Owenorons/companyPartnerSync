@@ -6,15 +6,15 @@
  */
 public with sharing class PartnerContentDTO {
   @AuraEnabled
-  public Id contentId;
+  public Id contentId { get; set; }
   @AuraEnabled
-  public String title;
+  public String title { get; set; }
   @AuraEnabled
-  public String description;
+  public String description { get; set; }
   @AuraEnabled
-  public String category;
+  public String category { get; set; }
   @AuraEnabled
-  public Boolean featured;
+  public Boolean featured { get; set; }
   @AuraEnabled
-  public Date publishedDate;
+  public Date publishedDate { get; set; }
 }

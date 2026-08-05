@@ -13,7 +13,7 @@ public with sharing class PartnerOnboardingService {
 
     SecurityUtil.assertUpdateable(Partner_Application__c.SObjectType);
 
-    Partner_Application__c application = PartnerApplicationSelector.selectById(
+    Partner_Application__c application = PartnerApplicationSelector.selectForDecisionById(
       request.applicationId
     );
 
@@ -23,6 +23,18 @@ public with sharing class PartnerOnboardingService {
     ) {
       throw new PartnerSyncHandledException(
         'This application has already been decided.'
+      );
+    }
+
+    if (application.Assigned_Reviewer__c == null) {
+      throw new PartnerSyncHandledException(
+        'Claim this application before making a decision.'
+      );
+    }
+
+    if (application.Assigned_Reviewer__c != UserInfo.getUserId()) {
+      throw new PartnerSyncHandledException(
+        'This application is assigned to another reviewer.'
       );
     }
 
@@ -43,6 +55,8 @@ public with sharing class PartnerOnboardingService {
     application.Decision_By__c = UserInfo.getUserId();
     application.Decision_On__c = System.now();
     application.Rejection_Reason__c = request.rejectionReason;
+    application.Active_Company_Key__c = null;
+    application.Active_Email_Key__c = null;
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ application });
 
@@ -56,6 +70,18 @@ public with sharing class PartnerOnboardingService {
     Partner_Application__c application,
     PartnerApprovalRequestDTO request
   ) {
+    List<PartnerApplicationMatchDTO> potentialMatches = PartnerApplicationMatchSelector.findPotentialMatches(
+      application
+    );
+
+    if (
+      !potentialMatches.isEmpty() && request.confirmPotentialMatches != true
+    ) {
+      throw new PartnerSyncHandledException(
+        'Potential existing Account or Contact matches must be reviewed before approval.'
+      );
+    }
+
     SecurityUtil.assertCreateable(Account.SObjectType);
     SecurityUtil.assertCreateable(Contact.SObjectType);
 
@@ -88,9 +114,12 @@ public with sharing class PartnerOnboardingService {
     application.Decision__c = 'Approved';
     application.Decision_By__c = UserInfo.getUserId();
     application.Decision_On__c = System.now();
+    application.Approval_Date__c = Date.today();
     application.Approval_Notes__c = request.approvalNotes;
     application.Created_Account__c = insertedAccount.Id;
     application.Created_Contact__c = insertedContact.Id;
+    application.Provisioning_Status__c = 'Awaiting Partner Enablement';
+    application.Provisioning_Error__c = 'Enable the created Account as a Partner, then request provisioning.';
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ application });
 

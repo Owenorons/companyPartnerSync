@@ -5,13 +5,13 @@
  */
 public with sharing class LeadConversionResultDTO {
   @AuraEnabled
-  public Id leadId;
+  public Id leadId { get; set; }
   @AuraEnabled
-  public Id opportunityId;
+  public Id opportunityId { get; set; }
   @AuraEnabled
-  public Id dealRegistrationId;
+  public Id dealRegistrationId { get; set; }
   @AuraEnabled
-  public Id customerAccountId;
+  public Id customerAccountId { get; set; }
   @AuraEnabled
-  public Boolean customerAccountCreated;
+  public Boolean customerAccountCreated { get; set; }
 }

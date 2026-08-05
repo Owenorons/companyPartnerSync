@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Action_Owner__c</fullName><label
+  >Current Action Owner</label><type>Lookup</type><referenceTo
+  >User</referenceTo><relationshipLabel
+  >Deal Lifecycle Actions</relationshipLabel><relationshipName
+  >Deal_Lifecycle_Actions</relationshipName><required>false</required>
+</CustomField>

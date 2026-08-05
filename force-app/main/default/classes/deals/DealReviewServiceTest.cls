@@ -138,6 +138,92 @@ private class DealReviewServiceTest {
   }
 
   @IsTest
+  static void channelManagerCannotApproveDealWithUnresolvedConflict() {
+    Deal_Registration__c deal = createSubmittedDeal();
+    deal.Conflict_Status__c = 'Potential Conflict';
+    update deal;
+
+    User channelManager = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealReviewDecisionDTO request = new DealReviewDecisionDTO();
+      request.dealId = deal.Id;
+      request.decision = 'Approved';
+      request.approvalNotes = 'Approved by channel manager.';
+
+      Boolean threw = false;
+
+      try {
+        DealReviewService.processDecision(request);
+      } catch (PartnerSyncHandledException ex) {
+        threw = true;
+      }
+
+      System.assertEquals(
+        true,
+        threw,
+        'A deal with an unresolved conflict should not be approvable.'
+      );
+    }
+
+    Deal_Registration__c updated = [
+      SELECT Status__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+
+    System.assertEquals(
+      'Under Review',
+      updated.Status__c,
+      'Status should be unchanged when approval is blocked by an unresolved conflict.'
+    );
+  }
+
+  @IsTest
+  static void channelManagerCanApproveDealAfterConflictResolved() {
+    Deal_Registration__c deal = createSubmittedDeal();
+    deal.Conflict_Status__c = 'Potential Conflict';
+    update deal;
+
+    User channelManager = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealReviewDecisionDTO resolveRequest = new DealReviewDecisionDTO();
+      resolveRequest.dealId = deal.Id;
+      resolveRequest.decision = 'Conflict Resolved';
+      resolveRequest.conflictResolutionNotes = 'Confirmed no overlap.';
+
+      DealReviewService.processDecision(resolveRequest);
+
+      DealReviewDecisionDTO approveRequest = new DealReviewDecisionDTO();
+      approveRequest.dealId = deal.Id;
+      approveRequest.decision = 'Approved';
+      approveRequest.approvalNotes = 'Approved by channel manager.';
+
+      DealReviewService.processDecision(approveRequest);
+    }
+
+    Deal_Registration__c updated = [
+      SELECT Status__c, Conflict_Status__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+
+    System.assertEquals('Approved', updated.Status__c);
+    System.assertEquals('Resolved', updated.Conflict_Status__c);
+  }
+
+  @IsTest
   static void plainInternalUserBlockedFromReviewQueue() {
     createSubmittedDeal();
 

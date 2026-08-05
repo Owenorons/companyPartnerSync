@@ -3,14 +3,14 @@
  */
 public with sharing class DealConflictDTO {
   @AuraEnabled
-  public Boolean hasConflict;
+  public Boolean hasConflict { get; set; }
 
   @AuraEnabled
-  public String conflictStatus;
+  public String conflictStatus { get; set; }
 
   @AuraEnabled
-  public List<Id> conflictingDealIds;
+  public List<Id> conflictingDealIds { get; set; }
 
   @AuraEnabled
-  public String summary;
+  public String summary { get; set; }
 }

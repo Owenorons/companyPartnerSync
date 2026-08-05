@@ -1,13 +1,19 @@
 {
-  "orgName": "owenmacpro company",
+  "orgName": "Evosphere Solutions",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "features": ["Communities", "Sites", "EnableSetPasswordInApi"],
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },
     "mobileSettings": {
       "enableS1EncryptedStoragePref2": false
+    },
+    "communitiesSettings": {
+      "enableNetworksEnabled": true
+    },
+    "experienceBundleSettings": {
+      "enableExperienceBundleMetadata": true
     }
   }
 }

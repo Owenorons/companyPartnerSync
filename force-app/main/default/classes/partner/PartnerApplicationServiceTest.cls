@@ -71,6 +71,9 @@ private class PartnerApplicationServiceTest {
         Submitted_By_Email__c,
         Application_Status__c,
         Decision__c,
+        Source__c,
+        Active_Company_Key__c,
+        Active_Email_Key__c,
         Application_Number__c
       FROM Partner_Application__c
       WHERE Id = :result.applicationId
@@ -92,6 +95,12 @@ private class PartnerApplicationServiceTest {
     );
     System.assertEquals('Submitted', inserted.Application_Status__c);
     System.assertEquals('Pending', inserted.Decision__c);
+    System.assertEquals('Website', inserted.Source__c);
+    System.assertEquals('fernvaledistribution', inserted.Active_Company_Key__c);
+    System.assertEquals(
+      'hello@fernvale-test.example.com',
+      inserted.Active_Email_Key__c
+    );
     System.assertEquals(
       inserted.Application_Number__c,
       result.applicationNumber
@@ -157,5 +166,26 @@ private class PartnerApplicationServiceTest {
       threw,
       'A request with no company name should be rejected.'
     );
+  }
+
+  @IsTest
+  static void submitApplicationRejectsInvalidPicklistValuesAndEmails() {
+    PartnerApplicationRequestDTO request = new PartnerApplicationRequestDTO();
+    request.companyName = 'Invalid Input Co';
+    request.businessEmail = 'not-an-email';
+    request.requestedTier = 'Diamond';
+    request.partnerType = 'Unknown';
+    request.submittedByEmail = 'also-invalid';
+
+    Boolean threw = false;
+
+    try {
+      PartnerApplicationService.submitApplication(request);
+    } catch (PartnerSyncHandledException ex) {
+      threw = true;
+      System.assertEquals('Business email is invalid.', ex.getMessage());
+    }
+
+    System.assertEquals(true, threw, 'Invalid input should be rejected.');
   }
 }

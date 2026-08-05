@@ -5,20 +5,20 @@
  */
 public with sharing class PartnerApplicationListDTO {
   @AuraEnabled
-  public Id applicationId;
+  public Id applicationId { get; set; }
   @AuraEnabled
-  public String applicationNumber;
+  public String applicationNumber { get; set; }
 
   @AuraEnabled
-  public String companyName;
+  public String companyName { get; set; }
 
   @AuraEnabled
-  public String requestedTier;
+  public String requestedTier { get; set; }
   @AuraEnabled
-  public String partnerType;
+  public String partnerType { get; set; }
 
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public Datetime submittedOn;
+  public Datetime submittedOn { get; set; }
 }

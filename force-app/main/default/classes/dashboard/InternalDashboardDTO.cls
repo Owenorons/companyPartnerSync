@@ -6,13 +6,13 @@
  */
 public with sharing class InternalDashboardDTO {
   @AuraEnabled
-  public String userName;
+  public String userName { get; set; }
   @AuraEnabled
-  public Integer pendingDealReviewCount;
+  public Integer pendingDealReviewCount { get; set; }
   @AuraEnabled
-  public Integer pendingMdfReviewCount;
+  public Integer pendingMdfReviewCount { get; set; }
   @AuraEnabled
-  public Integer unreadNotificationCount;
+  public Integer unreadNotificationCount { get; set; }
   @AuraEnabled
-  public List<String> alerts;
+  public List<String> alerts { get; set; }
 }

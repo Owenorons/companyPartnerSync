@@ -9,7 +9,23 @@
         <target>lightning__AppPage</target>
     </targets>
     <targetConfigs>
-        <targetConfig targets="lightningCommunity__Default,lightning__AppPage">
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+        name="companyName"
+        type="String"
+        default="PartnerSync"
+        label="Company Name"
+        description="Shown in the copyright line, e.g. '© 2026 {Company Name}. All rights reserved.'"
+      />
+            <property
+        name="footerMenuName"
+        type="String"
+        datasource="apex://NavigationPickList"
+        label="Footer Navigation Menu Name"
+        description="The name of the Navigation Menu Linkset to render as footer links, which can be configured in Settings > Navigation. Leave blank to hide the footer link row."
+      />
+        </targetConfig>
+        <targetConfig targets="lightning__AppPage">
             <property
         name="companyName"
         type="String"

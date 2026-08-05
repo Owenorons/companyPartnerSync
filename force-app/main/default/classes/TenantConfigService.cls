@@ -61,6 +61,14 @@ public with sharing class TenantConfigService {
     return value == null ? 30 : Integer.valueOf(value);
   }
 
+  // Null means unlimited — unlike getDealExpiryDays(), there's no sensible
+  // universal default cap, so an unset value must not silently start
+  // throttling every tenant that hasn't configured one.
+  public static Integer getMaxOpenDealsPerPartner() {
+    Decimal value = getConfig().Max_Open_Deals_Per_Partner__c;
+    return value == null ? null : Integer.valueOf(value);
+  }
+
   public static Integer getLeadSlaHours() {
     Decimal value = getConfig().Lead_SLA_Hours__c;
     return value == null ? 48 : Integer.valueOf(value);

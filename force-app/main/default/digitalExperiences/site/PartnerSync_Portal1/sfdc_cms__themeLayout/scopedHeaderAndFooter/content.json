@@ -1,0 +1,184 @@
+{
+  "type" : "sfdc_cms__themeLayout",
+  "title" : "Scoped Header and Footer",
+  "contentBody" : {
+    "component" : {
+      "attributes" : {
+        "hideThemeFooter" : false,
+        "showThemeFooterAtBottom" : true,
+        "stickyThemeHeader" : false
+      },
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"44727180-1525-464b-881a-41a21b11b3c2\",\"columns\":[{\"UUID\":\"6d537472-6639-48d7-8033-934fee7d2b81\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "contentAdminTabName" : "Content_Administration",
+                "dealReviewTabName" : "Deal_Review",
+                "mdfReviewTabName" : "MDF_Review",
+                "notificationsTabName" : "Notification_Center"
+              },
+              "definition" : "psync:psInternalDashboard",
+              "id" : "0f87b85a-dddc-4486-9455-78cfde1ae759",
+              "type" : "component"
+            } ],
+            "id" : "6d537472-6639-48d7-8033-934fee7d2b81",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "44727180-1525-464b-881a-41a21b11b3c2",
+          "type" : "component"
+        }, {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"9805f3cf-e617-4631-9305-4744676e5b79\",\"columns\":[{\"UUID\":\"b2ad6bc1-2791-44d8-b697-2ec53b63e0c6\",\"columnName\":\"Column 1\",\"columnKey\":\"headerSection\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "activeTabBorderHighlightWeight" : "2px",
+                "activeTabTextEmphasis" : "{\"bold\":true}",
+                "activeTabTextStyle" : "{\"textStyle\":\"paragraph1\",\"headingTag\":\"p\"}",
+                "borderColor" : "",
+                "borderRadius" : "0px",
+                "borderWeight" : "0px",
+                "enableOverflowMenu" : false,
+                "imageFit" : "cover",
+                "imagePosition" : "center center",
+                "overflowIconColor" : "rgb(116,116,116)",
+                "overflowIconStyle" : "down-arrow",
+                "overflowMenuLabel" : "More",
+                "tabAlignment" : "left",
+                "tabBorderColor" : "",
+                "tabBorderRadius" : "0px",
+                "tabBorderWeight" : "0px",
+                "tabHoverBorderHighlightWeight" : "1px",
+                "tabLayout" : "horizontal",
+                "tabPadding" : "12px",
+                "tabTextStyle" : "{\"textStyle\":\"paragraph1\",\"headingTag\":\"p\"}",
+                "tabsetConfig" : "{\"UUID\":\"6a37cb34-a6ee-46ad-bcfe-24f48d876868\",\"activeTab\":null,\"useOverflowMenu\":null,\"tabs\":[{\"UUID\":\"71478b45-18bf-403f-a686-d5427a2651b5\",\"tabName\":\"Deal Review\",\"tabKey\":\"tab1\",\"locked\":false,\"allowGuestUser\":false},{\"UUID\":\"6c4f9af6-5131-41c5-894c-c9506514770f\",\"tabName\":\"MDF Review\",\"tabKey\":\"tab2\",\"locked\":false,\"allowGuestUser\":false},{\"UUID\":\"49b9183b-e0d2-468f-aa19-eef6fbba216f\",\"tabName\":\"Notification Center\",\"tabKey\":\"tab3\",\"locked\":false,\"allowGuestUser\":false},{\"UUID\":\"94bc3a6d-f80b-4266-9718-0ff69fc46fc9\",\"tabName\":\"Content Admin\",\"tabKey\":\"d0095\",\"locked\":false,\"allowGuestUser\":false}]}",
+                "width" : "100%"
+              },
+              "children" : [ {
+                "children" : [ {
+                  "attributes" : { },
+                  "definition" : "psync:psDealReviewWorkspace",
+                  "id" : "e52c246b-1920-4610-b105-2ae5cd12b946",
+                  "type" : "component"
+                } ],
+                "id" : "71478b45-18bf-403f-a686-d5427a2651b5",
+                "name" : "tab1",
+                "title" : "Deal Review",
+                "type" : "region"
+              }, {
+                "children" : [ {
+                  "attributes" : { },
+                  "definition" : "psync:psMdfReviewWorkspace",
+                  "id" : "4e98306b-1a32-4b82-99a0-a6da81fdbf2a",
+                  "type" : "component"
+                } ],
+                "id" : "6c4f9af6-5131-41c5-894c-c9506514770f",
+                "name" : "tab2",
+                "title" : "MDF Review",
+                "type" : "region"
+              }, {
+                "children" : [ {
+                  "attributes" : { },
+                  "definition" : "psync:psNotificationCenter",
+                  "id" : "c5cbff84-3140-40bb-9c03-ca08ef368965",
+                  "type" : "component"
+                } ],
+                "id" : "49b9183b-e0d2-468f-aa19-eef6fbba216f",
+                "name" : "tab3",
+                "title" : "Notification Center",
+                "type" : "region"
+              }, {
+                "children" : [ {
+                  "attributes" : { },
+                  "definition" : "psync:psContentAdmin",
+                  "id" : "2c89ad99-0271-4635-b959-317812860ea3",
+                  "type" : "component"
+                } ],
+                "id" : "94bc3a6d-f80b-4266-9718-0ff69fc46fc9",
+                "name" : "d0095",
+                "title" : "Content Admin",
+                "type" : "region"
+              } ],
+              "definition" : "dxp_layout:tabs",
+              "id" : "6a37cb34-a6ee-46ad-bcfe-24f48d876868",
+              "type" : "component"
+            } ],
+            "id" : "b2ad6bc1-2791-44d8-b697-2ec53b63e0c6",
+            "name" : "headerSection",
+            "title" : "Theme Header",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "9805f3cf-e617-4631-9305-4744676e5b79",
+          "type" : "component"
+        } ],
+        "id" : "d8848375-572b-47e0-89f3-232f08eb5f38",
+        "name" : "header",
+        "title" : "Theme Header",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"c1297bba-98a1-46d1-9c73-1dbf7eed9edc\",\"columns\":[{\"UUID\":\"3d9b526a-8a76-482a-9532-db2041db4ea7\",\"columnName\":\"Column 1\",\"columnKey\":\"footerSection\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "id" : "3d9b526a-8a76-482a-9532-db2041db4ea7",
+            "name" : "footerSection",
+            "title" : "Theme Footer",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "c1297bba-98a1-46d1-9c73-1dbf7eed9edc",
+          "type" : "component"
+        } ],
+        "id" : "142a1bea-d185-4581-8101-73724149d878",
+        "name" : "footer",
+        "title" : "Theme Footer",
+        "type" : "region"
+      } ],
+      "definition" : "community_byo:scopedHeaderAndFooter",
+      "id" : "58e8a7db-8045-4eff-9572-8cf06c68e66f",
+      "type" : "component"
+    }
+  },
+  "urlName" : "scoped-header-and-footer"
+}

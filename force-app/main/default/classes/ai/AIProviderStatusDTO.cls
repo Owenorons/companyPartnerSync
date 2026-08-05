@@ -4,17 +4,17 @@
  */
 public with sharing class AIProviderStatusDTO {
   @AuraEnabled
-  public String developerName;
+  public String developerName { get; set; }
   @AuraEnabled
-  public String providerName;
+  public String providerName { get; set; }
   @AuraEnabled
-  public String providerType;
+  public String providerType { get; set; }
   @AuraEnabled
-  public Boolean active;
+  public Boolean active { get; set; }
   @AuraEnabled
-  public String connectionStatus;
+  public String connectionStatus { get; set; }
   @AuraEnabled
-  public Datetime lastTestDate;
+  public Datetime lastTestDate { get; set; }
   @AuraEnabled
-  public String lastTestResult;
+  public String lastTestResult { get; set; }
 }

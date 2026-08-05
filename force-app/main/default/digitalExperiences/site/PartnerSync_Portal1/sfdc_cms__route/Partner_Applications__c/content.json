@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Partner Applications",
+  "contentBody" : {
+    "activeViewId" : "Partner_Applications",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-partner-applications",
+    "urlPrefix" : "partner-applications"
+  },
+  "urlName" : "partner-applications"
+}

@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "AI Insights",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"6f1abaa1-f7b7-492e-94c1-fba0327f84da\",\"columns\":[{\"UUID\":\"614ac553-6db3-4ba9-96de-138d256049fb\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psAiInsightPanel",
+              "id" : "7a3acbdd-b196-4594-8dc2-a0669c4e5c19",
+              "type" : "component"
+            } ],
+            "id" : "614ac553-6db3-4ba9-96de-138d256049fb",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "6f1abaa1-f7b7-492e-94c1-fba0327f84da",
+          "type" : "component"
+        } ],
+        "id" : "3a44adf5-235d-4b79-8496-68f50c8c946a",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "AI Insights",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "a769367d-fe7d-48b1-9f22-973abaea0b0c",
+          "type" : "component"
+        } ],
+        "id" : "3b9d3bee-9f08-43ab-b584-30cb7fc62c64",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "43cb4536-9759-4c1d-a344-f627be7c5f64",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "ZzSlrxOz3RmaOnzooRy6mjar2T2Csr",
+    "viewType" : "custom-ai-insights"
+  },
+  "urlName" : "ai-insights"
+}

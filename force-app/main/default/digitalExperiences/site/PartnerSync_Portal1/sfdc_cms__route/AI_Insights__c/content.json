@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "AI Insights",
+  "contentBody" : {
+    "activeViewId" : "AI_Insights",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-ai-insights",
+    "urlPrefix" : "-ai-insights"
+  },
+  "urlName" : "ai-insights"
+}

@@ -26,21 +26,6 @@
   gap: 1.25rem;
 }
 
-.footer-links a {
-  color: var(--ps-color-text-muted, #3a4150);
-  font-family: var(--ps-font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 0.68rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.footer-links a:hover,
-.footer-links a:focus-visible {
-  color: var(--ps-color-primary, #005fb2);
-}
-
 @media (max-width: 640px) {
   .ps-footer {
     flex-direction: column;

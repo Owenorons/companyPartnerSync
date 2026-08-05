@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [feature, main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, format, and LWC tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run prettier:verify
+
+      - name: LWC Jest with coverage
+        run: npm run test:unit:coverage
+
+      - name: Install Salesforce Code Analyzer
+        run: |
+          npm install --global "@salesforce/cli@2.143.6"
+          echo y | sf plugins install "code-analyzer@5.14.0"
+
+      - name: Salesforce security and quality scan
+        run: |
+          mkdir -p reports
+          sf code-analyzer run \
+            --workspace force-app \
+            --target force-app \
+            --rule-selector "pmd:Security" \
+            --severity-threshold 1 \
+            --output-file reports/code-analyzer.sarif
+
+      - name: Enforce security debt baseline
+        run: npm run security:baseline
+
+      - name: Upload Code Analyzer report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-analyzer-${{ github.sha }}
+          path: reports/code-analyzer.sarif
+          if-no-files-found: warn
+          retention-days: 14

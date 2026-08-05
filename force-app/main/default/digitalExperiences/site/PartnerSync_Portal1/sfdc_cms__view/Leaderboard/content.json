@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Leaderboard",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"72a3b918-e9de-41bd-9036-47a4cc09be8a\",\"columns\":[{\"UUID\":\"3fd73cb3-f418-4e86-9af5-00020c6e49b8\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psPartnerLeaderboard",
+              "id" : "359efa2b-6e40-442f-ad7e-fd4068e8a45b",
+              "type" : "component"
+            } ],
+            "id" : "3fd73cb3-f418-4e86-9af5-00020c6e49b8",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "72a3b918-e9de-41bd-9036-47a4cc09be8a",
+          "type" : "component"
+        } ],
+        "id" : "78b5f68a-2f5e-45a1-b23b-7324e85b0dce",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Leaderboard",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "d526f348-dcd8-43a3-8c6b-d87961d3b1c9",
+          "type" : "component"
+        } ],
+        "id" : "57810f2e-c563-4ac0-b176-206ee279cf15",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "906015ba-7fed-4580-999d-9fbfdf3d97eb",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "ZzSlrxOz3RmaOnzooRy6mjar2T2Csr",
+    "viewType" : "custom-leaderboard"
+  },
+  "urlName" : "leaderboard"
+}

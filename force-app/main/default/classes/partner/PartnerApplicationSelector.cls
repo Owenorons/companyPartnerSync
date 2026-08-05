@@ -46,8 +46,14 @@ public with sharing class PartnerApplicationSelector {
         Rejection_Reason__c,
         Approval_Notes__c,
         Submitted_On__c,
+        Assigned_Reviewer__c,
+        Assigned_Reviewer__r.Name,
         Created_Account__c,
-        Created_Contact__c
+        Created_Contact__c,
+        Provisioned_User__c,
+        Provisioning_Status__c,
+        Provisioning_Error__c,
+        Provisioned_On__c
       FROM Partner_Application__c
       WHERE Id = :applicationId
       WITH USER_MODE
@@ -61,17 +67,37 @@ public with sharing class PartnerApplicationSelector {
     return rows[0];
   }
 
-  public static Partner_Application__c selectSubmissionResultById(
-    Id applicationId
-  ) {
+  public static Partner_Application__c selectForDecisionById(Id applicationId) {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 
     List<Partner_Application__c> rows = [
-      SELECT Id, Name, Application_Number__c, Application_Status__c
+      SELECT
+        Id,
+        Company_Name__c,
+        Business_Email__c,
+        Phone__c,
+        Website__c,
+        Region__c,
+        Requested_Tier__c,
+        Partner_Type__c,
+        Submitted_By_Contact_Name__c,
+        Submitted_By_Email__c,
+        Application_Status__c,
+        Decision__c,
+        Assigned_Reviewer__c,
+        Created_Account__c,
+        Created_Contact__c,
+        Provisioned_User__c,
+        Provisioning_Status__c,
+        Provisioning_Job_Id__c,
+        Provisioning_Started_On__c,
+        Active_Company_Key__c,
+        Active_Email_Key__c
       FROM Partner_Application__c
       WHERE Id = :applicationId
       WITH USER_MODE
       LIMIT 1
+      FOR UPDATE
     ];
 
     if (rows.isEmpty()) {

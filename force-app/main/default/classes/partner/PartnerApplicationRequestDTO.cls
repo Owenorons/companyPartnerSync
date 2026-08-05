@@ -5,23 +5,23 @@
  */
 public with sharing class PartnerApplicationRequestDTO {
   @AuraEnabled
-  public String companyName;
+  public String companyName { get; set; }
   @AuraEnabled
-  public String businessEmail;
+  public String businessEmail { get; set; }
   @AuraEnabled
-  public String phone;
+  public String phone { get; set; }
   @AuraEnabled
-  public String website;
+  public String website { get; set; }
   @AuraEnabled
-  public String country;
+  public String country { get; set; }
   @AuraEnabled
-  public String region;
+  public String region { get; set; }
   @AuraEnabled
-  public String requestedTier;
+  public String requestedTier { get; set; }
   @AuraEnabled
-  public String partnerType;
+  public String partnerType { get; set; }
   @AuraEnabled
-  public String submittedByContactName;
+  public String submittedByContactName { get; set; }
   @AuraEnabled
-  public String submittedByEmail;
+  public String submittedByEmail { get; set; }
 }

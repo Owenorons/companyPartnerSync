@@ -5,37 +5,37 @@
  */
 public with sharing class PartnerKPIDTO {
   @AuraEnabled
-  public Integer totalLeads;
+  public Integer totalLeads { get; set; }
   @AuraEnabled
-  public Integer acceptedLeads;
+  public Integer acceptedLeads { get; set; }
   @AuraEnabled
-  public Integer convertedLeads;
+  public Integer convertedLeads { get; set; }
 
   @AuraEnabled
-  public Integer totalDeals;
+  public Integer totalDeals { get; set; }
   @AuraEnabled
-  public Integer approvedDeals;
+  public Integer approvedDeals { get; set; }
   @AuraEnabled
-  public Integer wonDeals;
+  public Integer wonDeals { get; set; }
 
   @AuraEnabled
-  public Decimal totalPipeline;
+  public Decimal totalPipeline { get; set; }
   @AuraEnabled
-  public Decimal totalRevenue;
+  public Decimal totalRevenue { get; set; }
 
   @AuraEnabled
-  public Decimal leadAcceptanceRate;
+  public Decimal leadAcceptanceRate { get; set; }
   @AuraEnabled
-  public Decimal leadConversionRate;
+  public Decimal leadConversionRate { get; set; }
   @AuraEnabled
-  public Decimal dealWinRate;
+  public Decimal dealWinRate { get; set; }
 
   @AuraEnabled
-  public Decimal mdfAnnualBudget;
+  public Decimal mdfAnnualBudget { get; set; }
   @AuraEnabled
-  public Decimal mdfUsed;
+  public Decimal mdfUsed { get; set; }
   @AuraEnabled
-  public Decimal mdfRemaining;
+  public Decimal mdfRemaining { get; set; }
   @AuraEnabled
-  public Decimal mdfUtilisationRate;
+  public Decimal mdfUtilisationRate { get; set; }
 }

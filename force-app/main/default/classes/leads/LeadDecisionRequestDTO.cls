@@ -5,9 +5,9 @@
  */
 public with sharing class LeadDecisionRequestDTO {
   @AuraEnabled
-  public Id leadId;
+  public Id leadId { get; set; }
   @AuraEnabled
-  public String decision;
+  public String decision { get; set; }
   @AuraEnabled
-  public String notes;
+  public String notes { get; set; }
 }

@@ -206,4 +206,82 @@ private class PartnerAccessServiceTest {
       );
     }
   }
+
+  @IsTest
+  static void canSubmitDealReflectsContactFlagForExternalUsers() {
+    Account partner = new Account(
+      Name = 'Partner',
+      Is_Partner__c = true,
+      Partner_Status__c = 'Active'
+    );
+    insert partner;
+
+    Contact authorizedContact = new Contact(
+      LastName = 'Authorized Partner User',
+      AccountId = partner.Id,
+      Email = 'authorizeddealuser@example.com',
+      Is_Partner_User__c = true,
+      Can_Submit_Deals__c = true
+    );
+    insert authorizedContact;
+
+    Contact unauthorizedContact = new Contact(
+      LastName = 'Unauthorized Partner User',
+      AccountId = partner.Id,
+      Email = 'unauthorizeddealuser@example.com',
+      Is_Partner_User__c = true,
+      Can_Submit_Deals__c = false
+    );
+    insert unauthorizedContact;
+
+    User authorizedUser = TestUserFactory.createExternalUser(
+      authorizedContact.Id
+    );
+    User unauthorizedUser = TestUserFactory.createExternalUser(
+      unauthorizedContact.Id
+    );
+
+    System.runAs(authorizedUser) {
+      System.assertEquals(
+        true,
+        PartnerAccessService.canSubmitDeal(),
+        'A contact flagged Can_Submit_Deals__c should be able to submit deals.'
+      );
+    }
+
+    System.runAs(unauthorizedUser) {
+      System.assertEquals(
+        false,
+        PartnerAccessService.canSubmitDeal(),
+        'A contact not flagged Can_Submit_Deals__c should not be able to submit deals.'
+      );
+
+      Boolean threw = false;
+
+      try {
+        PartnerAccessService.assertCanSubmitDeal();
+      } catch (PartnerSyncHandledException ex) {
+        threw = true;
+      }
+
+      System.assertEquals(
+        true,
+        threw,
+        'assertCanSubmitDeal should throw for an unauthorized contact.'
+      );
+    }
+  }
+
+  @IsTest
+  static void canSubmitDealAlwaysTrueForInternalUsers() {
+    User internalUser = TestUserFactory.createInternalUser();
+
+    System.runAs(internalUser) {
+      System.assertEquals(
+        true,
+        PartnerAccessService.canSubmitDeal(),
+        'Internal users can always submit deals on a partner\'s behalf.'
+      );
+    }
+  }
 }

@@ -6,15 +6,15 @@
  */
 public with sharing class LeadAssignmentRequestDTO {
   @AuraEnabled
-  public Id leadId;
+  public Id leadId { get; set; }
   @AuraEnabled
-  public Id partnerAccountId;
+  public Id partnerAccountId { get; set; }
   @AuraEnabled
-  public Id partnerContactId;
+  public Id partnerContactId { get; set; }
   @AuraEnabled
-  public Id customerAccountId;
+  public Id customerAccountId { get; set; }
   @AuraEnabled
-  public Integer slaHoursOverride;
+  public Integer slaHoursOverride { get; set; }
   @AuraEnabled
-  public String notes;
+  public String notes { get; set; }
 }

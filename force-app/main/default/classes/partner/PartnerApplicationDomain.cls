@@ -5,6 +5,20 @@
  * queries here — PartnerApplicationService owns persistence.
  */
 public with sharing class PartnerApplicationDomain {
+  private static final Set<String> ALLOWED_TIERS = new Set<String>{
+    'Silver',
+    'Gold',
+    'Platinum',
+    'Strategic'
+  };
+  private static final Set<String> ALLOWED_PARTNER_TYPES = new Set<String>{
+    'Distributor',
+    'Reseller',
+    'Agent',
+    'Dealer',
+    'Referral'
+  };
+
   public static void validateForSubmit(PartnerApplicationRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException(
@@ -20,16 +34,32 @@ public with sharing class PartnerApplicationDomain {
       throw new PartnerSyncHandledException('Business email is required.');
     }
 
+    if (!isValidEmail(request.businessEmail)) {
+      throw new PartnerSyncHandledException('Business email is invalid.');
+    }
+
     if (String.isBlank(request.requestedTier)) {
       throw new PartnerSyncHandledException('Requested tier is required.');
+    }
+
+    if (!ALLOWED_TIERS.contains(request.requestedTier)) {
+      throw new PartnerSyncHandledException('Requested tier is invalid.');
     }
 
     if (String.isBlank(request.partnerType)) {
       throw new PartnerSyncHandledException('Partner type is required.');
     }
 
+    if (!ALLOWED_PARTNER_TYPES.contains(request.partnerType)) {
+      throw new PartnerSyncHandledException('Partner type is invalid.');
+    }
+
     if (String.isBlank(request.submittedByEmail)) {
       throw new PartnerSyncHandledException('Submitted by email is required.');
+    }
+
+    if (!isValidEmail(request.submittedByEmail)) {
+      throw new PartnerSyncHandledException('Submitted by email is invalid.');
     }
   }
 
@@ -79,7 +109,10 @@ public with sharing class PartnerApplicationDomain {
     record.Application_Status__c = 'Submitted';
     record.Decision__c = 'Pending';
     record.Submitted_On__c = System.now();
+    record.Source__c = 'Website';
     record.Normalized_Company_Name__c = normalizedCompanyName;
+    record.Active_Company_Key__c = normalizedCompanyName;
+    record.Active_Email_Key__c = normalizeEmail(request.businessEmail);
     record.Duplicate_Check_Key__c =
       normalizedCompanyName +
       ':' +
@@ -133,16 +166,46 @@ public with sharing class PartnerApplicationDomain {
     dto.rejectionReason = record.Rejection_Reason__c;
     dto.approvalNotes = record.Approval_Notes__c;
     dto.submittedOn = record.Submitted_On__c;
+    dto.assignedReviewerId = record.Assigned_Reviewer__c;
+    dto.assignedReviewerName = record.Assigned_Reviewer__c == null
+      ? null
+      : record.Assigned_Reviewer__r.Name;
     dto.createdAccountId = record.Created_Account__c;
     dto.createdContactId = record.Created_Contact__c;
+    dto.provisionedUserId = record.Provisioned_User__c;
+    dto.provisioningStatus = record.Provisioning_Status__c;
+    dto.provisioningError = record.Provisioning_Error__c;
+    dto.provisionedOn = record.Provisioned_On__c;
     dto.isReviewable =
       record.Application_Status__c == 'Submitted' ||
       record.Application_Status__c == 'Under Review';
-    dto.canDecide = PartnerPermissionService.canApprovePartnerApplications();
+    Boolean hasReviewPermission = PartnerPermissionService.canApprovePartnerApplications();
+    dto.isAssignedToCurrentUser =
+      record.Assigned_Reviewer__c == UserInfo.getUserId();
+    dto.canClaim =
+      dto.isReviewable &&
+      record.Assigned_Reviewer__c == null &&
+      hasReviewPermission;
+    dto.canDecide =
+      dto.isReviewable &&
+      dto.isAssignedToCurrentUser &&
+      hasReviewPermission;
+    dto.canRequestProvisioning =
+      record.Application_Status__c == 'Approved' &&
+      record.Created_Account__c != null &&
+      record.Created_Contact__c != null &&
+      record.Provisioned_User__c == null &&
+      record.Provisioning_Status__c != 'Queued' &&
+      hasReviewPermission;
     return dto;
   }
 
   private static String normalizeEmail(String value) {
     return String.isBlank(value) ? null : value.trim().toLowerCase();
+  }
+
+  private static Boolean isValidEmail(String value) {
+    return !String.isBlank(value) &&
+      Pattern.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', value.trim());
   }
 }

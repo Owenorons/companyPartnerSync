@@ -99,6 +99,22 @@ public with sharing class DealRegistrationSelector {
     ];
   }
 
+  // 'Draft' is excluded (never submitted, doesn't count against the cap);
+  // 'Rejected'/'Expired'/'Converted'/'Closed Won'/'Closed Lost' are terminal
+  // and no longer occupy a slot.
+  public static Integer countOpenDealsForPartner(Id partnerAccountId) {
+    SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
+
+    return [
+      SELECT COUNT()
+      FROM Deal_Registration__c
+      WHERE
+        Partner_Account__c = :partnerAccountId
+        AND Status__c IN ('Submitted', 'Under Review', 'Approved')
+      WITH USER_MODE
+    ];
+  }
+
   public static Deal_Registration__c selectById(Id dealId) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 

@@ -8,19 +8,19 @@
  */
 public with sharing class DealConflictDetailDTO {
   @AuraEnabled
-  public Id dealId;
+  public Id dealId { get; set; }
   @AuraEnabled
-  public String dealNumber;
+  public String dealNumber { get; set; }
 
   @AuraEnabled
-  public String partnerName;
+  public String partnerName { get; set; }
   @AuraEnabled
-  public String customerName;
+  public String customerName { get; set; }
 
   @AuraEnabled
-  public Decimal estimatedRevenue;
+  public Decimal estimatedRevenue { get; set; }
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public Date protectionEndDate;
+  public Date protectionEndDate { get; set; }
 }

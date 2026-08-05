@@ -2,7 +2,9 @@ import { LightningElement, wire } from "lwc";
 import { refreshApex } from "@salesforce/apex";
 import getPendingApplications from "@salesforce/apex/PartnerApplicationController.getPendingApplications";
 import getApplicationDetail from "@salesforce/apex/PartnerApplicationController.getApplicationDetail";
+import claimApplication from "@salesforce/apex/PartnerApplicationController.claimApplication";
 import processDecision from "@salesforce/apex/PartnerApprovalController.processDecision";
+import requestProvisioning from "@salesforce/apex/PartnerApprovalController.requestProvisioning";
 
 export default class PsPartnerApplicationReview extends LightningElement {
   applications = [];
@@ -14,6 +16,8 @@ export default class PsPartnerApplicationReview extends LightningElement {
   loadingDetail = false;
   showRejectDialog = false;
   rejectionReason = "";
+  potentialMatchesAcknowledged = false;
+  processingDecision = false;
   wiredQueueResult;
 
   @wire(getPendingApplications)
@@ -66,14 +70,29 @@ export default class PsPartnerApplicationReview extends LightningElement {
   }
 
   get isRejectDisabled() {
-    return !this.rejectionReason.trim();
+    return this.processingDecision || !this.rejectionReason.trim();
+  }
+
+  get isApproveDisabled() {
+    return (
+      this.processingDecision ||
+      (this.selectedApplication?.hasPotentialMatches &&
+        !this.potentialMatchesAcknowledged)
+    );
   }
 
   get showNoDecisionPermission() {
     return Boolean(
       this.selectedApplication?.isReviewable &&
-      !this.selectedApplication?.canDecide
+      !this.selectedApplication?.canDecide &&
+      !this.selectedApplication?.canClaim
     );
+  }
+
+  get decisionStateMessage() {
+    return this.selectedApplication?.assignedReviewerName
+      ? `This application is assigned to ${this.selectedApplication.assignedReviewerName}.`
+      : "You do not have permission to review this application.";
   }
 
   handleSearch(event) {
@@ -88,6 +107,51 @@ export default class PsPartnerApplicationReview extends LightningElement {
     await this.submitDecision("Approved");
   }
 
+  async handleClaim() {
+    if (!this.selectedApplicationId || this.processingDecision) {
+      return;
+    }
+
+    this.processingDecision = true;
+    this.detailError = undefined;
+
+    try {
+      await claimApplication({ applicationId: this.selectedApplicationId });
+      await refreshApex(this.wiredQueueResult);
+      await this.loadApplication(this.selectedApplicationId);
+    } catch (error) {
+      this.detailError = this.getErrorMessage(
+        error,
+        "Unable to start reviewing this application."
+      );
+    } finally {
+      this.processingDecision = false;
+    }
+  }
+
+  async handleRequestProvisioning() {
+    if (!this.selectedApplicationId || this.processingDecision) {
+      return;
+    }
+
+    this.processingDecision = true;
+    this.detailError = undefined;
+
+    try {
+      await requestProvisioning({
+        applicationId: this.selectedApplicationId
+      });
+      await this.loadApplication(this.selectedApplicationId);
+    } catch (error) {
+      this.detailError = this.getErrorMessage(
+        error,
+        "Unable to request partner access."
+      );
+    } finally {
+      this.processingDecision = false;
+    }
+  }
+
   handleReject() {
     this.rejectionReason = "";
     this.showRejectDialog = true;
@@ -95,6 +159,10 @@ export default class PsPartnerApplicationReview extends LightningElement {
 
   handleRejectionReasonChange(event) {
     this.rejectionReason = event.target.value || "";
+  }
+
+  handlePotentialMatchesAcknowledgement(event) {
+    this.potentialMatchesAcknowledged = event.target.checked;
   }
 
   handleCancelReject() {
@@ -122,6 +190,7 @@ export default class PsPartnerApplicationReview extends LightningElement {
     }
 
     this.selectedApplicationId = applicationId;
+    this.potentialMatchesAcknowledged = false;
     this.loadingDetail = true;
     this.detailError = undefined;
 
@@ -140,9 +209,12 @@ export default class PsPartnerApplicationReview extends LightningElement {
   }
 
   async submitDecision(decision, extraFields = {}) {
-    if (!this.selectedApplicationId) {
+    if (!this.selectedApplicationId || this.processingDecision) {
       return false;
     }
+
+    this.processingDecision = true;
+    this.detailError = undefined;
 
     try {
       await processDecision({
@@ -153,6 +225,8 @@ export default class PsPartnerApplicationReview extends LightningElement {
             decision === "Approved"
               ? "Approved from partner application review."
               : "",
+          confirmPotentialMatches:
+            decision === "Approved" && this.potentialMatchesAcknowledged,
           ...extraFields
         }
       });
@@ -166,6 +240,8 @@ export default class PsPartnerApplicationReview extends LightningElement {
         "Unable to process application decision."
       );
       return false;
+    } finally {
+      this.processingDecision = false;
     }
   }
 

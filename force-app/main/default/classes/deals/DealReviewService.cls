@@ -51,7 +51,7 @@ public with sharing class DealReviewService {
     );
 
     if (request.decision == 'Approved') {
-      assertCanFinalize(record);
+      assertCanApprove(record);
       approve(record, request);
     } else if (request.decision == 'Rejected') {
       assertCanFinalize(record);
@@ -106,15 +106,28 @@ public with sharing class DealReviewService {
     }
   }
 
+  // Approval additionally requires that any flagged conflict has already
+  // been resolved via the 'Conflict Resolved' decision — otherwise a
+  // reviewer could approve a deal that still overlaps with another
+  // partner's active registration on the same customer account.
+  private static void assertCanApprove(Deal_Registration__c record) {
+    assertCanFinalize(record);
+
+    if (
+      record.Conflict_Status__c == 'Potential Conflict' ||
+      record.Conflict_Status__c == 'Confirmed Conflict'
+    ) {
+      throw new PartnerSyncHandledException(
+        'This deal has an unresolved conflict and must be resolved before it can be approved.'
+      );
+    }
+  }
+
   private static void approve(
     Deal_Registration__c record,
     DealReviewDecisionDTO request
   ) {
     record.Status__c = 'Approved';
-    // record.Conflict_Status__c =
-    //     record.Conflict_Status__c == 'Potential Conflict'
-    //         ? 'Conflict Review Required'
-    //         : 'No Conflict';
 
     record.Protection_Start_Date__c = Date.today();
     // Protection window length is tenant-configurable (defaults to 30 days
@@ -149,6 +162,49 @@ public with sharing class DealReviewService {
 
     record.Decision_By__c = UserInfo.getUserId();
     record.Decision_On__c = System.now();
+  }
+
+  /*
+   * Entry point for unattended expiry enforcement (e.g. DealExpiryBatch).
+   * processDecision()'s decisions all gate on assertCanDecide(), a
+   * permission-set check meant for an interactive reviewer action. A
+   * scheduled/batch job runs as whoever scheduled it, who may not hold that
+   * permission set, so gating this path the same way would silently break
+   * expiry cleanup. Authorization here instead comes from the record
+   * actually being Approved and past its Protection_End_Date__c.
+   */
+  public static void expireProtection(Id dealId) {
+    Deal_Registration__c record = DealReviewSelector.selectForInternalReview(
+      dealId
+    );
+
+    if (
+      record.Status__c != 'Approved' ||
+      record.Protection_End_Date__c == null ||
+      record.Protection_End_Date__c >= Date.today()
+    ) {
+      throw new PartnerSyncHandledException(
+        'Deal registration is not past its protection window: ' + dealId
+      );
+    }
+
+    record.Status__c = 'Expired';
+
+    update SecurityUtil.stripForUpdate(new List<SObject>{ record });
+
+    PlatformEventPublisherService.publish(
+      'DealExpired',
+      record.Id,
+      'Deal_Registration__c',
+      record.Partner_Account__c,
+      'Deal registration protection window expired.',
+      'Info'
+    );
+
+    LoggingService.info(
+      'DealReviewService',
+      'Deal registration expired. DealId=' + record.Id
+    );
   }
 
   private static void extendProtection(

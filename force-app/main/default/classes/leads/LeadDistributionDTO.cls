@@ -5,19 +5,19 @@
  */
 public with sharing class LeadDistributionDTO {
   @AuraEnabled
-  public Id leadId;
+  public Id leadId { get; set; }
   @AuraEnabled
-  public String leadName;
+  public String leadName { get; set; }
   @AuraEnabled
-  public String company;
+  public String company { get; set; }
   @AuraEnabled
-  public String email;
+  public String email { get; set; }
   @AuraEnabled
-  public String phone;
+  public String phone { get; set; }
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
   @AuraEnabled
-  public Datetime assignedDate;
+  public Datetime assignedDate { get; set; }
   @AuraEnabled
-  public Datetime slaDeadline;
+  public Datetime slaDeadline { get; set; }
 }

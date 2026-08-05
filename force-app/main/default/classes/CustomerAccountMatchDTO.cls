@@ -6,9 +6,9 @@
  */
 public with sharing class CustomerAccountMatchDTO {
   @AuraEnabled
-  public Id accountId;
+  public Id accountId { get; set; }
   @AuraEnabled
-  public String accountName;
+  public String accountName { get; set; }
   @AuraEnabled
-  public Boolean created;
+  public Boolean created { get; set; }
 }

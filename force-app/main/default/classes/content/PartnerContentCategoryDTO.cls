@@ -4,7 +4,7 @@
  */
 public with sharing class PartnerContentCategoryDTO {
   @AuraEnabled
-  public String label;
+  public String label { get; set; }
   @AuraEnabled
-  public String value;
+  public String value { get; set; }
 }

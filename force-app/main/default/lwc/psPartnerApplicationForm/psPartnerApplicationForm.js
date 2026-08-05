@@ -47,17 +47,17 @@ export default class PsPartnerApplicationForm extends LightningElement {
   }
 
   handleFieldChange(event) {
-    this[event.target.name] = event.target.value;
+    this[event.target.name] = event.target.value.trim();
   }
 
   handleComboboxChange(event) {
-    this[event.target.name] = event.detail.value;
+    this[event.target.name] = event.detail.value.trim();
   }
 
   async handleSubmit(event) {
     event.preventDefault();
 
-    if (this.isSubmitDisabled) {
+    if (this.isSubmitDisabled || !this.validateFields()) {
       return;
     }
 
@@ -87,6 +87,22 @@ export default class PsPartnerApplicationForm extends LightningElement {
     } finally {
       this.submitting = false;
     }
+  }
+
+  validateFields() {
+    const fields = this.template.querySelectorAll(
+      "lightning-input, lightning-combobox"
+    );
+
+    return Array.from(fields).reduce((isValid, field) => {
+      if (typeof field.reportValidity === "function") {
+        field.reportValidity();
+      }
+
+      const fieldIsValid =
+        typeof field.checkValidity !== "function" || field.checkValidity();
+      return fieldIsValid && isValid;
+    }, true);
   }
 
   getErrorMessage(error, fallback) {

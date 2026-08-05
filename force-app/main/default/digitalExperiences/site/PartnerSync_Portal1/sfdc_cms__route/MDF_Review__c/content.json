@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "MDF Review",
+  "contentBody" : {
+    "activeViewId" : "MDF_Review",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-mdf-review",
+    "urlPrefix" : "mdf-review"
+  },
+  "urlName" : "mdf-review"
+}

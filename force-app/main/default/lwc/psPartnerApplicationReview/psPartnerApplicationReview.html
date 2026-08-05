@@ -82,21 +82,55 @@
           </div>
 
           <template if:true={selectedApplication.isReviewable}>
+            <template if:true={selectedApplication.canClaim}>
+              <div class="slds-grid hero-actions">
+                <button
+                  class="claim"
+                  disabled={processingDecision}
+                  onclick={handleClaim}
+                >
+                  Start Review
+                </button>
+              </div>
+            </template>
+
             <template if:true={selectedApplication.canDecide}>
               <div class="slds-grid hero-actions">
-                <button class="approve" onclick={handleApprove}>Approve</button>
-                <button class="reject" onclick={handleReject}>Reject</button>
+                <button
+                  class="approve"
+                  disabled={isApproveDisabled}
+                  onclick={handleApprove}
+                >
+                  Approve
+                </button>
+                <button
+                  class="reject"
+                  disabled={processingDecision}
+                  onclick={handleReject}
+                >
+                  Reject
+                </button>
               </div>
             </template>
 
             <template if:true={showNoDecisionPermission}>
-              <div class="decision-state">
-                You do not have permission to decide this application.
-              </div>
+              <div class="decision-state">{decisionStateMessage}</div>
             </template>
           </template>
 
           <template if:false={selectedApplication.isReviewable}>
+            <template if:true={selectedApplication.canRequestProvisioning}>
+              <div class="slds-grid hero-actions">
+                <button
+                  class="provision"
+                  disabled={processingDecision}
+                  onclick={handleRequestProvisioning}
+                >
+                  Provision Access
+                </button>
+              </div>
+            </template>
+
             <template if:true={selectedApplication.isStamped}>
               <div class="stamp-wrap">
                 <span class={selectedApplication.stampClass}
@@ -153,7 +187,41 @@
               <span>Phone</span>
               <strong>{selectedApplication.phone}</strong>
             </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Assigned Reviewer</span>
+              <strong>{selectedApplication.assignedReviewerName}</strong>
+            </div>
           </article>
+
+          <template if:true={selectedApplication.hasPotentialMatches}>
+            <article class="panel-card full-width match-warning">
+              <h3 class="slds-var-m-bottom_medium">Potential CRM Matches</h3>
+              <p class="slds-var-m-bottom_medium">
+                Review these records before creating a new partner Account and
+                Contact.
+              </p>
+
+              <template
+                for:each={selectedApplication.potentialMatches}
+                for:item="match"
+              >
+                <div key={match.recordId} class="status-row">
+                  <strong>{match.recordType}: {match.name}</strong>
+                  <span>{match.emailOrWebsite} — {match.matchReason}</span>
+                </div>
+              </template>
+
+              <lightning-input
+                class="slds-var-m-top_medium match-acknowledgement"
+                type="checkbox"
+                label="I reviewed these matches and still want to create new records"
+                checked={potentialMatchesAcknowledged}
+                onchange={handlePotentialMatchesAcknowledgement}
+              >
+              </lightning-input>
+            </article>
+          </template>
 
           <template if:true={selectedApplication.rejectionReason}>
             <article class="panel-card full-width decision-detail">
@@ -170,6 +238,21 @@
               <div class="slds-var-p-around_medium notes-body">
                 {selectedApplication.approvalNotes}
               </div>
+            </article>
+          </template>
+
+          <template if:true={selectedApplication.provisioningStatus}>
+            <article class="panel-card full-width provisioning-detail">
+              <h3 class="slds-var-m-bottom_medium">Access Provisioning</h3>
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Status</span>
+                <strong>{selectedApplication.provisioningStatus}</strong>
+              </div>
+              <template if:true={selectedApplication.provisioningError}>
+                <div class="slds-var-p-around_medium notes-body">
+                  {selectedApplication.provisioningError}
+                </div>
+              </template>
             </article>
           </template>
         </section>

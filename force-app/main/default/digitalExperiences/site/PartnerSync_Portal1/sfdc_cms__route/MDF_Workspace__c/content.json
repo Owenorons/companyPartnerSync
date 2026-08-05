@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "MDF Workspace",
+  "contentBody" : {
+    "activeViewId" : "MDF_Workspace",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-mdf-workspace",
+    "urlPrefix" : "mdf-workspace"
+  },
+  "urlName" : "mdf-workspace"
+}

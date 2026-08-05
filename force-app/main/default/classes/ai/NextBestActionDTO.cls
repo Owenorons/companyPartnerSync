@@ -4,23 +4,23 @@
  */
 public with sharing class NextBestActionDTO {
   @AuraEnabled
-  public Id actionId;
+  public Id actionId { get; set; }
 
   @AuraEnabled
-  public String title;
+  public String title { get; set; }
 
   @AuraEnabled
-  public String recommendation;
+  public String recommendation { get; set; }
 
   @AuraEnabled
-  public String reason;
+  public String reason { get; set; }
 
   @AuraEnabled
-  public String sourceSignal;
+  public String sourceSignal { get; set; }
 
   @AuraEnabled
-  public Decimal confidence;
+  public Decimal confidence { get; set; }
 
   @AuraEnabled
-  public String priority;
+  public String priority { get; set; }
 }

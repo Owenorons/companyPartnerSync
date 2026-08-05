@@ -43,7 +43,7 @@ public with sharing class PartnerAccessService {
     // }
 
     List<Contact> contacts = [
-      SELECT Id, AccountId, Name, Email, Phone
+      SELECT Id, AccountId, Name, Email, Phone, Can_Submit_Deals__c
       FROM Contact
       WHERE Id = :currentUser.ContactId
       WITH USER_MODE
@@ -167,6 +167,25 @@ public with sharing class PartnerAccessService {
 
   public static Boolean canSubmitMDF() {
     return isExternalUser();
+  }
+
+  // Unlike canSubmitMDF(), deal submission is additionally gated per-contact
+  // via Contact.Can_Submit_Deals__c — not every contact on a partner account
+  // is authorized to register deals, only ones an internal admin has flagged.
+  public static Boolean canSubmitDeal() {
+    if (isInternalUser()) {
+      return true;
+    }
+
+    return getCurrentPartnerContact().Can_Submit_Deals__c == true;
+  }
+
+  public static void assertCanSubmitDeal() {
+    if (!canSubmitDeal()) {
+      throw new PartnerSyncHandledException(
+        'This contact is not authorized to submit deal registrations.'
+      );
+    }
   }
 
   public static Boolean canViewLead(Id leadId) {

@@ -4,19 +4,19 @@
  */
 public with sharing class MDFRequestDTO {
   @AuraEnabled
-  public String requestType;
+  public String requestType { get; set; }
   @AuraEnabled
-  public String campaignName;
+  public String campaignName { get; set; }
   @AuraEnabled
-  public String campaignDescription;
+  public String campaignDescription { get; set; }
   @AuraEnabled
-  public Decimal requestedAmount;
+  public Decimal requestedAmount { get; set; }
   @AuraEnabled
-  public Date startDate;
+  public Date startDate { get; set; }
   @AuraEnabled
-  public Date endDate;
+  public Date endDate { get; set; }
   @AuraEnabled
-  public Id relatedDealId;
+  public Id relatedDealId { get; set; }
   @AuraEnabled
-  public Decimal roiTarget;
+  public Decimal roiTarget { get; set; }
 }

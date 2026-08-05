@@ -2,14 +2,10 @@
   <footer class="ps-footer" part="footer">
     <p class="copyright">{copyrightLabel}</p>
 
-    <!--
-      Placeholder links — replace href="#" with real destinations
-      (or an internal page name via NavigationMixin) once these pages exist.
-    -->
-    <nav class="footer-links" aria-label="Footer">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Support</a>
-    </nav>
+    <template if:true={hasFooterMenu}>
+      <nav class="footer-links" aria-label="Footer">
+        <c-ps-footer-list menu-name={footerMenuName}></c-ps-footer-list>
+      </nav>
+    </template>
   </footer>
 </template>

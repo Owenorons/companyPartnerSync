@@ -5,11 +5,13 @@
  */
 public with sharing class PartnerApprovalRequestDTO {
   @AuraEnabled
-  public Id applicationId;
+  public Id applicationId { get; set; }
   @AuraEnabled
-  public String decision;
+  public String decision { get; set; }
   @AuraEnabled
-  public String approvalNotes;
+  public String approvalNotes { get; set; }
   @AuraEnabled
-  public String rejectionReason;
+  public String rejectionReason { get; set; }
+  @AuraEnabled
+  public Boolean confirmPotentialMatches { get; set; }
 }

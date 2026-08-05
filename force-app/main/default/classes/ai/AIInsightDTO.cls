@@ -5,29 +5,29 @@
  */
 public with sharing class AIInsightDTO {
   @AuraEnabled
-  public Id insightId;
+  public Id insightId { get; set; }
 
   @AuraEnabled
-  public String insightType;
+  public String insightType { get; set; }
 
   @AuraEnabled
-  public String provider;
+  public String provider { get; set; }
 
   @AuraEnabled
-  public Decimal confidence;
+  public Decimal confidence { get; set; }
 
   @AuraEnabled
-  public String recommendation;
+  public String recommendation { get; set; }
 
   @AuraEnabled
-  public String summary;
+  public String summary { get; set; }
 
   @AuraEnabled
-  public String reason;
+  public String reason { get; set; }
 
   @AuraEnabled
-  public String status;
+  public String status { get; set; }
 
   @AuraEnabled
-  public Datetime generatedOn;
+  public Datetime generatedOn { get; set; }
 }

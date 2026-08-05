@@ -36,19 +36,19 @@ export default class PsInternalDashboard extends NavigationMixin(
   }
 
   handleDealReview() {
-    this.navigateToTab(this.dealReviewTabName);
+    this.handleNavigation(this.dealReviewTabName);
   }
 
   handleMdfReview() {
-    this.navigateToTab(this.mdfReviewTabName);
+    this.handleNavigation(this.mdfReviewTabName);
   }
 
   handleNotifications() {
-    this.navigateToTab(this.notificationsTabName);
+    this.handleNavigation(this.notificationsTabName);
   }
 
   handleContentAdmin() {
-    this.navigateToTab(this.contentAdminTabName);
+    this.handleNavigation(this.contentAdminTabName);
   }
 
   navigateToTab(apiName) {
@@ -60,6 +60,19 @@ export default class PsInternalDashboard extends NavigationMixin(
       type: "standard__navItemPage",
       attributes: {
         apiName
+      }
+    });
+  }
+
+  handleNavigation(apiName) {
+    if (!apiName) {
+      return;
+    }
+
+    this[NavigationMixin.Navigate]({
+      type: "comm__namedPage",
+      attributes: {
+        name: apiName
       }
     });
   }

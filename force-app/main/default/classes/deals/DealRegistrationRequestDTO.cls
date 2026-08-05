@@ -6,17 +6,17 @@
  */
 public with sharing class DealRegistrationRequestDTO {
   @AuraEnabled
-  public Id opportunityId;
+  public Id opportunityId { get; set; }
   @AuraEnabled
-  public String businessProblem;
+  public String businessProblem { get; set; }
   @AuraEnabled
-  public String proposedSolution;
+  public String proposedSolution { get; set; }
   @AuraEnabled
-  public Decimal estimatedRevenue;
+  public Decimal estimatedRevenue { get; set; }
   @AuraEnabled
-  public Date estimatedCloseDate;
+  public Date estimatedCloseDate { get; set; }
   @AuraEnabled
-  public String implementationTimeline;
+  public String implementationTimeline { get; set; }
   @AuraEnabled
-  public String notes;
+  public String notes { get; set; }
 }
