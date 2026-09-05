@@ -34,24 +34,35 @@ public with sharing class NotificationEventConsumerService {
     'LeadConverted' => 'Lead'
   };
 
-  public static void notifyBusinessEvent(PartnerSync_Event__e eventRecord) {
+  public static void notifyBusinessEvent(
+    PartnerSync_Event__e eventRecord,
+    List<User> recipients
+  ) {
     String title = TITLE_BY_EVENT_TYPE.get(eventRecord.Event_Type__c);
 
     if (title == null) {
       return;
     }
 
-    NotificationRequestDTO request = new NotificationRequestDTO();
-    request.partnerAccountId = idOrNull(eventRecord.Partner_Account_Id__c);
-    request.notificationType = NOTIFICATION_TYPE_BY_EVENT_TYPE.get(
-      eventRecord.Event_Type__c
-    );
-    request.title = title;
-    request.message = MESSAGE_BY_EVENT_TYPE.get(eventRecord.Event_Type__c);
-    request.relatedObject = eventRecord.Object_Name__c;
-    request.relatedRecordId = idOrNull(eventRecord.Record_Id__c);
+    if (recipients == null || recipients.isEmpty())
+      throw new PartnerSyncHandledException(
+        'No active partner user was found for notification delivery.'
+      );
 
-    NotificationService.create(request);
+    for (User recipient : recipients) {
+      NotificationRequestDTO request = new NotificationRequestDTO();
+      request.partnerAccountId = idOrNull(eventRecord.Partner_Account_Id__c);
+      request.recipientUserId = recipient.Id;
+      request.recipientContactId = recipient.ContactId;
+      request.notificationType = NOTIFICATION_TYPE_BY_EVENT_TYPE.get(
+        eventRecord.Event_Type__c
+      );
+      request.title = title;
+      request.message = MESSAGE_BY_EVENT_TYPE.get(eventRecord.Event_Type__c);
+      request.relatedObject = eventRecord.Object_Name__c;
+      request.relatedRecordId = idOrNull(eventRecord.Record_Id__c);
+      NotificationService.create(request);
+    }
   }
 
   private static Id idOrNull(String value) {

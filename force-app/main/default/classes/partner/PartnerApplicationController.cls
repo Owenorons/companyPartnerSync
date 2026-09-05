@@ -11,17 +11,12 @@ public with sharing class PartnerApplicationController {
   ) {
     try {
       return PartnerApplicationService.submitApplication(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApplicationController',
         'Unable to submit application.',
+        'Unable to submit application. Please contact support.',
         ex
-      );
-
-      throw new AuraHandledException(
-        'Unable to submit application. Please contact support.'
       );
     }
   }
@@ -30,16 +25,13 @@ public with sharing class PartnerApplicationController {
   public static List<PartnerApplicationListDTO> getPendingApplications() {
     try {
       return PartnerApplicationService.getPendingApplications();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApplicationController',
+        'Unable to load pending applications.',
         'Unable to load pending applications.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load pending applications.');
     }
   }
 
@@ -49,16 +41,13 @@ public with sharing class PartnerApplicationController {
   ) {
     try {
       return PartnerApplicationService.getApplicationDetail(applicationId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApplicationController',
+        'Unable to load application detail.',
         'Unable to load application detail.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load application detail.');
     }
   }
 
@@ -66,15 +55,13 @@ public with sharing class PartnerApplicationController {
   public static void claimApplication(Id applicationId) {
     try {
       PartnerApplicationService.claimApplication(applicationId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApplicationController',
+        'Unable to claim partner application.',
         'Unable to claim partner application.',
         ex
       );
-      throw new AuraHandledException('Unable to claim partner application.');
     }
   }
 }

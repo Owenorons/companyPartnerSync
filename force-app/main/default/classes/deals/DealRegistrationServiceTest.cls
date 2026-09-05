@@ -35,6 +35,22 @@ private class DealRegistrationServiceTest {
     insert opportunity;
 
     User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+    if (
+      !PartnerAccessService.testPartnerAccountIdsByUser.containsKey(
+        partnerUser.Id
+      )
+    ) {
+      insert new OpportunityShare(
+        OpportunityId = opportunity.Id,
+        UserOrGroupId = partnerUser.Id,
+        OpportunityAccessLevel = 'Read',
+        RowCause = Schema.OpportunityShare.RowCause.Manual
+      );
+    }
 
     Tenant_Config__mdt config = new Tenant_Config__mdt(
       Enable_Deals__c = true,
@@ -73,6 +89,7 @@ private class DealRegistrationServiceTest {
       contact.Id,
       null
     );
+    existingDeal.Customer_Name__c = 'Customer';
     insert existingDeal;
 
     Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(

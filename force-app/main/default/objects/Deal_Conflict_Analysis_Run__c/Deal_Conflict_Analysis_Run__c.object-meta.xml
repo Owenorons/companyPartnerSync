@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label
+  >Deal Conflict Analysis Run</label><pluralLabel
+  >Deal Conflict Analysis Runs</pluralLabel><nameField><displayFormat
+    >DCAR-{00000000}</displayFormat><label
+    >Deal Conflict Analysis Run Number</label><type
+    >AutoNumber</type></nameField><sharingModel
+  >Private</sharingModel><enableReports>true</enableReports><enableActivities
+  >false</enableActivities></CustomObject>

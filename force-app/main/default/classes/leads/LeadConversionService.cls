@@ -14,6 +14,11 @@ public with sharing class LeadConversionService {
 
     LeadConversionDomain.validate(request);
 
+    // The packaged partner permission set intentionally grants read-only
+    // access to Lead and Opportunity. Conversion is therefore an internal
+    // CRM operation, not a partner self-service capability.
+    PartnerAccessService.assertInternalUser();
+
     SecurityUtil.assertCreateable(Opportunity.SObjectType);
 
     SecurityUtil.assertCreateable(Deal_Registration__c.SObjectType);

@@ -42,7 +42,9 @@ public with sharing class AzureOpenAIProvider implements AIProvider {
       return OpenAICompatibleResponseParser.parse(
         res,
         'Azure OpenAI',
-        config.Model_Name__c
+        String.isBlank(request.modelOverride)
+          ? config.Model_Name__c
+          : request.modelOverride
       );
     } catch (Exception ex) {
       // Callout exceptions (timeout, DNS, cert, malformed named
@@ -54,6 +56,7 @@ public with sharing class AzureOpenAIProvider implements AIProvider {
       response.providerName = 'Azure OpenAI';
       response.modelName = config.Model_Name__c;
       response.errorMessage = ex.getMessage();
+      response.errorCode = 'CALLOUT_ERROR';
       return response;
     }
   }

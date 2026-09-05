@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Deal__c</fullName><label>Deal</label><type>Lookup</type><referenceTo
+  >Deal_Registration__c</referenceTo><relationshipLabel
+  >Conflict Analysis Runs</relationshipLabel><relationshipName
+  >Conflict_Analysis_Runs</relationshipName><deleteConstraint
+  >SetNull</deleteConstraint><required>false</required></CustomField>

@@ -6,9 +6,18 @@
  */
 public with sharing class PartnerSyncEventHandler {
   public static void handle(List<PartnerSync_Event__e> events) {
+    Set<Id> partnerAccountIds = new Set<Id>();
+    for (PartnerSync_Event__e eventRecord : events) {
+      Id partnerAccountId = idOrNull(eventRecord.Partner_Account_Id__c);
+      if (partnerAccountId != null)
+        partnerAccountIds.add(partnerAccountId);
+    }
+    Map<Id, List<User>> recipientsByAccount = NotificationRecipientResolver.resolveByPartnerAccount(
+      partnerAccountIds
+    );
     for (PartnerSync_Event__e eventRecord : events) {
       try {
-        process(eventRecord);
+        process(eventRecord, recipientsByAccount);
       } catch (Exception ex) {
         // Platform event triggers process a batch; one bad event must not
         // stop the rest of the batch from reaching the consumers, so each
@@ -20,8 +29,19 @@ public with sharing class PartnerSyncEventHandler {
     }
   }
 
-  private static void process(PartnerSync_Event__e eventRecord) {
+  private static void process(
+    PartnerSync_Event__e eventRecord,
+    Map<Id, List<User>> recipientsByAccount
+  ) {
     AuditEventConsumerService.logBusinessEvent(eventRecord);
-    NotificationEventConsumerService.notifyBusinessEvent(eventRecord);
+    Id partnerAccountId = idOrNull(eventRecord.Partner_Account_Id__c);
+    NotificationEventConsumerService.notifyBusinessEvent(
+      eventRecord,
+      recipientsByAccount.get(partnerAccountId)
+    );
+  }
+
+  private static Id idOrNull(String value) {
+    return String.isBlank(value) ? null : (Id) value;
   }
 }

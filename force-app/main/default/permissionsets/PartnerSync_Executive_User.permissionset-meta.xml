@@ -27,6 +27,16 @@
         <apexClass>PartnerAIController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <fieldPermissions><editable>false</editable><field
+    >Account.Is_Partner__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Account.Partner_Status__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Account.Partner_Tier__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Opportunity.Partner_Account__c</field><readable
+    >true</readable></fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>AI_Insight__c.Confidence__c</field>
@@ -201,4 +211,8 @@
         <viewAllFields>true</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Account</object><viewAllRecords>true</viewAllRecords></objectPermissions>
 </PermissionSet>

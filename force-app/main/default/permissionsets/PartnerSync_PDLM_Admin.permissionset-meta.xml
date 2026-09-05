@@ -5,6 +5,8 @@
   >Administers and validates the Partner Deal Lifecycle Management control plane.</description>
     <classAccesses><apexClass>DealCommandController</apexClass><enabled
     >true</enabled></classAccesses>
+    <classAccesses><apexClass>DealConflictCommandController</apexClass><enabled
+    >true</enabled></classAccesses>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_Administer_PDLM</name></customPermissions>
     <customPermissions><enabled>true</enabled><name
@@ -13,36 +15,71 @@
     >PartnerSync_Replay_Deal_Event</name></customPermissions>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_View_Internal_Deal_Events</name></customPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Phase__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Current_Action_Required__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Current_Action_Owner__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Next_Action_Due__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Health__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Last_Lifecycle_Change__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Last_Lifecycle_Event__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Version_Number__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Locked__c</field><readable
     >true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field
+    <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Lock_Reason__c</field><readable
     >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Normalized_Customer_Name__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Normalized_Trading_Name__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Normalized_Domain__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Normalized_Phone__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Normalized_Address__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Identity_Country__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Ultimate_Parent_Identity__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Masked_Registration_Id__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Customer_Identity_Fingerprint__c</field><readable
+    >true</readable></fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Deal_Registration__c.Identity_Schema_Version__c</field><readable
+    >true</readable></fieldPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Registration__c</object><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>false</allowCreate><allowDelete
     >false</allowDelete><allowEdit>false</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
@@ -57,5 +94,62 @@
     >false</allowDelete><allowEdit>false</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
     >Deal_Event_Outbox__c</object><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Validation_Finding__c</object><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Review_Plan__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Review__c</object><viewAllFields>true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Information_Request__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Approval_Plan__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Approval__c</object><viewAllFields>true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Approval_Condition__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Protection_Grant__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Protection_Extension__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Protection_Action__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
 </PermissionSet>

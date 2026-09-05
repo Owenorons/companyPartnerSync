@@ -42,13 +42,13 @@ public with sharing class DealRegistrationDomain {
 
     record.Partner_Contact__c = opportunity.Partner_Contact__c;
 
-    record.Status__c = 'Submitted';
+    record.Status__c = 'Draft';
 
     // Placeholder only: DealRegistrationService.createDealRegistrationInternal
     // runs DealConflictService.analyze() right after insert (it needs the
     // record's Id to query for siblings) and overwrites this with the real
     // conflict outcome before the caller ever sees it.
-    record.Conflict_Status__c = 'Pending Analysis';
+    record.Conflict_Status__c = 'None';
 
     record.Business_Problem__c = request.businessProblem;
 

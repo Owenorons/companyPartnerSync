@@ -8,6 +8,12 @@
 private class PartnerShareControllerTest {
   @IsTest
   static void getActiveSharesReturnsGrantsForChannelManager() {
+    User manager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSetGroup(
+      manager.Id,
+      'PSG_Internal_Administrator'
+    );
+
     Account owningPartner = PartnerSyncTestDataFactory.partnerAccount(
       'Owning Partner'
     );
@@ -47,14 +53,16 @@ private class PartnerShareControllerTest {
     request.partnerAccountId = coSellPartner.Id;
     request.accessLevel = 'Read';
     request.shareReason = 'Co-Sell';
-    PartnerShareController.grantAccess(request);
+    System.runAs(manager) {
+      PartnerShareController.grantAccess(request);
 
-    List<PartnerShareListDTO> results = PartnerShareController.getActiveShares(
-      deal.Id
-    );
+      List<PartnerShareListDTO> results = PartnerShareController.getActiveShares(
+        deal.Id
+      );
 
-    System.assertEquals(1, results.size());
-    System.assertEquals(coSellPartner.Id, results[0].partnerAccountId);
+      System.assertEquals(1, results.size());
+      System.assertEquals(coSellPartner.Id, results[0].partnerAccountId);
+    }
   }
 
   @IsTest

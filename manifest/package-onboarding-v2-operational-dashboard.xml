@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>InternalDashboardDTO</members>
+    <members>InternalDashboardService</members>
+    <members>InternalDashboardServiceTest</members>
+    <members>InternalPortalController</members>
+    <members>InternalPortalControllerTest</members>
+    <members>OperationalAlertDTO</members>
+    <members>PartnerOperationalAlertActionService</members>
+    <name>ApexClass</name>
+  </types>
+  <types><members>psInternalDashboard</members><name
+    >LightningComponentBundle</name></types>
+  <types><members>Partner_Operational_Alert__c.Resolved_By__c</members><members
+    >Partner_Operational_Alert__c.Reopened_By__c</members><members
+    >Partner_Operational_Alert__c.Reopened_On__c</members><name
+    >CustomField</name></types>
+  <types><members>PartnerSync_Operational_Alert_Manager</members><name
+    >PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

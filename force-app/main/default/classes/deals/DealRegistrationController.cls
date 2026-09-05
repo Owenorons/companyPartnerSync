@@ -12,16 +12,13 @@ public with sharing class DealRegistrationController {
   ) {
     try {
       return DealRegistrationService.createDealRegistration(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealRegistrationController',
+        'Unable to create deal registration.',
         'Unable to create deal registration.',
         ex
       );
-
-      throw new AuraHandledException('Unable to create deal registration.');
     }
   }
 
@@ -29,16 +26,13 @@ public with sharing class DealRegistrationController {
   public static List<EligibleOpportunityDTO> getEligibleOpportunities() {
     try {
       return DealRegistrationService.getEligibleOpportunities();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealRegistrationController',
+        'Unable to load eligible opportunities.',
         'Unable to load eligible opportunities.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load eligible opportunities.');
     }
   }
 
@@ -46,16 +40,13 @@ public with sharing class DealRegistrationController {
   public static List<DealRegistrationListDTO> getMyDeals() {
     try {
       return DealRegistrationService.getMyDeals();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealRegistrationController',
         'Unable to load partner deals.',
+        'Unable to load deals.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load deals.');
     }
   }
 }

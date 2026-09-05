@@ -225,6 +225,7 @@ private class PartnerOnboardingServiceTest {
       Partner_Application__c application = createApplication();
       application.Application_Status__c = 'Approved';
       application.Decision__c = 'Approved';
+      application.Provisioning_Status__c = 'Queued';
       update application;
 
       new PartnerProvisioningStatusQueueable(

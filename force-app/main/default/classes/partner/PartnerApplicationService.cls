@@ -15,8 +15,6 @@ public with sharing class PartnerApplicationService {
       );
     }
 
-    SecurityUtil.assertCreateable(Partner_Application__c.SObjectType);
-
     PartnerApplicationDomain.validateForSubmit(request);
 
     String normalizedCompanyName = PartnerApplicationDomain.normalizeCompanyName(
@@ -27,7 +25,7 @@ public with sharing class PartnerApplicationService {
       ? null
       : request.businessEmail.trim().toLowerCase();
 
-    List<Partner_Application__c> duplicates = PartnerApplicationSelector.findPotentialDuplicates(
+    List<Partner_Application__c> duplicates = PartnerApplicationSubmissionSelector.findPotentialDuplicates(
       normalizedCompanyName,
       businessEmail
     );
@@ -42,16 +40,15 @@ public with sharing class PartnerApplicationService {
       request
     );
 
-    List<SObject> sanitized = SecurityUtil.stripForCreate(
-      new List<SObject>{ record }
-    );
-
     try {
-      Database.insert(sanitized, AccessLevel.USER_MODE);
+      // The public form maps a fixed DTO into package-owned fields. Persist
+      // that trusted command independently of guest/profile CRUD so a core
+      // package install doesn't require subscriber guest-profile mutation.
+      Database.insert(record, AccessLevel.SYSTEM_MODE);
     } catch (DmlException ex) {
       if (
         ex.getNumDml() > 0 &&
-        ex.getDmlStatusCode(0) == StatusCode.DUPLICATE_VALUE
+        String.valueOf(ex.getDmlStatusCode(0)) == 'DUPLICATE_VALUE'
       ) {
         throw new PartnerSyncHandledException(
           'A partner application already exists for this company or email.'
@@ -61,7 +58,7 @@ public with sharing class PartnerApplicationService {
       throw ex;
     }
 
-    Partner_Application__c insertedRecord = (Partner_Application__c) sanitized[0];
+    Partner_Application__c insertedRecord = record;
 
     // Re-query rather than reuse the DML result: fields like the
     // auto-number Application_Number__c are only populated by the platform

@@ -9,16 +9,13 @@ public with sharing class AnalyticsController {
   public static PartnerKPIDTO getMyKPI() {
     try {
       return AnalyticsService.getMyKPI();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AnalyticsController',
         'Unable to load partner KPI.',
+        'Unable to load partner analytics.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load partner analytics.');
     }
   }
 
@@ -26,16 +23,13 @@ public with sharing class AnalyticsController {
   public static List<PartnerLeaderboardRowDTO> getPartnerLeaderboard() {
     try {
       return AnalyticsService.getPartnerLeaderboard();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AnalyticsController',
+        'Unable to load partner leaderboard.',
         'Unable to load partner leaderboard.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load partner leaderboard.');
     }
   }
 
@@ -43,17 +37,12 @@ public with sharing class AnalyticsController {
   public static List<CustomerRevenueDTO> getCustomerRevenue() {
     try {
       return AnalyticsService.getCustomerRevenue();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AnalyticsController',
         'Unable to load customer revenue analytics.',
+        'Unable to load customer revenue analytics.',
         ex
-      );
-
-      throw new AuraHandledException(
-        'Unable to load customer revenue analytics.'
       );
     }
   }

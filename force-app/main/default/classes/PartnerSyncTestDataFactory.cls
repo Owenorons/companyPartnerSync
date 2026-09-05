@@ -119,7 +119,7 @@ public class PartnerSyncTestDataFactory {
       Confidence__c = 85,
       Insight_Text__c = 'Strong partner engagement.',
       Recommendation__c = 'Prioritize follow-up.',
-      Status__c = 'Generated'
+      Status__c = 'Accepted'
     );
   }
 

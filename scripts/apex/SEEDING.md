@@ -23,6 +23,16 @@ All scripts are rerun-safe. The access and user scripts create only missing
 records. The business script performs no DML if its fixture accounts already
 exist.
 
+To create the Partner 360 rollout fixture, run:
+
+```sh
+sf apex run --file scripts/apex/seed-partner-360-uat.apex --target-org <org>
+sf apex run --file scripts/apex/verify-partner-360-uat.apex --target-org <org>
+```
+
+This rerun-safe script creates a dedicated blocked partner with onboarding,
+document, risk, access, training, deal, MDF, and lifecycle-event records.
+
 Step 3 creates two named personas:
 
 - a partner tester assigned `PSG_Partner_User`;

@@ -9,16 +9,13 @@ public with sharing class PartnerApprovalController {
   public static void processDecision(PartnerApprovalRequestDTO request) {
     try {
       PartnerOnboardingService.processDecision(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApprovalController',
         'Unable to process partner approval decision.',
+        'Unable to process application decision.',
         ex
       );
-
-      throw new AuraHandledException('Unable to process application decision.');
     }
   }
 
@@ -26,15 +23,13 @@ public with sharing class PartnerApprovalController {
   public static void requestProvisioning(Id applicationId) {
     try {
       PartnerUserProvisioningService.requestProvisioning(applicationId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerApprovalController',
         'Unable to request partner user provisioning.',
+        'Unable to request partner access.',
         ex
       );
-      throw new AuraHandledException('Unable to request partner access.');
     }
   }
 }

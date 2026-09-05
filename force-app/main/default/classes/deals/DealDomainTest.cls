@@ -56,7 +56,7 @@ private class DealDomainTest {
     System.assertEquals(customer.Id, record.Customer_Account__c);
     System.assertEquals(partner.Id, record.Partner_Account__c);
     System.assertEquals(25000, record.Estimated_Revenue__c);
-    System.assertEquals('Pending Analysis', record.Conflict_Status__c);
+    System.assertEquals('None', record.Conflict_Status__c);
   }
 
   @IsTest
@@ -109,6 +109,153 @@ private class DealDomainTest {
         ex.getMessage().contains('Rejection reason'),
         'Unexpected message: ' + ex.getMessage()
       );
+    }
+  }
+
+  @IsTest
+  static void validatesRegistrationAndAllReviewDecisionBranches() {
+    assertRegistrationRejected(null, 'request is required');
+    DealRegistrationRequestDTO registration = new DealRegistrationRequestDTO();
+    registration.opportunityId = UserInfo.getUserId();
+    assertRegistrationRejected(registration, 'Estimated revenue');
+    registration.estimatedRevenue = 100;
+    DealRegistrationDomain.validate(registration);
+
+    assertReviewRejected(null, 'invalid');
+    DealReviewDecisionDTO review = new DealReviewDecisionDTO();
+    review.dealId = UserInfo.getUserId();
+    review.decision = 'Unknown';
+    assertReviewRejected(review, 'Unsupported');
+    review.decision = 'Protection Extended';
+    assertReviewRejected(review, 'greater than zero');
+    review.protectionExtensionDays = 15;
+    DealReviewDomain.validateDecision(review);
+    review.decision = 'Rejected';
+    review.rejectionReason = 'Outside policy';
+    DealReviewDomain.validateDecision(review);
+    review.decision = 'Approved';
+    DealReviewDomain.validateDecision(review);
+  }
+
+  @IsTest
+  static void mapsRegistrationReviewDetailListAndConflicts() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    Account customer = PartnerSyncTestDataFactory.customerAccount('Customer');
+    insert new List<Account>{ partner, customer };
+    Opportunity opportunity = new Opportunity(
+      Name = 'Opportunity',
+      AccountId = customer.Id,
+      Partner_Account__c = partner.Id,
+      StageName = 'Qualification',
+      CloseDate = Date.today().addDays(30),
+      Amount = 5000
+    );
+    insert opportunity;
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Opportunity__c = opportunity.Id,
+      Customer_Account__c = customer.Id,
+      Partner_Account__c = partner.Id,
+      Status__c = 'Submitted',
+      Conflict_Status__c = 'Potential Conflict',
+      Estimated_Revenue__c = 5000,
+      Estimated_Close_Date__c = Date.today().addDays(30),
+      Business_Problem__c = 'Problem',
+      Proposed_Solution__c = 'Solution',
+      Implementation_Timeline__c = 'Quarter',
+      Notes__c = 'Notes',
+      Approval_Notes__c = 'Review',
+      Rejection_Reason__c = 'None',
+      Conflict_Resolution_Notes__c = 'Pending',
+      Submitted_On__c = System.now()
+    );
+    Deal_Registration__c conflict = new Deal_Registration__c(
+      Customer_Account__c = customer.Id,
+      Partner_Account__c = partner.Id,
+      Status__c = 'Approved',
+      Conflict_Status__c = 'None',
+      Estimated_Revenue__c = 2500
+    );
+    insert new List<Deal_Registration__c>{ deal, conflict };
+    deal = selectDeal(deal.Id);
+    conflict = selectDeal(conflict.Id);
+
+    DealRegistrationResultDTO result = DealRegistrationDomain.toDTO(deal);
+    Assert.areEqual(deal.Id, result.dealRegistrationId);
+    Assert.areEqual('Submitted', result.status);
+    DealRegistrationListDTO registrationList = DealRegistrationDomain.toListDTO(
+      deal
+    );
+    Assert.areEqual('Customer', registrationList.customerName);
+    Assert.areEqual('Partner', registrationList.partnerName);
+    Assert.areEqual('Qualification', registrationList.stage);
+
+    DealReviewListDTO reviewList = DealReviewDomain.toListDTO(deal);
+    Assert.areEqual('Customer', reviewList.customerName);
+    Assert.areEqual('Partner', reviewList.partnerName);
+    DealReviewDetailDTO detail = DealReviewDomain.toDetailDTO(
+      deal,
+      new List<Deal_Registration__c>{ conflict }
+    );
+    Assert.areEqual(1, detail.conflicts.size());
+    Assert.areEqual('Partner', detail.conflicts[0].partnerName);
+    Assert.isNotNull(detail.riskScore);
+
+    Deal_Registration__c noParents = new Deal_Registration__c();
+    Assert.isNull(DealReviewDomain.toListDTO(noParents).customerName);
+    Assert.isNull(DealReviewDomain.toConflictDTO(noParents).partnerName);
+  }
+
+  private static Deal_Registration__c selectDeal(Id dealId) {
+    return [
+      SELECT
+        Id,
+        Name,
+        Opportunity__c,
+        Opportunity__r.StageName,
+        Customer_Account__c,
+        Customer_Account__r.Name,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Estimated_Revenue__c,
+        Estimated_Close_Date__c,
+        Business_Problem__c,
+        Proposed_Solution__c,
+        Implementation_Timeline__c,
+        Notes__c,
+        Status__c,
+        Conflict_Status__c,
+        Protection_End_Date__c,
+        Submitted_On__c,
+        Approval_Notes__c,
+        Rejection_Reason__c,
+        Conflict_Resolution_Notes__c,
+        CreatedDate
+      FROM Deal_Registration__c
+      WHERE Id = :dealId
+    ];
+  }
+
+  private static void assertRegistrationRejected(
+    DealRegistrationRequestDTO request,
+    String expectedMessage
+  ) {
+    try {
+      DealRegistrationDomain.validate(request);
+      Assert.fail('Expected invalid registration rejection.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains(expectedMessage));
+    }
+  }
+
+  private static void assertReviewRejected(
+    DealReviewDecisionDTO request,
+    String expectedMessage
+  ) {
+    try {
+      DealReviewDomain.validateDecision(request);
+      Assert.fail('Expected invalid review rejection.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains(expectedMessage));
     }
   }
 }

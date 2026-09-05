@@ -85,6 +85,13 @@ public with sharing class AnalyticsDomain {
     dto.mdfRemaining = annualBudget - used;
     dto.mdfUtilisationRate = annualBudget == 0 ? 0 : used / annualBudget;
 
+    dto.healthScore = PartnerHealthScoringService.calculate(dto);
+    dto.healthLabel = PartnerHealthScoringService.healthLabel(dto.healthScore);
+    dto.recommendedTier = PartnerHealthScoringService.recommendTier(
+      dto.healthScore
+    );
+    dto.healthSignals = PartnerHealthScoringService.explain(dto);
+
     return dto;
   }
 
@@ -106,14 +113,11 @@ public with sharing class AnalyticsDomain {
     dto.revenue = kpi.totalRevenue;
     dto.conversionRate = kpi.dealWinRate;
 
-    // Leaderboard score is a weighted blend (weights sum to 100) chosen so
-    // deal win rate matters most and MDF utilisation least; adjust weights
-    // here, not at call sites, if the ranking formula changes.
-    dto.score =
-      (kpi.leadAcceptanceRate * 25) +
-      (kpi.leadConversionRate * 25) +
-      (kpi.dealWinRate * 30) +
-      (kpi.mdfUtilisationRate * 20);
+    // Use the same explainable 0-100 score shown to the partner so internal
+    // rankings and partner-facing performance guidance cannot drift apart.
+    dto.score = kpi.healthScore == null
+      ? PartnerHealthScoringService.calculate(kpi)
+      : kpi.healthScore;
 
     return dto;
   }

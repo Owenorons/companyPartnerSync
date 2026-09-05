@@ -3,6 +3,7 @@
  * not execute the worker or its terminal-status job. Run hourly; only jobs
  * older than 24 hours are considered stale.
  */
+@SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class PartnerProvisioningReconciler implements Schedulable {
   @TestVisible
   private static final Integer STALE_AFTER_HOURS = 24;

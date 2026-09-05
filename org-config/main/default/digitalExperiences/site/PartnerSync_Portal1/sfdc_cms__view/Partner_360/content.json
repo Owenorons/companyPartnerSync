@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Partner 360",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"313f734e-8ddd-45cb-a1e1-7134a0aeccfb\",\"columns\":[{\"UUID\":\"0fd4f013-31db-40cc-86ca-6c9eb37a3d51\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psPartner360",
+              "id" : "4b286bd5-aa2b-4907-bc18-d4fc04b95a63",
+              "type" : "component"
+            } ],
+            "id" : "0fd4f013-31db-40cc-86ca-6c9eb37a3d51",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "313f734e-8ddd-45cb-a1e1-7134a0aeccfb",
+          "type" : "component"
+        } ],
+        "id" : "0b37eeac-b62d-480b-bd50-d16bb9fdb103",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "Internal partner lifecycle and commercial summary.",
+            "pageTitle" : "Partner 360",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "1322f9a7-e42a-45af-9d07-e2acb4283eed",
+          "type" : "component"
+        } ],
+        "id" : "b32c6729-2017-460c-beed-a559a0ced914",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "2f270861-642a-4145-8126-542b24db1615",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "ZzSlrxOz3RmaOnzooRy6mjar2T2Csr",
+    "viewType" : "custom-partner-360"
+  },
+  "urlName" : "partner-360"
+}

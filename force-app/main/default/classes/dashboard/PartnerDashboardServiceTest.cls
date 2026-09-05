@@ -19,6 +19,28 @@ private class PartnerDashboardServiceTest {
     insert contact;
 
     User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+
+    // A customer account is outside the partner user's account hierarchy.
+    // Grant the access that the production sharing configuration provides so
+    // this unit test remains independent of org-level sharing-set setup.
+    if (
+      !PartnerAccessService.testPartnerAccountIdsByUser.containsKey(
+        partnerUser.Id
+      )
+    ) {
+      insert new AccountShare(
+        AccountId = customer.Id,
+        UserOrGroupId = partnerUser.Id,
+        AccountAccessLevel = 'Read',
+        OpportunityAccessLevel = 'None',
+        CaseAccessLevel = 'None',
+        RowCause = Schema.AccountShare.RowCause.Manual
+      );
+    }
 
     Tenant_Config__mdt enabledConfig = new Tenant_Config__mdt(
       Enable_Deals__c = true,

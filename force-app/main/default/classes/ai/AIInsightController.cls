@@ -13,15 +13,64 @@ public with sharing class AIInsightController {
       AI_Insight__c insight = AIInsightGeneratorService.generate(request);
 
       return AIInsightDomain.toDTO(insight);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AIInsightController',
+        'Unable to generate AI insight.',
         'Unable to generate AI insight.',
         ex
       );
-      throw new AuraHandledException('Unable to generate AI insight.');
+    }
+  }
+
+  @AuraEnabled
+  public static Id enqueueInsight(AIInsightRequestDTO request) {
+    try {
+      PartnerPermissionService.assertCanGenerateAIInsights();
+      return System.enqueueJob(new AIInsightGenerationQueueable(request));
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'AIInsightController',
+        'Unable to queue AI insight generation.',
+        'Unable to queue AI insight generation.',
+        ex
+      );
+    }
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static List<AIInsightDTO> getPendingReview() {
+    try {
+      return AIInsightGovernanceService.getPendingReview();
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'AIInsightController',
+        'Unable to load AI insights for review.',
+        'Unable to load AI insights for review.',
+        ex
+      );
+    }
+  }
+
+  @AuraEnabled
+  public static AIInsightDTO reviewInsight(
+    Id insightId,
+    String decision,
+    String recommendation
+  ) {
+    try {
+      return AIInsightGovernanceService.decide(
+        insightId,
+        decision,
+        recommendation
+      );
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'AIInsightController',
+        'Unable to review AI insight.',
+        'Unable to review AI insight.',
+        ex
+      );
     }
   }
 
@@ -29,15 +78,13 @@ public with sharing class AIInsightController {
   public static List<AIProviderStatusDTO> getProviders() {
     try {
       return AIProviderAdminService.getProviders();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AIInsightController',
+        'Unable to load AI providers.',
         'Unable to load AI providers.',
         ex
       );
-      throw new AuraHandledException('Unable to load AI providers.');
     }
   }
 
@@ -55,15 +102,13 @@ public with sharing class AIInsightController {
       }
 
       return 'Connection successful.';
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'AIInsightController',
+        'Unable to test AI provider connection.',
         'Unable to test AI provider connection.',
         ex
       );
-      throw new AuraHandledException('Unable to test AI provider connection.');
     }
   }
 }

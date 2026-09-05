@@ -11,15 +11,13 @@ public with sharing class PartnerShareController {
   public static List<PartnerShareListDTO> getActiveShares(Id targetRecordId) {
     try {
       return PartnerShareService.getActiveShares(targetRecordId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerShareController.getActiveShares',
         ex.getMessage(),
+        'Unable to load record shares.',
         ex
       );
-      throw new AuraHandledException('Unable to load record shares.');
     }
   }
 
@@ -27,15 +25,13 @@ public with sharing class PartnerShareController {
   public static Id grantAccess(PartnerShareDTO request) {
     try {
       return PartnerShareService.grantAccess(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerShareController.grantAccess',
         ex.getMessage(),
+        'Unable to grant access.',
         ex
       );
-      throw new AuraHandledException('Unable to grant access.');
     }
   }
 
@@ -43,15 +39,13 @@ public with sharing class PartnerShareController {
   public static void revokeAccess(Id partnerRecordShareId) {
     try {
       PartnerShareService.revokeAccess(partnerRecordShareId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerShareController.revokeAccess',
         ex.getMessage(),
+        'Unable to revoke access.',
         ex
       );
-      throw new AuraHandledException('Unable to revoke access.');
     }
   }
 }

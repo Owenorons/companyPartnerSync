@@ -10,16 +10,13 @@ public with sharing class DealReviewController {
   public static List<DealReviewListDTO> getReviewQueue() {
     try {
       return DealReviewService.getReviewQueue();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealReviewController',
+        'Unable to load deal review queue.',
         'Unable to load deal review queue.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load deal review queue.');
     }
   }
 
@@ -27,16 +24,13 @@ public with sharing class DealReviewController {
   public static DealReviewDetailDTO getReviewDetail(Id dealId) {
     try {
       return DealReviewService.getReviewDetail(dealId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealReviewController',
+        'Unable to load deal review detail.',
         'Unable to load deal review detail.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load deal review detail.');
     }
   }
 
@@ -44,16 +38,13 @@ public with sharing class DealReviewController {
   public static void processDecision(DealReviewDecisionDTO request) {
     try {
       DealReviewService.processDecision(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'DealReviewController',
+        'Unable to process deal review decision.',
         'Unable to process deal review decision.',
         ex
       );
-
-      throw new AuraHandledException('Unable to process deal review decision.');
     }
   }
 }

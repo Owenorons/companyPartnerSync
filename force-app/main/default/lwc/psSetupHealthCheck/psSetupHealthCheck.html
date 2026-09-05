@@ -1,0 +1,105 @@
+<template>
+  <div class="setup-page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">PartnerSync Administration</p>
+        <h1>Setup and Health Check</h1>
+        <p class="hero-copy">
+          Confirm that the core application is operational and see what remains
+          before launching an Experience Cloud partner portal.
+        </p>
+      </div>
+      <lightning-button
+        label="Run checks again"
+        icon-name="utility:refresh"
+        onclick={handleRefresh}
+        disabled={loading}
+      ></lightning-button>
+    </header>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Checking PartnerSync configuration..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasReport}>
+      <section class="summary" aria-label="Readiness summary">
+        <div>
+          <span class="summary-label">Overall</span>
+          <strong>{readinessLabel}</strong>
+        </div>
+        <lightning-badge
+          label={coreStatus}
+          class={coreVariant}
+        ></lightning-badge>
+        <lightning-badge
+          label={portalStatus}
+          class={portalVariant}
+        ></lightning-badge>
+        <div class="timestamp">
+          Checked
+          <lightning-formatted-date-time
+            value={generatedAt}
+            year="numeric"
+            month="short"
+            day="2-digit"
+            hour="2-digit"
+            minute="2-digit"
+          ></lightning-formatted-date-time>
+        </div>
+      </section>
+
+      <section class="check-list" aria-label="Configuration checks">
+        <template for:each={checks} for:item="check">
+          <article key={check.key} class={check.itemClass}>
+            <div class="check-heading">
+              <h2>{check.label}</h2>
+              <c-ps-status-badge
+                label={check.statusLabel}
+                variant={check.variant}
+              ></c-ps-status-badge>
+            </div>
+            <p class="detail">{check.detail}</p>
+            <p class="action"><strong>Next:</strong> {check.action}</p>
+          </article>
+        </template>
+      </section>
+
+      <template if:true={automationNeedsConfiguration}>
+        <section class="automation-action">
+          <div>
+            <h2>Activate PartnerSync operational protection</h2>
+            <p>
+              Configure the required scheduled jobs for governance, alerting,
+              provisioning reconciliation, deal expiry, and sharing cleanup.
+            </p>
+          </div>
+          <lightning-button
+            variant="brand"
+            label={automationButtonLabel}
+            disabled={configuringAutomation}
+            onclick={handleConfigureAutomation}
+          ></lightning-button>
+        </section>
+      </template>
+
+      <aside class="boundary-note">
+        <lightning-icon
+          icon-name="utility:info"
+          size="small"
+          alternative-text="Information"
+        ></lightning-icon>
+        <p>
+          PartnerSync can be core-ready without a portal. Experience Cloud
+          licences, domain selection, external-user security, credentials, and
+          site publication remain controlled by the subscriber.
+        </p>
+      </aside>
+    </template>
+  </div>
+</template>

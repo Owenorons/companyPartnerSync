@@ -60,6 +60,8 @@ public with sharing class PartnerOnboardingService {
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ application });
 
+    PartnerOnboardingLifecycleService.initialise(application, 'Rejected');
+
     LoggingService.info(
       'PartnerOnboardingService',
       'Partner application rejected: ' + application.Id
@@ -122,6 +124,8 @@ public with sharing class PartnerOnboardingService {
     application.Provisioning_Error__c = 'Enable the created Account as a Partner, then request provisioning.';
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ application });
+
+    PartnerOnboardingLifecycleService.initialise(application, 'Approved');
 
     LoggingService.info(
       'PartnerOnboardingService',

@@ -5,7 +5,7 @@
  * enforced). Every query here runs WITH USER_MODE, and each method selects
  * only the columns its caller actually needs.
  */
-public with sharing class PartnerShareSelector {
+public without sharing class PartnerShareSelector {
   public static List<Partner_Record_Share__c> selectActiveSharesForRecord(
     Id recordId
   ) {
@@ -29,7 +29,7 @@ public with sharing class PartnerShareSelector {
         Salesforce_Share_Id__c
       FROM Partner_Record_Share__c
       WHERE Target_Record_Id__c = :String.valueOf(recordId) AND Active__c = TRUE
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Granted_On__c DESC
     ];
   }
@@ -49,7 +49,7 @@ public with sharing class PartnerShareSelector {
         Active__c = TRUE
         AND Expiry_Date__c != NULL
         AND Expiry_Date__c < :Date.today()
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 10000
     ];
   }
@@ -67,7 +67,7 @@ public with sharing class PartnerShareSelector {
         Salesforce_Share_Id__c
       FROM Partner_Record_Share__c
       WHERE Id = :partnerRecordShareId
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
 
@@ -86,7 +86,7 @@ public with sharing class PartnerShareSelector {
           Target_Record_Id__c = :String.valueOf(targetRecordId)
           AND Partner_Account__c = :partnerAccountId
           AND Active__c = TRUE
-        WITH USER_MODE
+        WITH SYSTEM_MODE
       ] > 0;
   }
 }

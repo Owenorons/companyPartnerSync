@@ -18,9 +18,9 @@ public with sharing class OpenAIProvider implements AIProvider {
       return unconfigured;
     }
 
-    String modelName = String.isBlank(config.Model_Name__c)
-      ? 'gpt-5'
-      : config.Model_Name__c;
+    String modelName = !String.isBlank(request.modelOverride)
+      ? request.modelOverride
+      : (String.isBlank(config.Model_Name__c) ? 'gpt-5' : config.Model_Name__c);
 
     try {
       HttpRequest req = new HttpRequest();
@@ -46,6 +46,7 @@ public with sharing class OpenAIProvider implements AIProvider {
       response.providerName = 'OpenAI';
       response.modelName = modelName;
       response.errorMessage = ex.getMessage();
+      response.errorCode = 'CALLOUT_ERROR';
       return response;
     }
   }

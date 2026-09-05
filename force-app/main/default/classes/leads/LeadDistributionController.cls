@@ -9,16 +9,13 @@ public with sharing class LeadDistributionController {
   public static void assignLeadToPartner(LeadAssignmentRequestDTO request) {
     try {
       LeadDistributionService.assignLeadToPartner(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'LeadDistributionController',
+        'Unable to assign lead.',
         'Unable to assign lead.',
         ex
       );
-
-      throw new AuraHandledException('Unable to assign lead.');
     }
   }
 
@@ -26,16 +23,13 @@ public with sharing class LeadDistributionController {
   public static List<LeadDistributionDTO> getMyLeads() {
     try {
       return LeadDistributionService.getMyLeads();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'LeadDistributionController',
         'Unable to load partner leads.',
+        'Unable to load leads.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load leads.');
     }
   }
 
@@ -43,16 +37,13 @@ public with sharing class LeadDistributionController {
   public static void processDecision(LeadDecisionRequestDTO request) {
     try {
       LeadDecisionService.processDecision(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'LeadDistributionController',
+        'Unable to process lead decision.',
         'Unable to process lead decision.',
         ex
       );
-
-      throw new AuraHandledException('Unable to process lead decision.');
     }
   }
 }

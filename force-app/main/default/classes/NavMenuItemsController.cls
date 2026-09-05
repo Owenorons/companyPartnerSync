@@ -7,6 +7,9 @@
  * feeds page chrome that should degrade quietly instead of erroring the page.
  */
 global with sharing class NavMenuItemsController {
+  @TestVisible
+  private static Id linkSetIdOverride;
+
   public NavMenuItemsController() {
   }
 
@@ -29,11 +32,13 @@ global with sharing class NavMenuItemsController {
       WITH USER_MODE
     ];
 
-    if (linkSets.isEmpty()) {
+    if (linkSets.isEmpty() && linkSetIdOverride == null) {
       return new List<NavigationMenuItem>();
     }
 
-    Id linkSetId = linkSets[0].Id;
+    Id linkSetId = linkSetIdOverride == null
+      ? linkSets[0].Id
+      : linkSetIdOverride;
 
     // collect all the menu items belonging to the link set
     // published state is either Draft or Live

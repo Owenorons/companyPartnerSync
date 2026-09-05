@@ -11,27 +11,32 @@ public with sharing class DealExpiryBatch implements Database.Batchable<SObject>
   public Database.QueryLocator start(Database.BatchableContext context) {
     return Database.getQueryLocator(
       [
-        SELECT Id
-        FROM Deal_Registration__c
+        SELECT Id, Deal__c, Version_Number__c
+        FROM Deal_Protection_Grant__c
         WHERE
-          Status__c = 'Approved'
-          AND Protection_End_Date__c != NULL
-          AND Protection_End_Date__c < :Date.today()
+          Status__c = 'Active'
+          AND Current__c = TRUE
+          AND End_Date__c < :Date.today()
       ]
     );
   }
 
   public void execute(
     Database.BatchableContext context,
-    List<Deal_Registration__c> scope
+    List<Deal_Protection_Grant__c> scope
   ) {
-    for (Deal_Registration__c deal : scope) {
+    for (Deal_Protection_Grant__c grant : scope) {
       try {
-        DealReviewService.expireProtection(deal.Id);
+        DealProtectionCommand command = new DealProtectionCommand();
+        command.dealId = grant.Deal__c;
+        command.action = 'Expire Protection';
+        command.commandKey = 'scheduled-expiry-' + grant.Id;
+        command.expectedVersion = Integer.valueOf(grant.Version_Number__c);
+        DealProtectionCommandService.execute(command);
       } catch (Exception ex) {
         LoggingService.error(
           'DealExpiryBatch',
-          'Failed to expire deal registration ' + deal.Id,
+          'Failed to expire protection grant ' + grant.Id,
           ex
         );
       }

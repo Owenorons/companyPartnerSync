@@ -6,7 +6,7 @@
  * assertCanReviewDeals), not by a WHERE-clause partner filter. Compare to
  * DealRegistrationSelector, which is intentionally scoped per partner.
  */
-public with sharing class DealReviewSelector {
+public without sharing class DealReviewSelector {
   public static List<Deal_Registration__c> selectReviewQueue() {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -26,7 +26,7 @@ public with sharing class DealReviewSelector {
         Submitted_On__c
       FROM Deal_Registration__c
       WHERE Status__c IN ('Submitted', 'Under Review', 'Approved', 'Rejected')
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Submitted_On__c ASC NULLS LAST, CreatedDate ASC
       LIMIT 500
     ];
@@ -60,7 +60,7 @@ public with sharing class DealReviewSelector {
         Notes__c
       FROM Deal_Registration__c
       WHERE Id = :dealId
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
 
@@ -99,7 +99,7 @@ public with sharing class DealReviewSelector {
         Customer_Account__c = :customerAccountId
         AND Id != :currentDealId
         AND Status__c IN ('Submitted', 'Under Review', 'Approved')
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY CreatedDate DESC
       LIMIT 50
     ];

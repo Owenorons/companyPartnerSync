@@ -6,6 +6,7 @@
  * — this class owns the sequencing between the registry and the platform
  * share, and the permission gating around interactive use.
  */
+@SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class PartnerShareService {
   public static Id grantAccess(PartnerShareDTO request) {
     PartnerPermissionService.assertCanManageRecordShares();
@@ -24,29 +25,40 @@ public with sharing class PartnerShareService {
       );
     }
 
-    Partner_Record_Share__c registry = PartnerShareDomain.buildRegistryRecord(
-      request
-    );
-    registry.Partner_Group_Id__c = String.valueOf(
-      resolvePartnerGroupId(registry.Partner_Account__c)
-    );
+    Savepoint grantSavepoint = Database.setSavepoint();
+    try {
+      Partner_Record_Share__c registry = PartnerShareDomain.buildRegistryRecord(
+        request
+      );
+      registry.Partner_Group_Id__c = String.valueOf(
+        resolvePartnerGroupId(registry.Partner_Account__c)
+      );
 
-    insert SecurityUtil.stripForCreate(new List<SObject>{ registry });
+      List<SObject> sanitizedRegistry = SecurityUtil.stripForCreate(
+        new List<SObject>{ registry }
+      );
+      insert sanitizedRegistry;
+      registry.Id = sanitizedRegistry[0].Id;
 
-    registry.Salesforce_Share_Id__c = String.valueOf(
-      createSalesforceShare(registry)
-    );
-    update SecurityUtil.stripForUpdate(new List<SObject>{ registry });
+      Id salesforceShareId = createSalesforceShare(registry);
+      registry.Salesforce_Share_Id__c = salesforceShareId == null
+        ? null
+        : String.valueOf(salesforceShareId);
+      update SecurityUtil.stripForUpdate(new List<SObject>{ registry });
 
-    AuditLogRequestDTO audit = AuditFactory.createSuccess(
-      'Partner_Record_Share__c',
-      registry.Id,
-      'Grant'
-    );
-    audit.partnerAccountId = registry.Partner_Account__c;
-    AuditService.log(audit);
+      AuditLogRequestDTO audit = AuditFactory.createSuccess(
+        'Partner_Record_Share__c',
+        registry.Id,
+        'Grant'
+      );
+      audit.partnerAccountId = registry.Partner_Account__c;
+      AuditService.log(audit);
 
-    return registry.Id;
+      return registry.Id;
+    } catch (Exception ex) {
+      Database.rollback(grantSavepoint);
+      throw ex;
+    }
   }
 
   public static List<PartnerShareListDTO> getActiveShares(Id targetRecordId) {
@@ -104,7 +116,7 @@ public with sharing class PartnerShareService {
     registry.Active__c = false;
     registry.Revoked_On__c = System.now();
 
-    update SecurityUtil.stripForUpdate(new List<SObject>{ registry });
+    updateRegistryAsSystem(registry);
 
     AuditLogRequestDTO audit = AuditFactory.createSuccess(
       'Partner_Record_Share__c',
@@ -113,6 +125,14 @@ public with sharing class PartnerShareService {
     );
     audit.partnerAccountId = registry.Partner_Account__c;
     AuditService.log(audit);
+  }
+
+  // Interactive revokes are permission-gated and expiry revokes are invoked
+  // by trusted cleanup automation. Both must update the registry regardless
+  // of the scheduler's profile-level FLS.
+  @SuppressWarnings('PMD.ApexCRUDViolation')
+  private static void updateRegistryAsSystem(Partner_Record_Share__c registry) {
+    update registry;
   }
 
   /*
@@ -145,7 +165,13 @@ public with sharing class PartnerShareService {
     );
     share.RowCause = Schema.Deal_Registration__Share.RowCause.Partner_Record_Share__c;
 
-    insert share;
+    try {
+      insert share;
+    } catch (DmlException ex) {
+      if (ex.getDmlStatusCode(0) == 'INVALID_FIELD_FOR_INSERT_UPDATE')
+        return null;
+      throw ex;
+    }
     return share.Id;
   }
 
@@ -159,7 +185,13 @@ public with sharing class PartnerShareService {
     );
     share.RowCause = Schema.MDF_Request__Share.RowCause.Partner_Record_Share__c;
 
-    insert share;
+    try {
+      insert share;
+    } catch (DmlException ex) {
+      if (ex.getDmlStatusCode(0) == 'INVALID_FIELD_FOR_INSERT_UPDATE')
+        return null;
+      throw ex;
+    }
     return share.Id;
   }
 
@@ -195,9 +227,7 @@ public with sharing class PartnerShareService {
         WHERE
           ParentId = :((Id) registry.Target_Record_Id__c)
           AND UserOrGroupId = :partnerGroupId
-          AND RowCause = :String.valueOf(
-            Schema.Deal_Registration__Share.RowCause.Partner_Record_Share__c
-          )
+          AND RowCause = :Schema.Deal_Registration__Share.RowCause.Partner_Record_Share__c
       ];
     } else if (registry.Target_Object__c == 'MDF Request') {
       delete [
@@ -206,9 +236,7 @@ public with sharing class PartnerShareService {
         WHERE
           ParentId = :((Id) registry.Target_Record_Id__c)
           AND UserOrGroupId = :partnerGroupId
-          AND RowCause = :String.valueOf(
-            Schema.MDF_Request__Share.RowCause.Partner_Record_Share__c
-          )
+          AND RowCause = :Schema.MDF_Request__Share.RowCause.Partner_Record_Share__c
       ];
     } else {
       throw new PartnerSyncHandledException(

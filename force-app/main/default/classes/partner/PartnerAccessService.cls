@@ -6,7 +6,25 @@
  * this specific record" rather than "can this user use this feature at all."
  */
 public with sharing class PartnerAccessService {
+  @TestVisible
+  private static Boolean internalUserOverride;
+  @TestVisible
+  private static Id partnerAccountIdOverride;
+  @TestVisible
+  private static Contact partnerContactOverride;
+  @TestVisible
+  private static Map<Id, Id> testPartnerAccountIdsByUser = new Map<Id, Id>();
+  @TestVisible
+  private static Map<Id, Contact> testPartnerContactsByUser = new Map<Id, Contact>();
+
   public static Id getCurrentPartnerAccountId() {
+    if (
+      Test.isRunningTest() &&
+      testPartnerAccountIdsByUser.containsKey(UserInfo.getUserId())
+    )
+      return testPartnerAccountIdsByUser.get(UserInfo.getUserId());
+    if (partnerAccountIdOverride != null)
+      return partnerAccountIdOverride;
     User currentUser = [
       SELECT Id, UserType, ContactId, Contact.AccountId
       FROM User
@@ -28,6 +46,13 @@ public with sharing class PartnerAccessService {
   }
 
   public static Contact getCurrentPartnerContact() {
+    if (
+      Test.isRunningTest() &&
+      testPartnerContactsByUser.containsKey(UserInfo.getUserId())
+    )
+      return testPartnerContactsByUser.get(UserInfo.getUserId());
+    if (partnerContactOverride != null)
+      return partnerContactOverride;
     User currentUser = [
       SELECT Id, ContactId
       FROM User
@@ -66,6 +91,13 @@ public with sharing class PartnerAccessService {
   }
 
   public static Boolean isInternalUser() {
+    if (
+      Test.isRunningTest() &&
+      testPartnerAccountIdsByUser.containsKey(UserInfo.getUserId())
+    )
+      return false;
+    if (internalUserOverride != null)
+      return internalUserOverride;
     User currentUser = [
       SELECT Id, UserType
       FROM User

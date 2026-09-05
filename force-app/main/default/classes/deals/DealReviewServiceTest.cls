@@ -7,6 +7,50 @@
  */
 @IsTest
 private class DealReviewServiceTest {
+  @IsTest
+  static void expireProtectionUpdatesOnlyPastApprovedDeals() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Expiry Partner'
+    );
+    insert partner;
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Expiry Customer'
+    );
+    insert customer;
+    Deal_Registration__c expired = PartnerSyncTestDataFactory.deal(
+      customer.Id,
+      partner.Id,
+      null,
+      null
+    );
+    expired.Status__c = 'Approved';
+    expired.Protection_End_Date__c = Date.today().addDays(-1);
+    insert expired;
+
+    DealReviewService.expireProtection(expired.Id);
+    Assert.areEqual(
+      'Expired',
+      [SELECT Status__c FROM Deal_Registration__c WHERE Id = :expired.Id]
+      .Status__c
+    );
+
+    Deal_Registration__c active = PartnerSyncTestDataFactory.deal(
+      customer.Id,
+      partner.Id,
+      null,
+      null
+    );
+    active.Status__c = 'Approved';
+    active.Protection_End_Date__c = Date.today().addDays(5);
+    insert active;
+    try {
+      DealReviewService.expireProtection(active.Id);
+      Assert.fail('Expected active protection to be retained.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains('not past'));
+    }
+  }
+
   private static Deal_Registration__c createSubmittedDeal() {
     Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
     insert partner;
@@ -20,6 +64,7 @@ private class DealReviewServiceTest {
       null,
       null
     );
+    deal.Customer_Name__c = 'Customer';
     insert deal;
 
     return deal;
@@ -90,6 +135,7 @@ private class DealReviewServiceTest {
       request.decision = 'Approved';
       request.approvalNotes = 'Approved by channel manager.';
 
+      completeApprovalPlan(deal.Id);
       DealReviewService.processDecision(request);
     }
 
@@ -100,8 +146,8 @@ private class DealReviewServiceTest {
     ];
 
     System.assertEquals('Approved', updated.Status__c);
-    System.assertNotEquals(null, updated.Protection_Start_Date__c);
-    System.assertNotEquals(null, updated.Protection_End_Date__c);
+    System.assertEquals(null, updated.Protection_Start_Date__c);
+    System.assertEquals(null, updated.Protection_End_Date__c);
   }
 
   @IsTest
@@ -140,6 +186,7 @@ private class DealReviewServiceTest {
   @IsTest
   static void channelManagerCannotApproveDealWithUnresolvedConflict() {
     Deal_Registration__c deal = createSubmittedDeal();
+    deal.Status__c = 'Under Review';
     deal.Conflict_Status__c = 'Potential Conflict';
     update deal;
 
@@ -210,6 +257,7 @@ private class DealReviewServiceTest {
       approveRequest.decision = 'Approved';
       approveRequest.approvalNotes = 'Approved by channel manager.';
 
+      completeApprovalPlan(deal.Id);
       DealReviewService.processDecision(approveRequest);
     }
 
@@ -244,5 +292,20 @@ private class DealReviewServiceTest {
         'A plain internal user with no reviewer permission set should be blocked.'
       );
     }
+  }
+
+  private static void completeApprovalPlan(Id dealId) {
+    DealApprovalPlanService.generate(new Set<Id>{ dealId });
+    Deal_Approval__c approval = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Approval__c
+      WHERE Deal__c = :dealId AND Plan__r.Current__c = TRUE
+      LIMIT 1
+    ];
+    DealApprovalCommand command = new DealApprovalCommand();
+    command.approvalId = approval.Id;
+    command.expectedVersion = Integer.valueOf(approval.Version_Number__c);
+    command.decision = 'Approved';
+    DealApprovalCommandService.complete(command);
   }
 }

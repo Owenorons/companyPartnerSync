@@ -56,6 +56,11 @@ private class AnalyticsDomainTest {
     System.assertEquals(1, dto.approvedDeals);
     System.assertEquals(12000, dto.totalRevenue);
     System.assertEquals(8000, dto.mdfRemaining);
+    // Apex Decimal.setScale(0) uses half-even rounding, so 46.5 becomes 46.
+    System.assertEquals(46, dto.healthScore);
+    System.assertEquals('Developing', dto.healthLabel);
+    System.assertEquals('Silver', dto.recommendedTier);
+    System.assertEquals(5, dto.healthSignals.size());
   }
 
   @IsTest
@@ -70,6 +75,7 @@ private class AnalyticsDomainTest {
     kpi.leadConversionRate = 0.25;
     kpi.dealWinRate = 0.2;
     kpi.mdfUtilisationRate = 0.1;
+    kpi.healthScore = 31;
 
     PartnerLeaderboardRowDTO row = AnalyticsDomain.buildLeaderboardRow(
       partner,
@@ -78,6 +84,27 @@ private class AnalyticsDomainTest {
 
     System.assertEquals('Partner', row.partnerName);
     System.assertEquals(50000, row.revenue);
-    System.assert(row.score > 0, 'Expected a positive leaderboard score.');
+    System.assertEquals(31, row.score);
+  }
+
+  @IsTest
+  static void healthScoreIsBoundedAndTiered() {
+    PartnerKPIDTO kpi = new PartnerKPIDTO();
+    kpi.leadAcceptanceRate = 2;
+    kpi.leadConversionRate = 1;
+    kpi.dealWinRate = 1;
+    kpi.totalRevenue = 200;
+    kpi.totalPipeline = 100;
+    kpi.mdfUtilisationRate = 1.5;
+
+    System.assertEquals(100, PartnerHealthScoringService.calculate(kpi));
+    System.assertEquals(
+      'Thriving',
+      PartnerHealthScoringService.healthLabel(100)
+    );
+    System.assertEquals(
+      'Strategic',
+      PartnerHealthScoringService.recommendTier(100)
+    );
   }
 }

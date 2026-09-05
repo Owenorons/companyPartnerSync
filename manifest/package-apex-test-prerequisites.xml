@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>Deal_State_Transition__mdt</members>
+    <members>Deal_Validation_Rule__mdt</members>
+    <name>CustomObject</name>
+  </types>
+  <types>
+    <members>Deal_State_Transition.Registration_Draft_Initialize</members>
+    <members>Deal_State_Transition.Registration_Draft_Submit</members>
+    <members>Deal_Validation_Rule.Customer_Account_Required</members>
+    <members>Deal_Validation_Rule.Customer_Name_Required</members>
+    <members>Deal_Validation_Rule.Estimated_Revenue_Required</members>
+    <name>CustomMetadata</name>
+  </types>
+  <types>
+    <members>Deal_Registration__c.Partner_Record_Share__c</members>
+    <members>MDF_Request__c.Partner_Record_Share__c</members>
+    <name>SharingReason</name>
+  </types>
+  <version>65.0</version>
+</Package>

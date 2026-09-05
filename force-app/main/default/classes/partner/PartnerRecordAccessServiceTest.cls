@@ -6,6 +6,71 @@
 @IsTest
 private class PartnerRecordAccessServiceTest {
   @IsTest
+  static void internalUserBypassesPartnerScopedChecks() {
+    PartnerRecordAccessService.assertPartnerAccessToAccount(null);
+    PartnerRecordAccessService.assertPartnerAccessToMdf(null);
+    PartnerRecordAccessService.assertPartnerAccessToNotification(null);
+    PartnerRecordAccessService.assertPartnerAccessToAIInsight(null);
+  }
+
+  @IsTest
+  static void partnerAccessesOnlyRecordsInItsOwnScope() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Scoped Partner'
+    );
+    insert partner;
+    Account otherPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Other Partner'
+    );
+    insert otherPartner;
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    insert contact;
+    Partner_Content__c content = PartnerSyncTestDataFactory.content(
+      'All Partners'
+    );
+    insert content;
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+    TestUserFactory.assignPermissionSet(partnerUser.Id, 'PartnerSync_AI_User');
+    System.runAs(partnerUser) {
+      MDF_Request__c mdf = PartnerSyncTestDataFactory.mdfRequest(
+        partner.Id,
+        contact.Id
+      );
+      insert mdf;
+      Partner_Notification__c notification = new Partner_Notification__c(
+        Partner_Account__c = partner.Id,
+        Recipient_User__c = partnerUser.Id,
+        Title__c = 'Scoped notification',
+        Message__c = 'Visible only to its recipient',
+        Is_Read__c = false,
+        Dismissed__c = false
+      );
+      insert notification;
+
+      PartnerRecordAccessService.assertPartnerAccessToAccount(partner.Id);
+      PartnerRecordAccessService.assertPartnerAccessToMdf(mdf.Id);
+      PartnerRecordAccessService.assertPartnerAccessToNotification(
+        notification.Id
+      );
+      PartnerRecordAccessService.assertPartnerAccessToContent(content.Id);
+      assertBlockedAccount(otherPartner.Id);
+    }
+  }
+
+  private static void assertBlockedAccount(Id accountId) {
+    try {
+      PartnerRecordAccessService.assertPartnerAccessToAccount(accountId);
+      Assert.fail('Expected cross-partner account rejection.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains('not accessible'));
+    }
+  }
+
+  @IsTest
   static void partnerCannotAccessAnotherPartnerDeal() {
     Account partnerA = new Account(
       Name = 'Partner A',

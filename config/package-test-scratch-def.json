@@ -1,0 +1,16 @@
+{
+  "orgName": "PartnerSync Package Validation",
+  "edition": "Developer",
+  "features": ["Communities", "Sites", "EnableSetPasswordInApi"],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "communitiesSettings": {
+      "enableNetworksEnabled": true
+    },
+    "experienceBundleSettings": {
+      "enableExperienceBundleMetadata": true
+    }
+  }
+}

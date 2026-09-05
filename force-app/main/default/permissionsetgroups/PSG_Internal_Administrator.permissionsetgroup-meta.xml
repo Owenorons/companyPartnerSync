@@ -9,5 +9,26 @@
     <permissionSets>psync__PartnerSync_Content_Admin</permissionSets>
     <permissionSets>psync__PartnerSync_Internal_Admin</permissionSets>
     <permissionSets>psync__PartnerSync_MDF_Reviewer</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Onboarding_Access_Manager</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Onboarding_Approval_Authority</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Onboarding_Contract_Manager</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Onboarding_Readiness_Manager</permissionSets>
+    <permissionSets>psync__PartnerSync_Onboarding_Risk_Reviewer</permissionSets>
+    <permissionSets>psync__PartnerSync_Partner_Access_Approver</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Partner_Access_Provisioner</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Partner_Lifecycle_Authority</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Agreement_Activation_Authority</permissionSets>
+    <permissionSets
+  >psync__PartnerSync_Operational_Alert_Manager</permissionSets>
+    <permissionSets>psync__PartnerSync_PDLM_Admin</permissionSets>
+    <permissionSets>psync__PartnerSync_Command_Operations</permissionSets>
+    <permissionSets>psync__PartnerSync_Event_Operations</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

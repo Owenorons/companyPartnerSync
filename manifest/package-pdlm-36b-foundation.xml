@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>DealApprovalPlanService</members>
+    <members>DealApprovalCommand</members>
+    <members>DealApprovalCommandService</members>
+    <members>DealApprovalFinalisationGuard</members>
+    <members>DealApprovalServiceTest</members>
+    <members>RegistrationLifecycleCommandHandler</members>
+    <members>RegistrationLifecycleCommandHandlerTest</members>
+    <name>ApexClass</name>
+  </types>
+  <types>
+    <members>Deal_Approval_Plan__c</members>
+    <members>Deal_Approval__c</members>
+    <members>Deal_Approval_Condition__c</members>
+    <members>Deal_Approval_Step_Rule__mdt</members>
+    <name>CustomObject</name>
+  </types>
+  <types>
+    <members>Deal_Approval_Step_Rule.Channel_Manager</members>
+    <name>CustomMetadata</name>
+  </types>
+  <version>66.0</version>
+</Package>

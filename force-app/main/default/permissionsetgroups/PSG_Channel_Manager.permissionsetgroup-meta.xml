@@ -9,5 +9,6 @@
     <permissionSets>psync__PartnerSync_Channel_Manager</permissionSets>
     <permissionSets>psync__PartnerSync_Content_Admin</permissionSets>
     <permissionSets>psync__PartnerSync_MDF_Reviewer</permissionSets>
+    <permissionSets>psync__PartnerSync_Deal_Reviewer</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

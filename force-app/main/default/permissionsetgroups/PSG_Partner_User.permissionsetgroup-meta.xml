@@ -7,5 +7,6 @@
     <permissionSets>psync__PartnerSync_AI_User</permissionSets>
     <permissionSets>psync__PartnerSync_Analytics_User</permissionSets>
     <permissionSets>psync__PartnerSync_Partner_User</permissionSets>
+    <permissionSets>psync__PartnerSync_Partner_Base_Data</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

@@ -29,6 +29,41 @@
       </section>
 
       <div class="page-shell">
+        <section class="ps-card unified-workspace">
+          <h2>Unified Work Queue ({dashboard.unifiedWorkCount})</h2>
+          <div class="alert-filters">
+            <lightning-combobox
+              label="Domain"
+              value={workDomainFilter}
+              options={workDomainOptions}
+              data-filter="workDomainFilter"
+              onchange={handleAlertFilter}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Priority"
+              value={workPriorityFilter}
+              options={workPriorityOptions}
+              data-filter="workPriorityFilter"
+              onchange={handleAlertFilter}
+            ></lightning-combobox>
+          </div>
+          <template if:true={hasUnifiedWork}>
+            <lightning-datatable
+              key-field="recordId"
+              data={unifiedWorkItems}
+              columns={unifiedWorkColumns}
+              hide-checkbox-column
+              onrowaction={handleUnifiedWorkAction}
+            ></lightning-datatable>
+          </template>
+          <template if:false={hasUnifiedWork}>
+            <c-ps-empty-state
+              title="Queue clear"
+              message="No work items match the selected filters."
+            ></c-ps-empty-state>
+          </template>
+        </section>
+
         <section class="metrics-grid">
           <c-ps-dashboard-metric-card
             label="Pending Deal Reviews"
@@ -55,10 +90,214 @@
           </c-ps-dashboard-metric-card>
         </section>
 
+        <section class="metrics-grid onboarding-metrics">
+          <c-ps-dashboard-metric-card
+            label="Blocked Onboarding"
+            value={dashboard.blockedOnboardingCount}
+            icon-name="utility:block_visitor"
+            icon-alternative-text="Blocked onboarding"
+          ></c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Onboarding Work"
+            value={dashboard.onboardingWorkCount}
+            icon-name="utility:work_order_type"
+            icon-alternative-text="Onboarding work"
+          ></c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Provisioning Failures"
+            value={dashboard.provisioningFailureCount}
+            icon-name="utility:error"
+            icon-alternative-text="Provisioning failures"
+          ></c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Recertification Due"
+            value={dashboard.recertificationDueCount}
+            icon-name="utility:date_time"
+            icon-alternative-text="Recertification due"
+          ></c-ps-dashboard-metric-card>
+        </section>
+
+        <section class="ps-card onboarding-outcomes">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Onboarding Performance</p>
+              <h2>Programme outcomes and bottlenecks</h2>
+            </div>
+            <p>
+              Activation speed is measured from onboarding creation to partner
+              activation.
+            </p>
+          </div>
+          <div class="outcome-grid">
+            <c-ps-dashboard-metric-card
+              label="Total Onboardings"
+              value={dashboard.totalOnboardingCount}
+              icon-name="utility:people"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Active Partners"
+              value={dashboard.activeOnboardingCount}
+              icon-name="utility:success"
+              tone="green"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Completion Rate"
+              value={onboardingCompletionLabel}
+              icon-name="utility:chart"
+              tone="purple"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Average Activation"
+              value={averageActivationLabel}
+              icon-name="utility:clock"
+              tone="orange"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Overdue Tasks"
+              value={dashboard.overdueOnboardingTaskCount}
+              icon-name="utility:warning"
+              tone="orange"
+            ></c-ps-dashboard-metric-card>
+          </div>
+          <div class="bottleneck-callout">
+            <lightning-icon
+              icon-name="utility:routing_offline"
+              size="small"
+              alternative-text="Bottleneck"
+            ></lightning-icon>
+            <div>
+              <span>Largest active-stage bottleneck</span>
+              <strong>{onboardingBottleneckLabel}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="ps-card onboarding-workspace">
+          <h2>Onboarding Operations Queue</h2>
+          <template if:true={hasOnboardingWork}>
+            <lightning-datatable
+              key-field="recordId"
+              data={onboardingWorkItems}
+              columns={onboardingColumns}
+              hide-checkbox-column
+              onrowaction={handleOnboardingRowAction}
+            ></lightning-datatable>
+          </template>
+          <template if:false={hasOnboardingWork}>
+            <c-ps-empty-state
+              title="Queue clear"
+              message="No onboarding operations require attention."
+            ></c-ps-empty-state>
+          </template>
+        </section>
+
+        <section class="ps-card compliance-workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Partner Compliance</p>
+              <h2>Evidence renewal and requirement queue</h2>
+            </div>
+          </div>
+          <div class="compliance-metrics">
+            <c-ps-dashboard-metric-card
+              label="Expired Evidence"
+              value={dashboard.expiredEvidenceCount}
+              icon-name="utility:error"
+              tone="orange"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Expiring in 30 Days"
+              value={dashboard.expiringEvidenceCount}
+              icon-name="utility:date_time"
+              tone="purple"
+            ></c-ps-dashboard-metric-card>
+            <c-ps-dashboard-metric-card
+              label="Overdue Requirements"
+              value={dashboard.overdueRequirementCount}
+              icon-name="utility:warning"
+              tone="orange"
+            ></c-ps-dashboard-metric-card>
+          </div>
+          <template if:true={hasComplianceItems}>
+            <lightning-datatable
+              key-field="recordId"
+              data={complianceItems}
+              columns={complianceColumns}
+              hide-checkbox-column
+              onrowaction={handleComplianceRowAction}
+            ></lightning-datatable>
+          </template>
+          <template if:false={hasComplianceItems}>
+            <c-ps-empty-state
+              title="Evidence portfolio healthy"
+              message="No expired, near-expiry, or overdue partner evidence requires attention."
+            ></c-ps-empty-state>
+          </template>
+        </section>
+
+        <section class="ps-card operational-alerts">
+          <h2>Operational Alerts ({dashboard.openOperationalAlertCount})</h2>
+          <div class="alert-filters">
+            <lightning-combobox
+              label="Status"
+              value={alertStatusFilter}
+              options={statusOptions}
+              data-filter="alertStatusFilter"
+              onchange={handleAlertFilter}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Severity"
+              value={alertSeverityFilter}
+              options={severityOptions}
+              data-filter="alertSeverityFilter"
+              onchange={handleAlertFilter}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Type"
+              value={alertTypeFilter}
+              options={alertTypeOptions}
+              data-filter="alertTypeFilter"
+              onchange={handleAlertFilter}
+            ></lightning-combobox>
+            <lightning-input
+              type="date"
+              label="Detected from"
+              value={alertDetectedFrom}
+              data-filter="alertDetectedFrom"
+              onchange={handleAlertFilter}
+            ></lightning-input>
+          </div>
+          <template if:true={hasOperationalAlerts}>
+            <lightning-datatable
+              key-field="recordId"
+              data={operationalAlerts}
+              columns={operationalAlertColumns}
+              hide-checkbox-column
+              onrowaction={handleOperationalAlertAction}
+            ></lightning-datatable>
+          </template>
+          <template if:false={hasOperationalAlerts}>
+            <c-ps-empty-state
+              title="Monitoring clear"
+              message="No operational alerts match the selected filters."
+            ></c-ps-empty-state>
+          </template>
+        </section>
+
         <section class="workspace-grid">
           <div class="ps-card quick-actions">
             <h2>Quick Actions</h2>
             <div class="action-grid">
+              <lightning-button
+                type="button"
+                class="action-button"
+                label="Partner 360"
+                icon-name="utility:company"
+                title="Open Partner 360"
+                onclick={handlePartner360}
+              >
+              </lightning-button>
+
               <lightning-button
                 type="button"
                 class="action-button"

@@ -14,8 +14,6 @@ public with sharing class NotificationService {
     // operation (deal approval, lead assignment, etc.); a failure here must
     // never fail that operation, so every exception is caught and logged.
     try {
-      SecurityUtil.assertCreateable(Partner_Notification__c.SObjectType);
-
       Partner_Notification__c notification = new Partner_Notification__c();
 
       notification.Partner_Account__c = request.partnerAccountId;
@@ -46,15 +44,11 @@ public with sharing class NotificationService {
 
       notification.Is_Read__c = false;
 
-      List<SObject> sanitized = SecurityUtil.stripForCreate(
-        new List<SObject>{ notification }
-      );
+      // Notifications are trusted domain side effects, not user-authored
+      // records. Their creation must not depend on recipient/actor CRUD.
+      Database.insert(notification, AccessLevel.SYSTEM_MODE);
 
-      Database.insert(sanitized, AccessLevel.USER_MODE);
-
-      PlatformEventPublisherService.publishNotificationCreated(
-        (Partner_Notification__c) sanitized[0]
-      );
+      PlatformEventPublisherService.publishNotificationCreated(notification);
     } catch (Exception ex) {
       LoggingService.error(
         'NotificationService',

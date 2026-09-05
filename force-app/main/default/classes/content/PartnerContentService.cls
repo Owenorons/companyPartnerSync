@@ -148,6 +148,13 @@ public with sharing class PartnerContentService {
     log.Performed_By__c = UserInfo.getUserId();
     log.Performed_On__c = System.now();
 
-    insert SecurityUtil.stripForCreate(new List<SObject>{ log });
+    try {
+      insert SecurityUtil.stripForCreate(new List<SObject>{ log });
+    } catch (Exception ex) {
+      LoggingService.warn(
+        'PartnerContentService',
+        'Unable to persist optional content usage telemetry: ' + ex.getMessage()
+      );
+    }
   }
 }

@@ -16,12 +16,8 @@ public with sharing class OpenAICompatibleResponseParser {
 
     if (res.getStatusCode() != 200) {
       response.success = false;
-      response.errorMessage =
-        providerName +
-        ' request failed with status ' +
-        res.getStatusCode() +
-        ': ' +
-        res.getBody();
+      response.errorCode = 'HTTP_' + res.getStatusCode();
+      response.errorMessage = providerName + ' request failed.';
       return response;
     }
 
@@ -45,10 +41,25 @@ public with sharing class OpenAICompatibleResponseParser {
         'message'
       );
 
+      String content = message == null ? null : (String) message.get('content');
+      if (String.isBlank(content)) {
+        response.success = false;
+        response.errorCode = 'EMPTY_RESPONSE';
+        response.errorMessage = providerName + ' returned an empty response.';
+        return response;
+      }
+
+      Map<String, Object> structured = parseStructuredContent(content);
+      response.responseText = (String) structured.get('summary');
+      response.recommendation = (String) structured.get('recommendation');
+      response.explanation = (String) structured.get('rationale');
+      response.confidence = Decimal.valueOf(
+        String.valueOf(structured.get('confidence'))
+      );
+      if (response.confidence < 0 || response.confidence > 100) {
+        throw new AIResponseValidationException('confidence must be 0-100');
+      }
       response.success = true;
-      response.responseText = message == null
-        ? null
-        : (String) message.get('content');
 
       if (body.get('model') != null) {
         response.modelName = (String) body.get('model');
@@ -66,12 +77,33 @@ public with sharing class OpenAICompatibleResponseParser {
       // so a malformed response becomes a normal failed
       // AIProviderResponseDTO instead of an unhandled exception.
       response.success = false;
-      response.errorMessage =
-        'Unable to parse ' +
-        providerName +
-        ' response: ' +
-        ex.getMessage();
+      response.errorCode = 'INVALID_RESPONSE';
+      response.errorMessage = providerName + ' returned an invalid response.';
       return response;
     }
+  }
+
+  private static Map<String, Object> parseStructuredContent(String content) {
+    String normalized = content.trim();
+    if (normalized.startsWith('```')) {
+      normalized = normalized.replaceFirst('^```(?:json)?\\s*', '');
+      normalized = normalized.replaceFirst('\\s*```$', '');
+    }
+    Map<String, Object> value = (Map<String, Object>) JSON.deserializeUntyped(
+      normalized
+    );
+    if (
+      value == null ||
+      String.isBlank((String) value.get('summary')) ||
+      String.isBlank((String) value.get('recommendation')) ||
+      String.isBlank((String) value.get('rationale')) ||
+      value.get('confidence') == null
+    ) {
+      throw new AIResponseValidationException('required fields are missing');
+    }
+    return value;
+  }
+
+  private class AIResponseValidationException extends Exception {
   }
 }

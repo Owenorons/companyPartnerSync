@@ -9,15 +9,13 @@ public with sharing class MDFController {
   public static void submitRequest(MDFRequestDTO request) {
     try {
       MDFService.submitRequest(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'MDFController',
+        'Unable to submit MDF request.',
         'Unable to submit MDF request.',
         ex
       );
-      throw new AuraHandledException('Unable to submit MDF request.');
     }
   }
 
@@ -25,11 +23,13 @@ public with sharing class MDFController {
   public static List<MDFListDTO> getMyRequests() {
     try {
       return MDFService.getMyRequests();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error('MDFController', 'Unable to load MDF requests.', ex);
-      throw new AuraHandledException('Unable to load MDF requests.');
+      throw ControllerExceptionMapper.toAura(
+        'MDFController',
+        'Unable to load MDF requests.',
+        'Unable to load MDF requests.',
+        ex
+      );
     }
   }
 
@@ -37,11 +37,13 @@ public with sharing class MDFController {
   public static MDFBudgetDTO getMyBudget() {
     try {
       return MDFService.getMyBudget();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error('MDFController', 'Unable to load MDF budget.', ex);
-      throw new AuraHandledException('Unable to load MDF budget.');
+      throw ControllerExceptionMapper.toAura(
+        'MDFController',
+        'Unable to load MDF budget.',
+        'Unable to load MDF budget.',
+        ex
+      );
     }
   }
 
@@ -55,15 +57,13 @@ public with sharing class MDFController {
       }
 
       return results;
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'MDFController',
+        'Unable to load MDF review queue.',
         'Unable to load MDF review queue.',
         ex
       );
-      throw new AuraHandledException('Unable to load MDF review queue.');
     }
   }
 
@@ -71,15 +71,13 @@ public with sharing class MDFController {
   public static void processDecision(MDFDecisionDTO request) {
     try {
       MDFApprovalService.processDecision(request);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'MDFController',
+        'Unable to process MDF decision.',
         'Unable to process MDF decision.',
         ex
       );
-      throw new AuraHandledException('Unable to process MDF decision.');
     }
   }
 }

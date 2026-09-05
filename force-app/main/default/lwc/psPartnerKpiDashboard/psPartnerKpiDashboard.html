@@ -1,1 +1,82 @@
-<template> </template>
+<template>
+  <section class="scorecard-shell">
+    <header>
+      <p class="eyebrow">Partner Performance</p>
+      <h1>My Partner Scorecard</h1>
+      <p>Understand the activity driving your programme performance.</p>
+    </header>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Calculating partner performance..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasKpi}>
+      <div class="score-summary">
+        <div class="score-ring">
+          <strong>{scoreLabel}</strong>
+          <span>{kpi.healthLabel}</span>
+        </div>
+        <div class="score-context">
+          <span class="context-label">Recommended programme tier</span>
+          <strong>{kpi.recommendedTier}</strong>
+          <lightning-progress-bar
+            value={score}
+            size="large"
+          ></lightning-progress-bar>
+          <p>
+            This recommendation is explainable guidance. Your programme owner
+            retains the final tier decision.
+          </p>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <c-ps-dashboard-metric-card
+          label="Pipeline"
+          value={pipelineLabel}
+          icon-name="utility:chart"
+          tone="blue"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Revenue"
+          value={revenueLabel}
+          icon-name="utility:money"
+          tone="green"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Lead Conversion"
+          value={leadConversionLabel}
+          icon-name="utility:people"
+          tone="purple"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Deal Win Rate"
+          value={dealWinLabel}
+          icon-name="utility:success"
+          tone="orange"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="MDF Utilisation"
+          value={mdfLabel}
+          icon-name="utility:campaign"
+          tone="blue"
+        ></c-ps-dashboard-metric-card>
+      </div>
+
+      <div class="explanation">
+        <h2>How your score is calculated</h2>
+        <ul>
+          <template for:each={healthSignals} for:item="signal">
+            <li key={signal.key}>{signal.label}</li>
+          </template>
+        </ul>
+      </div>
+    </template>
+  </section>
+</template>

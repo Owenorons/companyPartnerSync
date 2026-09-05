@@ -3,7 +3,7 @@
  * a specific record. Gated behind the internal-analytics permission —
  * partner/community users have no path to this service.
  */
-public with sharing class AuditQueryService {
+public without sharing class AuditQueryService {
   public static List<Audit_Log__c> getAuditForRecord(Id recordId) {
     PartnerPermissionService.assertCanAccessInternalAnalytics();
 
@@ -21,7 +21,7 @@ public with sharing class AuditQueryService {
       // are written against many unrelated SObject types (polymorphic
       // reference); comparing on Id-as-String is intentional, not a bug.
       WHERE Record_Id__c = :String.valueOf(recordId)
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Audit_Timestamp__c DESC
       LIMIT 500
     ];

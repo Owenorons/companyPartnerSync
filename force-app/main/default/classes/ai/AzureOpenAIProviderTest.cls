@@ -45,6 +45,27 @@ private class AzureOpenAIProviderTest {
     Test.stopTest();
 
     System.assertEquals(false, response.success);
-    System.assert(response.errorMessage.contains('500'));
+    System.assertEquals('HTTP_500', response.errorCode);
+    System.assertEquals('Azure OpenAI request failed.', response.errorMessage);
+  }
+
+  @IsTest
+  static void generateReturnsFailureWhenCalloutThrows() {
+    Test.setMock(HttpCalloutMock.class, new ThrowingCalloutMock());
+    AIProviderRequestDTO request = new AIProviderRequestDTO();
+    request.prompt = 'Assess this deal.';
+    request.temperature = 0.4;
+    request.maxTokens = 100;
+    AIProviderResponseDTO response = new AzureOpenAIProvider()
+      .generate(request);
+    Assert.isFalse(response.success);
+    Assert.areEqual('Azure OpenAI', response.providerName);
+    Assert.areEqual('CALLOUT_ERROR', response.errorCode);
+  }
+
+  private class ThrowingCalloutMock implements HttpCalloutMock {
+    public HttpResponse respond(HttpRequest request) {
+      throw new CalloutException('Simulated outage');
+    }
   }
 }

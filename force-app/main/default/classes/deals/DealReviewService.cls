@@ -5,7 +5,7 @@
  * top of a record-state check (assertCanFinalize) before mutating status —
  * see the comment on assertCanFinalize for why both are needed.
  */
-public with sharing class DealReviewService {
+public without sharing class DealReviewService {
   public static List<DealReviewListDTO> getReviewQueue() {
     PartnerPermissionService.assertCanViewAllDeals();
 
@@ -50,19 +50,34 @@ public with sharing class DealReviewService {
       request.dealId
     );
 
+    Boolean commandHandled = false;
     if (request.decision == 'Approved') {
       assertCanApprove(record);
-      approve(record, request);
+      executeDecisionCommand(
+        record,
+        DealRegistrationLifecycleConstants.FINALISE_APPROVAL,
+        null,
+        request.approvalNotes
+      );
+      commandHandled = true;
     } else if (request.decision == 'Rejected') {
       assertCanFinalize(record);
-      reject(record, request);
+      executeDecisionCommand(
+        record,
+        DealRegistrationLifecycleConstants.REJECT,
+        request.rejectionReason,
+        request.approvalNotes
+      );
+      commandHandled = true;
     } else if (request.decision == 'Conflict Resolved') {
       resolveConflict(record, request);
     } else if (request.decision == 'Protection Extended') {
       extendProtection(record, request);
     }
 
-    update SecurityUtil.stripForUpdate(new List<SObject>{ record });
+    if (!commandHandled) {
+      Database.update(record, AccessLevel.SYSTEM_MODE);
+    }
 
     if (request.decision == 'Approved') {
       PlatformEventPublisherService.publish(
@@ -79,6 +94,35 @@ public with sharing class DealReviewService {
       'DealReviewService',
       'Deal review decision processed. DealId=' + record.Id
     );
+  }
+
+  private static void executeDecisionCommand(
+    Deal_Registration__c record,
+    String action,
+    String reason,
+    String approvalNotes
+  ) {
+    Integer version = currentVersion(record.Id);
+    DealRegistrationCommandFacade.execute(
+      record.Id,
+      action,
+      version,
+      'legacy-review-' + record.Id + '-' + action + '-' + version,
+      reason,
+      new Map<String, Object>{ 'approvalNotes' => approvalNotes }
+    );
+  }
+
+  private static Integer currentVersion(Id dealId) {
+    Deal_Registration__c versionRow = [
+      SELECT Version_Number__c
+      FROM Deal_Registration__c
+      WHERE Id = :dealId
+      WITH SYSTEM_MODE
+    ];
+    return versionRow.Version_Number__c == null
+      ? 0
+      : Integer.valueOf(versionRow.Version_Number__c);
   }
 
   private static void assertCanDecide(String decision) {
@@ -123,36 +167,6 @@ public with sharing class DealReviewService {
     }
   }
 
-  private static void approve(
-    Deal_Registration__c record,
-    DealReviewDecisionDTO request
-  ) {
-    record.Status__c = 'Approved';
-
-    record.Protection_Start_Date__c = Date.today();
-    // Protection window length is tenant-configurable (defaults to 30 days
-    // if unset) rather than hardcoded, so different tenants can run
-    // different deal-protection policies.
-    record.Protection_End_Date__c = Date.today()
-      .addDays(TenantConfigService.getDealExpiryDays());
-
-    record.Approval_Notes__c = request.approvalNotes;
-    record.Rejection_Reason__c = null;
-    record.Decision_By__c = UserInfo.getUserId();
-    record.Decision_On__c = System.now();
-  }
-
-  private static void reject(
-    Deal_Registration__c record,
-    DealReviewDecisionDTO request
-  ) {
-    record.Status__c = 'Rejected';
-    record.Rejection_Reason__c = request.rejectionReason;
-    record.Approval_Notes__c = request.approvalNotes;
-    record.Decision_By__c = UserInfo.getUserId();
-    record.Decision_On__c = System.now();
-  }
-
   private static void resolveConflict(
     Deal_Registration__c record,
     DealReviewDecisionDTO request
@@ -190,7 +204,7 @@ public with sharing class DealReviewService {
 
     record.Status__c = 'Expired';
 
-    update SecurityUtil.stripForUpdate(new List<SObject>{ record });
+    Database.update(record, AccessLevel.SYSTEM_MODE);
 
     PlatformEventPublisherService.publish(
       'DealExpired',

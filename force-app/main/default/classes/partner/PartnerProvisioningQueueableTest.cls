@@ -114,6 +114,24 @@ private class PartnerProvisioningQueueableTest {
     System.assertEquals(null, unchanged.Provisioning_Error__c);
   }
 
+  @IsTest
+  static void reconcilerAbortsAStaleRunningJob() {
+    Test.startTest();
+    Id queuedJobId = Database.executeBatch(
+      new ProvisioningNoOpBatchTestHelper(),
+      1
+    );
+    Partner_Application__c stale = createQueuedApplication(
+      System.now().addHours(-25),
+      String.valueOf(queuedJobId)
+    );
+    new PartnerProvisioningReconciler().execute(null);
+    Partner_Application__c updated = selectProvisioningState(stale.Id);
+    Assert.areEqual('Failed', updated.Provisioning_Status__c);
+    Assert.isTrue(updated.Provisioning_Error__c.contains('Retry provisioning'));
+    Test.stopTest();
+  }
+
   private static Partner_Application__c selectProvisioningState(
     Id applicationId
   ) {

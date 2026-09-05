@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>View Event Payload</label>
+  <description
+  >Allows an authorised operator to view internal deal event payloads.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

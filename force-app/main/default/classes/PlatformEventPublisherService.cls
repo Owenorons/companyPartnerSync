@@ -8,6 +8,8 @@
  * queryable/updatable record.
  */
 public with sharing class PlatformEventPublisherService {
+  private static final String EVENT_VERSION = '2.0';
+
   public static void publish(
     String eventType,
     Id recordId,
@@ -17,6 +19,8 @@ public with sharing class PlatformEventPublisherService {
     String severity
   ) {
     try {
+      String eventId = newEventId();
+      Datetime occurredOn = System.now();
       PartnerSync_Event__e eventRecord = new PartnerSync_Event__e();
       eventRecord.Event_Type__c = eventType;
       eventRecord.Record_Id__c = recordId == null
@@ -28,9 +32,25 @@ public with sharing class PlatformEventPublisherService {
         : String.valueOf(partnerAccountId);
       eventRecord.Summary__c = summary;
       eventRecord.Severity__c = String.isBlank(severity) ? 'Info' : severity;
-      eventRecord.Occurred_On__c = System.now();
+      eventRecord.Occurred_On__c = occurredOn;
+      eventRecord.Event_Id__c = eventId;
+      eventRecord.Event_Version__c = EVENT_VERSION;
+      eventRecord.Correlation_Id__c = eventId;
+      eventRecord.Idempotency_Key__c = String.join(
+        new List<String>{ eventType, String.valueOf(recordId), eventId },
+        ':'
+      );
 
-      EventBus.publish(eventRecord);
+      Database.SaveResult result = EventBus.publish(eventRecord);
+      EventPublicationService.record(
+        'PartnerSync_Event__e',
+        eventType,
+        eventId,
+        EVENT_VERSION,
+        eventRecord.Correlation_Id__c,
+        eventRecord.Idempotency_Key__c,
+        result
+      );
     } catch (Exception ex) {
       // Swallowed intentionally: this event only drives audit logging and
       // in-app notifications, so a publish failure must never roll back or
@@ -48,6 +68,7 @@ public with sharing class PlatformEventPublisherService {
   public static void publishNotificationCreated(
     Partner_Notification__c notification
   ) {
+    String eventId = newEventId();
     NotificationCreatedEvent__e eventRecord = new NotificationCreatedEvent__e();
 
     eventRecord.NotificationId__c = String.valueOf(notification.Id);
@@ -68,8 +89,24 @@ public with sharing class PlatformEventPublisherService {
 
     eventRecord.NavigationUrl__c = notification.Navigation_URL__c;
 
-    eventRecord.EventVersion__c = '1.0';
+    eventRecord.EventVersion__c = EVENT_VERSION;
+    eventRecord.EventId__c = eventId;
+    eventRecord.CorrelationId__c = String.valueOf(notification.Id);
+    eventRecord.IdempotencyKey__c = 'NotificationCreated:' + notification.Id;
 
-    EventBus.publish(eventRecord);
+    Database.SaveResult result = EventBus.publish(eventRecord);
+    EventPublicationService.record(
+      'NotificationCreatedEvent__e',
+      'NotificationCreated',
+      eventId,
+      EVENT_VERSION,
+      eventRecord.CorrelationId__c,
+      eventRecord.IdempotencyKey__c,
+      result
+    );
+  }
+
+  private static String newEventId() {
+    return EncodingUtil.convertToHex(Crypto.generateAesKey(128));
   }
 }

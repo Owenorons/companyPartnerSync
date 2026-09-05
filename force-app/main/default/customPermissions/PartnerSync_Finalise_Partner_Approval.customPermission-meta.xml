@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata"><label
+  >Finalise Partner Approval</label><description
+  >Allows final approval of a completed partner approval plan.</description><isLicensed
+  >false</isLicensed></CustomPermission>

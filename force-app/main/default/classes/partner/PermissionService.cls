@@ -64,7 +64,65 @@ public with sharing class PermissionService {
       return false;
     }
 
-    return FeatureManagement.checkPermission(customPermissionName);
+    if (!FeatureManagement.checkPermission(customPermissionName)) {
+      return false;
+    }
+
+    List<CustomPermission> permissions = [
+      SELECT Id
+      FROM CustomPermission
+      WHERE DeveloperName = :customPermissionName
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    if (permissions.isEmpty()) {
+      return false;
+    }
+
+    Set<Id> grantingPermissionSetIds = new Set<Id>();
+    for (SetupEntityAccess access : [
+      SELECT ParentId
+      FROM SetupEntityAccess
+      WHERE SetupEntityId = :permissions[0].Id
+      WITH SYSTEM_MODE
+    ]) {
+      grantingPermissionSetIds.add(access.ParentId);
+    }
+    if (grantingPermissionSetIds.isEmpty()) {
+      return false;
+    }
+
+    if (
+      [
+        SELECT COUNT()
+        FROM PermissionSetAssignment
+        WHERE
+          AssigneeId = :UserInfo.getUserId()
+          AND PermissionSetId IN :grantingPermissionSetIds
+        WITH SYSTEM_MODE
+      ] > 0
+    ) {
+      return true;
+    }
+
+    Set<Id> assignedGroupIds = new Set<Id>();
+    for (PermissionSetAssignment assignment : [
+      SELECT PermissionSetGroupId
+      FROM PermissionSetAssignment
+      WHERE AssigneeId = :UserInfo.getUserId() AND PermissionSetGroupId != NULL
+      WITH SYSTEM_MODE
+    ]) {
+      assignedGroupIds.add(assignment.PermissionSetGroupId);
+    }
+    return !assignedGroupIds.isEmpty() &&
+      [
+        SELECT COUNT()
+        FROM PermissionSetGroupComponent
+        WHERE
+          PermissionSetGroupId IN :assignedGroupIds
+          AND PermissionSetId IN :grantingPermissionSetIds
+        WITH SYSTEM_MODE
+      ] > 0;
   }
 
   public static Boolean hasPermissionGroup(String permissionSetGroupName) {

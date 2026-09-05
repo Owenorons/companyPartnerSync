@@ -145,4 +145,54 @@ private class LeadDomainTest {
       opportunity.Partner_Deal_Status__c
     );
   }
+
+  @IsTest
+  static void conversionCoversNullValidationCustomStageAndResult() {
+    try {
+      LeadConversionDomain.validate(null);
+      Assert.fail('Expected null conversion request rejection.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains('request is required'));
+    }
+
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    insert partner;
+    Lead lead = new Lead(
+      LastName = 'Buyer',
+      Company = 'Customer',
+      Partner_Account__c = partner.Id
+    );
+    insert lead;
+    LeadConversionRequestDTO request = new LeadConversionRequestDTO();
+    request.leadId = lead.Id;
+    request.opportunityName = 'Custom Stage Opportunity';
+    request.stageName = 'Proposal/Price Quote';
+    request.estimatedCloseDate = Date.today().addDays(10);
+    LeadConversionDomain.validate(request);
+
+    Opportunity opportunity = LeadConversionDomain.buildOpportunity(
+      lead,
+      partner.Id,
+      request
+    );
+    insert opportunity;
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Opportunity__c = opportunity.Id
+    );
+    insert deal;
+    Assert.areEqual('Proposal/Price Quote', opportunity.StageName);
+
+    LeadConversionResultDTO result = LeadConversionDomain.buildResult(
+      lead,
+      opportunity,
+      deal,
+      true
+    );
+    Assert.areEqual(lead.Id, result.leadId);
+    Assert.areEqual(opportunity.Id, result.opportunityId);
+    Assert.areEqual(deal.Id, result.dealRegistrationId);
+    Assert.areEqual(partner.Id, result.customerAccountId);
+    Assert.isTrue(result.customerAccountCreated);
+  }
 }

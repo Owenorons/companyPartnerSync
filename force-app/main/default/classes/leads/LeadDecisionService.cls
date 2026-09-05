@@ -13,8 +13,6 @@ public with sharing class LeadDecisionService {
 
     LeadDistributionDomain.validateDecision(request);
 
-    SecurityUtil.assertUpdateable(Lead.SObjectType);
-
     PartnerRecordAccessService.assertPartnerAccessToLead(request.leadId);
 
     Lead lead = LeadDistributionSelector.selectInternalLead(request.leadId);
@@ -35,7 +33,10 @@ public with sharing class LeadDecisionService {
       lead.Rejected_Date__c = System.now();
     }
 
-    update SecurityUtil.stripForUpdate(new List<SObject>{ lead });
+    // Partners intentionally have read-only Lead CRUD. This command can only
+    // mutate the two decision timestamps/status after record-scope access and
+    // transition validation have both succeeded.
+    Database.update(lead, AccessLevel.SYSTEM_MODE);
 
     LeadDistributionLogService.logAction(
       lead.Id,

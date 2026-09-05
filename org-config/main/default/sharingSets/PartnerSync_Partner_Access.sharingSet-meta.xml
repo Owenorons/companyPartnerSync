@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>Partner_Onboarding__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>ReadWrite</accessLevel>
+    <object>Deal_Registration__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>MDF_Request__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>Partner_Performance__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>Partner_Notification__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>AI_Insight__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <accessMappings>
+    <accessLevel>Read</accessLevel>
+    <object>Usage_Metric__c</object>
+    <objectField>Partner_Account__c</objectField>
+    <userField>User.Contact.AccountId</userField>
+  </accessMappings>
+  <description
+  >Grants partner users access to records belonging to their Contact account, as documented in the PartnerSync post-install sharing configuration.</description>
+  <name>PartnerSync Partner Access</name>
+  <profiles>PartnerSync Partner Tester</profiles>
+</SharingSet>

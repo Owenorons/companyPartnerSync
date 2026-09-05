@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.scorecard-shell {
+  padding: clamp(1rem, 4vw, 3rem);
+  color: var(--ps-color-text, #172033);
+  background: var(--ps-color-bg, #f7f8fa);
+}
+
+header {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--ps-color-border, #dce3ed);
+}
+
+.eyebrow,
+.context-label {
+  color: var(--ps-color-text-muted, #5c667a);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  margin: 0.35rem 0;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+}
+
+.score-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--ps-color-border, #dce3ed);
+  background: white;
+}
+
+.score-ring {
+  display: grid;
+  place-content: center;
+  width: 9rem;
+  height: 9rem;
+  text-align: center;
+  border: 0.7rem solid #1a8c70;
+  border-radius: 50%;
+  background: #f0fbf7;
+}
+
+.score-ring strong {
+  font-size: 1.8rem;
+}
+
+.score-ring span,
+.score-context p {
+  color: var(--ps-color-text-muted, #5c667a);
+}
+
+.score-context {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.score-context > strong {
+  font-size: 1.5rem;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 1.5rem;
+  border: 1px solid var(--ps-color-border, #dce3ed);
+}
+
+.metric-grid c-ps-dashboard-metric-card:not(:first-child) {
+  border-left: 1px solid var(--ps-color-border, #dce3ed);
+}
+
+.explanation {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border-left: 0.25rem solid #176b87;
+  background: #eaf5f7;
+}
+
+.explanation h2 {
+  font-size: 1rem;
+}
+
+.explanation ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 2rem;
+  margin: 1rem 0 0;
+  padding-left: 1.25rem;
+}
+
+@media (max-width: 64rem) {
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .score-summary,
+  .metric-grid,
+  .explanation ul {
+    grid-template-columns: 1fr;
+  }
+
+  .score-ring {
+    margin: auto;
+  }
+}

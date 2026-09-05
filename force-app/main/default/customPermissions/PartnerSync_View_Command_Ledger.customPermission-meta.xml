@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>View Command Ledger</label>
+  <description
+  >Allows operational users to inspect the deal command execution ledger.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

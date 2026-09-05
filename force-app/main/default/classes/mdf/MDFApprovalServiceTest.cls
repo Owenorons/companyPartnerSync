@@ -67,9 +67,14 @@ private class MDFApprovalServiceTest {
     MDFDecisionDTO request = new MDFDecisionDTO();
     request.requestId = mdfRequest.Id;
     request.decision = 'Approved';
-    request.approvedAmount = 8000;
+    request.approvedAmount = 20000;
 
     System.runAs(mdfReviewer) {
+      System.assertEquals(
+        false,
+        PartnerPermissionService.canOverrideMdfBudget(),
+        'The baseline MDF reviewer must not inherit the budget override.'
+      );
       Boolean threw = false;
 
       try {

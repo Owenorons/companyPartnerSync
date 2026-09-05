@@ -16,13 +16,21 @@ public class AIHttpCalloutMock implements HttpCalloutMock {
   }
 
   public static AIHttpCalloutMock success(String content) {
+    String structuredContent = JSON.serialize(
+      new Map<String, Object>{
+        'summary' => content,
+        'recommendation' => 'Follow the recommended next step.',
+        'rationale' => 'Based on the supplied partner context.',
+        'confidence' => 82
+      }
+    );
     Map<String, Object> body = new Map<String, Object>{
       'model' => 'gpt-5',
       'choices' => new List<Object>{
         new Map<String, Object>{
           'message' => new Map<String, Object>{
             'role' => 'assistant',
-            'content' => content
+            'content' => structuredContent
           }
         }
       },

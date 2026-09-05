@@ -38,4 +38,13 @@ public with sharing class PartnerKPIDTO {
   public Decimal mdfRemaining { get; set; }
   @AuraEnabled
   public Decimal mdfUtilisationRate { get; set; }
+
+  @AuraEnabled
+  public Decimal healthScore { get; set; }
+  @AuraEnabled
+  public String healthLabel { get; set; }
+  @AuraEnabled
+  public String recommendedTier { get; set; }
+  @AuraEnabled
+  public List<String> healthSignals { get; set; }
 }

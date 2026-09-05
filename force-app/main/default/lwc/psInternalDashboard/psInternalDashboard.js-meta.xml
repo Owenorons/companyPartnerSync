@@ -38,6 +38,13 @@
         label="Content Administration tab API name"
         description="Internal app tab/page API name the Manage Content quick action navigates to"
       />
+            <property
+        name="partner360TabName"
+        type="String"
+        default="Partner_360__c"
+        label="Partner 360 page API name"
+        description="Internal LWR page API name the Partner 360 quick action navigates to"
+      />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

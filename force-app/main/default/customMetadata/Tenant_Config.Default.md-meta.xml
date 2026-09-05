@@ -55,6 +55,26 @@
         <value xsi:type="xsd:double">48.0</value>
     </values>
     <values>
+        <field>Health_Lead_Acceptance_Weight__c</field>
+        <value xsi:type="xsd:double">20.0</value>
+    </values>
+    <values>
+        <field>Health_Lead_Conversion_Weight__c</field>
+        <value xsi:type="xsd:double">25.0</value>
+    </values>
+    <values>
+        <field>Health_Deal_Win_Weight__c</field>
+        <value xsi:type="xsd:double">30.0</value>
+    </values>
+    <values>
+        <field>Health_Revenue_Weight__c</field>
+        <value xsi:type="xsd:double">20.0</value>
+    </values>
+    <values>
+        <field>Health_MDF_Weight__c</field>
+        <value xsi:type="xsd:double">5.0</value>
+    </values>
+    <values>
         <field>Max_Open_Deals_Per_Partner__c</field>
         <value xsi:type="xsd:double">50.0</value>
     </values>

@@ -5,7 +5,7 @@
  * selectForInternalReview additionally assert the internal MDF-review
  * permission before returning records outside that scope.
  */
-public with sharing class MDFSelector {
+public without sharing class MDFSelector {
   public static List<MDF_Request__c> selectMyRequests(Id partnerAccountId) {
     SecurityUtil.assertReadable(MDF_Request__c.SObjectType);
 
@@ -47,7 +47,7 @@ public with sharing class MDFSelector {
         Activity_End_Date__c
       FROM MDF_Request__c
       WHERE Status__c IN ('Submitted', 'Under Review')
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY CreatedDate ASC
       LIMIT 500
     ];
@@ -132,7 +132,7 @@ public with sharing class MDFSelector {
         Approver__c
       FROM MDF_Request__c
       WHERE Id = :requestId
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
 

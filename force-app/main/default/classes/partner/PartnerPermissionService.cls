@@ -146,6 +146,16 @@ public with sharing class PartnerPermissionService {
       PermissionService.hasPermissionSet('PartnerSync_AI_Admin');
   }
 
+  public static Boolean canGenerateAIInsights() {
+    return PartnerAccessService.isInternalUser() &&
+      PermissionService.hasCustomPermission('PartnerSync_Generate_AI_Insights');
+  }
+
+  public static Boolean canReviewAIInsights() {
+    return PartnerAccessService.isInternalUser() &&
+      PermissionService.hasCustomPermission('PartnerSync_Review_AI_Insights');
+  }
+
   public static Boolean canManageContent() {
     return PartnerAccessService.isInternalUser() &&
       PermissionService.hasPermissionSet('PartnerSync_Content_Admin');
@@ -273,6 +283,22 @@ public with sharing class PartnerPermissionService {
     if (!canConfigureAI()) {
       throw new PartnerSyncHandledException(
         'You do not have permission to configure AI providers.'
+      );
+    }
+  }
+
+  public static void assertCanGenerateAIInsights() {
+    if (!canGenerateAIInsights()) {
+      throw new PartnerSyncHandledException(
+        'You do not have permission to generate AI insights.'
+      );
+    }
+  }
+
+  public static void assertCanReviewAIInsights() {
+    if (!canReviewAIInsights()) {
+      throw new PartnerSyncHandledException(
+        'You do not have permission to review AI insights.'
       );
     }
   }

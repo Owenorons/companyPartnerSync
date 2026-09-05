@@ -7,7 +7,7 @@ public with sharing class AIProviderSelector {
     return [
       SELECT DeveloperName, Provider_Name__c, Provider_Type__c, Active__c
       FROM AI_Provider_Config__mdt
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Provider_Name__c ASC
     ];
   }

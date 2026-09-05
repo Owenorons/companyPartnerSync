@@ -13,7 +13,11 @@ public class DealLifecycleMutationContext {
   }
 
   public static void beginMigration() {
-    if (!FeatureManagement.checkPermission('PartnerSync_Override_Lifecycle')) {
+    if (
+      !DealLifecyclePermissionService.hasPermission(
+        'PartnerSync_Override_Lifecycle'
+      )
+    ) {
       throw new DealLifecycleException(
         'Lifecycle migration permission is required.'
       );

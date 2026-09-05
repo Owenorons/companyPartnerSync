@@ -9,16 +9,13 @@ public with sharing class PartnerContentController {
   public static List<PartnerContentDTO> getAvailableContent() {
     try {
       return PartnerContentService.getAvailableContent();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerContentController',
+        'Unable to load content.',
         'Unable to load content.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load content.');
     }
   }
 
@@ -26,16 +23,13 @@ public with sharing class PartnerContentController {
   public static List<PartnerContentCategoryDTO> getCategories() {
     try {
       return PartnerContentService.getCategories();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerContentController',
+        'Unable to load content categories.',
         'Unable to load content categories.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load content categories.');
     }
   }
 
@@ -43,17 +37,12 @@ public with sharing class PartnerContentController {
   public static List<PartnerContentAdminDTO> getAllContent() {
     try {
       return PartnerContentService.getAllContentForAdmin();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerContentController',
         'Unable to load content for administration.',
+        'Unable to load content for administration.',
         ex
-      );
-
-      throw new AuraHandledException(
-        'Unable to load content for administration.'
       );
     }
   }
@@ -64,16 +53,13 @@ public with sharing class PartnerContentController {
   ) {
     try {
       return PartnerContentService.saveContent(content);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerContentController',
+        'Unable to save content.',
         'Unable to save content.',
         ex
       );
-
-      throw new AuraHandledException('Unable to save content.');
     }
   }
 
@@ -81,16 +67,13 @@ public with sharing class PartnerContentController {
   public static PartnerContentDownloadDTO getDownloadUrl(Id contentId) {
     try {
       return PartnerContentService.getDownloadUrl(contentId);
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerContentController',
         'Unable to generate content download URL.',
+        'Unable to download content.',
         ex
       );
-
-      throw new AuraHandledException('Unable to download content.');
     }
   }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Release Stale Command Lease</label>
+  <description
+  >Allows an authorised operator to release a stale deal command lease.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

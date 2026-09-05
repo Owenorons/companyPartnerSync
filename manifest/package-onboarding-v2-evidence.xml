@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>PartnerDocumentService</members><members
+    >PartnerDocumentServiceTest</members><members
+    >PartnerOnboardingLifecycleService</members><members
+    >PartnerOnboardingLifecycleServiceTest</members><members
+    >PartnerOnboardingMigrationBatch</members><name>ApexClass</name></types>
+  <types><members>Partner_Document_Requirement__c</members><members
+    >Partner_Document__c</members><members
+    >Partner_Document_Review__c</members><members
+    >Partner_Document_Requirement_Rule__mdt</members><name
+    >CustomObject</name></types>
+  <types><members
+    >Partner_Document_Requirement_Rule.Business_Registration</members><members
+    >Partner_Document_Requirement_Rule.Gold_Financial_Statements</members><name
+    >CustomMetadata</name></types>
+  <types><members>PartnerSync_Review_Onboarding_Documents</members><name
+    >CustomPermission</name></types>
+  <types><members>PartnerSync_Channel_Manager</members><members
+    >PartnerSync_Internal_Admin</members><name>PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

@@ -1,12 +1,25 @@
 {
   "packageDirectories": [
     {
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
       "path": "force-app",
-      "default": true
+      "default": true,
+      "package": "PartnerSync",
+      "definitionFile": "config/package-test-scratch-def.json",
+      "versionDescription": "PartnerSync Partner Relationship Management"
     }
   ],
   "name": "partnerSyncApp",
   "namespace": "psync",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "66.0"
+  "sourceApiVersion": "66.0",
+  "packageAliases": {
+    "PartnerSync": "0HoQE0000000F8j0AE",
+    "PartnerSync@0.1.0-1": "04tQE00000if46LYAQ",
+    "PartnerSync@0.1.0-2": "04tQE00000if7QnYAI",
+    "PartnerSync@0.1.0-3": "04tQE00000if7aTYAQ",
+    "PartnerSync@0.1.0-4": "04tQE00000if8l3YAA",
+    "PartnerSync@0.1.0-5": "04tQE00000if8t7YAA"
+  }
 }

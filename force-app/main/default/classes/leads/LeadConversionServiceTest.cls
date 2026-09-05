@@ -33,6 +33,7 @@ private class LeadConversionServiceTest {
     LeadConversionResultDTO result;
 
     System.runAs(internalAdmin) {
+      enableLeadConversionFeatures();
       Test.startTest();
       result = LeadConversionService.convertLead(request);
       Test.stopTest();
@@ -112,6 +113,7 @@ private class LeadConversionServiceTest {
     LeadConversionResultDTO result;
 
     System.runAs(internalAdmin) {
+      enableLeadConversionFeatures();
       result = LeadConversionService.convertLead(request);
     }
 
@@ -146,6 +148,7 @@ private class LeadConversionServiceTest {
     request.estimatedCloseDate = Date.today().addDays(30);
 
     System.runAs(internalAdmin) {
+      enableLeadConversionFeatures();
       Boolean threw = false;
 
       try {
@@ -183,6 +186,7 @@ private class LeadConversionServiceTest {
     request.estimatedCloseDate = Date.today().addDays(30);
 
     System.runAs(partnerUser) {
+      enableLeadConversionFeatures();
       Boolean threw = false;
 
       try {
@@ -199,5 +203,11 @@ private class LeadConversionServiceTest {
           'documents current behavior, not a deliberate ownership check.'
       );
     }
+  }
+
+  private static void enableLeadConversionFeatures() {
+    TenantConfigService.setConfigForTest(
+      new Tenant_Config__mdt(Enable_Deals__c = true, Enable_Leads__c = true)
+    );
   }
 }

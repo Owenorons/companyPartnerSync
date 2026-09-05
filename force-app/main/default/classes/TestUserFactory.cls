@@ -12,7 +12,7 @@ public class TestUserFactory {
     Profile profile = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE Name = 'Standard User'
       LIMIT 1
     ];
 
@@ -70,12 +70,32 @@ public class TestUserFactory {
   }
 
   public static User createExternalUser(Id contactId) {
-    Profile profile = [
-      SELECT Id
+    List<Profile> candidates = [
+      SELECT Id, Name
       FROM Profile
-      WHERE UserType != 'Standard'
-      LIMIT 1
+      WHERE
+        Name IN (
+          'PartnerSync Partner Tester',
+          'Customer Community User',
+          'Partner Community User'
+        )
     ];
+    Map<String, Profile> profilesByName = new Map<String, Profile>();
+    for (Profile candidate : candidates) {
+      profilesByName.put(candidate.Name, candidate);
+    }
+    Profile profile = profilesByName.get('PartnerSync Partner Tester');
+    if (profile == null) {
+      profile = profilesByName.get('Customer Community User');
+    }
+    if (profile == null) {
+      profile = profilesByName.get('Partner Community User');
+    }
+    System.assertNotEquals(
+      null,
+      profile,
+      'An Experience Cloud profile is required for external-user tests.'
+    );
 
     User user = new User(
       FirstName = 'Partner',
@@ -91,7 +111,43 @@ public class TestUserFactory {
       ContactId = contactId
     );
 
-    insert user;
+    Database.SaveResult result = Database.insert(user, false);
+    if (!result.isSuccess()) {
+      // A managed-package build org and a core-only subscriber org need not
+      // enable Experience Cloud. Preserve the external identity semantics in
+      // tests without making package installation depend on that org setting.
+      user = createInternalUser();
+      Contact partnerContact = [
+        SELECT Id, AccountId, Name, Email, Phone, Can_Submit_Deals__c
+        FROM Contact
+        WHERE Id = :contactId
+        LIMIT 1
+      ];
+      PartnerAccessService.testPartnerAccountIdsByUser.put(
+        user.Id,
+        partnerContact.AccountId
+      );
+      PartnerAccessService.testPartnerContactsByUser.put(
+        user.Id,
+        partnerContact
+      );
+      if (
+        !NotificationRecipientResolver.testRecipientsByAccount.containsKey(
+          partnerContact.AccountId
+        )
+      ) {
+        NotificationRecipientResolver.testRecipientsByAccount.put(
+          partnerContact.AccountId,
+          new List<User>()
+        );
+      }
+      NotificationRecipientResolver.testRecipientsByAccount.get(
+          partnerContact.AccountId
+        )
+        .add(new User(Id = user.Id, ContactId = partnerContact.Id));
+    }
+
+    assignPermissionSet(user.Id, 'PartnerSync_Partner_Base_Data');
 
     return user;
   }
@@ -104,10 +160,12 @@ public class TestUserFactory {
       LIMIT 1
     ];
 
-    insert new PermissionSetAssignment(
-      AssigneeId = userId,
-      PermissionSetId = permissionSet.Id
-    );
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert new PermissionSetAssignment(
+        AssigneeId = userId,
+        PermissionSetId = permissionSet.Id
+      );
+    }
   }
 
   public static void assignPermissionSetGroup(
@@ -121,10 +179,16 @@ public class TestUserFactory {
       LIMIT 1
     ];
 
-    insert new PermissionSetAssignment(
-      AssigneeId = userId,
-      PermissionSetGroupId = permissionSetGroup.Id
-    );
+    // Metadata validation can temporarily leave a changed group in Updating
+    // status. Force its test-context calculation before assigning it.
+    Test.calculatePermissionSetGroup(permissionSetGroup.Id);
+
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert new PermissionSetAssignment(
+        AssigneeId = userId,
+        PermissionSetGroupId = permissionSetGroup.Id
+      );
+    }
   }
 
   private static String uniqueEmail(String prefix) {

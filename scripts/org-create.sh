@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 sf org create scratch \
   -f config/project-scratch-def.json \
-  -a psync-dev \
+  -a "${PARTNER_SYNC_SCRATCH_ALIAS:-psync-dev}" \
   -d \
-  -y 7
+  -y "${PARTNER_SYNC_SCRATCH_DAYS:-7}"

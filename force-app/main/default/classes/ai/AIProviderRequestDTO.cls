@@ -6,6 +6,7 @@
 public with sharing class AIProviderRequestDTO {
   public String featureName;
   public String prompt;
+  public String modelOverride;
   public Map<String, Object> contextData;
   public Decimal temperature;
   public Integer maxTokens;

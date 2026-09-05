@@ -4,7 +4,7 @@
  * readable checks so PartnerContentDomain and PartnerContentService never
  * issue raw SOQL.
  */
-public with sharing class PartnerContentSelector {
+public without sharing class PartnerContentSelector {
   public static Account selectPartnerVisibilityContext(Id partnerAccountId) {
     SecurityUtil.assertReadable(Account.SObjectType);
 
@@ -12,7 +12,7 @@ public with sharing class PartnerContentSelector {
       SELECT Id, Partner_Tier__c, Partner_Type__c
       FROM Account
       WHERE Id = :partnerAccountId AND Is_Partner__c = TRUE
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
 
@@ -42,7 +42,7 @@ public with sharing class PartnerContentSelector {
         Sort_Order__c
       FROM Partner_Content__c
       WHERE Is_Active__c = TRUE
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Sort_Order__c ASC NULLS LAST, Published_Date__c DESC
       LIMIT 500
     ];
@@ -64,7 +64,7 @@ public with sharing class PartnerContentSelector {
         Featured__c,
         Sort_Order__c
       FROM Partner_Content__c
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Sort_Order__c ASC NULLS LAST, Name ASC
       LIMIT 500
     ];
@@ -89,7 +89,7 @@ public with sharing class PartnerContentSelector {
         Sort_Order__c
       FROM Partner_Content__c
       WHERE Id = :contentId
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       LIMIT 1
     ];
 

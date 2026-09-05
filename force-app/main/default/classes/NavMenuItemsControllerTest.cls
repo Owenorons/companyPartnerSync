@@ -25,4 +25,22 @@ private class NavMenuItemsControllerTest {
 
     System.assertEquals(0, results.size());
   }
+
+  @IsTest
+  static void queriesItemsForResolvedLinkSet() {
+    String keyPrefix = NavigationLinkSet.SObjectType.getDescribe()
+      .getKeyPrefix();
+    NavMenuItemsController.linkSetIdOverride = Id.valueOf(
+      keyPrefix + '000000000001'
+    );
+    try {
+      List<NavigationMenuItem> results = NavMenuItemsController.getNavigationMenuItems(
+        'Test_Menu',
+        'Live'
+      );
+      Assert.areEqual(0, results.size());
+    } finally {
+      NavMenuItemsController.linkSetIdOverride = null;
+    }
+  }
 }

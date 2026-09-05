@@ -18,6 +18,6 @@ private class AIInsightDomainTest {
     System.assertEquals('Deal Risk', dto.insightType);
     System.assertEquals('Rules', dto.provider);
     System.assertEquals(85, dto.confidence);
-    System.assertEquals('Generated', dto.status);
+    System.assertEquals('Accepted', dto.status);
   }
 }

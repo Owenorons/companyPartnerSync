@@ -1,12 +1,27 @@
 # PartnerSync Post-Install: Sharing Set Setup
 
-PartnerSync ships its data model with `Private` (or `Read`-only external, see below)
-sharing and enforces partner scoping in Apex. It does **not** ship pre-configured
-Sharing Sets, because a Sharing Set must be assigned to a Profile, and PartnerSync
-does not create or depend on a specific customer Profile — you're using whichever
-Experience Cloud license your org already has (`Partner Community User`,
-`Customer Community Plus User`, `External Apps User`, etc.). This is the one
-setup step every installing org must complete by hand.
+PartnerSync ships its managed data model with `Private` sharing and enforces
+partner scoping in Apex. Profiles and Sharing Sets are subscriber-owned
+configuration and are intentionally excluded from the managed 2GP package.
+The repository's `org-config` directory contains a development example named
+`PartnerSync_Partner_Access.sharingSet-meta.xml`; review its profile names and
+mappings before using it in a prepared subscriber org. Never deploy
+`org-config` wholesale into a customer org.
+
+> **Current `evoScratchOrg` limitation:** its partner profile uses the
+> role-based `PowerPartner` license. Salesforce returned internal Metadata API
+> error `1275092482` for both source-format and non-namespaced Sharing Set
+> deployments. Configure this Sharing Set through Setup after connecting a
+> browser session, or use a Sharing-Set-compatible external profile. Do not
+> replace it with a broad owner/criteria sharing rule; those rules cannot map
+> each user's Contact Account to `Partner_Account__c` safely.
+
+The onboarding security deployment on 6 August 2026 reproduced the same
+platform error while adding `Partner_Onboarding__c.Partner_Account__c` to this
+Sharing Set (deployment `0AfBn00000R5xazKAB`, ErrorId
+`738083678-447227 (1275092482)`). The field, private OWD, read-only partner
+permissions and regression tests deployed successfully; only the Sharing Set
+mapping still requires the Setup action described below.
 
 ## What to configure
 
@@ -21,6 +36,14 @@ assign it to your org's partner-facing Profile(s), and add these access mappings
 | `Partner_Notification__c` | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 | `AI_Insight__c`           | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 | `Usage_Metric__c`         | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
+| `Partner_Onboarding__c`   | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
+
+The onboarding mapping exposes only the private onboarding root associated with
+the signed-in user's Contact Account. Partner-safe requirements, document status,
+agreement status, relationship status, access-request status and training records
+inherit that access through controlled-by-parent sharing. Reviews, findings,
+approval steps, signatories, signature events, provisioning attempts and lifecycle
+events remain internal-only and are not included in partner permission sets.
 
 `Deal_Registration__c` is Read/Write at the Sharing Set level because partners can
 submit deals; the actual decision-making transitions (approve/reject/etc.) still go

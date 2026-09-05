@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>PartnerLifecycleGovernanceBatch</members><members
+    >PartnerLifecycleGovernanceBatchTest</members><name>ApexClass</name></types>
+  <types><members>Partner_Training_Assignment__c.Expires_On__c</members><name
+    >CustomField</name></types>
+  <types><members>PartnerSync_Onboarding_Readiness_Manager</members><name
+    >PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

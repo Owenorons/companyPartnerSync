@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Partner 360",
+  "contentBody" : {
+    "activeViewId" : "Partner_360",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-partner-360",
+    "urlPrefix" : "partner-360"
+  },
+  "urlName" : "partner-360"
+}

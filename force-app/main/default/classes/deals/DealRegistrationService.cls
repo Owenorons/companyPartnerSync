@@ -114,34 +114,18 @@ public with sharing class DealRegistrationService {
 
     Deal_Registration__c insertedRecord = (Deal_Registration__c) sanitized[0];
 
-    // Conflict analysis must run after insert, not before: it queries for
-    // other active registrations on the same customer account and needs
-    // insertedRecord.Id to exclude itself from those results.
-    DealConflictDTO conflict = DealConflictService.analyze(insertedRecord);
-
-    /*
-     * Enterprise Governance Pattern
-     *
-     * ALL deals require internal review.
-     *
-     * No conflict:
-     *      Submitted + No Conflict
-     *
-     * Conflict:
-     *      Under Review + Potential Conflict
-     */
-
-    if (conflict.hasConflict) {
-      insertedRecord.Status__c = 'Under Review';
-
-      insertedRecord.Conflict_Status__c = 'Potential Conflict';
-    } else {
-      insertedRecord.Status__c = 'Submitted';
-
-      insertedRecord.Conflict_Status__c = 'No Conflict';
-    }
-
-    update SecurityUtil.stripForUpdate(new List<SObject>{ insertedRecord });
+    // Backward-compatible facade: callers still create-and-submit in one
+    // operation, but the lifecycle transition, conflict routing, event and
+    // idempotency ledger are now owned by the command boundary.
+    DealRegistrationCommandFacade.execute(
+      insertedRecord.Id,
+      DealRegistrationLifecycleConstants.SUBMIT,
+      0,
+      'registration-submit-' + insertedRecord.Id,
+      null,
+      null
+    );
+    insertedRecord = DealRegistrationSelector.selectById(insertedRecord.Id);
 
     PlatformEventPublisherService.publish(
       'DealSubmitted',

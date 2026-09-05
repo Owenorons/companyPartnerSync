@@ -1,0 +1,64 @@
+<template>
+  <section class="slds-var-p-around_large" aria-labelledby="ai-review-title">
+    <h1 id="ai-review-title" class="slds-text-heading_large">
+      AI Insight Review
+    </h1>
+    <p class="slds-var-m-bottom_medium">
+      Model output remains private until an authorized reviewer accepts it.
+    </p>
+    <template lwc:if={loading}>
+      <c-ps-loading-state
+        message="Loading AI insights for review"
+      ></c-ps-loading-state>
+    </template>
+    <template lwc:elseif={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+    <template lwc:elseif={hasInsights}>
+      <div class="review-list">
+        <template for:each={insights} for:item="insight">
+          <article
+            key={insight.insightId}
+            class="slds-box slds-var-m-bottom_medium"
+          >
+            <div class="slds-grid slds-wrap slds-grid_align-spread">
+              <h2 class="slds-text-heading_medium">{insight.insightType}</h2>
+              <c-ps-status-badge
+                label={insight.status}
+                variant="warning"
+              ></c-ps-status-badge>
+            </div>
+            <p class="slds-var-m-vertical_medium">{insight.summary}</p>
+            <lightning-textarea
+              data-id={insight.insightId}
+              label="Reviewed recommendation"
+              value={insight.recommendation}
+              onchange={handleRecommendation}
+            ></lightning-textarea>
+            <div class="slds-var-m-top_medium slds-button-group" role="group">
+              <lightning-button
+                data-id={insight.insightId}
+                data-decision="Dismissed"
+                label="Dismiss"
+                onclick={handleDecision}
+              ></lightning-button>
+              <lightning-button
+                data-id={insight.insightId}
+                data-decision="Accepted"
+                label="Accept and publish"
+                variant="brand"
+                onclick={handleDecision}
+              ></lightning-button>
+            </div>
+          </article>
+        </template>
+      </div>
+    </template>
+    <template lwc:else>
+      <c-ps-empty-state
+        title="No AI insights awaiting review"
+        message="New model output will appear here as Draft."
+      ></c-ps-empty-state>
+    </template>
+  </section>
+</template>

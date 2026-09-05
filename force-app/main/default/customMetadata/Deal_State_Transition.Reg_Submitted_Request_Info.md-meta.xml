@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+<label>Submitted Request Information</label><protected>false</protected>
+<values><field>Active__c</field><value
+      xsi:type="xsd:boolean"
+    >true</value></values>
+<values><field>Aggregate_Type__c</field><value
+      xsi:type="xsd:string"
+    >Deal Registration</value></values>
+<values><field>Lifecycle_Dimension__c</field><value
+      xsi:type="xsd:string"
+    >Registration</value></values>
+<values><field>From_State__c</field><value
+      xsi:type="xsd:string"
+    >Submitted</value></values>
+<values><field>Action__c</field><value
+      xsi:type="xsd:string"
+    >Request Information</value></values>
+<values><field>To_State__c</field><value
+      xsi:type="xsd:string"
+    >Needs Information</value></values>
+<values><field>Required_Permission__c</field><value
+      xsi:type="xsd:string"
+    >PartnerSync_Reject_Deal</value></values>
+<values><field>Handler_Class__c</field><value
+      xsi:type="xsd:string"
+    >RegistrationLifecycleCommandHandler</value></values>
+<values><field>Event_Type__c</field><value
+      xsi:type="xsd:string"
+    >DealInformationRequested</value></values>
+<values><field>Partner_Visible__c</field><value
+      xsi:type="xsd:boolean"
+    >false</value></values>
+<values><field>Requires_Reason__c</field><value
+      xsi:type="xsd:boolean"
+    >true</value></values>
+<values><field>Requires_Version__c</field><value
+      xsi:type="xsd:boolean"
+    >true</value></values>
+<values><field>Allow_Partner__c</field><value
+      xsi:type="xsd:boolean"
+    >false</value></values>
+<values><field>Allow_Internal__c</field><value
+      xsi:type="xsd:boolean"
+    >true</value></values>
+</CustomMetadata>

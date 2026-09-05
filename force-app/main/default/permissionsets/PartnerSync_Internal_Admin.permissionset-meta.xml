@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>PartnerSync_Operations</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <customPermissions>
         <enabled>true</enabled>
         <name>PartnerSync_Approve_Deal</name>
@@ -32,6 +36,8 @@
         <enabled>true</enabled>
         <name>PartnerSync_Export_Executive_Reports</name>
     </customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Review_Onboarding_Documents</name></customPermissions>
     <classAccesses>
         <apexClass>AnalyticsController</apexClass>
         <enabled>true</enabled>
@@ -48,6 +54,8 @@
         <apexClass>InternalPortalController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses><apexClass>Partner360Controller</apexClass><enabled
+    >true</enabled></classAccesses>
     <classAccesses>
         <apexClass>LeadDistributionController</apexClass>
         <enabled>true</enabled>
@@ -82,6 +90,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>PartnerPortalController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PartnerSyncSetupController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PartnerSyncPostInstall</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <fieldPermissions>
@@ -467,6 +483,56 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Deal_Registration__c.Implementation_Timeline__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Current_Action_Owner__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Current_Action_Required__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Last_Lifecycle_Change__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Last_Lifecycle_Event__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Lifecycle_Health__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Lifecycle_Lock_Reason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Lifecycle_Locked__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Lifecycle_Phase__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Next_Action_Due__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Deal_Registration__c.Version_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1246,22 +1312,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Partner_Record_Share__c.Access_Level__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Partner_Record_Share__c.Expiry_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Partner_Record_Share__c.Partner_Group_Id__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Partner_Record_Share__c.Partner_Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1282,21 +1338,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Partner_Record_Share__c.Revoked_On__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Partner_Record_Share__c.Share_Reason__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Partner_Record_Share__c.Target_Object__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Partner_Record_Share__c.Target_Record_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1516,4 +1557,98 @@
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Onboarding__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Onboarding_Task__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Lifecycle_Event__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Document_Requirement__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Document__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Document_Review__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Assessment__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Assessment_Finding__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Approval_Plan__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Approval_Step__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Agreement__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Relationship__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Access_Request__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Provisioning_Attempt__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Partner_Training_Assignment__c</object><viewAllFields
+    >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <tabSettings>
+        <tab>Partner_360</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

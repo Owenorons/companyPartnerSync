@@ -21,9 +21,8 @@ public with sharing class AIInsightSelector {
       FROM AI_Insight__c
       WHERE
         Partner_Account__c = :partnerAccountId
-        // Draft = a failed generation (see AIInsightGeneratorService);
-        // partners should never see a raw provider error in their list.
-        AND Status__c IN ('Generated', 'Reviewed', 'Accepted')
+        // Only human-accepted model output is partner-visible.
+        AND Status__c = 'Accepted'
       WITH USER_MODE
       ORDER BY CreatedDate DESC
       LIMIT 200

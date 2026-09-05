@@ -14,8 +14,6 @@ public with sharing class AuditService {
       // Audit logging must never break the operation it's recording (e.g.
       // a deal submission shouldn't fail because the audit insert did) —
       // any failure here is caught and logged, never rethrown to the caller.
-      SecurityUtil.assertCreateable(Audit_Log__c.SObjectType);
-
       Audit_Log__c audit = new Audit_Log__c();
 
       audit.Audit_Timestamp__c = System.now();
@@ -50,10 +48,10 @@ public with sharing class AuditService {
 
       audit.Performed_By_Type__c = determineActorType();
 
-      List<SObject> sanitized = SecurityUtil.stripForCreate(
-        new List<SObject>{ audit }
-      );
-      Database.insert(sanitized, AccessLevel.USER_MODE);
+      // This is an internal, immutable telemetry write. Running it in the
+      // actor's user mode makes the audit trail disappear for least-privilege
+      // users, which is both a compliance and operability defect.
+      Database.insert(audit, AccessLevel.SYSTEM_MODE);
     } catch (Exception ex) {
       LoggingService.error('AuditService', 'Unable to create audit log.', ex);
     }

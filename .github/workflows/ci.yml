@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate Salesforce project configuration
+        run: npm run validate:project
+
       - name: ESLint
         run: npm run lint
 
@@ -44,8 +47,8 @@ jobs:
           sf code-analyzer run \
             --workspace force-app \
             --target force-app \
-            --rule-selector "pmd:Security" \
-            --severity-threshold 1 \
+            --rule-selector "pmd:(Security,AppExchange)" \
+            --severity-threshold 3 \
             --output-file reports/code-analyzer.sarif
 
       - name: Enforce security debt baseline

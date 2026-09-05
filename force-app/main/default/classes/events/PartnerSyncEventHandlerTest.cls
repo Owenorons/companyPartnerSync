@@ -12,6 +12,9 @@ private class PartnerSyncEventHandlerTest {
       'Event Partner'
     );
     insert partner;
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    insert contact;
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
 
     PartnerSync_Event__e eventRecord = new PartnerSync_Event__e(
       Event_Type__c = 'DealSubmitted',
@@ -45,7 +48,7 @@ private class PartnerSyncEventHandlerTest {
     System.assertEquals('Submit', logs[0].Action__c);
 
     List<Partner_Notification__c> notifications = [
-      SELECT Id, Notification_Type__c, Title__c
+      SELECT Id, Notification_Type__c, Title__c, Recipient_User__c
       FROM Partner_Notification__c
       WHERE Partner_Account__c = :partner.Id
     ];
@@ -56,6 +59,7 @@ private class PartnerSyncEventHandlerTest {
       'One notification should be created for the event.'
     );
     System.assertEquals('Deal Submitted', notifications[0].Title__c);
+    System.assertEquals(partnerUser.Id, notifications[0].Recipient_User__c);
   }
 
   @IsTest
@@ -91,6 +95,40 @@ private class PartnerSyncEventHandlerTest {
         WHERE Partner_Account__c = :partner.Id
       ],
       'Unmapped event types should not create a notification.'
+    );
+  }
+
+  @IsTest
+  static void mappedEventWithoutRecipientIsDeadLetteredNotOrphaned() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'No Active Recipient Partner'
+    );
+    insert partner;
+
+    Test.startTest();
+    EventBus.publish(
+      new PartnerSync_Event__e(
+        Event_Type__c = 'DealApproved',
+        Partner_Account_Id__c = partner.Id,
+        Object_Name__c = 'Deal_Registration__c'
+      )
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Partner_Notification__c],
+      'A mapped event must never create an unaddressed notification.'
+    );
+    Event_DLQ__c deadLetter = [
+      SELECT Status__c, Error_Message__c
+      FROM Event_DLQ__c
+      WHERE Event_Type__c = 'DealApproved'
+      LIMIT 1
+    ];
+    System.assertEquals('New', deadLetter.Status__c);
+    System.assert(
+      deadLetter.Error_Message__c.contains('No active partner user')
     );
   }
 

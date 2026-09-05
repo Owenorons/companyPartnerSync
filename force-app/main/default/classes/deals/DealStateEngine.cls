@@ -52,7 +52,9 @@ public with sharing class DealStateEngine {
     }
     if (
       String.isNotBlank(transition.requiredPermission) &&
-      !FeatureManagement.checkPermission(transition.requiredPermission)
+      !DealLifecyclePermissionService.hasPermission(
+        transition.requiredPermission
+      )
     ) {
       throw new DealLifecycleException(
         'You are not authorised to perform this action.'

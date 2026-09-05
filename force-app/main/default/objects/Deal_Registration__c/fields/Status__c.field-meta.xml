@@ -19,6 +19,11 @@
                 <label>Submitted</label>
             </value>
             <value>
+                <fullName>Needs Information</fullName>
+                <default>false</default>
+                <label>Needs Information</label>
+            </value>
+            <value>
                 <fullName>Under Review</fullName>
                 <default>false</default>
                 <label>Under Review</label>
@@ -32,6 +37,11 @@
                 <fullName>Rejected</fullName>
                 <default>false</default>
                 <label>Rejected</label>
+            </value>
+            <value>
+                <fullName>Cancelled</fullName>
+                <default>false</default>
+                <label>Cancelled</label>
             </value>
             <value>
                 <fullName>Expired</fullName>

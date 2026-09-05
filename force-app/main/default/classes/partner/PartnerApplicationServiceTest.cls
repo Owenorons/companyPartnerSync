@@ -1,26 +1,13 @@
 /*
- * Covers the partner application submission flow end-to-end as the actual
- * Experience Cloud Guest User (not an internal test user), plus the
- * duplicate-detection and required-field validation paths.
+ * Package-isolated coverage for application submission, duplicate detection,
+ * and input validation. Guest-user access is a subscriber integration concern
+ * because the managed core package doesn't own the customer's site or guest
+ * profile.
  */
 @IsTest
 private class PartnerApplicationServiceTest {
   @IsTest
-  static void submitApplicationCreatesRecordAsGuestUser() {
-    List<User> guestUsers = [
-      SELECT Id
-      FROM User
-      WHERE Profile.Name = 'PartnerSync Portal Profile'
-      LIMIT 1
-    ];
-
-    System.assert(
-      !guestUsers.isEmpty(),
-      'No Guest User found for the "PartnerSync Portal Profile" profile. ' +
-        'The Experience Cloud site needs to be published at least once so a ' +
-        'Guest User is provisioned before this test can run.'
-    );
-
+  static void submitApplicationCreatesCoreRecord() {
     PartnerApplicationRequestDTO request = new PartnerApplicationRequestDTO();
     request.companyName = 'Fernvale Distribution';
     request.businessEmail = 'hello@fernvale-test.example.com';
@@ -35,16 +22,14 @@ private class PartnerApplicationServiceTest {
 
     PartnerApplicationResultDTO result;
 
-    System.runAs(guestUsers[0]) {
-      Test.startTest();
-      result = PartnerApplicationController.submitApplication(request);
-      Test.stopTest();
-    }
+    Test.startTest();
+    result = PartnerApplicationController.submitApplication(request);
+    Test.stopTest();
 
     System.assertNotEquals(
       null,
       result.applicationId,
-      'submitApplication should return the new record\'s Id as a Guest User.'
+      'submitApplication should return the new record\'s Id.'
     );
     System.assertEquals('Submitted', result.status);
     System.assertNotEquals(
@@ -53,9 +38,7 @@ private class PartnerApplicationServiceTest {
       'applicationNumber should be populated from Application_Number__c.'
     );
 
-    // Query as the (privileged) test-running user, not the guest, so this
-    // confirms what was actually persisted rather than what the guest can
-    // merely read back — catches silent field-stripping from missing FLS.
+    // Re-query to verify persistence and catch silent security field stripping.
     Partner_Application__c inserted = [
       SELECT
         Name,
@@ -187,5 +170,84 @@ private class PartnerApplicationServiceTest {
     }
 
     System.assertEquals(true, threw, 'Invalid input should be rejected.');
+  }
+
+  @IsTest
+  static void reviewerListsViewsAndClaimsApplicationThroughController() {
+    User manager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      manager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(manager) {
+      Partner_Application__c application = new Partner_Application__c(
+        Name = 'Review Coverage Partner',
+        Company_Name__c = 'Review Coverage Partner',
+        Business_Email__c = 'review-coverage@example.com',
+        Requested_Tier__c = 'Gold',
+        Partner_Type__c = 'Reseller',
+        Submitted_By_Contact_Name__c = 'Review Contact',
+        Submitted_By_Email__c = 'review-contact@example.com',
+        Application_Status__c = 'Submitted',
+        Decision__c = 'Pending',
+        Submitted_On__c = System.now()
+      );
+      insert application;
+
+      List<PartnerApplicationListDTO> pending = PartnerApplicationController.getPendingApplications();
+      Assert.areEqual(1, pending.size());
+      Assert.areEqual(application.Id, pending[0].applicationId);
+
+      PartnerApplicationDetailDTO beforeClaim = PartnerApplicationController.getApplicationDetail(
+        application.Id
+      );
+      Assert.isTrue(beforeClaim.canClaim);
+      Assert.isFalse(beforeClaim.canDecide);
+
+      PartnerApplicationController.claimApplication(application.Id);
+
+      PartnerApplicationDetailDTO afterClaim = PartnerApplicationController.getApplicationDetail(
+        application.Id
+      );
+      Assert.areEqual('Under Review', afterClaim.status);
+      Assert.areEqual(manager.Id, afterClaim.assignedReviewerId);
+      Assert.isTrue(afterClaim.isAssignedToCurrentUser);
+      Assert.isTrue(afterClaim.canDecide);
+    }
+  }
+
+  @IsTest
+  static void reviewerSeesWebsiteAndContactEmailMatches() {
+    User manager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      manager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(manager) {
+      Account existing = new Account(
+        Name = 'Different Trading Name',
+        Website = 'https://matched.example.com'
+      );
+      insert existing;
+      insert new Contact(
+        AccountId = existing.Id,
+        LastName = 'Existing Contact',
+        Email = 'existing-contact@matched.example.com'
+      );
+      Partner_Application__c application = new Partner_Application__c(
+        Company_Name__c = 'New Applicant Name',
+        Website__c = 'https://matched.example.com',
+        Submitted_By_Email__c = 'existing-contact@matched.example.com'
+      );
+
+      List<PartnerApplicationMatchDTO> matches = PartnerApplicationMatchSelector.findPotentialMatches(
+        application
+      );
+      Assert.areEqual(2, matches.size());
+      Assert.areEqual('Website matches', matches[0].matchReason);
+      Assert.areEqual('Contact email matches', matches[1].matchReason);
+    }
   }
 }

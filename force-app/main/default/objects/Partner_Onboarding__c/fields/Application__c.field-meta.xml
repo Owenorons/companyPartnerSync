@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Application__c</fullName><label>Application</label><type
+  >Lookup</type><referenceTo
+  >Partner_Application__c</referenceTo><relationshipLabel
+  >Onboarding Cases</relationshipLabel><relationshipName
+  >Onboarding_Cases</relationshipName><deleteConstraint
+  >Restrict</deleteConstraint><required>true</required></CustomField>

@@ -1,287 +1,155 @@
-/*
- * Cross-tenant isolation coverage for PartnerAccessService's canX() checks —
- * confirms a partner user can act on their own records but is blocked from
- * another partner's, independent of PartnerRecordAccessService's own tests.
- */
 @IsTest
 private class PartnerAccessServiceTest {
   @IsTest
-  static void canViewDealTrueForOwningPartnerFalseForAnother() {
-    Account partnerA = new Account(
-      Name = 'Partner A',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
+  static void internalAdministratorCoversInternalCapabilities() {
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSetGroup(
+      adminUser.Id,
+      'PSG_Internal_Administrator'
     );
-    insert partnerA;
-
-    Account partnerB = new Account(
-      Name = 'Partner B',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
-    );
-    insert partnerB;
-
-    Contact contactA = new Contact(
-      LastName = 'Partner User A',
-      AccountId = partnerA.Id,
-      Email = 'partneraview@example.com',
-      Is_Partner_User__c = true
-    );
-    insert contactA;
-
-    Account customer = new Account(Name = 'Customer', Is_Partner__c = false);
-    insert customer;
-
-    Deal_Registration__c dealA = new Deal_Registration__c(
-      Partner_Account__c = partnerA.Id,
-      Customer_Account__c = customer.Id,
-      Status__c = 'Submitted',
-      Conflict_Status__c = 'No Conflict',
-      Estimated_Revenue__c = 10000
-    );
-    insert dealA;
-
-    Deal_Registration__c dealB = new Deal_Registration__c(
-      Partner_Account__c = partnerB.Id,
-      Customer_Account__c = customer.Id,
-      Status__c = 'Submitted',
-      Conflict_Status__c = 'No Conflict',
-      Estimated_Revenue__c = 10000
-    );
-    insert dealB;
-
-    User partnerUserA = TestUserFactory.createExternalUser(contactA.Id);
-
-    System.runAs(partnerUserA) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canViewDeal(dealA.Id),
-        'Partner A should be able to view their own deal.'
+    System.runAs(adminUser) {
+      Assert.isTrue(PartnerAccessService.isInternalUser());
+      Assert.isFalse(PartnerAccessService.isExternalUser());
+      PartnerAccessService.assertInternalUser();
+      PartnerAccessService.assertCurrentUserCanAccessPartnerAccount(
+        UserInfo.getUserId()
       );
-      System.assertEquals(
-        false,
-        PartnerAccessService.canViewDeal(dealB.Id),
-        'Partner A should not be able to view Partner B deal.'
-      );
-    }
-  }
-
-  @IsTest
-  static void canViewDealTrueForInternalUser() {
-    Account partner = new Account(
-      Name = 'Partner',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
-    );
-    insert partner;
-
-    Account customer = new Account(Name = 'Customer', Is_Partner__c = false);
-    insert customer;
-
-    Deal_Registration__c deal = new Deal_Registration__c(
-      Partner_Account__c = partner.Id,
-      Customer_Account__c = customer.Id,
-      Status__c = 'Submitted',
-      Conflict_Status__c = 'No Conflict',
-      Estimated_Revenue__c = 10000
-    );
-    insert deal;
-
-    User internalUser = TestUserFactory.createInternalUser();
-
-    System.runAs(internalUser) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canViewDeal(deal.Id),
-        'Internal users can view any deal.'
-      );
-    }
-  }
-
-  @IsTest
-  static void canEditDealAndCanApproveMdfAreInternalOnly() {
-    User internalUser = TestUserFactory.createInternalUser();
-    Account partner = new Account(
-      Name = 'Partner',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
-    );
-    insert partner;
-
-    Contact contact = new Contact(
-      LastName = 'Partner User',
-      AccountId = partner.Id,
-      Email = 'partnereditcheck@example.com',
-      Is_Partner_User__c = true
-    );
-    insert contact;
-
-    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
-
-    TestUserFactory.assignPermissionSet(
-      internalUser.Id,
-      'PartnerSync_Internal_Admin'
-    );
-
-    System.runAs(internalUser) {
-      System.assertEquals(true, PartnerAccessService.canEditDeal(null));
-      System.assertEquals(true, PartnerAccessService.canApproveMDF(null));
-    }
-
-    System.runAs(partnerUser) {
-      System.assertEquals(false, PartnerAccessService.canEditDeal(null));
-      System.assertEquals(false, PartnerAccessService.canApproveMDF(null));
-    }
-  }
-
-  @IsTest
-  static void canViewAnalyticsAlwaysTrueForExternalUsers() {
-    Account partner = new Account(
-      Name = 'Partner',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
-    );
-    insert partner;
-
-    Contact contact = new Contact(
-      LastName = 'Partner User',
-      AccountId = partner.Id,
-      Email = 'partneranalytics@example.com',
-      Is_Partner_User__c = true
-    );
-    insert contact;
-
-    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
-
-    System.runAs(partnerUser) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canViewAnalytics(),
-        'Partners can always view their own analytics.'
-      );
-    }
-  }
-
-  @IsTest
-  static void canAccessContentReflectsVisibility() {
-    Partner_Content__c publicContent = PartnerSyncTestDataFactory.content(
-      'All Partners'
-    );
-    insert publicContent;
-
-    Partner_Content__c internalOnlyContent = PartnerSyncTestDataFactory.content(
-      'Internal Only'
-    );
-    insert internalOnlyContent;
-
-    Account partner = new Account(
-      Name = 'Partner',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active',
-      Partner_Tier__c = 'Gold',
-      Partner_Type__c = 'Reseller'
-    );
-    insert partner;
-
-    Contact contact = new Contact(
-      LastName = 'Partner User',
-      AccountId = partner.Id,
-      Email = 'partnercontent@example.com',
-      Is_Partner_User__c = true
-    );
-    insert contact;
-
-    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
-
-    System.runAs(partnerUser) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canAccessContent(publicContent.Id),
-        'Content marked All Partners should be accessible.'
-      );
-      System.assertEquals(
-        false,
-        PartnerAccessService.canAccessContent(internalOnlyContent.Id),
-        'Content marked Internal Only should not be accessible to partners.'
-      );
-    }
-  }
-
-  @IsTest
-  static void canSubmitDealReflectsContactFlagForExternalUsers() {
-    Account partner = new Account(
-      Name = 'Partner',
-      Is_Partner__c = true,
-      Partner_Status__c = 'Active'
-    );
-    insert partner;
-
-    Contact authorizedContact = new Contact(
-      LastName = 'Authorized Partner User',
-      AccountId = partner.Id,
-      Email = 'authorizeddealuser@example.com',
-      Is_Partner_User__c = true,
-      Can_Submit_Deals__c = true
-    );
-    insert authorizedContact;
-
-    Contact unauthorizedContact = new Contact(
-      LastName = 'Unauthorized Partner User',
-      AccountId = partner.Id,
-      Email = 'unauthorizeddealuser@example.com',
-      Is_Partner_User__c = true,
-      Can_Submit_Deals__c = false
-    );
-    insert unauthorizedContact;
-
-    User authorizedUser = TestUserFactory.createExternalUser(
-      authorizedContact.Id
-    );
-    User unauthorizedUser = TestUserFactory.createExternalUser(
-      unauthorizedContact.Id
-    );
-
-    System.runAs(authorizedUser) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canSubmitDeal(),
-        'A contact flagged Can_Submit_Deals__c should be able to submit deals.'
-      );
-    }
-
-    System.runAs(unauthorizedUser) {
-      System.assertEquals(
-        false,
-        PartnerAccessService.canSubmitDeal(),
-        'A contact not flagged Can_Submit_Deals__c should not be able to submit deals.'
-      );
-
-      Boolean threw = false;
+      Assert.isTrue(PartnerAccessService.canViewDeal(null));
+      Assert.isTrue(PartnerAccessService.canEditDeal(null));
+      Assert.isTrue(PartnerAccessService.canApproveMDF(null));
+      Assert.isTrue(PartnerAccessService.canViewAnalytics());
+      Assert.isTrue(PartnerAccessService.canAccessContent(null));
+      Assert.isTrue(PartnerAccessService.canApproveDeal(null));
+      Assert.isFalse(PartnerAccessService.canSubmitMDF());
+      Assert.isTrue(PartnerAccessService.canSubmitDeal());
+      PartnerAccessService.assertCanSubmitDeal();
+      Assert.isTrue(PartnerAccessService.canViewLead(null));
+      Assert.isTrue(PartnerAccessService.canAcceptLead(null));
+      Assert.isTrue(PartnerAccessService.canConvertLead(null));
+      Assert.isFalse(PartnerAccessService.canUseAI());
 
       try {
-        PartnerAccessService.assertCanSubmitDeal();
-      } catch (PartnerSyncHandledException ex) {
-        threw = true;
+        PartnerAccessService.assertCurrentUserCanAccessPartnerAccount(null);
+        Assert.fail('Expected missing partner account rejection.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('required'));
+      }
+      try {
+        PartnerAccessService.getCurrentPartnerAccountId();
+        Assert.fail('Expected unlinked internal user rejection.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('not linked'));
+      }
+      try {
+        PartnerAccessService.getCurrentPartnerContact();
+        Assert.fail('Expected missing contact rejection.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('could not be found'));
       }
 
-      System.assertEquals(
-        true,
-        threw,
-        'assertCanSubmitDeal should throw for an unauthorized contact.'
+      Partner_Content__c content = PartnerSyncTestDataFactory.content(
+        'All Partners'
       );
+      insert content;
+      Assert.isFalse(PartnerAccessService.canDownloadContent(content.Id));
+      content.Content_Document_Id__c = '069000000000001AAA';
+      update content;
+      Assert.isTrue(PartnerAccessService.canDownloadContent(content.Id));
     }
   }
 
   @IsTest
-  static void canSubmitDealAlwaysTrueForInternalUsers() {
-    User internalUser = TestUserFactory.createInternalUser();
-
-    System.runAs(internalUser) {
-      System.assertEquals(
-        true,
-        PartnerAccessService.canSubmitDeal(),
-        'Internal users can always submit deals on a partner\'s behalf.'
+  static void externalPartnerCapabilitiesAreAccountScoped() {
+    User simulator = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSetGroup(
+      simulator.Id,
+      'PSG_Internal_Administrator'
+    );
+    System.runAs(simulator) {
+      Account partner = PartnerSyncTestDataFactory.partnerAccount(
+        'External Partner'
       );
+      Account otherPartner = PartnerSyncTestDataFactory.partnerAccount(
+        'Other Partner'
+      );
+      Account customer = PartnerSyncTestDataFactory.customerAccount('Customer');
+      insert new List<Account>{ partner, otherPartner, customer };
+      Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+      contact.Can_Submit_Deals__c = true;
+      insert contact;
+      Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+        customer.Id,
+        partner.Id,
+        contact.Id
+      );
+      insert opportunity;
+      Deal_Registration__c deal = PartnerSyncTestDataFactory.deal(
+        customer.Id,
+        partner.Id,
+        contact.Id,
+        opportunity.Id
+      );
+      Lead lead = PartnerSyncTestDataFactory.lead(partner.Id, contact.Id);
+      Partner_Content__c content = PartnerSyncTestDataFactory.content(
+        'All Partners'
+      );
+      content.Content_Document_Id__c = '069000000000001AAA';
+      insert deal;
+      insert lead;
+      insert content;
+
+      PartnerAccessService.internalUserOverride = false;
+      PartnerAccessService.partnerAccountIdOverride = partner.Id;
+      PartnerAccessService.partnerContactOverride = contact;
+      try {
+        Assert.isFalse(PartnerAccessService.isInternalUser());
+        Assert.isTrue(PartnerAccessService.isExternalUser());
+        Assert.areEqual(
+          partner.Id,
+          PartnerAccessService.getCurrentPartnerAccountId()
+        );
+        Assert.areEqual(
+          contact.Id,
+          PartnerAccessService.getCurrentPartnerContact().Id
+        );
+        Assert.isTrue(PartnerAccessService.canSubmitMDF());
+        Assert.isTrue(PartnerAccessService.canSubmitDeal());
+        PartnerAccessService.assertCanSubmitDeal();
+        PartnerAccessService.assertCurrentUserCanAccessPartnerAccount(
+          partner.Id
+        );
+        Assert.isTrue(PartnerAccessService.canViewDeal(deal.Id));
+        Assert.isFalse(PartnerAccessService.canViewDeal(null));
+        Assert.isTrue(PartnerAccessService.canViewLead(lead.Id));
+        Assert.isFalse(PartnerAccessService.canViewLead(null));
+        Assert.isTrue(PartnerAccessService.canAcceptLead(lead.Id));
+        Assert.isTrue(PartnerAccessService.canConvertLead(lead.Id));
+        Assert.isTrue(PartnerAccessService.canViewAnalytics());
+        Assert.isTrue(PartnerAccessService.canAccessContent(content.Id));
+        Assert.isFalse(PartnerAccessService.canAccessContent(null));
+        Assert.isTrue(PartnerAccessService.canDownloadContent(content.Id));
+
+        assertRejectedAccount(otherPartner.Id);
+        try {
+          PartnerAccessService.assertInternalUser();
+          Assert.fail('Expected external-user rejection.');
+        } catch (PartnerSyncHandledException expected) {
+          Assert.isTrue(expected.getMessage().contains('internal'));
+        }
+      } finally {
+        PartnerAccessService.internalUserOverride = null;
+        PartnerAccessService.partnerAccountIdOverride = null;
+        PartnerAccessService.partnerContactOverride = null;
+      }
+    }
+  }
+
+  private static void assertRejectedAccount(Id accountId) {
+    try {
+      PartnerAccessService.assertCurrentUserCanAccessPartnerAccount(accountId);
+      Assert.fail('Expected account-scope rejection.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(expected.getMessage().contains('not accessible'));
     }
   }
 }

@@ -1,0 +1,117 @@
+<template>
+  <section class="partner-360">
+    <header>
+      <p class="eyebrow">PartnerSync Internal</p>
+      <h1>Partner 360</h1>
+      <lightning-record-picker
+        label="Partner account"
+        placeholder="Search partner accounts"
+        object-api-name="Account"
+        value={pickerValue}
+        onchange={handlePartnerChange}
+      ></lightning-record-picker>
+    </header>
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading partner profile..."
+      ></c-ps-loading-state>
+    </template>
+    <template if:true={error}
+      ><c-ps-error-panel message={error}></c-ps-error-panel
+    ></template>
+    <template if:true={summary}>
+      <div class="identity">
+        <div><span>Partner</span><strong>{summary.partnerName}</strong></div>
+        <div><span>Partner ID</span><strong>{summary.partnerId}</strong></div>
+        <div><span>Status</span><strong>{summary.partnerStatus}</strong></div>
+        <div><span>Tier</span><strong>{summary.tier}</strong></div>
+        <div><span>Type</span><strong>{summary.partnerType}</strong></div>
+        <div><span>Region</span><strong>{summary.region}</strong></div>
+      </div>
+      <div class="metrics">
+        <c-ps-dashboard-metric-card
+          label="Open Deals"
+          value={summary.openDealCount}
+          icon-name="utility:opportunity"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Open MDF"
+          value={summary.openMdfCount}
+          icon-name="utility:money"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Documents"
+          value={summary.openDocumentCount}
+          icon-name="utility:file"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Risk Findings"
+          value={summary.blockingFindingCount}
+          icon-name="utility:warning"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Access Work"
+          value={summary.openAccessRequestCount}
+          icon-name="utility:lock"
+        ></c-ps-dashboard-metric-card>
+        <c-ps-dashboard-metric-card
+          label="Training"
+          value={summary.incompleteTrainingCount}
+          icon-name="utility:education"
+        ></c-ps-dashboard-metric-card>
+      </div>
+      <div class="detail-grid">
+        <section class="card">
+          <h2>Lifecycle</h2>
+          <dl>
+            <dt>Onboarding</dt>
+            <dd>{summary.onboardingStatus}</dd>
+            <dt>Stage</dt>
+            <dd>{summary.currentStage}</dd>
+            <dt>Activation gate</dt>
+            <dd>{summary.activationGateStatus}</dd>
+            <dt>Relationship</dt>
+            <dd>{summary.relationshipStatus}</dd>
+            <dt>Programme</dt>
+            <dd>{summary.programmeKey}</dd>
+          </dl>
+        </section>
+        <section class="card">
+          <h2>Current blockers</h2>
+          <template if:true={hasBlockers}
+            ><ul>
+              <template for:each={summary.blockers} for:item="blocker"
+                ><li key={blocker}>{blocker}</li></template
+              >
+            </ul></template
+          >
+          <template if:false={hasBlockers}
+            ><c-ps-empty-state
+              title="No blockers"
+              message="No current activation blockers were found."
+            ></c-ps-empty-state
+          ></template>
+        </section>
+      </div>
+      <section class="card timeline">
+        <h2>Recent lifecycle</h2>
+        <template if:true={hasEvents}
+          ><ul>
+            <template for:each={summary.recentEvents} for:item="item"
+              ><li key={item.recordId}>
+                <strong>{item.eventType}</strong
+                ><span>{item.stage} — {item.summary}</span>
+              </li></template
+            >
+          </ul></template
+        >
+        <template if:false={hasEvents}
+          ><c-ps-empty-state
+            title="No lifecycle events"
+            message="No lifecycle history is available."
+          ></c-ps-empty-state
+        ></template>
+      </section>
+    </template>
+  </section>
+</template>

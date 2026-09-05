@@ -8,16 +8,13 @@ public with sharing class PartnerAIController {
   public static List<AIInsightDTO> getMyInsights() {
     try {
       return AIInsightService.getMyInsights();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerAIController',
+        'Unable to load AI insights.',
         'Unable to load AI insights.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load AI insights.');
     }
   }
 
@@ -25,16 +22,13 @@ public with sharing class PartnerAIController {
   public static List<NextBestActionDTO> getMyNextBestActions() {
     try {
       return NextBestActionService.getMyActions();
-    } catch (PartnerSyncHandledException ex) {
-      throw new AuraHandledException(ex.getMessage());
     } catch (Exception ex) {
-      LoggingService.error(
+      throw ControllerExceptionMapper.toAura(
         'PartnerAIController',
+        'Unable to load next best actions.',
         'Unable to load next best actions.',
         ex
       );
-
-      throw new AuraHandledException('Unable to load next best actions.');
     }
   }
 }

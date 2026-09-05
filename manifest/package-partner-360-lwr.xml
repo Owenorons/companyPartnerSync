@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members
+    >site/PartnerSync_Portal1.sfdc_cms__route/Partner_360__c</members>
+        <members>site/PartnerSync_Portal1.sfdc_cms__view/Internal_App</members>
+        <members>site/PartnerSync_Portal1.sfdc_cms__view/Partner_360</members>
+        <name>DigitalExperience</name>
+    </types>
+    <types>
+        <members>psInternalDashboard</members>
+        <members>psPartner360</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <version>66.0</version>
+</Package>

@@ -25,6 +25,16 @@ private class DealExpiryBatchTest {
     deal.Protection_Start_Date__c = protectionEndDate.addDays(-30);
     deal.Protection_End_Date__c = protectionEndDate;
     insert deal;
+    insert new Deal_Protection_Grant__c(
+      Deal__c = deal.Id,
+      Current__c = true,
+      Current_Grant_Key__c = String.valueOf(deal.Id),
+      Status__c = 'Active',
+      Start_Date__c = protectionEndDate.addDays(-30),
+      End_Date__c = protectionEndDate,
+      Version_Number__c = 0,
+      Extension_Count__c = 0
+    );
 
     return deal;
   }

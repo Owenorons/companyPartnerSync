@@ -10,8 +10,10 @@ public with sharing class AIProviderResponseDTO {
   public String providerName;
   public String modelName;
   public String responseText;
+  public String recommendation;
   public Decimal confidence;
   public String explanation;
   public Integer tokensUsed;
   public String errorMessage;
+  public String errorCode;
 }

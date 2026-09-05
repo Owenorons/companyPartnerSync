@@ -8,10 +8,6 @@
         <enabled>true</enabled>
         <name>PartnerSync_Reject_MDF</name>
     </customPermissions>
-    <customPermissions>
-        <enabled>true</enabled>
-        <name>PartnerSync_Override_MDF_Budget</name>
-    </customPermissions>
     <classAccesses>
         <apexClass>MDFController</apexClass>
         <enabled>true</enabled>
@@ -21,6 +17,8 @@
         <field>Account.MDF_Annual_Budget__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions><editable>false</editable><field
+    >Account.Is_Partner__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.MDF_Available_Budget__c</field>
