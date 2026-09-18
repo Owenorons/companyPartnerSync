@@ -1,6 +1,0 @@
-{
-  "apiName" : "MDF_Workspace__c",
-  "type" : "sfdc_cms__route",
-  "parentId" : "sfdc_cms__route/Partner_Portal__c",
-  "path" : "routes"
-}
