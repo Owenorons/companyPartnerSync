@@ -1,3 +1,8 @@
+/**
+ * In-memory representation of a configured deal state transition (from the
+ * Deal_State_Transition__mdt custom metadata type), describing the allowed
+ * from/to states, handler, permissions, and actor eligibility for an action.
+ */
 public class DealTransitionDefinition {
   public String aggregateType;
   public String lifecycleDimension;

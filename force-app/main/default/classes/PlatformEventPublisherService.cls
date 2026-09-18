@@ -1,4 +1,4 @@
-/*
+/**
  * Publishes the two platform event types used for cross-cutting concerns:
  * the generic PartnerSync_Event__e (audit + notification fan-out, consumed
  * by PartnerSyncEventHandler) and the more specific NotificationCreatedEvent__e
@@ -10,6 +10,21 @@
 public with sharing class PlatformEventPublisherService {
   private static final String EVENT_VERSION = '2.0';
 
+  /**
+   * Publishes a PartnerSync_Event__e for a business event, then records the
+   * EventBus acceptance result via EventPublicationService. Any failure
+   * (including from EventBus.publish itself) is caught and logged rather
+   * than propagated, since this event only drives audit logging and
+   * in-app notifications and must never roll back or surface an error on
+   * the caller's primary business transaction.
+   *
+   * @param eventType The business event type (e.g. DealSubmitted, LeadAccepted).
+   * @param recordId The Id of the record the event relates to, if any.
+   * @param objectName The name of the SObject the event relates to.
+   * @param partnerAccountId The Id of the partner account the event relates to, if any.
+   * @param summary A short human-readable summary of the event.
+   * @param severity The event severity; defaults to 'Info' when blank.
+   */
   public static void publish(
     String eventType,
     Id recordId,
@@ -65,6 +80,16 @@ public with sharing class PlatformEventPublisherService {
   // Unlike publish() above, this method does not catch its own exceptions:
   // its only caller (NotificationService.create) already wraps this call in
   // a try/catch, so publish failure here is handled one level up.
+  /**
+   * Publishes a NotificationCreatedEvent__e for an already-inserted
+   * Partner_Notification__c, to drive real-time UI push, then records the
+   * EventBus acceptance result via EventPublicationService. Unlike
+   * publish(), this method does not catch its own exceptions — its only
+   * caller (NotificationService.create) already wraps this call in a
+   * try/catch.
+   *
+   * @param notification The already-inserted notification record to publish an event for.
+   */
   public static void publishNotificationCreated(
     Partner_Notification__c notification
   ) {

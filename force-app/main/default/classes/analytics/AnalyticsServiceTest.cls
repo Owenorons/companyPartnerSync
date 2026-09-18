@@ -86,7 +86,7 @@ private class AnalyticsServiceTest {
     User executiveUser = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSet(
       executiveUser.Id,
-      'PartnerSync_Internal_Admin'
+      'PartnerSync_Executive_User'
     );
     System.runAs(executiveUser) {
       Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
@@ -150,6 +150,118 @@ private class AnalyticsServiceTest {
       } catch (PartnerSyncHandledException expected) {
         Assert.isTrue(expected.getMessage().contains('not found'));
       }
+    }
+  }
+
+  @IsTest
+  static void leaderboardScalesAndKeepsPartnerMetricsIsolated() {
+    User executiveUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      executiveUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(executiveUser) {
+      List<Account> partners = new List<Account>();
+      for (Integer i = 0; i < 30; i++) {
+        partners.add(
+          PartnerSyncTestDataFactory.partnerAccount('Scale Partner ' + i)
+        );
+      }
+      insert partners;
+      Account emptyPartner = PartnerSyncTestDataFactory.partnerAccount(
+        'No Activity'
+      );
+      insert emptyPartner;
+      List<Lead> leads = new List<Lead>();
+      List<Opportunity> opportunities = new List<Opportunity>();
+      List<Deal_Registration__c> deals = new List<Deal_Registration__c>();
+      for (Integer i = 0; i < partners.size(); i++) {
+        Account partner = partners[i];
+        for (
+          String status : new List<String>{
+            'Accepted',
+            'Converted',
+            'Assigned'
+          }
+        ) {
+          leads.add(
+            new Lead(
+              LastName = status,
+              Company = 'Scale',
+              Partner_Account__c = partner.Id,
+              Lead_Distribution_Status__c = status
+            )
+          );
+        }
+        deals.add(
+          new Deal_Registration__c(
+            Partner_Account__c = partner.Id,
+            Status__c = 'Submitted',
+            Estimated_Revenue__c = 1000
+          )
+        );
+        for (
+          String stage : new List<String>{
+            'Closed Won',
+            'Closed Lost',
+            'Qualification'
+          }
+        ) {
+          opportunities.add(
+            new Opportunity(
+              Name = stage,
+              Partner_Account__c = partner.Id,
+              StageName = stage,
+              CloseDate = Date.today(),
+              Amount = 100 + i
+            )
+          );
+        }
+      }
+      insert leads;
+      insert deals;
+      insert opportunities;
+      Test.startTest();
+      Integer queriesBefore = Limits.getQueries();
+      List<PartnerLeaderboardRowDTO> rows = AnalyticsService.getPartnerLeaderboard();
+      Integer queriesUsed = Limits.getQueries() - queriesBefore;
+      Test.stopTest();
+      Assert.areEqual(31, rows.size());
+      Assert.isTrue(
+        queriesUsed <= 13,
+        'Expected nine data queries plus four permission checks, got ' +
+        queriesUsed
+      );
+      Map<Id, PartnerLeaderboardRowDTO> byPartner = new Map<Id, PartnerLeaderboardRowDTO>();
+      for (PartnerLeaderboardRowDTO row : rows) {
+        byPartner.put(row.partnerAccountId, row);
+      }
+      for (Integer i = 0; i < partners.size(); i++) {
+        PartnerLeaderboardRowDTO row = byPartner.get(partners[i].Id);
+        Assert.areEqual(2, row.acceptedLeads);
+        Assert.areEqual(1, row.wonDeals);
+        Assert.areEqual(100 + i, row.revenue);
+        Assert.areEqual(0.5, row.conversionRate);
+      }
+      Assert.areEqual(0, byPartner.get(emptyPartner.Id).revenue);
+      Assert.areEqual(0, byPartner.get(emptyPartner.Id).conversionRate);
+      Id firstId = partners[0].Id;
+      AnalyticsDomain.KpiTotals totals = AnalyticsSelector.selectKpiTotals(
+          new Set<Id>{ firstId }
+        )
+        .get(firstId);
+      PartnerKPIDTO kpi = AnalyticsDomain.calculatePartnerKPI(
+        totals,
+        partners[0]
+      );
+      Assert.areEqual(1000, kpi.totalPipeline);
+      Assert.areEqual(3, kpi.totalLeads);
+      Assert.areEqual(1, kpi.convertedLeads);
+      Assert.areEqual(kpi.healthScore, byPartner.get(firstId).score);
+      Assert.areEqual(
+        kpi.healthScore,
+        PartnerHealthScoringService.calculate(firstId)
+      );
     }
   }
 }

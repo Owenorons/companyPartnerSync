@@ -1,4 +1,4 @@
-/*
+/**
  * Query layer for Partner_Record_Share__c, the registry of manually-granted
  * partner access to individual Deal Registration / MDF Request records (see
  * PartnerShareService/PartnerShareDomain for how grants are created and
@@ -6,6 +6,14 @@
  * only the columns its caller actually needs.
  */
 public without sharing class PartnerShareSelector {
+  /**
+   * Retrieves active share grants for a single target record, most
+   * recently granted first.
+   *
+   * @param recordId Id of the target (Deal Registration or MDF Request)
+   * record.
+   * @return Active Partner_Record_Share__c records for the record.
+   */
   public static List<Partner_Record_Share__c> selectActiveSharesForRecord(
     Id recordId
   ) {
@@ -34,6 +42,13 @@ public without sharing class PartnerShareSelector {
     ];
   }
 
+  /**
+   * Retrieves active share grants whose expiry date has passed, for the
+   * cleanup batch.
+   *
+   * @return Up to 10,000 expired, still-active Partner_Record_Share__c
+   * records.
+   */
   public static List<Partner_Record_Share__c> selectExpiredShares() {
     return [
       SELECT
@@ -54,6 +69,13 @@ public without sharing class PartnerShareSelector {
     ];
   }
 
+  /**
+   * Retrieves a single share grant by Id.
+   *
+   * @param partnerRecordShareId Id of the Partner_Record_Share__c to
+   * retrieve.
+   * @return The matching Partner_Record_Share__c record.
+   */
   public static Partner_Record_Share__c selectById(Id partnerRecordShareId) {
     List<Partner_Record_Share__c> results = [
       SELECT
@@ -78,6 +100,14 @@ public without sharing class PartnerShareSelector {
     return results[0];
   }
 
+  /**
+   * Checks whether an active share grant already exists for the given
+   * target record and partner account.
+   *
+   * @param targetRecordId Id of the target record.
+   * @param partnerAccountId Id of the partner Account.
+   * @return True if an active grant exists for that record/account pair.
+   */
   public static Boolean hasActiveGrant(Id targetRecordId, Id partnerAccountId) {
     return [
         SELECT COUNT()

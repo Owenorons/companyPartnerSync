@@ -16,19 +16,38 @@ Salesforce packaging uses several identifiers that are not interchangeable:
 
 Use aliases locally where convenient, but retain the IDs in CI output and release records.
 
-### Current validated beta
+### Latest locally recorded beta — built 12 September 2026
 
-| Item                          | Value                 |
-| ----------------------------- | --------------------- |
-| Version                       | `0.1.0.3`             |
-| Package alias                 | `PartnerSync@0.1.0-3` |
-| Subscriber Package Version ID | `04tQE00000if7aTYAQ`  |
-| Creation request              | `08cQE000000342HYAQ`  |
-| Stored package coverage       | 90%                   |
-| Coverage check                | Passed                |
+| Item                          | Value                                               |
+| ----------------------------- | --------------------------------------------------- |
+| Dev Hub alias                 | `evosphereSolutions`                                |
+| Package ID                    | `0HoQE0000000F8j0AE`                                |
+| Version                       | `0.1.0.7`                                           |
+| Package alias                 | `PartnerSync@0.1.0-7`                               |
+| Subscriber Package Version ID | `04tQE00000ifZ25YAE`                                |
+| Stored package coverage       | Not yet confirmed — run `sf package version report` |
+| Coverage check                | Not yet confirmed — run `sf package version report` |
+| Validation skipped            | No                                                  |
+| Released                      | No (beta)                                           |
+| Ancestor                      | None                                                |
 
-This version is a beta. It has not yet passed clean-install and upgrade
-acceptance and must not be promoted on package-creation evidence alone.
+Superseded the previous `0.1.0-6` (`04tQE00000ifSi9YAE`) build. Built to include
+schema/Apex that existed in `force-app` but wasn't in `-6`'s snapshot
+(`Account.Assigned_Channel_Manager__c`, `AIConnectionTestService`, and possibly
+others — confirm by redeploying `org-config` against an org with this version
+installed and checking whether those errors are gone).
+
+These values were checked with `sf package version report` against the Dev Hub.
+They establish package creation and coverage, not clean-install, upgrade, or
+AppExchange security-review acceptance. No install acceptance is recorded here.
+A package version is a snapshot; later working-tree changes require another build.
+
+For the install and post-install examples below, set one candidate ID in your
+terminal and keep using that same value. Replace it after a newer successful build:
+
+```sh
+export PARTNER_SYNC_CANDIDATE=04tQE00000ifZ25YAE
+```
 
 ## 1. Confirm the prerequisites
 
@@ -53,18 +72,20 @@ The project declaration is in [`sfdx-project.json`](../sfdx-project.json). Names
 
 ## 2. Authenticate the Dev Hub
 
-For an interactive workstation login:
+The existing package belongs to the Dev Hub authenticated as `evosphereSolutions`.
+If that alias is already authenticated, skip login and verify it below. Otherwise,
+log in to that same Dev Hub account:
 
 ```sh
 sf org login web \
-  --alias psync-dev-hub \
+  --alias evosphereSolutions \
   --set-default-dev-hub
 ```
 
 Verify the authenticated identity:
 
 ```sh
-sf org display --target-org psync-dev-hub
+sf org display --target-org evosphereSolutions
 sf config get target-dev-hub
 ```
 
@@ -75,7 +96,7 @@ CI should use a non-interactive authentication method and a protected secret. Ne
 List packages owned by the Dev Hub:
 
 ```sh
-sf package list --target-dev-hub psync-dev-hub
+sf package list --target-dev-hub evosphereSolutions
 ```
 
 Locate the managed package named `PartnerSync` and record its `0Ho…` ID.
@@ -84,7 +105,9 @@ Do not create another package merely because a local alias is missing. A package
 
 ## 4. Create the package only when it does not exist
 
-Skip this step when `PartnerSync` already appears in the Dev Hub package list.
+**Skip this step for this repository: PartnerSync already exists as
+`0HoQE0000000F8j0AE`.** The command below is only for an intentionally separate
+new package setup.
 
 ```sh
 sf package create \
@@ -120,7 +143,7 @@ Before creating a version, inspect `sfdx-project.json`. The PartnerSync package 
 
 - `package`: `PartnerSync`
 - `versionName`: the intended release name
-- `versionNumber`: a four-part version such as `1.0.0.NEXT`
+- `versionNumber`: currently `0.1.0.NEXT`; `NEXT` selects the next build number
 - `ancestorVersion` or `ancestorId`: required for subsequent managed release lines
 - dependencies, when PartnerSync depends on another package
 
@@ -130,7 +153,12 @@ Run the local quality gate before consuming package-version capacity:
 
 ```sh
 npm run validate
+node --test scripts/ci/deployment-baseline.test.js
 ```
+
+`npm run validate` runs local project, lint, formatting, and LWC checks. The
+Node CI tests run separately from Jest. Neither command executes Apex; package
+creation with `--code-coverage` provides the packaged Apex test gate.
 
 ## 6. Create a validated beta package version
 
@@ -138,7 +166,7 @@ The repository helper creates a validated version and requests packaged Apex cov
 
 ```sh
 PARTNER_SYNC_PACKAGE=PartnerSync \
-PARTNER_SYNC_DEV_HUB=psync-dev-hub \
+PARTNER_SYNC_DEV_HUB=evosphereSolutions \
 PARTNER_SYNC_PACKAGE_WAIT_MINUTES=90 \
 ./scripts/package-version.sh
 ```
@@ -147,7 +175,7 @@ During package-boundary development, a metadata-validated beta can be created wi
 
 ```sh
 PARTNER_SYNC_PACKAGE=PartnerSync \
-PARTNER_SYNC_DEV_HUB=psync-dev-hub \
+PARTNER_SYNC_DEV_HUB=evosphereSolutions \
 PARTNER_SYNC_CODE_COVERAGE=false \
 ./scripts/package-version.sh
 ```
@@ -165,7 +193,7 @@ sf package version create \
   --installation-key-bypass \
   --code-coverage \
   --wait 90 \
-  --target-dev-hub psync-dev-hub \
+  --target-dev-hub evosphereSolutions \
   --verbose
 ```
 
@@ -181,14 +209,14 @@ If the command times out while Salesforce continues processing, query the reques
 ```sh
 sf package version create report \
   --package-create-request-id 08c... \
-  --target-dev-hub psync-dev-hub
+  --target-dev-hub evosphereSolutions
 ```
 
 You can also inspect recent requests and versions:
 
 ```sh
-sf package version create list --target-dev-hub psync-dev-hub
-sf package version list --packages PartnerSync --target-dev-hub psync-dev-hub
+sf package version create list --target-dev-hub evosphereSolutions
+sf package version list --packages PartnerSync --target-dev-hub evosphereSolutions
 ```
 
 Save the successful `04t…` ID as the immutable release-candidate identifier.
@@ -201,8 +229,8 @@ Inspect the version details:
 
 ```sh
 sf package version report \
-  --package 04t... \
-  --target-dev-hub psync-dev-hub
+  --package "${PARTNER_SYNC_CANDIDATE:?Set the candidate 04t ID first}" \
+  --target-dev-hub evosphereSolutions
 ```
 
 If creation fails, diagnose the original `08c…` request. Fix source, metadata dependencies, test failures, or coverage locally and create a new build number. A failed or obsolete package version is not repaired in place.
@@ -215,10 +243,16 @@ Create a fresh scratch org so the install test cannot accidentally depend on unp
 sf org create scratch \
   --definition-file config/package-test-scratch-def.json \
   --alias psync-package-test \
+  --no-namespace \
+  --no-ancestors \
   --duration-days 7 \
-  --target-dev-hub psync-dev-hub \
+  --target-dev-hub evosphereSolutions \
   --wait 30
 ```
+
+Use `--no-namespace` to model a subscriber org rather than a development org
+inside `psync`; `--no-ancestors` prevents automatic ancestor installation. See
+the [Salesforce scratch-org command reference](https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_org_create_scratch.html).
 
 Confirm the target before installing:
 
@@ -230,11 +264,18 @@ Do not deploy `force-app` into this org first. The purpose of this org is to pro
 
 ## 9. Install the beta version
 
+A beta package version cannot be installed as an upgrade over a different beta
+version in the same org — Salesforce only supports upgrade installs over a
+`Released` ancestor (see step 13). Until a version is released, installing a
+newer beta requires a **fresh scratch org per beta build**; reinstalling into
+an org that already has an older beta installed will fail. Create a new
+scratch org (step 8) for each new candidate rather than trying to reuse one.
+
 Install using the `04t…` Subscriber Package Version ID, not the `0Ho…` package ID:
 
 ```sh
 sf package install \
-  --package PartnerSync@0.1.0-2 \
+  --package "${PARTNER_SYNC_CANDIDATE:?Set the candidate 04t ID first}" \
   --target-org psync-package-test \
   --security-type AdminsOnly \
   --wait 30 \
@@ -269,7 +310,7 @@ helper can perform the repeatable portion of setup:
 
 ```sh
 PARTNER_SYNC_TARGET_ORG=psync-package-test \
-PARTNER_SYNC_EXPECTED_PACKAGE_VERSION=04tQE00000if7aTYAQ \
+PARTNER_SYNC_EXPECTED_PACKAGE_VERSION="${PARTNER_SYNC_CANDIDATE:?Set the candidate 04t ID first}" \
 PARTNER_SYNC_DEPLOY_ORG_CONFIG=false \
 PARTNER_SYNC_RUN_POST_INSTALL_TESTS=true \
 ./scripts/post-install.sh
@@ -344,6 +385,11 @@ Then exercise the critical flows appropriate to the release, including permissio
 
 ## 13. Test an upgrade
 
+The recorded beta has no released ancestor. For the first release, record this
+gate as not applicable after confirming there is no released version to upgrade
+from. Once a version is released, use it as the baseline below; do not treat a
+prior beta as a supported released upgrade baseline.
+
 Clean installation and upgrade installation are different tests. Create a second scratch org and:
 
 1. Install the currently released ancestor using its released `04t…` ID.
@@ -378,8 +424,8 @@ Promotion changes a beta package version to released and is not a routine test a
 
 ```sh
 sf package version promote \
-  --package 04t... \
-  --target-dev-hub psync-dev-hub \
+  --package "${PARTNER_SYNC_CANDIDATE:?Set the candidate 04t ID first}" \
+  --target-dev-hub evosphereSolutions \
   --no-prompt
 ```
 
@@ -387,17 +433,33 @@ Verify the released state:
 
 ```sh
 sf package version report \
-  --package 04t... \
-  --target-dev-hub psync-dev-hub
+  --package "${PARTNER_SYNC_CANDIDATE:?Set the candidate 04t ID first}" \
+  --target-dev-hub evosphereSolutions
 ```
 
 Record the Git commit, `0Ho…` package ID, `04t…` released version ID, semantic version, ancestor, creation request, coverage, clean-install result, upgrade result, and approver in the release evidence.
+
+## Recent AI regression checks
+
+For builds containing the AI quota and review changes, include
+`AIUsageServiceTest`, `AIInsightGeneratorServiceTest`,
+`AIInsightGovernanceServiceTest`, and `AIProviderRouterTest` in focused diagnosis.
+The full package creation test gate must still pass.
+
+- Queue requests deserialize scalar context through untyped JSON; typed DTO
+  deserialization of `Map<String, Object>` previously failed during package tests.
+- The success test uses an in-memory active provider configuration. Packaged
+  OpenAI configuration remains inactive until a subscriber administrator configures
+  and enables it; an HTTP mock alone does not enable the provider router.
+- Review tests verify persisted status and recommendation, not just returned DTOs.
+- Generation now returns an asynchronous job ID. See [AI request quota](ai-request-quota.md)
+  for reservation, UTC-day, and failure behavior.
 
 ## Troubleshooting checklist
 
 ### Package or alias is not found
 
-- Run `sf package list --target-dev-hub psync-dev-hub`.
+- Run `sf package list --target-dev-hub evosphereSolutions`.
 - Confirm the authenticated user belongs to the correct Dev Hub.
 - Confirm the actual `0Ho…` ID is mapped under `packageAliases`.
 
@@ -437,6 +499,6 @@ A PartnerSync package candidate is ready for release review only when:
 - packaged Apex tests pass in subscriber context;
 - the post-install smoke test passes;
 - partner access and sharing boundaries are verified;
-- upgrade from the current released ancestor passes;
+- upgrade from the current released ancestor passes, or is recorded as not applicable for the first release;
 - no secrets or org-specific credentials are embedded in the package; and
 - the exact `04t…` candidate and Git commit have been recorded.

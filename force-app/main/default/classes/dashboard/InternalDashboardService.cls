@@ -1,4 +1,4 @@
-/*
+/**
  * Assembles the internal-user dashboard: org-wide review-queue counts and
  * unread notifications for the signed-in employee. Mirrors
  * PartnerDashboardService's shape, but every count here is scoped to
@@ -11,6 +11,13 @@ public with sharing class InternalDashboardService {
     'Under Review'
   };
 
+  /**
+   * Builds the internal dashboard DTO for the running employee, aggregating
+   * review-queue counts, onboarding/compliance operations, operational
+   * alerts and the unified work queue.
+   *
+   * @return The assembled internal dashboard DTO.
+   */
   public static InternalDashboardDTO getDashboard() {
     PartnerAccessService.assertInternalUser();
 
@@ -41,8 +48,11 @@ public with sharing class InternalDashboardService {
     }
 
     dto.unreadNotificationCount = 0;
+    Schema.DescribeSObjectResult notificationDescribe = Partner_Notification__c.SObjectType.getDescribe(
+      SObjectDescribeOptions.DEFERRED
+    );
     if (
-      Partner_Notification__c.SObjectType.getDescribe().isAccessible() &&
+      notificationDescribe.isAccessible() &&
       Partner_Notification__c.Recipient_User__c.getDescribe().isAccessible()
     ) {
       dto.unreadNotificationCount = NotificationSelector.countUnreadForUser(

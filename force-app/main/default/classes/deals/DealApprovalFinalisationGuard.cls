@@ -1,4 +1,19 @@
+/**
+ * Guard that verifies a deal's current approval plan is ready for final
+ * approval before the registration lifecycle handler is allowed to finalise
+ * it.
+ */
 public without sharing class DealApprovalFinalisationGuard {
+  /**
+   * Asserts that the deal's current approval plan is final, matches the
+   * expected deal version, has fully completed decisions with authority
+   * snapshots, and has no outstanding blocking reviews or information
+   * requests. Throws a DealLifecycleException when any precondition fails.
+   *
+   * @param dealId Id of the deal whose approval plan is being finalised.
+   * @param dealVersion Expected version of the deal the approval plan was generated for.
+   * @return The current, ready-for-finalisation approval plan.
+   */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static Deal_Approval_Plan__c assertReady(
     Id dealId,

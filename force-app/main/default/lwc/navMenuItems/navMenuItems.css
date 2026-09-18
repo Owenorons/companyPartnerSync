@@ -60,3 +60,29 @@
 :host([variant="submenu"]) .caret {
   display: none;
 }
+
+:host([variant="footer"]) .nav-link {
+  padding: 0;
+  color: var(--ps-color-text-muted, #3a4150);
+  font-family: var(--ps-font-mono);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  font-size: 0.7rem;
+  border-bottom: none;
+}
+
+:host([variant="footer"]) .nav-link:hover,
+:host([variant="footer"]) .nav-link:focus-visible {
+  color: var(--ps-color-text, #171b24);
+  text-decoration: underline;
+}
+
+:host([variant="footer"]) .nav-link.is-current {
+  color: var(--ps-color-text, #171b24);
+  border-bottom: none;
+}
+
+:host([variant="footer"]) .caret {
+  display: none;
+}

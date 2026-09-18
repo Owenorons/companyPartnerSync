@@ -1,10 +1,15 @@
-/*
+/**
  * Aura/LWC entry point for the partner portal dashboard. Thin boundary
  * that delegates to PartnerDashboardService and translates exceptions
  * into AuraHandledException, matching InternalPortalController's pattern
  * for the internal-facing side.
  */
 public with sharing class PartnerPortalController {
+  /**
+   * Loads the partner dashboard for the signed-in partner contact.
+   *
+   * @return The assembled partner dashboard DTO.
+   */
   @AuraEnabled(cacheable=true)
   public static PartnerDashboardDTO getDashboard() {
     try {

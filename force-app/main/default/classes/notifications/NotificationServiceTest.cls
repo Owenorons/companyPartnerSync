@@ -52,6 +52,17 @@ private class NotificationServiceTest {
     );
     System.assertEquals(false, inserted.Is_Read__c);
     System.assertEquals(partnerUser.Id, inserted.Recipient_User__c);
+
+    System.assertEquals(
+      1,
+      [
+        SELECT COUNT()
+        FROM Usage_Metric__c
+        WHERE
+          Partner_Account__c = :partner.Id
+          AND Metric_Type__c = 'Notification Sent'
+      ]
+    );
   }
 
   @IsTest

@@ -1,3 +1,8 @@
+/**
+ * Mutable execution context passed through evaluation and handling of a deal
+ * lifecycle command, carrying the deal, command, resolved transition, and
+ * the resulting state change and event data.
+ */
 public class DealCommandContext {
   public Deal_Registration__c deal;
   public DealCommand command;

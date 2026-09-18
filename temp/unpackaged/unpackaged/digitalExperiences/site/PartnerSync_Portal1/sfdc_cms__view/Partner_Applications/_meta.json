@@ -1,0 +1,5 @@
+{
+  "apiName" : "Partner_Applications",
+  "type" : "sfdc_cms__view",
+  "path" : "views"
+}

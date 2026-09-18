@@ -67,6 +67,12 @@ private class OpenAIProviderTest {
   }
 
   private class ThrowingCalloutMock implements HttpCalloutMock {
+    /**
+     * Simulates a callout-level outage instead of returning a response.
+     *
+     * @param request The outgoing HTTP request.
+     * @return Never returns — always throws.
+     */
     public HttpResponse respond(HttpRequest request) {
       throw new CalloutException('Simulated outage');
     }

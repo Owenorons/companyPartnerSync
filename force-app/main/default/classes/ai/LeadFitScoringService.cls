@@ -1,4 +1,4 @@
-/*
+/**
  * Rules-based (non-LLM) lead fit scoring engine ("AI Engine 1"), meant
  * to combine lead age, partner win rate/tier, industry match, and
  * previous revenue into a 0-100 fit score (see inputs documented below).
@@ -34,6 +34,15 @@ public with sharing class LeadFitScoringService {
   // Score (0-100)
 
   // Example
+  /**
+   * Scores a lead's fit for partner conversion. Currently a placeholder
+   * stub: returns a flat base score with a bonus for Healthcare industry
+   * leads, and does not yet incorporate lead age, partner win rate/tier,
+   * or previous revenue.
+   *
+   * @param lead The lead to score.
+   * @return A fit score (currently 50, or 60 for Healthcare industry leads).
+   */
   public static Decimal score(Lead lead) {
     Decimal score = 50;
 

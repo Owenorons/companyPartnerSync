@@ -61,7 +61,7 @@ The `force-app` directory declares the managed package name and a `0.1.0.NEXT` d
 
 ```sh
 PARTNER_SYNC_PACKAGE=0Ho... \
-PARTNER_SYNC_DEV_HUB=my-dev-hub \
+PARTNER_SYNC_DEV_HUB=evosphereSolutions \
 ./scripts/package-version.sh
 ```
 
@@ -69,7 +69,7 @@ Do not fabricate or copy package IDs between unrelated Dev Hubs. Once a released
 
 ## Release flow
 
-Pull requests run project validation, ESLint, formatting, Jest coverage, and Salesforce Code Analyzer. Pushes build an immutable Git-delta artifact. The `feature` branch promotes through staging and full sandbox; `main` validates and quick-deploys to production.
+Pull requests run project validation, deployment baseline regression tests, ESLint, formatting, Jest coverage, and Salesforce Code Analyzer. Pushes build an immutable artifact containing a delta from each environment's last successful deployment. The `feature` branch promotes through staging and full sandbox; `main` validates and quick-deploys to production.
 
 Direct org deployment and managed-package publication are separate release modes. A production package release should additionally create a beta version, install it into a clean org, run Apex and smoke tests, test upgrade from the current ancestor, and only then promote the package version.
 

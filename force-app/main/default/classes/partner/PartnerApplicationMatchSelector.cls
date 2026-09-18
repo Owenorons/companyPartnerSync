@@ -1,9 +1,16 @@
-/*
+/**
  * Finds existing CRM records that may represent the applicant. These are
  * advisory matches: reviewers must acknowledge them before creating a new
  * partner Account and Contact, but no records are merged automatically.
  */
 public with sharing class PartnerApplicationMatchSelector {
+  /**
+   * Finds existing Account and Contact records that may already represent
+   * the applicant, matching on company name, website, or submitter email.
+   *
+   * @param application The Partner_Application__c record being reviewed.
+   * @return Advisory potential-match DTOs for any matching Account/Contact records found.
+   */
   public static List<PartnerApplicationMatchDTO> findPotentialMatches(
     Partner_Application__c application
   ) {

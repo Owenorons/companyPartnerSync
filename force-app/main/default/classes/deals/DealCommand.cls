@@ -1,3 +1,8 @@
+/**
+ * Data carrier for a single lifecycle command submitted to DealCommandService: identifies the
+ * target deal/aggregate, the requested command type, an idempotency key, and any
+ * command-specific parameters.
+ */
 public class DealCommand {
   @AuraEnabled
   public String aggregateType;
@@ -24,10 +29,18 @@ public class DealCommand {
   @AuraEnabled
   public Map<String, Object> parameters;
 
+  /**
+   * Creates a new command with an initialized, empty parameters map.
+   */
   public DealCommand() {
     parameters = new Map<String, Object>();
   }
 
+  /**
+   * Validates that this command has the fields required to be executed: deal and aggregate
+   * identifiers, an aggregate type and lifecycle dimension, a command type, and a command key no
+   * longer than 80 characters. Also ensures parameters is non-null.
+   */
   public void validate() {
     if (dealId == null || aggregateId == null) {
       throw new DealLifecycleException(

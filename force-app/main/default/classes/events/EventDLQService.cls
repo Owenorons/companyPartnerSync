@@ -1,15 +1,19 @@
-/*
+/**
  * Dead-letter queue for platform event processing failures: when
  * PartnerSyncEventHandler catches an exception from a consumer, it lands
  * here instead of being lost, so it can be inspected/retried later.
  */
 public with sharing class EventDLQService {
-  /*
+  /**
    * Dead-letter logging is an operational recovery path invoked after another
    * transaction has failed. It intentionally writes in system mode so failure
    * evidence is retained even when the originating user cannot create DLQ
    * records. Callers cannot choose arbitrary fields: this service owns the
    * complete record construction.
+   *
+   * @param eventType The Event_Type__c of the platform event that failed to process.
+   * @param payload The event payload to serialize for later inspection.
+   * @param ex The exception that caused processing to fail.
    */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static void logFailure(

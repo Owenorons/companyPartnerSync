@@ -1,10 +1,20 @@
-/*
+/**
  * Query layer for Partner_Application__c across the onboarding flow:
  * duplicate detection at submit time, the reviewer queue, and single-record
  * lookups for detail/decision. Each method selects only the columns its
  * specific caller needs rather than one shared "full record" query.
  */
 public with sharing class PartnerApplicationSelector {
+  /**
+   * Finds submitted, under-review, or approved applications matching the
+   * given normalized company name or business email, for duplicate
+   * detection at submission time.
+   *
+   * @param normalizedCompanyName Normalized company name to match against.
+   * @param businessEmail Business email to match against.
+   * @return Up to 10 Partner_Application__c records considered potential
+   * duplicates.
+   */
   public static List<Partner_Application__c> findPotentialDuplicates(
     String normalizedCompanyName,
     String businessEmail
@@ -23,6 +33,13 @@ public with sharing class PartnerApplicationSelector {
     ];
   }
 
+  /**
+   * Retrieves a single partner application by Id with the fields needed
+   * for the reviewer detail view.
+   *
+   * @param applicationId Id of the Partner_Application__c to retrieve.
+   * @return The matching Partner_Application__c record.
+   */
   public static Partner_Application__c selectById(Id applicationId) {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 
@@ -67,6 +84,14 @@ public with sharing class PartnerApplicationSelector {
     return rows[0];
   }
 
+  /**
+   * Retrieves a single partner application locked for update, with the
+   * fields needed to record a review decision or provisioning outcome.
+   *
+   * @param applicationId Id of the Partner_Application__c to retrieve.
+   * @return The matching Partner_Application__c record, locked
+   * (FOR UPDATE).
+   */
   public static Partner_Application__c selectForDecisionById(Id applicationId) {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 
@@ -107,6 +132,13 @@ public with sharing class PartnerApplicationSelector {
     return rows[0];
   }
 
+  /**
+   * Retrieves applications currently awaiting review, ordered by
+   * submission date, for the reviewer queue.
+   *
+   * @return Up to 500 Partner_Application__c records with status
+   * Submitted or Under Review.
+   */
   public static List<Partner_Application__c> selectPendingApplications() {
     SecurityUtil.assertReadable(Partner_Application__c.SObjectType);
 

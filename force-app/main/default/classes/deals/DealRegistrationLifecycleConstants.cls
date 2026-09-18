@@ -1,3 +1,7 @@
+/**
+ * Action-name constants for the Deal Registration lifecycle dimension, used
+ * to identify commands routed to the RegistrationLifecycleCommandHandler.
+ */
 public class DealRegistrationLifecycleConstants {
   public static final String SUBMIT = 'Submit Deal';
   public static final String REQUEST_INFORMATION = 'Request Information';

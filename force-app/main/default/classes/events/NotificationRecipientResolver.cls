@@ -3,6 +3,15 @@ public without sharing class NotificationRecipientResolver {
   @TestVisible
   private static Map<Id, List<User>> testRecipientsByAccount = new Map<Id, List<User>>();
 
+  /**
+   * Resolves the active Experience Cloud users associated (via their
+   * Contact's Account) with each of the given partner account ids, so they
+   * can receive event notifications. In test context, also merges in any
+   * recipients seeded via testRecipientsByAccount.
+   *
+   * @param partnerAccountIds The partner account ids to resolve recipients for.
+   * @return A map of partner account id to the list of active users linked to that account.
+   */
   public static Map<Id, List<User>> resolveByPartnerAccount(
     Set<Id> partnerAccountIds
   ) {

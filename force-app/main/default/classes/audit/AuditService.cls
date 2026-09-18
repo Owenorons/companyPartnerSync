@@ -1,10 +1,19 @@
-/*
+/**
  * Writes immutable audit trail entries for partner-visible actions (deal
  * decisions, content downloads, MDF approvals, etc.). This is the single
  * write path into Audit_Log__c — build the request via AuditFactory, then
  * call log() here.
  */
 public with sharing class AuditService {
+  /**
+   * Writes an Audit_Log__c record from the given request, stamping the
+   * running user and timestamp. The insert runs in system mode so the audit
+   * trail is captured even for least-privilege users, and any failure is
+   * caught and logged rather than rethrown so audit logging never breaks
+   * the operation it's recording.
+   *
+   * @param request The audit entry to write; a null request is a no-op.
+   */
   public static void log(AuditLogRequestDTO request) {
     if (request == null) {
       return;

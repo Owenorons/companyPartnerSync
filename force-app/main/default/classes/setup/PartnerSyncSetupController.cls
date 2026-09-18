@@ -19,6 +19,14 @@ public with sharing class PartnerSyncSetupController {
     'PartnerSync Partner Share Cleanup' => '0 45 2 * * ?'
   };
 
+  /**
+   * Runs the full set of subscriber-org readiness checks (core metadata,
+   * administrator access, permission groups, onboarding policy, scheduled
+   * automation, Experience Cloud, AI configuration) and summarizes them.
+   * Requires PartnerSync setup administrator access.
+   *
+   * @return The readiness report, with one check result per readiness area.
+   */
   @AuraEnabled(cacheable=true)
   public static ReadinessReport getReadiness() {
     assertSetupAdministrator();
@@ -54,6 +62,14 @@ public with sharing class PartnerSyncSetupController {
     return report;
   }
 
+  /**
+   * Schedules (or re-schedules, if not already active) the required
+   * PartnerSync operational automation jobs, aborting any stale scheduled
+   * instances first, then returns the refreshed readiness report. Requires
+   * PartnerSync setup administrator access.
+   *
+   * @return The readiness report after the automation jobs have been scheduled.
+   */
   @AuraEnabled
   public static ReadinessReport configureOperationalAutomation() {
     assertSetupAdministrator();
@@ -338,30 +354,48 @@ public with sharing class PartnerSyncSetupController {
     return null;
   }
 
+  /**
+   * Summary of a subscriber org's PartnerSync setup readiness, made up of
+   * individual per-area ReadinessCheck results.
+   */
   public class ReadinessReport {
+    /** When this report was generated. */
     @AuraEnabled
     public Datetime generatedAt;
+    /** The individual readiness checks that make up this report. */
     @AuraEnabled
     public List<ReadinessCheck> checks;
+    /** The number of checks with status READY. */
     @AuraEnabled
     public Integer readyCount;
+    /** The total number of checks run. */
     @AuraEnabled
     public Integer totalCount;
+    /** True when no check has status ACTION_REQUIRED. */
     @AuraEnabled
     public Boolean coreReady;
+    /** True when coreReady is true and the Experience Cloud check is READY. */
     @AuraEnabled
     public Boolean portalReady;
   }
 
+  /**
+   * The result of a single readiness check for one setup area.
+   */
   public class ReadinessCheck {
+    /** Stable identifier for the readiness area (e.g. 'core-metadata'). */
     @AuraEnabled
     public String key;
+    /** Human-readable label for the readiness area. */
     @AuraEnabled
     public String label;
+    /** The check outcome: READY, ACTION_REQUIRED, or WARNING. */
     @AuraEnabled
     public String status;
+    /** A description of the current state for this readiness area. */
     @AuraEnabled
     public String detail;
+    /** The recommended next action for this readiness area. */
     @AuraEnabled
     public String action;
   }

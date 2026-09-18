@@ -1,5 +1,17 @@
+/**
+ * Executes protection-grant lifecycle commands (Activate, Extend, Release, Expire Protection)
+ * against Deal_Protection_Grant__c records, idempotently: a prior action row matching the
+ * command's key short-circuits re-execution and returns the previously recorded grant.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealProtectionCommandService {
+  /**
+   * Executes a protection command, dispatching to the matching action (activate, extend,
+   * release, or expire) and recording a Deal_Protection_Action__c for idempotency.
+   *
+   * @param command The protection command to execute.
+   * @return The resulting (or unchanged, for a replayed command) Deal_Protection_Grant__c.
+   */
   public static Deal_Protection_Grant__c execute(
     DealProtectionCommand command
   ) {
@@ -263,6 +275,10 @@ public without sharing class DealProtectionCommandService {
         'Deal, action, and a command key are required.'
       );
   }
+  /**
+   * Thrown when a protection command can't be executed, e.g. a stale version, an inactive grant,
+   * an unapproved deal, or a policy limit being exceeded.
+   */
   public class ProtectionCommandException extends Exception {
   }
 }

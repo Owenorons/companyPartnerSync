@@ -1,10 +1,17 @@
-/*
+/**
  * Admin-triggered "test connection" flow for a configured AI provider.
  * Runs a minimal live callout through AIProviderRouter and persists the
  * outcome onto AI_Configuration__c so the provider admin UI can show
  * connection health without re-running a callout on every page load.
  */
 public with sharing class AIConnectionTestService {
+  /**
+   * Runs a minimal live callout against a configured AI provider and
+   * records the outcome, asserting AI configuration permission first.
+   *
+   * @param providerDeveloperName DeveloperName of the AI_Provider_Config__mdt to test.
+   * @return The provider's response, with success indicating whether the callout succeeded.
+   */
   public static AIProviderResponseDTO testConnection(
     String providerDeveloperName
   ) {

@@ -1,4 +1,4 @@
-/*
+/**
  * Marker exception for expected, user-facing business-rule failures (bad
  * input, missing permission, invalid state) across the partner domain.
  * Controllers catch this type specifically to surface ex.getMessage()

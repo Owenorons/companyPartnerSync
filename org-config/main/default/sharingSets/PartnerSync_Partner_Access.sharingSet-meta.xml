@@ -2,44 +2,38 @@
 <SharingSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <accessMappings>
     <accessLevel>Read</accessLevel>
-    <object>Partner_Onboarding__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__Partner_Onboarding__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <accessMappings>
     <accessLevel>ReadWrite</accessLevel>
-    <object>Deal_Registration__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__Deal_Registration__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <accessMappings>
     <accessLevel>Read</accessLevel>
-    <object>MDF_Request__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__MDF_Request__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <accessMappings>
     <accessLevel>Read</accessLevel>
-    <object>Partner_Performance__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__Partner_Performance__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <accessMappings>
     <accessLevel>Read</accessLevel>
-    <object>Partner_Notification__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__Partner_Notification__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <accessMappings>
     <accessLevel>Read</accessLevel>
-    <object>AI_Insight__c</object>
-    <objectField>Partner_Account__c</objectField>
-    <userField>User.Contact.AccountId</userField>
-  </accessMappings>
-  <accessMappings>
-    <accessLevel>Read</accessLevel>
-    <object>Usage_Metric__c</object>
-    <objectField>Partner_Account__c</objectField>
+    <object>psync__AI_Insight__c</object>
+    <objectField>psync__Partner_Account__c</objectField>
     <userField>User.Contact.AccountId</userField>
   </accessMappings>
   <description

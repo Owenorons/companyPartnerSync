@@ -1,10 +1,20 @@
-/*
+/**
  * AIProvider implementation adapting the standard OpenAI chat
  * completions API. Unlike AzureOpenAIProvider, the model name travels
  * in the request body ("model") rather than being implied by the
  * endpoint/deployment, and there is no api-version query parameter.
  */
 public with sharing class OpenAIProvider implements AIProvider {
+  /**
+   * Calls the configured OpenAI chat completions endpoint via
+   * Named_Credential__c, including the resolved model name in the
+   * request body, and parses the response with
+   * OpenAICompatibleResponseParser. Returns success=false (rather than
+   * throwing) when the provider is unconfigured or the callout fails.
+   *
+   * @param request The normalized generation request (prompt, context, model params).
+   * @return The normalized generation result, with success indicating whether generation succeeded.
+   */
   public AIProviderResponseDTO generate(AIProviderRequestDTO request) {
     AI_Provider_Config__mdt config = AI_Provider_Config__mdt.getInstance(
       'OpenAI'

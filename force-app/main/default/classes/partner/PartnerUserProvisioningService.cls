@@ -1,9 +1,16 @@
-/*
+/**
  * Starts login provisioning after an administrator has enabled the approved
  * Account as a Salesforce partner account. User creation is asynchronous to
  * keep setup-object DML separate from application/Account/Contact DML.
  */
 public with sharing class PartnerUserProvisioningService {
+  /**
+   * Validates that an approved application's partner Account has been
+   * enabled and is not already provisioned/queued, then enqueues
+   * asynchronous partner user provisioning and marks the application Queued.
+   *
+   * @param applicationId Id of the approved Partner_Application__c record.
+   */
   public static void requestProvisioning(Id applicationId) {
     PartnerPermissionService.assertCanApprovePartnerApplications();
     SecurityUtil.assertUpdateable(Partner_Application__c.SObjectType);

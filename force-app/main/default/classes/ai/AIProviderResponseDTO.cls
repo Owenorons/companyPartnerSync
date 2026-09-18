@@ -1,4 +1,4 @@
-/*
+/**
  * DTO carrying a normalized generation result back out of an AIProvider
  * implementation. success=false with errorMessage set represents a
  * handled failure (misconfiguration, callout error, disabled provider)

@@ -35,6 +35,23 @@ private class MDFSelectorTest {
         request.Id,
         MDFSelector.selectForInternalReview(request.Id).Id
       );
+      Assert.areEqual(request.Id, MDFSelector.selectForDecision(request.Id).Id);
+      Assert.areEqual(
+        1000,
+        MDFSelector.selectPartnerBudgetForApproval(partner.Id).MDF_Used__c
+      );
+      try {
+        MDFSelector.selectForDecision(partner.Id);
+        Assert.fail('Expected missing locked request rejection.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('not found'));
+      }
+      try {
+        MDFSelector.selectPartnerBudgetForApproval(UserInfo.getUserId());
+        Assert.fail('Expected missing locked budget rejection.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('not found'));
+      }
       assertNotAccessible(request.Id, UserInfo.getUserId());
       assertBudgetMissing(UserInfo.getUserId());
       assertInternalMissing(partner.Id);

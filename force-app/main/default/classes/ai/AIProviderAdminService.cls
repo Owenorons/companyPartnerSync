@@ -1,9 +1,15 @@
-/*
+/**
  * Admin service backing the AI provider configuration UI: joins the
  * AI_Provider_Config__mdt catalog with per-provider connection status
  * recorded in AI_Configuration__c (see AIConnectionTestService).
  */
 public with sharing class AIProviderAdminService {
+  /**
+   * Lists all configured AI providers joined with their recorded
+   * connection status, asserting AI configuration permission first.
+   *
+   * @return AI provider status DTOs for the admin provider list UI.
+   */
   public static List<AIProviderStatusDTO> getProviders() {
     PartnerPermissionService.assertCanConfigureAI();
 

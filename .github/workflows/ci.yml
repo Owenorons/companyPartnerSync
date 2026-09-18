@@ -27,6 +27,9 @@ jobs:
       - name: Validate Salesforce project configuration
         run: npm run validate:project
 
+      - name: Deployment baseline regression tests
+        run: node --test scripts/ci/deployment-baseline.test.js
+
       - name: ESLint
         run: npm run lint
 

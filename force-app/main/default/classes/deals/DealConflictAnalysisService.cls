@@ -1,9 +1,22 @@
 // Internal conflict findings must cross partner sharing boundaries. Only the
 // restricted Candidate projection leaves the privileged selector. NOPMD
+/**
+ * Runs the conflict-detection rule set against a deal registration and
+ * persists the resulting analysis run and conflict findings, reusing a prior
+ * run when its inputs are unchanged.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealConflictAnalysisService {
   private static final String RULE_SET_VERSION = '1.0';
 
+  /**
+   * Analyses the deal in the given context for potential registration
+   * conflicts, superseding any prior current analysis run and creating a new
+   * one when the analysis inputs have changed since the last run.
+   *
+   * @param context The deal, derived customer identity, and validation findings to analyse.
+   * @return A summary of whether a conflict was found and the matched deal ids.
+   */
   public static DealConflictDTO analyze(DealConflictContext context) {
     String inputHash = buildInputHash(context);
     List<Deal_Conflict_Analysis_Run__c> currentRuns = [

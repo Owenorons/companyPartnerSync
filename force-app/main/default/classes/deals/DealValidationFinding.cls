@@ -1,3 +1,7 @@
+/**
+ * A single validation rule failure recorded against a deal registration
+ * during submission.
+ */
 public class DealValidationFinding {
   public String ruleKey;
   public String ruleVersion;

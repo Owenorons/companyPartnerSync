@@ -1,4 +1,4 @@
-/*
+/**
  * Domain layer for the internal review/decision workflow: maps queried
  * Deal_Registration__c rows (plus their conflicting siblings) into review
  * DTOs, and validates a reviewer's decision. The internal-review
@@ -6,6 +6,12 @@
  * the partner-submission side before any review has happened.
  */
 public with sharing class DealReviewDomain {
+  /**
+   * Maps a Deal_Registration__c to the row shape used in the internal review queue.
+   *
+   * @param record Deal registration record to map.
+   * @return The mapped DealReviewListDTO.
+   */
   public static DealReviewListDTO toListDTO(Deal_Registration__c record) {
     DealReviewListDTO dto = new DealReviewListDTO();
 
@@ -35,6 +41,15 @@ public with sharing class DealReviewDomain {
     return dto;
   }
 
+  /**
+   * Maps a Deal_Registration__c and its conflicting siblings to the full detail shape used on
+   * the internal review screen, including mapped conflict rows and computed risk fields from
+   * DealRiskScoringService.
+   *
+   * @param record Deal registration record to map.
+   * @param conflicts Competing deal registrations found for the same customer account.
+   * @return The mapped DealReviewDetailDTO.
+   */
   public static DealReviewDetailDTO toDetailDTO(
     Deal_Registration__c record,
     List<Deal_Registration__c> conflicts
@@ -96,6 +111,13 @@ public with sharing class DealReviewDomain {
     return dto;
   }
 
+  /**
+   * Maps a competing Deal_Registration__c to the per-conflict detail shape shown to internal
+   * reviewers.
+   *
+   * @param record Competing deal registration record to map.
+   * @return The mapped DealConflictDetailDTO.
+   */
   public static DealConflictDetailDTO toConflictDTO(
     Deal_Registration__c record
   ) {
@@ -119,6 +141,13 @@ public with sharing class DealReviewDomain {
     return dto;
   }
 
+  /**
+   * Validates that an internal reviewer's decision request is well-formed: a deal Id and a
+   * supported decision value are present, a rejection reason is given for 'Rejected', and a
+   * positive extension length is given for 'Protection Extended'.
+   *
+   * @param request The reviewer's decision request.
+   */
   public static void validateDecision(DealReviewDecisionDTO request) {
     if (request == null || request.dealId == null) {
       throw new PartnerSyncHandledException(

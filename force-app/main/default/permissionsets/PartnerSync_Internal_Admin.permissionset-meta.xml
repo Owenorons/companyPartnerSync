@@ -1345,6 +1345,11 @@
         <field>Usage_Metric__c.License_Tier__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Usage_Metric__c.Partner_Account__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>PartnerSync Internal Admin</label>
     <objectPermissions>

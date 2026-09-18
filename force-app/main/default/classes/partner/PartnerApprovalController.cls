@@ -1,10 +1,15 @@
-/*
+/**
  * Aura-enabled entry point for the internal reviewer UI's approve/reject
  * action on a partner application. Delegates all decisioning logic to
  * PartnerOnboardingService; this class only exists to translate handled vs.
  * unhandled exceptions into what the LWC is allowed to see.
  */
 public with sharing class PartnerApprovalController {
+  /**
+   * Applies a reviewer's approve/reject decision to a partner application.
+   *
+   * @param request The reviewer's decision payload.
+   */
   @AuraEnabled
   public static void processDecision(PartnerApprovalRequestDTO request) {
     try {
@@ -19,6 +24,11 @@ public with sharing class PartnerApprovalController {
     }
   }
 
+  /**
+   * Requests partner user access provisioning for an approved application.
+   *
+   * @param applicationId Id of the approved Partner_Application__c record.
+   */
   @AuraEnabled
   public static void requestProvisioning(Id applicationId) {
     try {

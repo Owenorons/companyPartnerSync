@@ -1,8 +1,13 @@
-/*
+/**
  * Selector layer for the AI provider catalog (AI_Provider_Config__mdt)
  * and connection status (AI_Configuration__c).
  */
 public with sharing class AIProviderSelector {
+  /**
+   * Selects all configured AI providers, ordered by display name.
+   *
+   * @return All AI_Provider_Config__mdt records.
+   */
   public static List<AI_Provider_Config__mdt> selectAllProviders() {
     return [
       SELECT DeveloperName, Provider_Name__c, Provider_Type__c, Active__c
@@ -12,6 +17,11 @@ public with sharing class AIProviderSelector {
     ];
   }
 
+  /**
+   * Selects the recorded connection status for every AI provider.
+   *
+   * @return Connection status records keyed by provider developer name (Provider__c).
+   */
   public static Map<String, AI_Configuration__c> selectStatusByProvider() {
     SecurityUtil.assertReadable(AI_Configuration__c.SObjectType);
 

@@ -1,8 +1,20 @@
-/*
+/**
  * Best-effort audit trail for lead distribution actions (assign/accept/
  * reject), writing to Lead_Distribution_Log__c.
  */
 public with sharing class LeadDistributionLogService {
+  /**
+   * Records a lead distribution action to the audit log. Never throws:
+   * a missing create permission or insert failure is logged and swallowed
+   * so logging can never block the caller's primary lead operation.
+   *
+   * @param leadId Id of the Lead the action relates to.
+   * @param partnerAccountId Id of the partner Account involved in the action.
+   * @param partnerContactId Id of the partner Contact involved in the action.
+   * @param action The action performed (e.g. Assigned, Accepted, Rejected).
+   * @param status The lead's resulting distribution status.
+   * @param notes Optional notes to attach to the log entry.
+   */
   public static void logAction(
     Id leadId,
     Id partnerAccountId,

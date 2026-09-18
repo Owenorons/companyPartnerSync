@@ -1,4 +1,16 @@
+/**
+ * Trigger-time guard that blocks direct changes to a deal registration's
+ * lifecycle control fields outside of an authorised deal command.
+ */
 public class DealLifecycleMutationGuard {
+  /**
+   * Adds a validation error to each row whose lifecycle control fields
+   * (phase, version, last event, lock flag, or lock reason) changed outside
+   * of a controlled mutation or migration context.
+   *
+   * @param newRows The trigger new records being saved.
+   * @param oldMap Map of trigger old records, keyed by Id, to compare against.
+   */
   public static void enforce(
     List<Deal_Registration__c> newRows,
     Map<Id, Deal_Registration__c> oldMap

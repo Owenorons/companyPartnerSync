@@ -46,6 +46,16 @@ private class PartnerContentServiceTest {
           WHERE Record_Id__c = :String.valueOf(visible.Id)
         ]
       );
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM Usage_Metric__c
+          WHERE
+            Partner_Account__c = :partner.Id
+            AND Metric_Type__c = 'Content Download'
+        ]
+      );
     }
   }
 

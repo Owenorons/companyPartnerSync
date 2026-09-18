@@ -1,10 +1,16 @@
-/*
+/**
  * Orchestrates converting an accepted Lead into an Opportunity and Deal
  * Registration. This is the "conversion" half of the lead lifecycle — it
  * only operates on leads that have already been through the assignment
  * (LeadDistributionService) and acceptance (LeadDecisionService) steps.
  */
 public with sharing class LeadConversionService {
+  /**
+   * Converts an accepted Lead into an Opportunity and Deal Registration.
+   *
+   * @param request The lead conversion request.
+   * @return The Ids of the records produced by the conversion.
+   */
   public static LeadConversionResultDTO convertLead(
     LeadConversionRequestDTO request
   ) {

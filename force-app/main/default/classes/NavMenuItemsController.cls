@@ -1,4 +1,4 @@
-/*
+/**
  * Aura-enabled controller backing a custom Experience Builder navigation
  * component. `global` because Experience Builder components / the platform
  * cache layer invoke it across package/namespace boundaries, not because
@@ -10,9 +10,22 @@ global with sharing class NavMenuItemsController {
   @TestVisible
   private static Id linkSetIdOverride;
 
+  /**
+   * Default constructor.
+   */
   public NavMenuItemsController() {
   }
 
+  /**
+   * Retrieves the published navigation menu items for the given menu, for
+   * the current Experience Cloud site. Returns an empty list rather than
+   * throwing when the menu name is blank or the menu/link set can't be
+   * found, so page chrome degrades quietly instead of erroring.
+   *
+   * @param menuName The DeveloperName of the NavigationLinkSet to retrieve items for.
+   * @param publishedState The Status of items to retrieve (Draft or Live).
+   * @return The matching NavigationMenuItem records, ordered by Position.
+   */
   @AuraEnabled(cacheable=true)
   public static List<NavigationMenuItem> getNavigationMenuItems(
     String menuName,

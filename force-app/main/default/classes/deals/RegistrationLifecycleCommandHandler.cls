@@ -1,8 +1,21 @@
+/**
+ * Command handler for the Deal Registration lifecycle dimension. Applies
+ * submission, information-request, rejection, cancellation, and
+ * final-approval actions to a deal registration.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class RegistrationLifecycleCommandHandler implements DealCommandHandler {
   @TestVisible
   private static Boolean useSystemModeForTests = true;
 
+  /**
+   * Validates that the requested registration action is allowed given the
+   * command context, throwing when a required reason is missing or when
+   * final-approval preconditions (blocking conflicts, approval plan
+   * readiness) are not met.
+   *
+   * @param context The command execution context, including the deal and command.
+   */
   public void validate(DealCommandContext context) {
     String action = context.command.commandType;
     if (
@@ -26,6 +39,13 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     }
   }
 
+  /**
+   * Applies the requested registration action to the deal on the command
+   * context: routing a submission, recording an information request,
+   * rejecting or cancelling the registration, or finalising approval.
+   *
+   * @param context The command execution context to mutate.
+   */
   public void execute(DealCommandContext context) {
     String action = context.command.commandType;
     if (

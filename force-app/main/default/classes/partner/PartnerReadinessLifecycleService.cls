@@ -5,15 +5,41 @@ public without sharing class PartnerReadinessLifecycleService {
   @TestVisible
   private static Boolean testLifecycleAuthority = false;
 
+  /**
+   * Result of evaluating an onboarding's activation gates, showing which
+   * individual gates passed and any blockers preventing readiness.
+   */
   public class GateResult {
+    /**
+     * Whether all activation gates passed.
+     */
     @AuraEnabled
     public Boolean ready;
+    /**
+     * Pass/fail state of each individual activation gate, keyed by gate
+     * name.
+     */
     @AuraEnabled
     public Map<String, Boolean> gates = new Map<String, Boolean>();
+    /**
+     * Human-readable descriptions of any failed gates.
+     */
     @AuraEnabled
     public List<String> blockers = new List<String>();
   }
 
+  /**
+   * Assigns (or re-assigns) a training item to a partner onboarding.
+   * Requires partner lifecycle management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c the training is
+   * assigned to.
+   * @param trainingKey Key identifying the training item.
+   * @param mandatory Whether completing the training is mandatory for
+   * readiness.
+   * @param dueOn Date the training assignment is due.
+   * @return The created or updated Partner_Training_Assignment__c record.
+   */
   public static Partner_Training_Assignment__c assignTraining(
     Id onboardingId,
     String trainingKey,
@@ -37,6 +63,15 @@ public without sharing class PartnerReadinessLifecycleService {
     return assignment;
   }
 
+  /**
+   * Evaluates all activation gates (documents, risk, approval, agreements,
+   * relationship, access, training) for an onboarding, persists a
+   * readiness assessment and updates the onboarding's gate status.
+   * Requires partner lifecycle management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c to evaluate.
+   * @return A GateResult describing readiness and any blockers found.
+   */
   public static GateResult evaluate(Id onboardingId) {
     assertLifecycleAuthority();
     Partner_Onboarding__c onboarding = [
@@ -183,6 +218,14 @@ public without sharing class PartnerReadinessLifecycleService {
     return result;
   }
 
+  /**
+   * Activates an onboarding that has a persisted Ready gate evaluation,
+   * setting hypercare and recertification dates and recording a lifecycle
+   * event. Requires partner lifecycle management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c to activate.
+   * @return The updated, now-Active Partner_Onboarding__c record.
+   */
   public static Partner_Onboarding__c activate(Id onboardingId) {
     assertLifecycleAuthority();
     Partner_Onboarding__c onboarding = [
@@ -216,6 +259,18 @@ public without sharing class PartnerReadinessLifecycleService {
     return onboarding;
   }
 
+  /**
+   * Transitions an onboarding to a post-activation lifecycle status
+   * (Suspended, Under Investigation, Termination Pending, Terminated, or
+   * Archived), recording the reason and, for Terminated, expiring related
+   * relationships and access requests. Requires partner lifecycle
+   * management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c to transition.
+   * @param targetStatus The lifecycle status to transition to.
+   * @param reason Reason for the transition.
+   * @return The updated Partner_Onboarding__c record.
+   */
   public static Partner_Onboarding__c transition(
     Id onboardingId,
     String targetStatus,
@@ -316,6 +371,10 @@ public without sharing class PartnerReadinessLifecycleService {
     );
   }
 
+  /**
+   * Thrown when a partner lifecycle operation is attempted without
+   * required authority or against an onboarding in an invalid state.
+   */
   public class LifecycleException extends Exception {
   }
 }

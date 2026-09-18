@@ -8,20 +8,31 @@ public with sharing class PartnerHealthScoringService {
     'Strategic'
   };
 
+  /**
+   * Calculates a partner's health score from its live KPI data.
+   *
+   * @param partnerAccountId Id of the partner Account to score.
+   * @return The partner's health score (0-100).
+   */
   public static Decimal calculate(Id partnerAccountId) {
     if (partnerAccountId == null) {
       throw new PartnerSyncHandledException('A partner account is required.');
     }
     PartnerKPIDTO kpi = AnalyticsDomain.calculatePartnerKPI(
-      AnalyticsSelector.selectPartnerLeads(partnerAccountId),
-      AnalyticsSelector.selectPartnerDeals(partnerAccountId),
-      AnalyticsSelector.selectPartnerOpportunities(partnerAccountId),
+      AnalyticsSelector.selectKpiTotals(new Set<Id>{ partnerAccountId })
+        .get(partnerAccountId),
       AnalyticsSelector.selectPartnerBudget(partnerAccountId)
     );
     return kpi.healthScore;
   }
 
-  /** Subscriber-configured weights are normalised to a safe 0-100 result. */
+  /**
+   * Calculates a partner's health score from a precomputed KPI DTO.
+   * Subscriber-configured weights are normalised to a safe 0-100 result.
+   *
+   * @param kpi Precomputed partner KPI data.
+   * @return The partner's health score (0-100), or 0 if kpi is null.
+   */
   public static Decimal calculate(PartnerKPIDTO kpi) {
     if (kpi == null)
       return 0;
@@ -35,6 +46,12 @@ public with sharing class PartnerHealthScoringService {
     return score.setScale(0);
   }
 
+  /**
+   * Maps a numeric health score to a display label.
+   *
+   * @param score The health score (0-100); treated as 0 if null.
+   * @return 'Thriving', 'Healthy', 'Developing', or 'Needs Attention'.
+   */
   public static String healthLabel(Decimal score) {
     Decimal value = score == null ? 0 : score;
     if (value >= 80)
@@ -46,7 +63,13 @@ public with sharing class PartnerHealthScoringService {
     return 'Needs Attention';
   }
 
-  /** Tier thresholds come from assignable Partner_Tier__mdt records. */
+  /**
+   * Recommends a partner tier for a given health score. Tier thresholds
+   * come from assignable Partner_Tier__mdt records.
+   *
+   * @param score The health score (0-100); treated as 0 if null.
+   * @return The developer name of the highest-qualifying assignable tier, or 'Silver' if none qualify.
+   */
   public static String recommendTier(Decimal score) {
     Decimal value = score == null ? 0 : score;
     for (Partner_Tier__mdt tier : [
@@ -62,6 +85,13 @@ public with sharing class PartnerHealthScoringService {
     return 'Silver';
   }
 
+  /**
+   * Builds human-readable explanations of each KPI's contribution to a
+   * partner's health score.
+   *
+   * @param kpi Precomputed partner KPI data.
+   * @return One explanatory sentence per scored signal (lead acceptance, lead conversion, deal win rate, pipeline realisation, MDF utilisation); a single fallback message if kpi is null.
+   */
   public static List<String> explain(PartnerKPIDTO kpi) {
     List<String> signals = new List<String>();
     if (kpi == null) {

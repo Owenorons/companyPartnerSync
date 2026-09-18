@@ -1,3 +1,7 @@
+/**
+ * Result of executing a deal conflict lifecycle command, returned to the UI
+ * and cached for idempotent replay of duplicate command keys.
+ */
 public class DealConflictCommandResult {
   @AuraEnabled
   public Boolean completed;

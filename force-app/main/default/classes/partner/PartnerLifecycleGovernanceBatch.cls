@@ -1,5 +1,12 @@
 /** Daily expiry and recertification enforcement for active partner relationships. */
 public without sharing class PartnerLifecycleGovernanceBatch implements Database.Batchable<SObject>, Schedulable {
+  /**
+   * Queries every active (non closed/terminated/archived) partner onboarding
+   * record to be evaluated for expiry and recertification enforcement.
+   *
+   * @param context The batch execution context provided by the platform.
+   * @return A query locator over the in-scope Partner_Onboarding__c records.
+   */
   public Database.QueryLocator start(Database.BatchableContext context) {
     return Database.getQueryLocator(
       [
@@ -17,6 +24,16 @@ public without sharing class PartnerLifecycleGovernanceBatch implements Database
     );
   }
 
+  /**
+   * Expires overdue partner agreements, access requests, training
+   * assignments and documents (and their dependent requirements) for the
+   * batch scope, then blocks activation and records a lifecycle event on any
+   * onboarding whose recertification is due or whose time-bound evidence
+   * just expired.
+   *
+   * @param context The batch execution context provided by the platform.
+   * @param scope The Partner_Onboarding__c records in this batch chunk.
+   */
   public void execute(
     Database.BatchableContext context,
     List<Partner_Onboarding__c> scope
@@ -137,9 +154,20 @@ public without sharing class PartnerLifecycleGovernanceBatch implements Database
     );
   }
 
+  /**
+   * No-op completion hook required by Database.Batchable; this job has no
+   * post-processing to perform.
+   *
+   * @param context The batch execution context provided by the platform.
+   */
   public void finish(Database.BatchableContext context) {
   }
 
+  /**
+   * Scheduled entry point that kicks off this class's own batch run.
+   *
+   * @param context The scheduled execution context provided by the platform.
+   */
   public void execute(SchedulableContext context) {
     Database.executeBatch(new PartnerLifecycleGovernanceBatch(), 100);
   }

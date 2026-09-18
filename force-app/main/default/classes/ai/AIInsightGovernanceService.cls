@@ -1,7 +1,14 @@
-/* Human-governance boundary for model output. Draft insights are never
+/**
+ * Human-governance boundary for model output. Draft insights are never
  * partner-visible; an authorized reviewer must explicitly accept or dismiss
- * them, optionally correcting the recommendation before acceptance. */
+ * them, optionally correcting the recommendation before acceptance.
+ */
 public with sharing class AIInsightGovernanceService {
+  /**
+   * Lists AI insights awaiting human review, asserting reviewer permission first.
+   *
+   * @return AI insights in Draft or Reviewed status, oldest first, limited to 200.
+   */
   public static List<AIInsightDTO> getPendingReview() {
     PartnerPermissionService.assertCanReviewAIInsights();
     List<AIInsightDTO> results = new List<AIInsightDTO>();
@@ -27,6 +34,17 @@ public with sharing class AIInsightGovernanceService {
     return results;
   }
 
+  /**
+   * Records a reviewer's accept/dismiss decision on a draft or reviewed AI
+   * insight, asserting reviewer permission, locking the row, and
+   * validating the transition and (on acceptance) that a summary and
+   * recommendation are present.
+   *
+   * @param insightId Id of the AI_Insight__c to decide.
+   * @param decision The review decision, 'Accepted' or 'Dismissed'.
+   * @param recommendation Optional replacement recommendation text to apply on acceptance; falls back to the insight's existing recommendation when blank.
+   * @return The updated insight as a DTO.
+   */
   public static AIInsightDTO decide(
     Id insightId,
     String decision,
@@ -78,7 +96,7 @@ public with sharing class AIInsightGovernanceService {
     }
     insight.Status__c = decision;
     SecurityUtil.assertUpdateable(AI_Insight__c.SObjectType);
-    update SecurityUtil.stripForUpdate(new List<SObject>{ insight });
+    persistDecision(insight, decision);
 
     AuditLogRequestDTO audit = AuditFactory.createSuccess(
       'AI_Insight__c',
@@ -88,5 +106,19 @@ public with sharing class AIInsightGovernanceService {
     audit.partnerAccountId = insight.Partner_Account__c;
     AuditService.log(audit);
     return AIInsightDomain.toDTO(insight);
+  }
+
+  // Only decide calls this, after reviewer permission, user-mode record access,
+  // row locking, and transition validation. Status and recommendation stay
+  // read-only in permission sets to prevent edits outside the review boundary.
+  @SuppressWarnings('PMD.ApexCRUDViolation')
+  private static void persistDecision(AI_Insight__c insight, String decision) {
+    AI_Insight__c changes = new AI_Insight__c(
+      Id = insight.Id,
+      Status__c = decision
+    );
+    if (decision == 'Accepted')
+      changes.Recommendation__c = insight.Recommendation__c;
+    update changes;
   }
 }

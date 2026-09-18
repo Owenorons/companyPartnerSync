@@ -1,6 +1,15 @@
 /** Controlled evidence orchestration. File binaries remain in Salesforce Files. */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class PartnerDocumentService {
+  /**
+   * Generates (via upsert on the requirement key) the set of document
+   * requirements that apply to an onboarding, based on active
+   * Partner_Document_Requirement_Rule__mdt rules matching the underlying
+   * application's requested tier, partner type and country.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c record to generate requirements for.
+   * @return The document requirement records that were generated.
+   */
   public static List<Partner_Document_Requirement__c> generateRequirements(
     Id onboardingId
   ) {
@@ -73,6 +82,18 @@ public without sharing class PartnerDocumentService {
     return generated;
   }
 
+  /**
+   * Records a partner's submission of a document against a requirement,
+   * versioning it after any prior submissions for the same requirement.
+   * Idempotent on submissionKey: a repeat call with the same key returns the
+   * already-recorded submission instead of creating a duplicate.
+   *
+   * @param requirementId Id of the Partner_Document_Requirement__c this submission satisfies.
+   * @param contentDocumentId Id of the ContentDocument holding the uploaded file.
+   * @param submissionKey Idempotency key identifying this submission attempt.
+   * @param confidentiality Confidentiality level for the document; defaults to 'Partner' when blank.
+   * @return The submitted (or previously recorded) Partner_Document__c record.
+   */
   public static Partner_Document__c submitDocument(
     Id requirementId,
     String contentDocumentId,
@@ -128,6 +149,18 @@ public without sharing class PartnerDocumentService {
     return document;
   }
 
+  /**
+   * Records a reviewer's decision (Accepted/Rejected/Replacement Required)
+   * on a submitted document, updating the document and its requirement to
+   * match. Idempotent on reviewKey: a repeat call with the same key returns
+   * the already-recorded review instead of creating a duplicate.
+   *
+   * @param documentId Id of the Partner_Document__c record being reviewed.
+   * @param outcome The review outcome: 'Accepted', 'Rejected', or 'Replacement Required'.
+   * @param reason Explanation for the outcome; required unless outcome is 'Accepted'.
+   * @param reviewKey Idempotency key identifying this review attempt.
+   * @return The recorded (or previously recorded) Partner_Document_Review__c record.
+   */
   public static Partner_Document_Review__c reviewDocument(
     Id documentId,
     String outcome,

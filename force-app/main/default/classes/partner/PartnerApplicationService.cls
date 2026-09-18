@@ -1,4 +1,4 @@
-/*
+/**
  * Application-layer orchestration for the partner onboarding flow: submit a
  * new application, list pending ones, and view a single application's
  * detail. Validation/shaping logic lives in PartnerApplicationDomain and
@@ -6,6 +6,15 @@
  * feature-flag/duplicate/permission gates around them.
  */
 public with sharing class PartnerApplicationService {
+  /**
+   * Validates and persists a new partner application, rejecting the
+   * submission if onboarding is disabled or a duplicate application
+   * already exists for the same company or email.
+   *
+   * @param request The application submission payload.
+   * @return A PartnerApplicationResultDTO summarizing the created
+   * application.
+   */
   public static PartnerApplicationResultDTO submitApplication(
     PartnerApplicationRequestDTO request
   ) {
@@ -75,6 +84,12 @@ public with sharing class PartnerApplicationService {
     return PartnerApplicationDomain.toResultDTO(insertedRecord);
   }
 
+  /**
+   * Retrieves applications currently awaiting review. Requires
+   * partner-application-approve permission.
+   *
+   * @return List of PartnerApplicationListDTO rows for the review queue.
+   */
   public static List<PartnerApplicationListDTO> getPendingApplications() {
     PartnerPermissionService.assertCanApprovePartnerApplications();
 
@@ -89,6 +104,15 @@ public with sharing class PartnerApplicationService {
     return results;
   }
 
+  /**
+   * Retrieves the full detail of a single partner application, including
+   * any potential duplicate matches. Requires
+   * partner-application-approve permission.
+   *
+   * @param applicationId Id of the Partner_Application__c to load.
+   * @return A PartnerApplicationDetailDTO describing the application and
+   * its potential matches.
+   */
   public static PartnerApplicationDetailDTO getApplicationDetail(
     Id applicationId
   ) {
@@ -108,6 +132,13 @@ public with sharing class PartnerApplicationService {
     return detail;
   }
 
+  /**
+   * Claims an undecided partner application for the running user to
+   * review, failing if it is already decided or assigned to a different
+   * reviewer. Requires partner-application-approve permission.
+   *
+   * @param applicationId Id of the Partner_Application__c to claim.
+   */
   public static void claimApplication(Id applicationId) {
     PartnerPermissionService.assertCanApprovePartnerApplications();
     SecurityUtil.assertUpdateable(Partner_Application__c.SObjectType);

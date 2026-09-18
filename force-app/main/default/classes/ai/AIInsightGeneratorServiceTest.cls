@@ -52,11 +52,34 @@ private class AIInsightGeneratorServiceTest {
       request.partnerAccountId = partner.Id;
       request.insightType = 'LeadFitScoring';
       request.contextData = new Map<String, Object>{ 'health' => 42 };
-      Test.setMock(
-        HttpCalloutMock.class,
-        AIHttpCalloutMock.success('Strong fit for this partner.')
+      // The package deliberately ships with providers inactive. Activate only
+      // this test's routing configuration so the real adapter reaches the mock.
+      AIProviderRouter.providerConfigForTest = new AI_Provider_Config__mdt(
+        Active__c = true,
+        Provider_Type__c = 'OpenAI'
       );
-      AI_Insight__c insight = AIInsightGeneratorService.generate(request);
+      Test.setMock(HttpCalloutMock.class, new NoDmlBeforeCalloutMock());
+      Test.startTest();
+      try {
+        new AIInsightGenerationQueueable(request, System.now().dateGMT())
+          .execute(null);
+        Test.stopTest();
+      } finally {
+        AIProviderRouter.providerConfigForTest = null;
+        TenantConfigService.clearCacheForTest();
+      }
+      AI_Insight__c insight = [
+        SELECT
+          Id,
+          Status__c,
+          Provider__c,
+          Insight_Text__c,
+          Recommendation__c,
+          Confidence__c
+        FROM AI_Insight__c
+        WHERE Partner_Account__c = :partner.Id
+        LIMIT 1
+      ];
       Assert.areEqual('Draft', insight.Status__c);
       Assert.areEqual('OpenAI', insight.Provider__c);
       Assert.areEqual('Strong fit for this partner.', insight.Insight_Text__c);
@@ -66,7 +89,68 @@ private class AIInsightGeneratorServiceTest {
       );
       Assert.areEqual(82, insight.Confidence__c);
       Assert.isNotNull(insight.Id);
-      TenantConfigService.clearCacheForTest();
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM Usage_Metric__c
+          WHERE
+            Partner_Account__c = :partner.Id
+            AND Metric_Type__c = 'AI Request'
+        ]
+      );
+    }
+  }
+
+  @IsTest
+  static void queueRequestPreservesScalarContextAndNulls() {
+    AIInsightRequestDTO original = new AIInsightRequestDTO();
+    original.partnerAccountId = '001000000000001';
+    original.relatedRecordId = '001000000000002';
+    original.relatedObject = 'Account';
+    original.insightType = 'LeadFitScoring';
+    original.contextData = new Map<String, Object>{
+      'score' => 42,
+      'ratio' => 0.5,
+      'active' => true,
+      'label' => 'Partner',
+      'missing' => null
+    };
+    AIInsightRequestDTO restored = AIInsightGenerationQueueable.deserializeRequest(
+      JSON.serialize(original)
+    );
+    Assert.areEqual(original.partnerAccountId, restored.partnerAccountId);
+    Assert.areEqual(original.relatedRecordId, restored.relatedRecordId);
+    Assert.areEqual(original.relatedObject, restored.relatedObject);
+    Assert.areEqual(original.insightType, restored.insightType);
+    Assert.areEqual(42, restored.contextData.get('score'));
+    Assert.areEqual(0.5, restored.contextData.get('ratio'));
+    Assert.areEqual(true, restored.contextData.get('active'));
+    Assert.areEqual('Partner', restored.contextData.get('label'));
+    Assert.isTrue(restored.contextData.containsKey('missing'));
+    Assert.isNull(restored.contextData.get('missing'));
+    original.contextData = null;
+    Assert.isNull(
+      AIInsightGenerationQueueable.deserializeRequest(JSON.serialize(original))
+        .contextData
+    );
+  }
+
+  private class NoDmlBeforeCalloutMock implements HttpCalloutMock {
+    /**
+     * Asserts no DML has run yet, then delegates to a successful mock response.
+     *
+     * @param request The outgoing HTTP request.
+     * @return A simulated successful AI provider response.
+     */
+    public HttpResponse respond(HttpRequest request) {
+      Assert.areEqual(
+        0,
+        Limits.getDmlStatements(),
+        'Worker must not reserve quota in the callout transaction.'
+      );
+      return AIHttpCalloutMock.success('Strong fit for this partner.')
+        .respond(request);
     }
   }
 }

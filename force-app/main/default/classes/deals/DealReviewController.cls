@@ -1,4 +1,4 @@
-/*
+/**
  * Aura-enabled entry point for the internal deal review/approval LWC
  * (queue, detail, decision). Thin wrapper only: delegates to
  * DealReviewService and translates handled exceptions into
@@ -6,6 +6,11 @@
  * equivalent entry point for the partner-facing submission flow.
  */
 public with sharing class DealReviewController {
+  /**
+   * Loads the internal review queue for reviewers with permission to view all deals.
+   *
+   * @return Row shapes for deals awaiting or already through review.
+   */
   @AuraEnabled(cacheable=true)
   public static List<DealReviewListDTO> getReviewQueue() {
     try {
@@ -20,6 +25,13 @@ public with sharing class DealReviewController {
     }
   }
 
+  /**
+   * Loads the full review detail (including conflicts, computed risk, and per-decision
+   * permission flags) for a single deal.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The full review detail DTO for the deal.
+   */
   @AuraEnabled(cacheable=true)
   public static DealReviewDetailDTO getReviewDetail(Id dealId) {
     try {
@@ -34,6 +46,11 @@ public with sharing class DealReviewController {
     }
   }
 
+  /**
+   * Processes an internal reviewer's decision on a deal.
+   *
+   * @param request The reviewer's decision request.
+   */
   @AuraEnabled
   public static void processDecision(DealReviewDecisionDTO request) {
     try {

@@ -1,4 +1,15 @@
+/**
+ * Aura/LWC-facing controller that deserialises and executes deal lifecycle
+ * commands submitted from the UI.
+ */
 public with sharing class DealCommandController {
+  /**
+   * Deserialises the given JSON payload into a DealCommand and executes it,
+   * translating known lifecycle failures into user-facing AuraHandledExceptions.
+   *
+   * @param requestJson JSON-serialised DealCommand to execute.
+   * @return The result of executing the command.
+   */
   @AuraEnabled
   public static DealCommandResult executeCommand(String requestJson) {
     try {

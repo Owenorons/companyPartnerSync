@@ -1,4 +1,4 @@
-/*
+/**
  * One of two consumers PartnerSyncEventHandler fans a PartnerSync_Event__e
  * out to (the other being NotificationEventConsumerService). Event types not
  * present in AUDIT_ACTION_BY_EVENT_TYPE are deliberately ignored rather than
@@ -13,6 +13,13 @@ public with sharing class AuditEventConsumerService {
     'LeadConverted' => 'Convert'
   };
 
+  /**
+   * Writes an audit log entry for a business event, if its event type maps
+   * to an audit action. Event types not present in
+   * AUDIT_ACTION_BY_EVENT_TYPE are silently ignored.
+   *
+   * @param eventRecord The published platform event to audit.
+   */
   public static void logBusinessEvent(PartnerSync_Event__e eventRecord) {
     String action = AUDIT_ACTION_BY_EVENT_TYPE.get(eventRecord.Event_Type__c);
 

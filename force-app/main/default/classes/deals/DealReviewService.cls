@@ -1,4 +1,4 @@
-/*
+/**
  * Orchestrates the internal review/decision workflow (approve, reject,
  * resolve conflict, extend protection) for a deal already created by
  * DealRegistrationService. Layers a permission check (assertCanDecide) on
@@ -6,6 +6,11 @@
  * see the comment on assertCanFinalize for why both are needed.
  */
 public without sharing class DealReviewService {
+  /**
+   * Loads the internal review queue for reviewers with permission to view all deals.
+   *
+   * @return Row shapes for deals awaiting or already through review.
+   */
   public static List<DealReviewListDTO> getReviewQueue() {
     PartnerPermissionService.assertCanViewAllDeals();
 
@@ -18,6 +23,13 @@ public without sharing class DealReviewService {
     return results;
   }
 
+  /**
+   * Loads the full review detail (including conflicts, computed risk, and per-decision
+   * permission flags) for a single deal, for reviewers with permission to view all deals.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The full review detail DTO for the deal.
+   */
   public static DealReviewDetailDTO getReviewDetail(Id dealId) {
     PartnerPermissionService.assertCanViewAllDeals();
 
@@ -39,6 +51,14 @@ public without sharing class DealReviewService {
     return dto;
   }
 
+  /**
+   * Processes an internal reviewer's decision on a deal: checks the reviewer's permission for
+   * the requested decision, validates the request, and dispatches to the matching branch
+   * (approve, reject, resolve conflict, or extend protection), publishing a platform event on
+   * approval.
+   *
+   * @param request The reviewer's decision request.
+   */
   public static void processDecision(DealReviewDecisionDTO request) {
     assertCanDecide(request.decision);
 
@@ -178,7 +198,7 @@ public without sharing class DealReviewService {
     record.Decision_On__c = System.now();
   }
 
-  /*
+  /**
    * Entry point for unattended expiry enforcement (e.g. DealExpiryBatch).
    * processDecision()'s decisions all gate on assertCanDecide(), a
    * permission-set check meant for an interactive reviewer action. A
@@ -186,6 +206,8 @@ public without sharing class DealReviewService {
    * permission set, so gating this path the same way would silently break
    * expiry cleanup. Authorization here instead comes from the record
    * actually being Approved and past its Protection_End_Date__c.
+   *
+   * @param dealId Id of the deal registration to expire.
    */
   public static void expireProtection(Id dealId) {
     Deal_Registration__c record = DealReviewSelector.selectForInternalReview(

@@ -1,21 +1,59 @@
-/** Governed v2 relationship and access-request boundary around technical provisioning. */
+/**
+ * Governed v2 relationship and access-request boundary around technical
+ * provisioning.
+ */
 public without sharing class PartnerAccessProvisioningService {
   @TestVisible
   private static Boolean testAccessManagementAuthority = false;
 
+  /**
+   * Result of checking whether a partner relationship is ready for
+   * enablement, including which prerequisites (if any) are still
+   * outstanding.
+   */
   public class EnablementDiagnostic {
+    /**
+     * Whether an effective agreement exists for the relationship's
+     * onboarding.
+     */
     @AuraEnabled
     public Boolean agreementsEffective;
+    /**
+     * Whether the relationship's Account is enabled as a Salesforce
+     * partner.
+     */
     @AuraEnabled
     public Boolean accountIsPartner;
+    /**
+     * Whether the given contact belongs to the relationship's Account.
+     */
     @AuraEnabled
     public Boolean contactEligible;
+    /**
+     * Whether all enablement prerequisites are satisfied.
+     */
     @AuraEnabled
     public Boolean ready;
+    /**
+     * Human-readable descriptions of any unmet enablement prerequisites.
+     */
     @AuraEnabled
     public List<String> blockers = new List<String>();
   }
 
+  /**
+   * Creates or updates the Partner_Relationship__c for an onboarding once
+   * an effective agreement exists, and links it back to the onboarding
+   * record.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c the relationship
+   * belongs to.
+   * @param accountId Id of the Account the relationship is with.
+   * @param programmeKey Key identifying the partner programme.
+   * @param awardedTier Tier awarded as part of the relationship.
+   * @param relationshipKey Idempotency key used to upsert the relationship.
+   * @return The created or updated Partner_Relationship__c record.
+   */
   public static Partner_Relationship__c establishRelationship(
     Id onboardingId,
     Id accountId,
@@ -59,6 +97,15 @@ public without sharing class PartnerAccessProvisioningService {
     return relationship;
   }
 
+  /**
+   * Evaluates whether a partner relationship meets all enablement
+   * prerequisites, and activates it if it now does.
+   *
+   * @param relationshipId Id of the Partner_Relationship__c to evaluate.
+   * @param contactId Id of the Contact to check eligibility for.
+   * @return An EnablementDiagnostic describing readiness and any
+   * blockers.
+   */
   public static EnablementDiagnostic evaluateEnablement(
     Id relationshipId,
     Id contactId
@@ -106,6 +153,20 @@ public without sharing class PartnerAccessProvisioningService {
     return result;
   }
 
+  /**
+   * Creates an access request for a contact against an active partner
+   * relationship.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c the request
+   * belongs to.
+   * @param relationshipId Id of the active Partner_Relationship__c the
+   * request is made against.
+   * @param contactId Id of the Contact the access is requested for.
+   * @param accessBundle Name of the access bundle being requested.
+   * @param requestKey Idempotency key used to upsert the request.
+   * @param expiresOn Date the requested access should expire, if any.
+   * @return The created or updated Partner_Access_Request__c record.
+   */
   public static Partner_Access_Request__c requestAccess(
     Id onboardingId,
     Id relationshipId,
@@ -147,6 +208,13 @@ public without sharing class PartnerAccessProvisioningService {
     return request;
   }
 
+  /**
+   * Approves a pending, unexpired access request. Requires the
+   * PartnerSync_Approve_Partner_Access custom permission.
+   *
+   * @param requestId Id of the Partner_Access_Request__c to approve.
+   * @return The approved Partner_Access_Request__c record.
+   */
   public static Partner_Access_Request__c approveAccess(Id requestId) {
     if (
       !FeatureManagement.checkPermission('PartnerSync_Approve_Partner_Access')
@@ -179,6 +247,16 @@ public without sharing class PartnerAccessProvisioningService {
     return request;
   }
 
+  /**
+   * Queues asynchronous provisioning of an approved access request.
+   * Requires the PartnerSync_Provision_Partner_Access custom permission.
+   *
+   * @param requestId Id of the approved Partner_Access_Request__c to
+   * provision.
+   * @param attemptKey Idempotency key used to upsert the provisioning
+   * attempt.
+   * @return The queued Partner_Provisioning_Attempt__c record.
+   */
   public static Partner_Provisioning_Attempt__c provisionApprovedAccess(
     Id requestId,
     String attemptKey
@@ -243,6 +321,11 @@ public without sharing class PartnerAccessProvisioningService {
     return attempt;
   }
 
+  /**
+   * Thrown when a partner access provisioning operation is attempted
+   * without the required authority or against a record in an invalid
+   * state.
+   */
   public class PartnerAccessException extends Exception {
   }
 

@@ -27,6 +27,41 @@
         <apexClass>PartnerAIController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.MDF_Annual_Budget__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.MDF_Used__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Partner_Account__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Lead_Distribution_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Deal_Registration__c.Partner_Account__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Deal_Registration__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Deal_Registration__c.Estimated_Revenue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions><editable>false</editable><field
     >Account.Is_Partner__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>false</editable><field

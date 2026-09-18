@@ -28,7 +28,9 @@ private class NavMenuItemsControllerTest {
 
   @IsTest
   static void queriesItemsForResolvedLinkSet() {
-    String keyPrefix = NavigationLinkSet.SObjectType.getDescribe()
+    String keyPrefix = NavigationLinkSet.SObjectType.getDescribe(
+        SObjectDescribeOptions.DEFERRED
+      )
       .getKeyPrefix();
     NavMenuItemsController.linkSetIdOverride = Id.valueOf(
       keyPrefix + '000000000001'

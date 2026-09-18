@@ -1,4 +1,4 @@
-/*
+/**
  * Grants/revokes a partner account's manual access to a single Deal
  * Registration or MDF Request record, keeping the Partner_Record_Share__c
  * registry in sync with the actual Salesforce __Share row underneath it.
@@ -8,6 +8,15 @@
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public with sharing class PartnerShareService {
+  /**
+   * Grants a partner account manual access to a Deal Registration or MDF
+   * Request record, creating the registry row and the underlying Salesforce
+   * share together inside a savepoint so a failure on either side rolls
+   * back both.
+   *
+   * @param request The grant details (target record, partner account, access level).
+   * @return The Id of the newly created Partner_Record_Share__c registry row.
+   */
   public static Id grantAccess(PartnerShareDTO request) {
     PartnerPermissionService.assertCanManageRecordShares();
 
@@ -61,6 +70,13 @@ public with sharing class PartnerShareService {
     }
   }
 
+  /**
+   * Lists the currently active manual record shares for a Deal Registration
+   * or MDF Request record.
+   *
+   * @param targetRecordId Id of the Deal Registration or MDF Request record.
+   * @return The active Partner_Record_Share__c rows for the record, as list DTOs.
+   */
   public static List<PartnerShareListDTO> getActiveShares(Id targetRecordId) {
     PartnerPermissionService.assertCanManageRecordShares();
 
@@ -77,18 +93,26 @@ public with sharing class PartnerShareService {
     return results;
   }
 
+  /**
+   * Revokes a partner account's manual access to the record represented by
+   * a Partner_Record_Share__c registry row, for interactive admin use.
+   *
+   * @param partnerRecordShareId Id of the Partner_Record_Share__c registry row to revoke.
+   */
   public static void revokeAccess(Id partnerRecordShareId) {
     PartnerPermissionService.assertCanManageRecordShares();
     revokeAccessInternal(PartnerShareSelector.selectById(partnerRecordShareId));
   }
 
-  /*
+  /**
    * Entry point for unattended expiry enforcement (e.g. PartnerShareCleanupBatch).
    * revokeAccess() gates on assertCanManageRecordShares(), a permission-set
    * check meant for an interactive admin action. A scheduled/batch job runs
    * as whoever scheduled it, who may not hold that permission set, so gating
    * this path the same way silently breaks expiry cleanup. Authorization here
    * instead comes from the record actually being past its Expiry_Date__c.
+   *
+   * @param partnerRecordShareId Id of the Partner_Record_Share__c registry row to revoke.
    */
   public static void revokeExpiredAccess(Id partnerRecordShareId) {
     Partner_Record_Share__c registry = PartnerShareSelector.selectById(

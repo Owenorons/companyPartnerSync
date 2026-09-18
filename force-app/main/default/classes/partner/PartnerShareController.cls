@@ -1,4 +1,4 @@
-/*
+/**
  * Aura-enabled entry points for the record-sharing panel (view/grant/revoke
  * access to a Deal Registration or MDF Request). All business logic lives
  * in PartnerShareService; this class only adapts its exceptions for the UI.
@@ -7,6 +7,13 @@
  * use.
  */
 public with sharing class PartnerShareController {
+  /**
+   * Lists the currently active manual record shares for a Deal Registration
+   * or MDF Request record, for display in the record-sharing panel.
+   *
+   * @param targetRecordId Id of the Deal Registration or MDF Request record.
+   * @return The active record shares for the record, as list DTOs.
+   */
   @AuraEnabled(cacheable=true)
   public static List<PartnerShareListDTO> getActiveShares(Id targetRecordId) {
     try {
@@ -21,6 +28,13 @@ public with sharing class PartnerShareController {
     }
   }
 
+  /**
+   * Grants a partner account manual access to a Deal Registration or MDF
+   * Request record from the record-sharing panel.
+   *
+   * @param request The grant details (target record, partner account, access level).
+   * @return The Id of the newly created record share.
+   */
   @AuraEnabled
   public static Id grantAccess(PartnerShareDTO request) {
     try {
@@ -35,6 +49,12 @@ public with sharing class PartnerShareController {
     }
   }
 
+  /**
+   * Revokes a partner account's manual access to a record from the
+   * record-sharing panel.
+   *
+   * @param partnerRecordShareId Id of the Partner_Record_Share__c registry row to revoke.
+   */
   @AuraEnabled
   public static void revokeAccess(Id partnerRecordShareId) {
     try {

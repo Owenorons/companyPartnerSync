@@ -5,6 +5,17 @@
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class PartnerOnboardingLifecycleService {
+  /**
+   * Creates (or, if already present for this application, retrieves) the
+   * onboarding aggregate for a decided application and appends a lifecycle
+   * event recording the decision. For a non-rejected outcome this also
+   * ensures the partner-enablement task, generates document requirements,
+   * and initialises risk approval.
+   *
+   * @param application The decided (Approved or Rejected) Partner_Application__c record.
+   * @param outcome The application's decision outcome, e.g. 'Approved' or 'Rejected'.
+   * @return The onboarding aggregate record.
+   */
   public static Partner_Onboarding__c initialise(
     Partner_Application__c application,
     String outcome

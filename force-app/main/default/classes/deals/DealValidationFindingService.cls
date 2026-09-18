@@ -1,4 +1,15 @@
+/**
+ * Persists a deal's current validation findings, superseding any previously
+ * current findings for the deal.
+ */
 public without sharing class DealValidationFindingService {
+  /**
+   * Marks the deal's existing current validation findings as superseded and
+   * inserts the given findings as the new current set.
+   *
+   * @param dealId Id of the deal the findings belong to.
+   * @param findings The validation findings to persist as current.
+   */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static void replaceCurrent(
     Id dealId,

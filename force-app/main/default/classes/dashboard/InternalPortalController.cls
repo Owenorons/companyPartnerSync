@@ -1,4 +1,4 @@
-/*
+/**
  * Aura/LWC entry point for the internal portal dashboard. Thin boundary
  * that delegates to InternalDashboardService and translates exceptions
  * into AuraHandledException, matching PartnerPortalController's pattern
@@ -8,6 +8,11 @@ public with sharing class InternalPortalController {
   @TestVisible
   private static Boolean testDashboardFailure = false;
 
+  /**
+   * Loads the internal-user dashboard for the running employee.
+   *
+   * @return The assembled internal dashboard DTO.
+   */
   @AuraEnabled(cacheable=true)
   public static InternalDashboardDTO getDashboard() {
     try {
@@ -27,6 +32,11 @@ public with sharing class InternalPortalController {
     }
   }
 
+  /**
+   * Acknowledges an operational alert on behalf of the running internal user.
+   *
+   * @param alertId Id of the Partner_Operational_Alert__c record to acknowledge.
+   */
   @AuraEnabled
   public static void acknowledgeOperationalAlert(Id alertId) {
     try {
@@ -42,6 +52,13 @@ public with sharing class InternalPortalController {
     }
   }
 
+  /**
+   * Transitions an operational alert's status on behalf of the running
+   * internal user.
+   *
+   * @param alertId Id of the Partner_Operational_Alert__c record to transition.
+   * @param actionName The transition to apply ("resolve" or "reopen").
+   */
   @AuraEnabled
   public static void transitionOperationalAlert(Id alertId, String actionName) {
     try {

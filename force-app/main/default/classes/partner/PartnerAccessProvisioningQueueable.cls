@@ -4,6 +4,14 @@ public without sharing class PartnerAccessProvisioningQueueable implements Queue
   private Id contactId;
   private Id attemptId;
 
+  /**
+   * Creates a queueable that provisions setup-object access for a partner
+   * contact and records the outcome against a provisioning attempt.
+   *
+   * @param requestId Id of the Partner_Access_Request__c the outcome should be recorded against.
+   * @param contactId Id of the Contact to provision (or verify) a partner user for.
+   * @param attemptId Id of the Partner_Provisioning_Attempt__c record to update on completion.
+   */
   public PartnerAccessProvisioningQueueable(
     Id requestId,
     Id contactId,
@@ -14,6 +22,13 @@ public without sharing class PartnerAccessProvisioningQueueable implements Queue
     this.attemptId = attemptId;
   }
 
+  /**
+   * Finds or creates a partner community User for the contact, then records
+   * the resulting Succeeded/Failed outcome onto the provisioning attempt and
+   * access request.
+   *
+   * @param context The queueable execution context provided by the platform.
+   */
   public void execute(QueueableContext context) {
     try {
       Contact contact = [
@@ -107,6 +122,11 @@ public without sharing class PartnerAccessProvisioningQueueable implements Queue
     );
   }
 
+  /**
+   * Thrown when a partner user cannot be provisioned or verified (missing
+   * contact email, misconfigured partner profile/license, or an inactive
+   * existing user).
+   */
   public class ProvisioningException extends Exception {
   }
 }

@@ -1,10 +1,23 @@
-/*
+/**
  * Write side of notification creation: turns a NotificationRequestDTO into
  * a Partner_Notification__c and fires the corresponding platform event.
  * Called internally by other domains (deals, MDF, leads, etc.) to raise a
  * notification, not called directly from the LWC layer.
  */
 public with sharing class NotificationService {
+  /**
+   * Creates a Partner_Notification__c from the given request, inserted
+   * in system mode since notifications are trusted domain side effects
+   * rather than user-authored records, then logs a
+   * METRIC_TYPE_NOTIFICATION_SENT usage metric and publishes the
+   * corresponding platform event. Notification creation is itself a
+   * side effect of some other business operation, so any exception
+   * (including from the usage-metric logging) is caught and logged
+   * rather than propagated, ensuring a notification failure never fails
+   * the triggering operation.
+   *
+   * @param request The notification to create; a null request is a no-op.
+   */
   public static void create(NotificationRequestDTO request) {
     if (request == null) {
       return;
@@ -47,6 +60,11 @@ public with sharing class NotificationService {
       // Notifications are trusted domain side effects, not user-authored
       // records. Their creation must not depend on recipient/actor CRUD.
       Database.insert(notification, AccessLevel.SYSTEM_MODE);
+
+      UsageMetricService.log(
+        request.partnerAccountId,
+        UsageMetricService.METRIC_TYPE_NOTIFICATION_SENT
+      );
 
       PlatformEventPublisherService.publishNotificationCreated(notification);
     } catch (Exception ex) {

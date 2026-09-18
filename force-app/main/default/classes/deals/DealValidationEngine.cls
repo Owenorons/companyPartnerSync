@@ -1,5 +1,16 @@
+/**
+ * Evaluates a deal registration against the active Deal_Validation_Rule__mdt
+ * rules and returns the findings for any rule the deal fails.
+ */
 @SuppressWarnings('PMD.ApexSOQLInjection')
 public without sharing class DealValidationEngine {
+  /**
+   * Runs every active validation rule against the given deal and collects a
+   * finding for each rule the deal fails.
+   *
+   * @param deal The deal registration to validate.
+   * @return The validation findings for all failed rules.
+   */
   public static List<DealValidationFinding> evaluate(
     Deal_Registration__c deal
   ) {

@@ -5,6 +5,7 @@ module.exports = {
   modulePathIgnorePatterns: ["<rootDir>/.localdevserver", "<rootDir>/tools"],
   testPathIgnorePatterns: [
     ...jestConfig.testPathIgnorePatterns,
+    "<rootDir>/scripts/ci/",
     "<rootDir>/tools"
   ],
   collectCoverageFrom: [

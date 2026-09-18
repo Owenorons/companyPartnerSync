@@ -1,4 +1,4 @@
-/*
+/**
  * Validation and shaping logic for Partner_Record_Share__c grants — the
  * allowed target objects/access levels/reasons, and the mapping from this
  * app's access-level vocabulary down to Salesforce's native Read/Edit share
@@ -25,6 +25,13 @@ public with sharing class PartnerShareDomain {
     'Multi-Account Access'
   };
 
+  /**
+   * Validates a share grant request, throwing a handled exception
+   * describing the first invalid or missing field found (including a
+   * target-record/target-object type mismatch).
+   *
+   * @param request The share grant request to validate.
+   */
   public static void validateGrant(PartnerShareDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException('Share request is required.');
@@ -85,6 +92,14 @@ public with sharing class PartnerShareDomain {
     }
   }
 
+  /**
+   * Builds a new Partner_Record_Share__c record from a validated grant
+   * request, populated with the granting user and timestamp. Does not
+   * perform DML.
+   *
+   * @param request The share grant request.
+   * @return A populated, unsaved Partner_Record_Share__c record.
+   */
   public static Partner_Record_Share__c buildRegistryRecord(
     PartnerShareDTO request
   ) {
@@ -104,6 +119,13 @@ public with sharing class PartnerShareDomain {
     return share;
   }
 
+  /**
+   * Maps this app's access-level vocabulary (Read/Edit/Review/Approve)
+   * down to Salesforce's native Read/Edit sharing access levels.
+   *
+   * @param accessLevel The app-level access level to map.
+   * @return "Edit" for Edit/Review/Approve, otherwise "Read".
+   */
   public static String toSalesforceAccessLevel(String accessLevel) {
     if (
       accessLevel == 'Edit' ||
@@ -116,6 +138,13 @@ public with sharing class PartnerShareDomain {
     return 'Read';
   }
 
+  /**
+   * Maps a Partner_Record_Share__c record to the "who has access" list
+   * row shape.
+   *
+   * @param record The Partner_Record_Share__c record to map.
+   * @return A PartnerShareListDTO summarizing the record.
+   */
   public static PartnerShareListDTO toListDTO(Partner_Record_Share__c record) {
     PartnerShareListDTO dto = new PartnerShareListDTO();
 

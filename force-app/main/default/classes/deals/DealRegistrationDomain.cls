@@ -1,4 +1,4 @@
-/*
+/**
  * Domain layer for the partner-submitted side of deal registration: builds
  * a Deal_Registration__c from an Opportunity + the partner's request DTO,
  * and maps records to their outbound DTOs. This is the registration-side
@@ -6,6 +6,11 @@
  * review-and-decision DTOs after a deal has already been submitted.
  */
 public with sharing class DealRegistrationDomain {
+  /**
+   * Validates that an inbound deal registration request has the required fields.
+   *
+   * @param request The partner's deal registration request.
+   */
   public static void validate(DealRegistrationRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException(
@@ -22,6 +27,15 @@ public with sharing class DealRegistrationDomain {
     }
   }
 
+  /**
+   * Builds an unsaved Deal_Registration__c from an eligible opportunity and the partner's
+   * request, defaulting Status__c to 'Draft' and Conflict_Status__c to a 'None' placeholder that
+   * gets overwritten once conflict analysis runs post-insert.
+   *
+   * @param opportunity Opportunity the registration is created against.
+   * @param request Partner-submitted registration details.
+   * @return An unsaved Deal_Registration__c record ready for insert.
+   */
   public static Deal_Registration__c buildRecord(
     Opportunity opportunity,
     DealRegistrationRequestDTO request
@@ -67,6 +81,13 @@ public with sharing class DealRegistrationDomain {
     return record;
   }
 
+  /**
+   * Maps a Deal_Registration__c to the minimal confirmation DTO returned to the partner right
+   * after creation.
+   *
+   * @param record Deal registration record to map.
+   * @return The mapped DealRegistrationResultDTO.
+   */
   public static DealRegistrationResultDTO toDTO(Deal_Registration__c record) {
     DealRegistrationResultDTO dto = new DealRegistrationResultDTO();
 
@@ -81,6 +102,12 @@ public with sharing class DealRegistrationDomain {
     return dto;
   }
 
+  /**
+   * Maps a Deal_Registration__c to the row shape used in a partner's own "My Deals" list.
+   *
+   * @param record Deal registration record to map.
+   * @return The mapped DealRegistrationListDTO.
+   */
   public static DealRegistrationListDTO toListDTO(Deal_Registration__c record) {
     DealRegistrationListDTO dto = new DealRegistrationListDTO();
 

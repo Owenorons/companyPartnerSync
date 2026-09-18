@@ -1,10 +1,17 @@
-/*
+/**
  * Selector layer for Partner_Content__c and the partner-account context
  * used to evaluate visibility. All queries enforce WITH USER_MODE /
  * readable checks so PartnerContentDomain and PartnerContentService never
  * issue raw SOQL.
  */
 public without sharing class PartnerContentSelector {
+  /**
+   * Returns the partner Account's tier/type fields used to evaluate
+   * content visibility.
+   *
+   * @param partnerAccountId Id of the partner account.
+   * @return The Account record with its tier/type fields queried.
+   */
   public static Account selectPartnerVisibilityContext(Id partnerAccountId) {
     SecurityUtil.assertReadable(Account.SObjectType);
 
@@ -23,6 +30,11 @@ public without sharing class PartnerContentSelector {
     return rows[0];
   }
 
+  /**
+   * Returns all active content records, ordered for display.
+   *
+   * @return Up to 500 active Partner_Content__c records.
+   */
   public static List<Partner_Content__c> selectActiveContent() {
     SecurityUtil.assertReadable(Partner_Content__c.SObjectType);
 
@@ -48,6 +60,12 @@ public without sharing class PartnerContentSelector {
     ];
   }
 
+  /**
+   * Returns all content records (active and inactive), for the
+   * content-management admin UI.
+   *
+   * @return Up to 500 Partner_Content__c records.
+   */
   public static List<Partner_Content__c> selectAllForAdmin() {
     SecurityUtil.assertReadable(Partner_Content__c.SObjectType);
 
@@ -70,6 +88,12 @@ public without sharing class PartnerContentSelector {
     ];
   }
 
+  /**
+   * Returns a single content record by Id.
+   *
+   * @param contentId Id of the Partner_Content__c record to fetch.
+   * @return The matching Partner_Content__c record.
+   */
   public static Partner_Content__c selectById(Id contentId) {
     SecurityUtil.assertReadable(Partner_Content__c.SObjectType);
 

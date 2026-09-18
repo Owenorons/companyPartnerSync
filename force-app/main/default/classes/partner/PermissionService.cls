@@ -1,4 +1,4 @@
-/*
+/**
  * Low-level permission-set/permission-set-group membership checks. This is
  * the generic building block underneath business-specific gates like
  * PartnerPermissionService — it only answers "does the running user have
@@ -6,10 +6,24 @@
  * permission set is meant to authorize.
  */
 public with sharing class PermissionService {
+  /**
+   * Checks whether the running user has a single named permission set,
+   * either by direct assignment or via a permission set group.
+   *
+   * @param permissionSetName Developer name of the permission set to check.
+   * @return True if the running user has the permission set.
+   */
   public static Boolean hasPermissionSet(String permissionSetName) {
     return hasAnyPermissionSet(new List<String>{ permissionSetName });
   }
 
+  /**
+   * Checks whether the running user has any of the named permission sets,
+   * either by direct assignment or via a permission set group they belong to.
+   *
+   * @param permissionSetNames Developer names of the permission sets to check.
+   * @return True if the running user has at least one of the permission sets.
+   */
   public static Boolean hasAnyPermissionSet(List<String> permissionSetNames) {
     if (permissionSetNames == null || permissionSetNames.isEmpty()) {
       return false;
@@ -59,6 +73,14 @@ public with sharing class PermissionService {
     return !inheritedPermissions.isEmpty();
   }
 
+  /**
+   * Checks whether the running user has a named custom permission, granted
+   * either directly, via a permission set group, or via
+   * FeatureManagement.checkPermission.
+   *
+   * @param customPermissionName Developer name of the custom permission to check.
+   * @return True if the running user has the custom permission.
+   */
   public static Boolean hasCustomPermission(String customPermissionName) {
     if (String.isBlank(customPermissionName)) {
       return false;
@@ -125,6 +147,13 @@ public with sharing class PermissionService {
       ] > 0;
   }
 
+  /**
+   * Checks whether the running user is directly assigned the named
+   * permission set group.
+   *
+   * @param permissionSetGroupName Developer name of the permission set group to check.
+   * @return True if the running user is assigned the permission set group.
+   */
   public static Boolean hasPermissionGroup(String permissionSetGroupName) {
     if (String.isBlank(permissionSetGroupName)) {
       return false;

@@ -1,10 +1,17 @@
-/*
+/**
  * Selector layer backing the lead assignment/decision flows: partner
  * account/contact validation queries and Lead reads. Used by
  * LeadDistributionService, LeadDecisionService and LeadConversionService
  * alike — not specific to conversion.
  */
 public with sharing class LeadDistributionSelector {
+  /**
+   * Reads a partner Account, verifying it is a valid, active partner
+   * account.
+   *
+   * @param partnerAccountId Id of the partner Account to read.
+   * @return The active partner Account record.
+   */
   public static Account selectActivePartnerAccount(Id partnerAccountId) {
     SecurityUtil.assertReadable(Account.SObjectType);
 
@@ -28,6 +35,13 @@ public with sharing class LeadDistributionSelector {
     return rows[0];
   }
 
+  /**
+   * Reads a Contact, verifying it belongs to the given partner Account.
+   *
+   * @param contactId Id of the Contact to read.
+   * @param partnerAccountId Id of the partner Account the contact must belong to.
+   * @return The partner Contact record.
+   */
   public static Contact selectPartnerContact(
     Id contactId,
     Id partnerAccountId
@@ -51,6 +65,13 @@ public with sharing class LeadDistributionSelector {
     return rows[0];
   }
 
+  /**
+   * Reads a Lead with the fields needed by the assignment/decision/
+   * conversion flows.
+   *
+   * @param leadId Id of the Lead to read.
+   * @return The Lead record with distribution/conversion fields populated.
+   */
   public static Lead selectInternalLead(Id leadId) {
     SecurityUtil.assertReadable(Lead.SObjectType);
 
@@ -84,6 +105,13 @@ public with sharing class LeadDistributionSelector {
     return rows[0];
   }
 
+  /**
+   * Reads the leads currently visible to a partner in their "My Leads"
+   * view (Assigned, Accepted, or Converted; Rejected leads are excluded).
+   *
+   * @param partnerAccountId Id of the partner Account whose leads to read.
+   * @return Up to 200 matching Lead records, most recently assigned first.
+   */
   public static List<Lead> selectAssignedLeadsByPartner(Id partnerAccountId) {
     SecurityUtil.assertReadable(Lead.SObjectType);
 

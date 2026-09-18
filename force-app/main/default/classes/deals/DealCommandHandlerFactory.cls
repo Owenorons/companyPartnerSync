@@ -1,4 +1,15 @@
+/**
+ * Factory that resolves a configured Apex class name to a DealCommandHandler
+ * instance for a deal lifecycle transition.
+ */
 public class DealCommandHandlerFactory {
+  /**
+   * Instantiates the DealCommandHandler implementation with the given fully
+   * qualified class name.
+   *
+   * @param className Fully qualified name of the DealCommandHandler implementation to instantiate.
+   * @return The instantiated command handler.
+   */
   public static DealCommandHandler getHandler(String className) {
     if (String.isBlank(className)) {
       throw new DealLifecycleException('No command handler is configured.');

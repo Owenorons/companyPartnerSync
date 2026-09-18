@@ -1,4 +1,4 @@
-/*
+/**
  * Orchestrates creation of a partner deal registration: ownership checks,
  * duplicate-registration guard, insert, conflict detection, and initial
  * status routing. This is the registration-side service; DealReviewService
@@ -7,6 +7,14 @@
  * protection).
  */
 public with sharing class DealRegistrationService {
+  /**
+   * Creates a new deal registration for the current partner: checks the deals feature is
+   * enabled, validates the request, confirms the opportunity belongs to the current partner and
+   * isn't already registered, enforces the partner's open-deal cap, then inserts the record.
+   *
+   * @param request Partner-submitted registration details.
+   * @return A minimal confirmation DTO for the newly created deal registration.
+   */
   public static DealRegistrationResultDTO createDealRegistration(
     DealRegistrationRequestDTO request
   ) {
@@ -59,6 +67,11 @@ public with sharing class DealRegistrationService {
     return DealRegistrationDomain.toDTO(record);
   }
 
+  /**
+   * Lists the current partner's opportunities that are eligible for a new deal registration.
+   *
+   * @return Row shapes for the "register a deal" opportunity picker.
+   */
   public static List<EligibleOpportunityDTO> getEligibleOpportunities() {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
@@ -81,6 +94,11 @@ public with sharing class DealRegistrationService {
     return results;
   }
 
+  /**
+   * Lists the current partner's own deal registrations for the "My Deals" list.
+   *
+   * @return Row shapes for the current partner's deal registrations.
+   */
   public static List<DealRegistrationListDTO> getMyDeals() {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
 
@@ -97,6 +115,15 @@ public with sharing class DealRegistrationService {
     return results;
   }
 
+  /**
+   * Builds, sanitizes, and inserts the deal registration record, then routes it through the
+   * submit command (lifecycle transition, conflict routing, event and idempotency ledger),
+   * publishes a submission platform event, and logs the outcome.
+   *
+   * @param opportunity Opportunity the registration is created against.
+   * @param request Partner-submitted registration details.
+   * @return The inserted (and re-queried) Deal_Registration__c record.
+   */
   public static Deal_Registration__c createDealRegistrationInternal(
     Opportunity opportunity,
     DealRegistrationRequestDTO request
@@ -113,6 +140,11 @@ public with sharing class DealRegistrationService {
     Database.insert(sanitized, AccessLevel.USER_MODE);
 
     Deal_Registration__c insertedRecord = (Deal_Registration__c) sanitized[0];
+
+    UsageMetricService.log(
+      insertedRecord.Partner_Account__c,
+      UsageMetricService.METRIC_TYPE_DEAL_SUBMITTED
+    );
 
     // Backward-compatible facade: callers still create-and-submit in one
     // operation, but the lifecycle transition, conflict routing, event and

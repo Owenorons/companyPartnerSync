@@ -1,6 +1,19 @@
+/**
+ * Derives a normalised, fingerprinted customer identity for a deal
+ * registration from an Account record, used to match deals against
+ * potential registration conflicts.
+ */
 public with sharing class DealCustomerIdentityService {
   private static final String SCHEMA_VERSION = 'v1';
 
+  /**
+   * Builds a normalised customer identity (name, trading name, domain,
+   * phone, address, country, ultimate parent, masked registration id, and
+   * fingerprint) for the given Account.
+   *
+   * @param accountId Id of the account to derive an identity for, or null.
+   * @return The derived customer identity. Only the schema version and fingerprint are set when accountId is null.
+   */
   public static DealCustomerIdentity derive(Id accountId) {
     DealCustomerIdentity identity = new DealCustomerIdentity();
     identity.schemaVersion = SCHEMA_VERSION;

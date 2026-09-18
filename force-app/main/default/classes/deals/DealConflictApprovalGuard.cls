@@ -1,4 +1,15 @@
+/**
+ * Guard that prevents a deal from being approved while it has current,
+ * unresolved blocking conflict findings.
+ */
 public without sharing class DealConflictApprovalGuard {
+  /**
+   * Throws a DealLifecycleException if the deal has any current, blocking
+   * conflict finding that has not been resolved, waived, marked a false
+   * positive, or superseded.
+   *
+   * @param dealId Id of the deal to check for blocking conflicts.
+   */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static void assertNoBlockingConflicts(Id dealId) {
     Integer blocking = [

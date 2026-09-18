@@ -1,4 +1,4 @@
-/*
+/**
  * Selector layer for Account records that represent customers rather than
  * partners. Every query here is hard-scoped to Is_Partner__c = FALSE so
  * partner accounts can never be matched or returned as a "customer" during
@@ -9,6 +9,14 @@ public with sharing class CustomerAccountSelector {
   @TestVisible
   private static Boolean useSystemModeForTests = true;
 
+  /**
+   * Finds up to 10 customer accounts (Is_Partner__c = FALSE) matching the
+   * given company name or website/email domain.
+   *
+   * @param companyName The company name to match against Account.Name.
+   * @param emailDomain The email domain to match against Account.Website; blank matches nothing on this criterion.
+   * @return Matching customer Account records, or an empty list if both inputs are blank.
+   */
   public static List<Account> findCustomerAccounts(
     String companyName,
     String emailDomain
@@ -49,6 +57,12 @@ public with sharing class CustomerAccountSelector {
     ];
   }
 
+  /**
+   * Retrieves a customer account (Is_Partner__c = FALSE) by Id.
+   *
+   * @param accountId The Id of the customer account to retrieve.
+   * @return The matching customer Account.
+   */
   public static Account selectCustomerAccountById(Id accountId) {
     SecurityUtil.assertReadable(Account.SObjectType);
 

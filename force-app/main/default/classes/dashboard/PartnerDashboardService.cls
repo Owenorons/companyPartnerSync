@@ -1,4 +1,4 @@
-/*
+/**
  * Assembles the partner-facing dashboard for the signed-in partner
  * contact's own account: open deal/lead/MDF counts and alerts. Mirrors
  * InternalDashboardService's shape, but every number here is scoped to a
@@ -28,6 +28,12 @@ public with sharing class PartnerDashboardService {
   // Below 20% of annual MDF budget remaining triggers a dashboard warning.
   private static final Decimal LOW_BUDGET_THRESHOLD = 0.2;
 
+  /**
+   * Builds the partner dashboard DTO for the signed-in partner contact's
+   * own account.
+   *
+   * @return The assembled partner dashboard DTO.
+   */
   public static PartnerDashboardDTO getDashboard() {
     Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
     Account partner = PartnerDashboardSelector.selectPartnerAccount(

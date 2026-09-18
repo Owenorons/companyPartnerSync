@@ -1,9 +1,17 @@
-/*
+/**
  * Read-side of the audit trail: lets internal users pull audit history for
  * a specific record. Gated behind the internal-analytics permission —
  * partner/community users have no path to this service.
  */
 public without sharing class AuditQueryService {
+  /**
+   * Retrieves up to the 500 most recent audit log entries for the given
+   * record, newest first. Requires the running user to have internal
+   * analytics access; throws otherwise.
+   *
+   * @param recordId The id of the record to fetch audit history for.
+   * @return The matching Audit_Log__c records, ordered by timestamp descending.
+   */
   public static List<Audit_Log__c> getAuditForRecord(Id recordId) {
     PartnerPermissionService.assertCanAccessInternalAnalytics();
 

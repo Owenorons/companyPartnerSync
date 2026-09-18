@@ -1,10 +1,17 @@
-/*
+/**
  * Domain logic for turning an approved Partner_Application__c into the
  * Account/Contact pair that represents the partner going forward, plus
  * validation of the reviewer's approve/reject decision payload. Pure
  * builders/validators only — no DML, no queries.
  */
 public with sharing class PartnerApplicationApprovalDomain {
+  /**
+   * Validates a reviewer's approve/reject decision payload, throwing when
+   * the application Id is missing, the decision is not Approved/Rejected,
+   * or a rejection is missing its required reason.
+   *
+   * @param request The reviewer's decision payload.
+   */
   public static void validateDecision(PartnerApprovalRequestDTO request) {
     if (request == null || request.applicationId == null) {
       throw new PartnerSyncHandledException(
@@ -25,6 +32,14 @@ public with sharing class PartnerApplicationApprovalDomain {
     }
   }
 
+  /**
+   * Builds (but does not insert) the partner Account record for an approved
+   * application, populating it from the application's requested tier, type
+   * and region.
+   *
+   * @param application The approved Partner_Application__c record.
+   * @return A new, unsaved Account record representing the partner.
+   */
   public static Account buildPartnerAccount(
     Partner_Application__c application
   ) {
@@ -39,6 +54,15 @@ public with sharing class PartnerApplicationApprovalDomain {
     return account;
   }
 
+  /**
+   * Builds (but does not insert) the primary partner Contact record for an
+   * approved application, linked to the newly created partner Account and
+   * marked as a Partner Admin portal user.
+   *
+   * @param application The approved Partner_Application__c record.
+   * @param accountId Id of the partner Account the contact should belong to.
+   * @return A new, unsaved Contact record representing the primary partner contact.
+   */
   public static Contact buildPrimaryPartnerContact(
     Partner_Application__c application,
     Id accountId

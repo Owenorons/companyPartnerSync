@@ -1,4 +1,4 @@
-/*
+/**
  * Validation and shaping logic for Partner_Application__c: submission-time
  * validation, building the initial record, and mapping the sObject to each
  * of the three DTO shapes the UI needs (result/list/detail). No DML or
@@ -19,6 +19,12 @@ public with sharing class PartnerApplicationDomain {
     'Referral'
   };
 
+  /**
+   * Validates a partner application submission, throwing a handled
+   * exception describing the first invalid or missing field found.
+   *
+   * @param request The submitted application payload to validate.
+   */
   public static void validateForSubmit(PartnerApplicationRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException(
@@ -67,6 +73,13 @@ public with sharing class PartnerApplicationDomain {
   // the same company submitted with different spacing/punctuation/casing
   // ("Acme, Inc." vs "acme inc" vs "ACME INC.") rather than requiring an
   // exact string match.
+  /**
+   * Normalizes a company name to lowercase alphanumeric characters only,
+   * for use as a duplicate-detection key.
+   *
+   * @param value The raw company name to normalize.
+   * @return The normalized company name, or null if value is blank.
+   */
   public static String normalizeCompanyName(String value) {
     if (String.isBlank(value)) {
       return null;
@@ -75,6 +88,14 @@ public with sharing class PartnerApplicationDomain {
     return value.trim().toLowerCase().replaceAll('[^a-z0-9]', '');
   }
 
+  /**
+   * Builds a new Partner_Application__c record populated from a validated
+   * submission, including derived normalization/duplicate-check keys.
+   * Does not perform DML.
+   *
+   * @param request The submitted application payload.
+   * @return A populated, unsaved Partner_Application__c record.
+   */
   public static Partner_Application__c buildSubmittedRecord(
     PartnerApplicationRequestDTO request
   ) {
@@ -121,6 +142,13 @@ public with sharing class PartnerApplicationDomain {
     return record;
   }
 
+  /**
+   * Maps a Partner_Application__c record to the minimal result shape
+   * returned right after submission.
+   *
+   * @param record The Partner_Application__c record to map.
+   * @return A PartnerApplicationResultDTO summarizing the record.
+   */
   public static PartnerApplicationResultDTO toResultDTO(
     Partner_Application__c record
   ) {
@@ -131,6 +159,13 @@ public with sharing class PartnerApplicationDomain {
     return dto;
   }
 
+  /**
+   * Maps a Partner_Application__c record to the review queue list row
+   * shape.
+   *
+   * @param record The Partner_Application__c record to map.
+   * @return A PartnerApplicationListDTO summarizing the record.
+   */
   public static PartnerApplicationListDTO toListDTO(
     Partner_Application__c record
   ) {
@@ -145,6 +180,15 @@ public with sharing class PartnerApplicationDomain {
     return dto;
   }
 
+  /**
+   * Maps a Partner_Application__c record to the full reviewer detail
+   * shape, including computed reviewer permission flags
+   * (canClaim/canDecide/canRequestProvisioning) for the running user.
+   *
+   * @param record The Partner_Application__c record to map.
+   * @return A PartnerApplicationDetailDTO describing the record and the
+   * running user's available actions on it.
+   */
   public static PartnerApplicationDetailDTO toDetailDTO(
     Partner_Application__c record
   ) {

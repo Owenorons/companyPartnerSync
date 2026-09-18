@@ -1,7 +1,21 @@
+/**
+ * Orchestrates execution of a Deal Registration lifecycle command: validates
+ * the command, enforces idempotency via command reservation, transitions the
+ * deal through the state engine, delegates to the resolved command handler,
+ * persists the resulting deal state, and emits the lifecycle event.
+ */
 public without sharing class DealCommandService {
   @TestVisible
   static Boolean useSystemModeForTests = true;
 
+  /**
+   * Executes the given deal lifecycle command end to end, returning the
+   * prior result unchanged if the same command key has already completed or
+   * is in progress.
+   *
+   * @param command The deal lifecycle command to execute.
+   * @return The result of executing the command.
+   */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static DealCommandResult execute(DealCommand command) {
     command.validate();

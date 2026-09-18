@@ -34,6 +34,10 @@ h1 {
   border: 1px solid var(--ps-color-border);
 }
 
+.form-wrapper {
+  min-height: 8rem;
+}
+
 .application-form {
   margin-top: 1.5rem;
   display: grid;

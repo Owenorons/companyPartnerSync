@@ -1,10 +1,20 @@
-/*
+/**
  * Trigger handler for PartnerSyncEventTrigger (after insert on
  * PartnerSync_Event__e), fanning each event out to the audit and
  * notification consumers. This is the entry point for the whole
  * events/ package.
  */
 public with sharing class PartnerSyncEventHandler {
+  /**
+   * Entry point invoked by PartnerSyncEventTrigger for a batch of newly
+   * published PartnerSync_Event__e records. Resolves notification
+   * recipients for the batch up front, then dispatches each event to the
+   * audit and notification consumers, isolating and dead-lettering any
+   * per-event failure so one bad event does not affect the rest of the
+   * batch.
+   *
+   * @param events The batch of published platform events to process.
+   */
   public static void handle(List<PartnerSync_Event__e> events) {
     Set<Id> partnerAccountIds = new Set<Id>();
     for (PartnerSync_Event__e eventRecord : events) {

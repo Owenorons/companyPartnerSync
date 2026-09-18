@@ -1,4 +1,19 @@
+/**
+ * Looks up the active deal state transition definition, configured via the
+ * Deal_State_Transition__mdt custom metadata type, matching a given
+ * aggregate type, lifecycle dimension, current state, and action.
+ */
 public without sharing class DealStateTransitionSelector {
+  /**
+   * Selects the single active transition matching the given aggregate type,
+   * lifecycle dimension, current state, and action.
+   *
+   * @param aggregateType The aggregate type the command targets (e.g. Deal Registration).
+   * @param lifecycleDimension The lifecycle dimension the command targets (e.g. Registration).
+   * @param currentState The aggregate's current state.
+   * @param action The action being requested.
+   * @return The matching transition definition, or null if none is configured.
+   */
   public static DealTransitionDefinition selectTransition(
     String aggregateType,
     String lifecycleDimension,

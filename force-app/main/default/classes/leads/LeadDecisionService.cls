@@ -1,4 +1,4 @@
-/*
+/**
  * Handles a partner's Accept/Reject decision on an already-assigned Lead.
  * Sits between LeadDistributionService (initial routing to a partner) and
  * LeadConversionService (turning an accepted lead into deal records) —
@@ -6,6 +6,12 @@
  * or Deal Registration data.
  */
 public with sharing class LeadDecisionService {
+  /**
+   * Processes a partner's accept/reject decision on an assigned Lead,
+   * updating its status and logging the action.
+   *
+   * @param request The lead decision request.
+   */
   public static void processDecision(LeadDecisionRequestDTO request) {
     if (!TenantConfigService.isLeadsEnabled()) {
       throw new PartnerSyncHandledException('Lead distribution is disabled.');

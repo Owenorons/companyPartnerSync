@@ -23,6 +23,22 @@ Sharing Set (deployment `0AfBn00000R5xazKAB`, ErrorId
 permissions and regression tests deployed successfully; only the Sharing Set
 mapping still requires the Setup action described below.
 
+## Prerequisite: Digital Experiences must already be enabled
+
+The **Setup → Digital Experiences → Sharing Sets** page does not appear (or
+cannot be used) until the org has Digital Experiences enabled and at least
+one Experience Cloud site created. Neither of those ships with the managed
+2GP package — the package installs only `force-app`, and the Experience
+Cloud site metadata lives in `org-config`, which is intentionally excluded
+from packaging (see `org-config/README.md`).
+
+If you just installed the beta into a clean scratch org following
+[the 2GP runbook](2gp-package-version-and-apex-test-runbook.md) and there is
+no site yet, this step isn't reachable. First enable Digital Experiences,
+register a domain, and create (or deploy) a site — see steps 5-6 of
+[appexchange-and-experience-cloud-installation.md](appexchange-and-experience-cloud-installation.md#5-enable-experience-cloud-when-required).
+Only then will the Sharing Sets page below be usable.
+
 ## What to configure
 
 Go to **Setup → Digital Experiences → Sharing Sets**, create one Sharing Set,
@@ -35,7 +51,6 @@ assign it to your org's partner-facing Profile(s), and add these access mappings
 | `Partner_Performance__c`  | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 | `Partner_Notification__c` | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 | `AI_Insight__c`           | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
-| `Usage_Metric__c`         | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 | `Partner_Onboarding__c`   | `Partner_Account__c` = `User.Contact.AccountId` | Read Only  |
 
 The onboarding mapping exposes only the private onboarding root associated with
@@ -54,6 +69,16 @@ visibility.
 
 ## What does _not_ need a Sharing Set
 
+- **`Usage_Metric__c`** — removed from the mapping table (2026-09-09): the
+  object has no `Partner_Account__c` field, or any lookup to Account/Contact
+  at all (verified against `force-app/main/default/objects/Usage_Metric__c/fields/`
+  — only `Metric_Date__c`, `Metric_Type__c`, `Quantity__c`, `License_Tier__c`
+  exist). It also has zero Apex/LWC references anywhere in the codebase. This
+  looks like unfinished scaffolding related to the license-tier work (see
+  [license-tier-implementation-plan.md](license-tier-implementation-plan.md)),
+  not a real partner-visible object yet — don't add a Sharing Set mapping for
+  it until it actually has a partner-account relationship and something
+  populates/reads it.
 - **`Partner_Content__c`** — its `externalSharingModel` is `Read`, so every
   authenticated partner user can already see published content without a Sharing
   Set. Which items they actually see is still governed by

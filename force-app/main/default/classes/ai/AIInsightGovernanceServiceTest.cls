@@ -24,6 +24,20 @@ private class AIInsightGovernanceServiceTest {
           .status
       );
       Assert.areEqual(0, AIInsightGovernanceService.getPendingReview().size());
+      Set<Id> reviewedIds = new Set<Id>{ accepted.Id, dismissed.Id };
+      Map<Id, AI_Insight__c> saved = new Map<Id, AI_Insight__c>(
+        [
+          SELECT Id, Status__c, Recommendation__c
+          FROM AI_Insight__c
+          WHERE Id IN :reviewedIds
+        ]
+      );
+      Assert.areEqual('Accepted', saved.get(accepted.Id).Status__c);
+      Assert.areEqual(
+        'Reviewed action.',
+        saved.get(accepted.Id).Recommendation__c
+      );
+      Assert.areEqual('Dismissed', saved.get(dismissed.Id).Status__c);
     }
   }
 

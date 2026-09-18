@@ -1,4 +1,4 @@
-/*
+/**
  * Routes a Lead to a partner account/contact and starts its SLA clock — the
  * first step of the lead lifecycle, upstream of LeadDecisionService
  * (accept/reject) and LeadConversionService (conversion to a deal). This
@@ -6,6 +6,11 @@
  * Registration records.
  */
 public with sharing class LeadDistributionService {
+  /**
+   * Assigns a Lead to a partner account/contact and starts its SLA clock.
+   *
+   * @param request The lead assignment request.
+   */
   public static void assignLeadToPartner(LeadAssignmentRequestDTO request) {
     if (!TenantConfigService.isLeadsEnabled()) {
       throw new PartnerSyncHandledException('Lead distribution is disabled.');
@@ -52,6 +57,11 @@ public with sharing class LeadDistributionService {
 
     update SecurityUtil.stripForUpdate(new List<SObject>{ lead });
 
+    UsageMetricService.log(
+      request.partnerAccountId,
+      UsageMetricService.METRIC_TYPE_LEAD_ASSIGNED
+    );
+
     LeadDistributionLogService.logAction(
       lead.Id,
       request.partnerAccountId,
@@ -67,6 +77,11 @@ public with sharing class LeadDistributionService {
     );
   }
 
+  /**
+   * Loads the leads currently visible to the signed-in partner user.
+   *
+   * @return The signed-in partner's leads.
+   */
   public static List<LeadDistributionDTO> getMyLeads() {
     if (!TenantConfigService.isLeadsEnabled()) {
       throw new PartnerSyncHandledException('Lead distribution is disabled.');

@@ -1,3 +1,9 @@
+/**
+ * Delivers in-app and/or email notifications for operational alerts that
+ * meet the configured severity threshold, per the active
+ * Operational_Alert_Route__mdt route, and records a delivery attempt (and
+ * resulting notification status) for every eligible alert.
+ */
 public without sharing class PartnerAlertNotificationService {
   @TestVisible
   private static Boolean testRouteEnabled;
@@ -10,6 +16,14 @@ public without sharing class PartnerAlertNotificationService {
   @TestVisible
   private static Integer testReminderHours;
 
+  /**
+   * Notifies configured recipients about a set of operational alerts that
+   * are pending, never notified, or due for a reminder, provided they meet
+   * the active route's minimum severity. Marks each eligible alert as
+   * Notified or Failed based on whether at least one delivery succeeded.
+   *
+   * @param alertIds Ids of the Partner_Operational_Alert__c records to consider for notification.
+   */
   public static void notifyNewAlerts(Set<Id> alertIds) {
     if (alertIds == null || alertIds.isEmpty())
       return;
@@ -150,6 +164,9 @@ public without sharing class PartnerAlertNotificationService {
     if (String.isBlank(recipients))
       return delivered;
     List<String> addresses = recipients.replace(';', ',').split(',');
+    List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
+    List<Partner_Operational_Alert__c> emailAlerts = new List<Partner_Operational_Alert__c>();
+    List<String> emailAddresses = new List<String>();
     for (String rawAddress : addresses) {
       String address = rawAddress.trim();
       if (String.isBlank(address))
@@ -161,23 +178,37 @@ public without sharing class PartnerAlertNotificationService {
         email.setPlainTextBody(
           alert.Name + ' | ' + alert.Alert_Type__c + ' | ' + alert.Message__c
         );
-        Messaging.SendEmailResult result = Messaging.sendEmail(
-          new List<Messaging.SingleEmailMessage>{ email }
-        )[0];
-        if (result.isSuccess())
-          delivered.add(alert.Id);
-        attempts.add(
-          newAttempt(
-            alert.Id,
-            'Email',
-            address,
-            result.isSuccess(),
-            result.isSuccess() ? null : result.getErrors()[0].getMessage(),
-            reminderHours,
-            null
-          )
-        );
+        emails.add(email);
+        emailAlerts.add(alert);
+        emailAddresses.add(address);
       }
+    }
+    if (emails.isEmpty())
+      return delivered;
+
+    // Batched into a single Messaging.sendEmail call (allOrNone=false) instead of
+    // one call per (address, alert) pair — avoids the 10-invocation-per-transaction
+    // limit and stops one bad address from throwing away every delivery attempt
+    // recorded so far. Results come back in the same order as the input list.
+    List<Messaging.SendEmailResult> results = Messaging.sendEmail(
+      emails,
+      false
+    );
+    for (Integer index = 0; index < results.size(); index++) {
+      Messaging.SendEmailResult result = results[index];
+      if (result.isSuccess())
+        delivered.add(emailAlerts[index].Id);
+      attempts.add(
+        newAttempt(
+          emailAlerts[index].Id,
+          'Email',
+          emailAddresses[index],
+          result.isSuccess(),
+          result.isSuccess() ? null : result.getErrors()[0].getMessage(),
+          reminderHours,
+          null
+        )
+      );
     }
     return delivered;
   }

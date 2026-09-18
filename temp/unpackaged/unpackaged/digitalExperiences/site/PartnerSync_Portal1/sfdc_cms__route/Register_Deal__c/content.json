@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Register Deal",
+  "contentBody" : {
+    "activeViewId" : "Register_Deal",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-register-deal",
+    "urlPrefix" : "register-deal"
+  },
+  "urlName" : "register-deal"
+}

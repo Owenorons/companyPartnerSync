@@ -187,4 +187,123 @@ private class MDFApprovalServiceTest {
 
     System.assertEquals('Rejected', updated.Status__c);
   }
+
+  @IsTest
+  static void repeatedDecisionCannotConsumeBudgetTwiceOrReverseApproval() {
+    MDF_Request__c mdf = createSubmittedMdfRequest();
+    User reviewer = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      reviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+    System.runAs(reviewer) {
+      MDFDecisionDTO decision = approval(mdf.Id, 1000);
+      MDFApprovalService.processDecision(decision);
+      assertDecisionBlocked(decision, 'Only submitted');
+      decision.decision = 'Rejected';
+      decision.rejectionReason = 'Stale reviewer tab';
+      assertDecisionBlocked(decision, 'Only submitted');
+    }
+    Assert.areEqual(
+      3500,
+      [SELECT MDF_Used__c FROM Account WHERE Id = :mdf.Partner_Account__c]
+      .MDF_Used__c
+    );
+    Assert.areEqual(
+      'Approved',
+      [SELECT Status__c FROM MDF_Request__c WHERE Id = :mdf.Id].Status__c
+    );
+  }
+
+  @IsTest
+  static void separateRequestsConsumeTheLatestSharedBudget() {
+    MDF_Request__c first = createSubmittedMdfRequest();
+    MDF_Request__c second = PartnerSyncTestDataFactory.mdfRequest(
+      first.Partner_Account__c,
+      first.Submitted_By__c
+    );
+    insert second;
+    User reviewer = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      reviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+    System.runAs(reviewer) {
+      MDFApprovalService.processDecision(approval(first.Id, 5000));
+      assertDecisionBlocked(approval(second.Id, 3000), 'budget exceeded');
+      MDFApprovalService.processDecision(approval(second.Id, 2500));
+    }
+    Assert.areEqual(
+      10000,
+      [SELECT MDF_Used__c FROM Account WHERE Id = :first.Partner_Account__c]
+      .MDF_Used__c
+    );
+    Assert.areEqual(
+      'Approved',
+      [SELECT Status__c FROM MDF_Request__c WHERE Id = :second.Id].Status__c
+    );
+  }
+
+  @IsTest
+  static void failedRequestWriteRollsBackBudgetEvenWhenCallerCatchesFailure() {
+    MDF_Request__c mdf = createSubmittedMdfRequest();
+    User reviewer = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      reviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+    System.runAs(reviewer) {
+      MDFDecisionDTO decision = approval(mdf.Id, 1000);
+      // Force the request write to fail after the account consumption update.
+      decision.decisionNotes = 'x'.repeat(32769);
+      try {
+        MDFApprovalService.processDecision(decision);
+        Assert.fail('Expected the oversized comment to fail DML.');
+      } catch (DmlException expected) {
+        Assert.areEqual(
+          StatusCode.STRING_TOO_LONG,
+          expected.getDmlStatusCode(0)
+        );
+      }
+      Assert.areEqual(
+        2500,
+        [SELECT MDF_Used__c FROM Account WHERE Id = :mdf.Partner_Account__c]
+        .MDF_Used__c
+      );
+      Assert.areEqual(
+        'Submitted',
+        [SELECT Status__c FROM MDF_Request__c WHERE Id = :mdf.Id].Status__c
+      );
+      decision.decisionNotes = 'Retry after correction';
+      MDFApprovalService.processDecision(decision);
+    }
+    Assert.areEqual(
+      3500,
+      [SELECT MDF_Used__c FROM Account WHERE Id = :mdf.Partner_Account__c]
+      .MDF_Used__c
+    );
+  }
+
+  private static MDFDecisionDTO approval(Id requestId, Decimal amount) {
+    MDFDecisionDTO decision = new MDFDecisionDTO();
+    decision.requestId = requestId;
+    decision.decision = 'Approved';
+    decision.approvedAmount = amount;
+    return decision;
+  }
+
+  private static void assertDecisionBlocked(
+    MDFDecisionDTO decision,
+    String message
+  ) {
+    try {
+      MDFApprovalService.processDecision(decision);
+      Assert.fail('Expected decision to be blocked.');
+    } catch (PartnerSyncHandledException expected) {
+      Assert.isTrue(
+        expected.getMessage().contains(message),
+        expected.getMessage()
+      );
+    }
+  }
 }

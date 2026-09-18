@@ -9,6 +9,16 @@ public without sharing class PartnerRiskApprovalService {
     'Programme'
   };
 
+  /**
+   * Creates (or returns the existing) approval plan for an onboarding,
+   * ensuring its baseline risk assessments and one approval step per
+   * dimension exist.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c to initialise
+   * approval for.
+   * @return The current Partner_Approval_Plan__c record for the
+   * onboarding.
+   */
   public static Partner_Approval_Plan__c initialise(Id onboardingId) {
     Partner_Onboarding__c onboarding = [
       SELECT Id, Onboarding_Key__c
@@ -60,6 +70,17 @@ public without sharing class PartnerRiskApprovalService {
     return plan;
   }
 
+  /**
+   * Records a risk finding against an assessment.
+   *
+   * @param assessmentId Id of the Partner_Assessment__c the finding
+   * belongs to.
+   * @param findingKey Idempotency key used to upsert the finding.
+   * @param severity Severity of the finding.
+   * @param blocking Whether the finding blocks activation until resolved.
+   * @param description Description of the finding.
+   * @return The created or updated Partner_Assessment_Finding__c record.
+   */
   public static Partner_Assessment_Finding__c addFinding(
     Id assessmentId,
     String findingKey,
@@ -88,6 +109,19 @@ public without sharing class PartnerRiskApprovalService {
     return finding;
   }
 
+  /**
+   * Records a decision on a single approval step and recalculates the
+   * owning plan's overall status. Only the step's assigned approver (if
+   * any) may decide it.
+   *
+   * @param stepId Id of the Partner_Approval_Step__c being decided.
+   * @param decision The decision being recorded (Approved, Conditionally
+   * Approved, Rejected, or More Information Required).
+   * @param reason Reason for the decision; required unless decision is
+   * Approved.
+   * @return The owning Partner_Approval_Plan__c with its recalculated
+   * status.
+   */
   public static Partner_Approval_Plan__c decideStep(
     Id stepId,
     String decision,
@@ -133,6 +167,15 @@ public without sharing class PartnerRiskApprovalService {
     return recalculate(step.Plan__c);
   }
 
+  /**
+   * Finalises an approval plan that is ready for final approval and has
+   * no open blocking risk findings. Requires the
+   * PartnerSync_Finalise_Partner_Approval custom permission.
+   *
+   * @param planId Id of the Partner_Approval_Plan__c to finalise.
+   * @return The updated Partner_Approval_Plan__c, now Approved for
+   * Contracting.
+   */
   public static Partner_Approval_Plan__c finalise(Id planId) {
     if (
       !FeatureManagement.checkPermission(
@@ -237,6 +280,10 @@ public without sharing class PartnerRiskApprovalService {
     return plan;
   }
 
+  /**
+   * Thrown when a partner risk/approval operation is attempted without
+   * required authority or against a plan/step in an invalid state.
+   */
   public class PartnerRiskApprovalException extends Exception {
   }
 }

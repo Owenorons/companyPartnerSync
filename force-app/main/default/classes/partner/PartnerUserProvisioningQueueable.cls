@@ -1,3 +1,9 @@
+/**
+ * Asynchronously creates (or verifies) a partner community User for a
+ * contact and assigns partner administrator access, then enqueues a
+ * PartnerProvisioningStatusQueueable to record the outcome on the
+ * originating application.
+ */
 public without sharing class PartnerUserProvisioningQueueable implements Queueable {
   private static final String PROFILE_NAME = 'PartnerSync Partner User';
   private static final String PERMISSION_GROUP_NAME = 'PSG_Partner_Administrator';
@@ -5,11 +11,25 @@ public without sharing class PartnerUserProvisioningQueueable implements Queueab
   private Id applicationId;
   private Id contactId;
 
+  /**
+   * Creates a queueable that provisions a partner user for the given
+   * application and contact.
+   *
+   * @param applicationId Id of the Partner_Application__c the outcome should be recorded against.
+   * @param contactId Id of the Contact to provision (or verify) a partner user for.
+   */
   public PartnerUserProvisioningQueueable(Id applicationId, Id contactId) {
     this.applicationId = applicationId;
     this.contactId = contactId;
   }
 
+  /**
+   * Finds or creates the partner community User for the contact, assigns
+   * partner administrator access, and enqueues a status write-back with the
+   * resulting user Id or, on failure, the error message.
+   *
+   * @param context The queueable execution context provided by the platform.
+   */
   public void execute(QueueableContext context) {
     String provisioningJobId = context == null
       ? null

@@ -1,3 +1,8 @@
+/**
+ * Evaluates a deal lifecycle command against the deal's current state and
+ * the configured state transition rules, producing the command context
+ * (target state, version, event type) used to carry out the transition.
+ */
 public with sharing class DealStateEngine {
   private static final Set<String> PARTNER_USER_TYPES = new Set<String>{
     'PowerPartner',
@@ -9,6 +14,16 @@ public with sharing class DealStateEngine {
     'CustomerCommunity'
   };
 
+  /**
+   * Resolves the configured transition for the deal's current state and the
+   * command's action, and validates it against the command's reason,
+   * expected version, the deal's lock status, required permission, and the
+   * running user's actor type (partner vs internal).
+   *
+   * @param deal The deal registration the command targets.
+   * @param command The lifecycle command being evaluated.
+   * @return A populated command context describing the resolved transition.
+   */
   public static DealCommandContext evaluate(
     Deal_Registration__c deal,
     DealCommand command

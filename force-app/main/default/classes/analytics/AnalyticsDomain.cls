@@ -1,52 +1,95 @@
-/*
+/**
  * Pure calculation layer for partner analytics: takes already-queried
  * SObjects/DTOs and derives KPI and leaderboard figures. Deliberately has
  * no SOQL, sharing, or permission logic so the math can be unit tested
  * without inserting records or running as a particular user.
  */
 public with sharing class AnalyticsDomain {
+  public static final Set<String> OPEN_PIPELINE_STATUSES = new Set<String>{
+    'Submitted',
+    'Needs Information',
+    'Under Review',
+    'Approved'
+  };
+
+  /** Shared inputs for partner KPI and leaderboard calculations. */
+  public class KpiTotals {
+    public Integer totalLeads = 0;
+    public Integer acceptedLeads = 0;
+    public Integer convertedLeads = 0;
+    public Integer totalDeals = 0;
+    public Integer approvedDeals = 0;
+    public Integer wonDeals = 0;
+    public Integer closedOpportunities = 0;
+    public Decimal totalPipeline = 0;
+    public Decimal totalRevenue = 0;
+  }
+
+  /**
+   * Derives a partner's full KPI summary (lead, deal, revenue, and MDF
+   * budget figures, plus health score/label/tier/signals) from
+   * already-queried records.
+   *
+   * @param leads The partner's leads.
+   * @param deals The partner's deal registrations.
+   * @param opportunities The partner's opportunities.
+   * @param budgetAccount The partner's Account record, with MDF budget fields populated.
+   * @return The calculated KPI summary for the partner.
+   */
   public static PartnerKPIDTO calculatePartnerKPI(
     List<Lead> leads,
     List<Deal_Registration__c> deals,
     List<Opportunity> opportunities,
     Account budgetAccount
   ) {
-    Integer acceptedLeads = 0;
-    Integer convertedLeads = 0;
-
+    KpiTotals totals = new KpiTotals();
+    totals.totalLeads = leads.size();
+    totals.totalDeals = deals.size();
     for (Lead lead : leads) {
-      if (lead.Lead_Distribution_Status__c == 'Accepted') {
-        acceptedLeads++;
+      if (
+        lead.Lead_Distribution_Status__c == 'Accepted' ||
+        lead.Lead_Distribution_Status__c == 'Converted'
+      ) {
+        totals.acceptedLeads++;
       }
-
       if (lead.Lead_Distribution_Status__c == 'Converted') {
-        convertedLeads++;
+        totals.convertedLeads++;
       }
     }
-
-    Integer approvedDeals = 0;
-    Decimal totalPipeline = 0;
-
     for (Deal_Registration__c deal : deals) {
       if (deal.Status__c == 'Approved') {
-        approvedDeals++;
+        totals.approvedDeals++;
       }
-
-      totalPipeline += deal.Estimated_Revenue__c == null
-        ? 0
-        : deal.Estimated_Revenue__c;
+      if (OPEN_PIPELINE_STATUSES.contains(deal.Status__c)) {
+        totals.totalPipeline += deal.Estimated_Revenue__c == null
+          ? 0
+          : deal.Estimated_Revenue__c;
+      }
     }
-
-    Integer wonDeals = 0;
-    Decimal totalRevenue = 0;
-
     for (Opportunity opp : opportunities) {
-      if (opp.StageName == 'Closed Won') {
-        wonDeals++;
-        totalRevenue += opp.Amount == null ? 0 : opp.Amount;
+      if (opp.IsClosed == true) {
+        totals.closedOpportunities++;
+      }
+      if (opp.IsWon == true) {
+        totals.wonDeals++;
+        totals.totalRevenue += opp.Amount == null ? 0 : opp.Amount;
       }
     }
+    return calculatePartnerKPI(totals, budgetAccount);
+  }
 
+  /**
+   * Builds the same KPI contract from database aggregates or in-memory totals.
+   * Acceptance includes converted leads; win rate uses closed opportunities.
+   *
+   * @param totals Counts and amounts for the partner.
+   * @param budgetAccount The partner's budget fields.
+   * @return Calculated KPIs and health signals.
+   */
+  public static PartnerKPIDTO calculatePartnerKPI(
+    KpiTotals totals,
+    Account budgetAccount
+  ) {
     Decimal annualBudget = budgetAccount.MDF_Annual_Budget__c == null
       ? 0
       : budgetAccount.MDF_Annual_Budget__c;
@@ -57,28 +100,28 @@ public with sharing class AnalyticsDomain {
 
     PartnerKPIDTO dto = new PartnerKPIDTO();
 
-    dto.totalLeads = leads.size();
-    dto.acceptedLeads = acceptedLeads;
-    dto.convertedLeads = convertedLeads;
+    dto.totalLeads = totals.totalLeads;
+    dto.acceptedLeads = totals.acceptedLeads;
+    dto.convertedLeads = totals.convertedLeads;
 
-    dto.totalDeals = deals.size();
-    dto.approvedDeals = approvedDeals;
-    dto.wonDeals = wonDeals;
+    dto.totalDeals = totals.totalDeals;
+    dto.approvedDeals = totals.approvedDeals;
+    dto.wonDeals = totals.wonDeals;
 
-    dto.totalPipeline = totalPipeline;
-    dto.totalRevenue = totalRevenue;
+    dto.totalPipeline = totals.totalPipeline;
+    dto.totalRevenue = totals.totalRevenue;
 
-    dto.leadAcceptanceRate = leads.isEmpty()
+    dto.leadAcceptanceRate = totals.totalLeads == 0
       ? 0
-      : Decimal.valueOf(acceptedLeads) / leads.size();
+      : Decimal.valueOf(totals.acceptedLeads) / totals.totalLeads;
 
-    dto.leadConversionRate = leads.isEmpty()
+    dto.leadConversionRate = totals.totalLeads == 0
       ? 0
-      : Decimal.valueOf(convertedLeads) / leads.size();
+      : Decimal.valueOf(totals.convertedLeads) / totals.totalLeads;
 
-    dto.dealWinRate = deals.isEmpty()
+    dto.dealWinRate = totals.closedOpportunities == 0
       ? 0
-      : Decimal.valueOf(wonDeals) / deals.size();
+      : Decimal.valueOf(totals.wonDeals) / totals.closedOpportunities;
 
     dto.mdfAnnualBudget = annualBudget;
     dto.mdfUsed = used;
@@ -95,6 +138,15 @@ public with sharing class AnalyticsDomain {
     return dto;
   }
 
+  /**
+   * Builds a single leaderboard row for a partner from its account details
+   * and already-calculated KPI summary, reusing the KPI's health score if
+   * present.
+   *
+   * @param partner The partner Account record.
+   * @param kpi The partner's calculated KPI summary.
+   * @return A leaderboard row for the partner.
+   */
   public static PartnerLeaderboardRowDTO buildLeaderboardRow(
     Account partner,
     PartnerKPIDTO kpi

@@ -1,8 +1,16 @@
-/*
+/**
  * Turns a partner's AI_Insight__c records into a short, prioritized list
  * of next-best-action recommendations for the partner portal.
  */
 public with sharing class NextBestActionService {
+  /**
+   * Builds up to 5 next-best-action recommendations from the running
+   * partner user's accepted AI insights, skipping any insight with no
+   * recommendation text, throwing if AI recommendations are disabled
+   * tenant-wide.
+   *
+   * @return Up to 5 next best action DTOs, in the same order as the underlying insights.
+   */
   public static List<NextBestActionDTO> getMyActions() {
     if (!TenantConfigService.isAiEnabled()) {
       throw new PartnerSyncHandledException('AI recommendations are disabled.');

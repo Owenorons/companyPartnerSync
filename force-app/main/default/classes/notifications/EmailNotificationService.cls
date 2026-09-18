@@ -1,10 +1,19 @@
-/*
+/**
  * Thin wrapper around Messaging.SingleEmailMessage for outbound partner
  * emails. Separate from the in-app Partner_Notification__c pipeline
  * (NotificationService/NotificationQueryService) — this only sends email,
  * it does not read or write notification records.
  */
 public with sharing class EmailNotificationService {
+  /**
+   * Sends a plain-text email notification. A blank address is a silent
+   * no-op rather than an error, since callers may invoke this for
+   * partner contacts that have no email on file.
+   *
+   * @param toAddress Recipient email address; a blank value is a no-op.
+   * @param subject Email subject line.
+   * @param body Plain-text email body.
+   */
   public static void sendNotification(
     String toAddress,
     String subject,

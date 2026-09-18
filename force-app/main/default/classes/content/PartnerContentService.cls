@@ -1,10 +1,17 @@
-/*
+/**
  * Service layer for the Partner Content Hub: partner browsing (tenant-flag
  * gated, visibility filtered per PartnerContentDomain), admin CRUD (gated on
  * assertCanManageContent), and download issuance (gated on
  * assertPartnerAccessToContent, with usage logging + audit trail).
  */
 public with sharing class PartnerContentService {
+  /**
+   * Returns the active content visible to the running partner user,
+   * per PartnerContentDomain's visibility rules. Requires the Content
+   * Hub tenant feature to be enabled.
+   *
+   * @return List of content items the caller may see.
+   */
   public static List<PartnerContentDTO> getAvailableContent() {
     if (!TenantConfigService.isContentEnabled()) {
       throw new PartnerSyncHandledException('Content Hub is disabled.');
@@ -29,6 +36,12 @@ public with sharing class PartnerContentService {
     return results;
   }
 
+  /**
+   * Returns the active Category__c picklist entries for content
+   * filtering.
+   *
+   * @return List of category label/value pairs.
+   */
   public static List<PartnerContentCategoryDTO> getCategories() {
     List<PartnerContentCategoryDTO> results = new List<PartnerContentCategoryDTO>();
 
@@ -49,6 +62,12 @@ public with sharing class PartnerContentService {
     return results;
   }
 
+  /**
+   * Returns all content records for the content-management admin UI.
+   * Requires the manage-content permission.
+   *
+   * @return List of all content items as admin DTOs.
+   */
   public static List<PartnerContentAdminDTO> getAllContentForAdmin() {
     PartnerPermissionService.assertCanManageContent();
 
@@ -63,6 +82,13 @@ public with sharing class PartnerContentService {
     return results;
   }
 
+  /**
+   * Saves changes to a content record from the admin UI. Requires the
+   * manage-content permission; validates the payload before updating.
+   *
+   * @param dto The content fields to save.
+   * @return The saved content as an admin DTO.
+   */
   public static PartnerContentAdminDTO saveContent(PartnerContentAdminDTO dto) {
     PartnerPermissionService.assertCanManageContent();
     PartnerContentDomain.validateAdminSave(dto);
@@ -79,6 +105,15 @@ public with sharing class PartnerContentService {
     return PartnerContentDomain.toAdminDTO(content);
   }
 
+  /**
+   * Resolves a download URL for a content record: verifies the Content
+   * Hub tenant feature is enabled and the running partner user has
+   * access to the content, then logs usage telemetry, a usage metric,
+   * and an audit entry before returning the download link.
+   *
+   * @param contentId Id of the Partner_Content__c record to download.
+   * @return The content Id paired with its resolved download URL.
+   */
   public static PartnerContentDownloadDTO getDownloadUrl(Id contentId) {
     if (!TenantConfigService.isContentEnabled()) {
       throw new PartnerSyncHandledException('Content Hub is disabled.');
@@ -98,6 +133,11 @@ public with sharing class PartnerContentService {
     }
 
     logUsage(partnerAccountId, contact.Id, content.Id, 'Downloaded');
+
+    UsageMetricService.log(
+      partnerAccountId,
+      UsageMetricService.METRIC_TYPE_CONTENT_DOWNLOAD
+    );
 
     AuditLogRequestDTO audit = AuditFactory.createSuccess(
       'Partner_Content__c',

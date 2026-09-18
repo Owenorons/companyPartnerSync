@@ -1,3 +1,8 @@
+/**
+ * Request payload for a deal review lifecycle command, describing the
+ * target review, the action, and any outcome, assignment, or evidence
+ * request details.
+ */
 public class DealReviewCommand {
   public Id reviewId;
   public String action;

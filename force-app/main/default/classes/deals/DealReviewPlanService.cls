@@ -1,5 +1,17 @@
+/**
+ * Generates internal review plans for a set of deals from the active review
+ * routing rules, superseding any existing current plan for each deal.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealReviewPlanService {
+  /**
+   * Creates a new current review plan (and its constituent reviews, routed
+   * by the active Deal_Review_Routing_Rule__mdt records) for each of the
+   * given deals, superseding any prior current plan.
+   *
+   * @param dealIds Ids of the deals to generate review plans for.
+   * @return The newly created review plans, one per deal.
+   */
   public static List<Deal_Review_Plan__c> generate(Set<Id> dealIds) {
     if (dealIds == null || dealIds.isEmpty())
       return new List<Deal_Review_Plan__c>();

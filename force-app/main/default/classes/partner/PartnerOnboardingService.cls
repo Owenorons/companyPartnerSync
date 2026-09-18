@@ -1,4 +1,4 @@
-/*
+/**
  * Decisioning logic for an already-submitted partner application: rejects
  * outright, or approves by creating the partner's Account/Contact pair and
  * linking them back onto the application. Submission itself is handled by
@@ -6,6 +6,14 @@
  * reviewer decides.
  */
 public with sharing class PartnerOnboardingService {
+  /**
+   * Applies a reviewer's approve/reject decision to a partner application,
+   * enforcing that the application is still undecided and assigned to the
+   * running user, then either rejects it or creates the partner's
+   * Account/Contact pair and marks it approved.
+   *
+   * @param request The reviewer's decision payload.
+   */
   public static void processDecision(PartnerApprovalRequestDTO request) {
     PartnerPermissionService.assertCanApprovePartnerApplications();
 

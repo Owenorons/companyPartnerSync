@@ -82,7 +82,8 @@ private class LeadDistributionSelectorTest {
     try {
       LeadDistributionSelector.selectInternalLead(
         Id.valueOf(
-          Lead.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+          Lead.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .getKeyPrefix() + '000000000001'
         )
       );
       Assert.fail('Expected missing lead rejection.');

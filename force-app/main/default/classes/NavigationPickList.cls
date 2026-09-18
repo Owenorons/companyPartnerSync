@@ -1,4 +1,4 @@
-/*
+/**
  * Dynamic picklist source for an Experience Builder component property,
  * letting admins pick a NavigationLinkSet by developer name in the page
  * editor UI. Must extend VisualEditor.DynamicPickList and stay `global` -

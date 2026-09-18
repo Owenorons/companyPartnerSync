@@ -1,4 +1,4 @@
-/*
+/**
  * Domain layer for LeadConversionService: validates a conversion request and
  * shapes the resulting Opportunity/result DTO. Handles the "turn an accepted
  * lead into partner-visible deal records" step — LeadDistributionDomain
@@ -6,6 +6,12 @@
  * not conversion.
  */
 public with sharing class LeadConversionDomain {
+  /**
+   * Validates that a lead conversion request carries the fields required to
+   * proceed, throwing if any are missing.
+   *
+   * @param request The lead conversion request to validate.
+   */
   public static void validate(LeadConversionRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException(
@@ -28,6 +34,14 @@ public with sharing class LeadConversionDomain {
     }
   }
 
+  /**
+   * Builds the (unsaved) Opportunity to create for a lead conversion.
+   *
+   * @param lead The Lead being converted.
+   * @param customerAccountId Id of the customer Account to associate with the Opportunity.
+   * @param request The lead conversion request supplying the Opportunity's field values.
+   * @return The Opportunity ready to insert.
+   */
   public static Opportunity buildOpportunity(
     Lead lead,
     Id customerAccountId,
@@ -63,6 +77,16 @@ public with sharing class LeadConversionDomain {
     return opportunity;
   }
 
+  /**
+   * Assembles the result DTO returned to the LWC layer after a successful
+   * lead conversion.
+   *
+   * @param lead The Lead that was converted.
+   * @param opportunity The Opportunity created by the conversion.
+   * @param deal The Deal Registration created by the conversion.
+   * @param customerAccountCreated Whether the customer Account was newly created as part of the conversion.
+   * @return The assembled lead conversion result DTO.
+   */
   public static LeadConversionResultDTO buildResult(
     Lead lead,
     Opportunity opportunity,

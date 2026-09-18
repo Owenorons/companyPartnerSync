@@ -1,4 +1,4 @@
-/*
+/**
  * Enforces MDF review/decision rules: who may approve vs. reject, budget
  * ceilings on approval, and side effects (audit log, platform event) once
  * a decision is recorded. Sits alongside MDFService (submission) and
@@ -6,6 +6,16 @@
  * step.
  */
 public with sharing class MDFApprovalService {
+  /**
+   * Records an internal reviewer's approve/reject decision on an MDF
+   * request: enforces the approve/reject permission (separately gated
+   * so a reviewer can hold one without the other), validates the
+   * decision payload, guards against re-deciding an already-decided
+   * request, applies the decision, updates the record, and logs an
+   * audit entry (plus a platform event on approval).
+   *
+   * @param request The decision (approve or reject) and its details.
+   */
   public static void processDecision(MDFDecisionDTO request) {
     // Approve and reject are gated by separate permissions so a reviewer
     // can be granted one without the other (e.g. reject-only triage).
@@ -18,10 +28,39 @@ public with sharing class MDFApprovalService {
     MDFDomain.validateDecision(request);
 
     SecurityUtil.assertUpdateable(MDF_Request__c.SObjectType);
+    for (
+      String fieldName : new List<String>{
+        'Status__c',
+        'Approval_Comments__c',
+        'Approver__c'
+      }
+    ) {
+      SecurityUtil.assertFieldUpdateable(MDF_Request__c.SObjectType, fieldName);
+    }
+    if (request.decision == 'Approved') {
+      SecurityUtil.assertFieldUpdateable(
+        MDF_Request__c.SObjectType,
+        'Approved_Amount__c'
+      );
+      SecurityUtil.assertUpdateable(Account.SObjectType);
+      SecurityUtil.assertFieldUpdateable(Account.SObjectType, 'MDF_Used__c');
+    }
 
-    MDF_Request__c record = MDFSelector.selectForInternalReview(
-      request.requestId
-    );
+    // Roll back budget consumption even if a caller catches a later request
+    // write failure (for example, a subscriber validation rule).
+    Savepoint decisionSavepoint = Database.setSavepoint();
+    try {
+      processLockedDecision(request);
+    } catch (Exception ex) {
+      Database.rollback(decisionSavepoint);
+      throw ex;
+    } finally {
+      Database.releaseSavepoint(decisionSavepoint);
+    }
+  }
+
+  private static void processLockedDecision(MDFDecisionDTO request) {
+    MDF_Request__c record = MDFSelector.selectForDecision(request.requestId);
 
     // Guards against re-deciding a request that was already approved/
     // rejected (e.g. a stale UI or double-submit), which would otherwise
@@ -63,7 +102,7 @@ public with sharing class MDFApprovalService {
   }
 
   private static void approve(MDF_Request__c record, MDFDecisionDTO request) {
-    Account partner = MDFSelector.selectPartnerBudget(
+    Account partner = MDFSelector.selectPartnerBudgetForApproval(
       record.Partner_Account__c
     );
 
@@ -82,9 +121,9 @@ public with sharing class MDFApprovalService {
 
     SecurityUtil.assertUpdateable(Account.SObjectType);
 
-    partner.MDF_Used__c = newUsed;
-
-    update SecurityUtil.stripForUpdate(new List<SObject>{ partner });
+    update SecurityUtil.stripForUpdate(
+      new List<SObject>{ new Account(Id = partner.Id, MDF_Used__c = newUsed) }
+    );
 
     record.Status__c = 'Approved';
     record.Approved_Amount__c = request.approvedAmount;

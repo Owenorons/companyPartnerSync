@@ -1,5 +1,18 @@
+/**
+ * Executes a batch of review-step commands (Start, Complete, Request Info, Resume, Reassign,
+ * Recuse, Waive, Escalate, Cancel) against Deal_Review__c records: locks and validates each
+ * review's expected version, applies the requested action, and releases any dependent review
+ * steps that were blocked on a step that just completed or was waived.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealReviewCommandService {
+  /**
+   * Executes a batch of review commands.
+   *
+   * @param commands Review commands to execute, each identifying a review step, action, and
+   * expected version.
+   * @return The updated Deal_Review__c records affected by the batch.
+   */
   public static List<Deal_Review__c> execute(List<DealReviewCommand> commands) {
     if (commands == null || commands.isEmpty())
       return new List<Deal_Review__c>();
@@ -180,6 +193,10 @@ public without sharing class DealReviewCommandService {
         'Action is not allowed from ' + review.Status__c + '.'
       );
   }
+  /**
+   * Thrown when a review command can't be executed, e.g. a missing/invalid review, a stale
+   * version, or an action that isn't allowed from the review's current status.
+   */
   public class DealReviewCommandException extends Exception {
   }
 }

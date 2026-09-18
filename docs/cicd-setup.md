@@ -131,12 +131,43 @@ into `main`.
 ## Incremental and recovery deployments
 
 Normal deployments use `sfdx-git-delta@6.44.4` and include changed, deleted, and
-renamed metadata. The generated artifact is retained for ten days and the same
-artifact is reused between staging and full sandbox.
+renamed metadata. Each environment's delta starts at its last successful
+deployment, recorded in a lightweight Git tag:
+
+- `salesforce-deployed/staging`
+- `salesforce-deployed/full-sandbox`
+- `salesforce-deployed/production`
+
+These tags advance only after deployment and smoke tests succeed. Failed,
+cancelled, or skipped releases leave the corresponding baseline unchanged, so
+the next release includes their outstanding changes. Staging and full sandbox
+can have different baselines; the artifact contains a separate delta for each,
+targeting the same release SHA. For example, if staging deployed A but full
+sandbox failed, release B uses A as staging's base and the earlier successful
+commit as full sandbox's base. The artifact is retained for ten days. Its name
+includes the run and attempt; downstream jobs use the producing job's output
+so retrying only failed jobs still downloads the original artifact.
+
+Deployment jobs have `contents: write` permission to maintain these tags through
+the GitHub API. Repository tag rules must allow the workflow to create and update
+`salesforce-deployed/*`. CI and artifact generation retain read-only access.
+The branch-level workflow concurrency covers artifact creation through promotion,
+preventing another release on that branch from changing the baselines midway.
+
+An environment without a baseline receives a full deployment. When adopting this
+workflow for an existing org, you can instead create its lightweight tag at the
+verified last successfully deployed commit before the first run. Do not seed it
+from the latest branch commit unless that exact revision is already deployed.
+API errors and failures fetching an existing baseline stop the build rather than
+substituting a guessed commit.
 
 For recovery, manually run **Salesforce CI/CD** with `full_deploy` enabled while
 on the relevant branch. This deploys the complete `force-app` directory through
 that branch's normal environment path.
+
+Full deployments do not remove metadata that is absent from the source tree.
+For an existing org with outstanding deletions, seed a verified baseline and use
+an incremental deployment, or handle those deletions in a reviewed recovery.
 
 Flow deletion has additional Salesforce Metadata API limitations. Deactivate
 and remove flows through an explicitly reviewed release rather than relying on

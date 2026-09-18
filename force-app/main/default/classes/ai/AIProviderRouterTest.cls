@@ -37,6 +37,32 @@ private class AIProviderRouterTest {
   }
 
   @IsTest
+  static void explicitTestConfigurationRespectsActivationAndFeatureGates() {
+    try {
+      AIProviderRouter.providerConfigForTest = new AI_Provider_Config__mdt(
+        Active__c = true,
+        Provider_Type__c = 'OpenAI'
+      );
+      Assert.isTrue(
+        AIProviderRouter.getProvider('LeadFitScoring') instanceof OpenAIProvider
+      );
+      Assert.isTrue(
+        AIProviderRouter.getProvider(
+          'NotARealFeature'
+        ) instanceof DisabledAIProvider
+      );
+      AIProviderRouter.providerConfigForTest.Active__c = false;
+      Assert.isTrue(
+        AIProviderRouter.getProvider(
+          'LeadFitScoring'
+        ) instanceof DisabledAIProvider
+      );
+    } finally {
+      AIProviderRouter.providerConfigForTest = null;
+    }
+  }
+
+  @IsTest
   static void providerForRoutesByType() {
     System.assert(
       AIProviderRouter.providerFor('OpenAI') instanceof OpenAIProvider,

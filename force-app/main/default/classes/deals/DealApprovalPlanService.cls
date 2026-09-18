@@ -1,7 +1,20 @@
+/**
+ * Generates approval plans and their steps for a set of deals from the active
+ * Deal_Approval_Step_Rule__mdt configuration, superseding any existing current plan for each
+ * deal first. Steps are filtered per deal by the deal's estimated revenue against each rule's
+ * min/max amount, and are marked 'Routing Failed' when a rule can't resolve an assignee.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealApprovalPlanService {
   private static final Integer MAX_STEPS = 25;
 
+  /**
+   * Generates a new current approval plan (and its steps) for each deal in the given set,
+   * superseding any prior current plan.
+   *
+   * @param dealIds Ids of the deal registrations to generate approval plans for.
+   * @return The newly created, current Deal_Approval_Plan__c records, one per deal.
+   */
   public static List<Deal_Approval_Plan__c> generate(Set<Id> dealIds) {
     if (dealIds == null || dealIds.isEmpty())
       return new List<Deal_Approval_Plan__c>();
@@ -101,6 +114,10 @@ public without sharing class DealApprovalPlanService {
       Database.insert(steps, AccessLevel.SYSTEM_MODE);
     return plans;
   }
+  /**
+   * Thrown when an approval plan can't be generated, e.g. no active step rules exist or the
+   * configured rule count is out of the supported range.
+   */
   public class ApprovalPlanException extends Exception {
   }
 }

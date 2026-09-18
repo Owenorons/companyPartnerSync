@@ -1,8 +1,14 @@
-/*
+/**
  * Maps AI_Insight__c records to AIInsightDTO for both the internal admin
  * UI and the partner-facing insight/next-best-action surfaces.
  */
 public with sharing class AIInsightDomain {
+  /**
+   * Converts an AI_Insight__c record to its DTO representation.
+   *
+   * @param record The AI_Insight__c record to convert.
+   * @return The corresponding AIInsightDTO.
+   */
   public static AIInsightDTO toDTO(AI_Insight__c record) {
     AIInsightDTO dto = new AIInsightDTO();
 

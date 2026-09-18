@@ -1,3 +1,7 @@
+/**
+ * Normalised, fingerprinted representation of a deal's customer identity,
+ * used to detect potential registration conflicts between deals.
+ */
 public class DealCustomerIdentity {
   public String schemaVersion;
   public String normalizedLegalName;

@@ -1,5 +1,18 @@
 /** Contracting aggregate and verified provider-event processing. */
 public without sharing class PartnerAgreementService {
+  /**
+   * Creates a draft partner agreement once final approval for contracting
+   * exists, or returns the existing agreement if one already exists for
+   * the given key.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c the agreement
+   * belongs to.
+   * @param agreementType Type of agreement being created.
+   * @param agreementKey Idempotency key identifying the agreement.
+   * @param templateKey Key of the agreement template to use.
+   * @param templateVersion Version of the agreement template to use.
+   * @return The created or existing Partner_Agreement__c record.
+   */
   public static Partner_Agreement__c createAgreement(
     Id onboardingId,
     String agreementType,
@@ -50,6 +63,18 @@ public without sharing class PartnerAgreementService {
     return agreement;
   }
 
+  /**
+   * Adds or updates a signatory on an agreement.
+   *
+   * @param agreementId Id of the Partner_Agreement__c the signatory
+   * belongs to.
+   * @param signatoryKey Idempotency key used to upsert the signatory.
+   * @param signatoryName Name of the signatory.
+   * @param email Email address of the signatory.
+   * @param role Role of the signatory on the agreement.
+   * @param signingOrder Order in which the signatory should sign.
+   * @return The created or updated Partner_Agreement_Signatory__c record.
+   */
   public static Partner_Agreement_Signatory__c addSignatory(
     Id agreementId,
     String signatoryKey,
@@ -82,6 +107,16 @@ public without sharing class PartnerAgreementService {
     return signatory;
   }
 
+  /**
+   * Releases an approved agreement to the e-signature provider, recording
+   * the provider's envelope reference.
+   *
+   * @param agreementId Id of the Partner_Agreement__c to release.
+   * @param provider Name of the e-signature provider.
+   * @param envelopeId The provider's envelope identifier for this
+   * agreement.
+   * @return The updated Partner_Agreement__c record, now in Sent status.
+   */
   public static Partner_Agreement__c releaseForSignature(
     Id agreementId,
     String provider,
@@ -122,6 +157,26 @@ public without sharing class PartnerAgreementService {
     return agreement;
   }
 
+  /**
+   * Verifies and processes an inbound e-signature provider webhook event,
+   * advancing the related agreement's status and recording the event.
+   * Duplicate provider event ids are returned as-is without reprocessing,
+   * and events outside the replay window or with an invalid HMAC
+   * signature are rejected.
+   *
+   * @param envelopeId The provider's envelope identifier for the
+   * agreement.
+   * @param providerEventId The provider's unique identifier for this
+   * event.
+   * @param eventType The provider's event type (e.g. "sent", "viewed",
+   * "completed").
+   * @param occurredOn Timestamp the event occurred at the provider.
+   * @param payload The raw event payload used for signature verification.
+   * @param suppliedSignature The HMAC signature supplied with the event.
+   * @param verificationSecret The shared secret used to verify the HMAC
+   * signature.
+   * @return The recorded Partner_Signature_Event__c record.
+   */
   public static Partner_Signature_Event__c processProviderEvent(
     String envelopeId,
     String providerEventId,
@@ -203,6 +258,16 @@ public without sharing class PartnerAgreementService {
     return eventRecord;
   }
 
+  /**
+   * Marks an executed agreement as effective. Requires the
+   * PartnerSync_Activate_Partner_Agreement custom permission.
+   *
+   * @param agreementId Id of the executed Partner_Agreement__c to
+   * activate.
+   * @param effectiveOn Date the agreement becomes effective.
+   * @param expiresOn Date the agreement expires, if any.
+   * @return The updated Partner_Agreement__c record.
+   */
   public static Partner_Agreement__c markEffective(
     Id agreementId,
     Date effectiveOn,
@@ -264,6 +329,10 @@ public without sharing class PartnerAgreementService {
     return value < 0 ? 100 : value;
   }
 
+  /**
+   * Thrown when a partner agreement operation is attempted against a
+   * record in an invalid state, or provider event verification fails.
+   */
   public class PartnerAgreementException extends Exception {
   }
 }

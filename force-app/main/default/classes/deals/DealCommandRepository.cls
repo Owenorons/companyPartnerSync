@@ -1,4 +1,16 @@
+/**
+ * Repository for the Deal_Command_Execution__c idempotency ledger, which records commands as
+ * they're reserved and completed so a retried command key can be recognized and short-circuited.
+ * Runs without sharing since it's an internal idempotency boundary meant to be called through
+ * DealCommandService, not queried/updated directly by end users.
+ */
 public without sharing class DealCommandRepository {
+  /**
+   * Finds a command execution ledger row by its command key.
+   *
+   * @param commandKey Idempotency key to look up.
+   * @return The matching Deal_Command_Execution__c row, or null if none exists.
+   */
   @SuppressWarnings('PMD.ApexCRUDViolation')
   public static Deal_Command_Execution__c findByKey(String commandKey) {
     // The ledger is an internal idempotency boundary. Callers are authorised by
@@ -12,6 +24,14 @@ public without sharing class DealCommandRepository {
     return rows.isEmpty() ? null : rows[0];
   }
 
+  /**
+   * Loads the previously stored result for a command that already completed, so a retried
+   * request can be answered from the ledger instead of re-executing the command.
+   *
+   * @param commandKey Idempotency key to look up.
+   * @return The deserialized result marked as a duplicate command, or null if no completed
+   * execution with a result payload exists for the key.
+   */
   public static DealCommandResult completedResult(String commandKey) {
     Deal_Command_Execution__c row = findByKey(commandKey);
     if (
@@ -29,6 +49,14 @@ public without sharing class DealCommandRepository {
     return result;
   }
 
+  /**
+   * Inserts a new ledger row reserving a command's key as "Processing", so a concurrent or
+   * retried request with the same key can be detected via the resulting duplicate-value error.
+   *
+   * @param command Command whose key/aggregate/version details should be reserved.
+   * @return The inserted ledger row, or null if a row for this command key was already reserved
+   * by another execution.
+   */
   public static Deal_Command_Execution__c reserve(DealCommand command) {
     Deal_Command_Execution__c execution = new Deal_Command_Execution__c(
       Command_Key__c = command.commandKey,
@@ -61,6 +89,13 @@ public without sharing class DealCommandRepository {
     );
   }
 
+  /**
+   * Marks a reserved ledger row as completed and stores its result payload for future
+   * idempotent lookups.
+   *
+   * @param execution Ledger row to mark completed (updated in place).
+   * @param result Result to serialize and store on the ledger row.
+   */
   public static void complete(
     Deal_Command_Execution__c execution,
     DealCommandResult result

@@ -1,4 +1,4 @@
-/*
+/**
  * Rules-based (non-LLM) deal risk scoring engine ("AI Engine 2"): scores
  * a Deal_Registration__c from 0-100 using conflict status/count,
  * revenue, close-date proximity, and qualification completeness, then
@@ -26,10 +26,27 @@ Medium
 High
 */
 
+  /**
+   * Scores a deal registration's risk with no known conflicting
+   * registrations, equivalent to calling the two-argument overload with
+   * an empty conflicts list.
+   *
+   * @param deal The deal registration to score.
+   * @return A risk score from 0 to 100.
+   */
   public static Decimal score(Deal_Registration__c deal) {
     return score(deal, new List<Deal_Registration__c>());
   }
 
+  /**
+   * Scores a deal registration's risk from 0-100 using conflict
+   * status/count, estimated revenue, close-date proximity, and
+   * qualification completeness.
+   *
+   * @param deal The deal registration to score.
+   * @param conflicts Related active registrations flagged as conflicts for this deal.
+   * @return A risk score from 0 to 100.
+   */
   public static Decimal score(
     Deal_Registration__c deal,
     List<Deal_Registration__c> conflicts
@@ -82,6 +99,12 @@ High
     return score > 100 ? 100 : score;
   }
 
+  /**
+   * Buckets a numeric risk score into a display level.
+   *
+   * @param score A risk score from 0 to 100, as produced by score().
+   * @return 'High' (>= 70), 'Medium' (>= 35), or 'Low'.
+   */
   public static String level(Decimal score) {
     // Cutoffs mirror the point allocations in score() above - if those
     // weights change, revisit these thresholds or High/Medium/Low will
@@ -97,6 +120,15 @@ High
     return 'Low';
   }
 
+  /**
+   * Builds a human-readable summary of the risk signals found for a deal
+   * (conflicts, revenue, close-date proximity, qualification gaps).
+   *
+   * @param deal The deal registration being summarized.
+   * @param conflicts Related active registrations flagged as conflicts for this deal.
+   * @param score The deal's computed risk score (unused directly; included for symmetry with score/level/recommendation callers).
+   * @return A sentence describing the risk signals found, or a fallback sentence if none were found.
+   */
   public static String summary(
     Deal_Registration__c deal,
     List<Deal_Registration__c> conflicts,
@@ -153,6 +185,14 @@ High
       '.';
   }
 
+  /**
+   * Recommends a next action for a deal based on its status and risk score.
+   *
+   * @param deal The deal registration being evaluated.
+   * @param conflicts Related active registrations flagged as conflicts for this deal (unused directly; included for symmetry with score/level/summary callers).
+   * @param score The deal's computed risk score.
+   * @return The rejection reason if the deal was rejected, otherwise a recommendation graded by risk score.
+   */
   public static String recommendation(
     Deal_Registration__c deal,
     List<Deal_Registration__c> conflicts,

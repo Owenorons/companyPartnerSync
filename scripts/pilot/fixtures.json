@@ -1,0 +1,1938 @@
+[
+  {
+    "alias": "PARTNER-A",
+    "object": "Account",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PARTNER-A",
+    "phase": "foundation",
+    "fields": {
+      "Is_Partner__c": true,
+      "Partner_Status__c": "Active",
+      "Partner_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Partner_Region__c": "ANZ",
+      "MDF_Annual_Budget__c": 50000,
+      "MDF_Used__c": 0,
+      "MDF_Available_Budget__c": 50000,
+      "Name": "UAT-PILOT-PARTNER-A"
+    }
+  },
+  {
+    "alias": "PARTNER-B",
+    "object": "Account",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PARTNER-B",
+    "phase": "foundation",
+    "fields": {
+      "Is_Partner__c": true,
+      "Partner_Status__c": "Active",
+      "Partner_Tier__c": "Silver",
+      "Partner_Type__c": "Distributor",
+      "Partner_Region__c": "ANZ",
+      "MDF_Annual_Budget__c": 50000,
+      "MDF_Used__c": 0,
+      "MDF_Available_Budget__c": 50000,
+      "Name": "UAT-PILOT-PARTNER-B"
+    }
+  },
+  {
+    "alias": "PARTNER-BLOCKED",
+    "object": "Account",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PARTNER-BLOCKED",
+    "phase": "foundation",
+    "fields": {
+      "Is_Partner__c": true,
+      "Partner_Status__c": "Pending Approval",
+      "Partner_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Partner_Region__c": "ANZ",
+      "MDF_Annual_Budget__c": 50000,
+      "MDF_Used__c": 0,
+      "MDF_Available_Budget__c": 50000,
+      "Name": "UAT-PILOT-PARTNER-BLOCKED"
+    }
+  },
+  {
+    "alias": "CONTACT-A-ADMIN",
+    "object": "Contact",
+    "keyField": "Email",
+    "key": "uat-pilot-a-admin@example.invalid",
+    "phase": "foundation",
+    "fields": {
+      "AccountId": {
+        "ref": "PARTNER-A"
+      },
+      "FirstName": "Pilot",
+      "LastName": "A-ADMIN",
+      "Email": "uat-pilot-a-admin@example.invalid",
+      "Is_Partner_User__c": true,
+      "Portal_Role__c": "Partner Admin",
+      "Can_Submit_Deals__c": true,
+      "Can_Submit_MDF__c": true,
+      "Can_View_Analytics__c": true,
+      "Certification_Status__c": "Active"
+    }
+  },
+  {
+    "alias": "CONTACT-A-USER",
+    "object": "Contact",
+    "keyField": "Email",
+    "key": "uat-pilot-a-user@example.invalid",
+    "phase": "foundation",
+    "fields": {
+      "AccountId": {
+        "ref": "PARTNER-A"
+      },
+      "FirstName": "Pilot",
+      "LastName": "A-USER",
+      "Email": "uat-pilot-a-user@example.invalid",
+      "Is_Partner_User__c": true,
+      "Portal_Role__c": "Partner User",
+      "Can_Submit_Deals__c": true,
+      "Can_Submit_MDF__c": true,
+      "Can_View_Analytics__c": true,
+      "Certification_Status__c": "Active"
+    }
+  },
+  {
+    "alias": "CONTACT-B-USER",
+    "object": "Contact",
+    "keyField": "Email",
+    "key": "uat-pilot-b-user@example.invalid",
+    "phase": "foundation",
+    "fields": {
+      "AccountId": {
+        "ref": "PARTNER-B"
+      },
+      "FirstName": "Pilot",
+      "LastName": "B-USER",
+      "Email": "uat-pilot-b-user@example.invalid",
+      "Is_Partner_User__c": true,
+      "Portal_Role__c": "Partner User",
+      "Can_Submit_Deals__c": true,
+      "Can_Submit_MDF__c": true,
+      "Can_View_Analytics__c": true,
+      "Certification_Status__c": "Active"
+    }
+  },
+  {
+    "alias": "CONTACT-BLOCKED",
+    "object": "Contact",
+    "keyField": "Email",
+    "key": "uat-pilot-blocked@example.invalid",
+    "phase": "foundation",
+    "fields": {
+      "AccountId": {
+        "ref": "PARTNER-BLOCKED"
+      },
+      "FirstName": "Pilot",
+      "LastName": "BLOCKED",
+      "Email": "uat-pilot-blocked@example.invalid",
+      "Is_Partner_User__c": true,
+      "Portal_Role__c": "Partner User",
+      "Can_Submit_Deals__c": true,
+      "Can_Submit_MDF__c": true,
+      "Can_View_Analytics__c": true,
+      "Certification_Status__c": "Active"
+    }
+  },
+  {
+    "alias": "CUSTOMER-ONE",
+    "object": "Account",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CUSTOMER-ONE",
+    "phase": "foundation",
+    "fields": {
+      "Is_Partner__c": false,
+      "Name": "UAT-PILOT-CUSTOMER-ONE"
+    }
+  },
+  {
+    "alias": "CUSTOMER-TWO",
+    "object": "Account",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CUSTOMER-TWO",
+    "phase": "foundation",
+    "fields": {
+      "Is_Partner__c": false,
+      "Name": "UAT-PILOT-CUSTOMER-TWO"
+    }
+  },
+  {
+    "alias": "APPLICATION-NEW",
+    "object": "Partner_Application__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-APPLICATION-NEW",
+    "phase": "foundation",
+    "fields": {
+      "Company_Name__c": "UAT-PILOT-Applicant-NEW",
+      "Business_Email__c": "uat-pilot-app-new@example.invalid",
+      "Submitted_By_Email__c": "uat-pilot-app-new@example.invalid",
+      "Submitted_By_Contact_Name__c": "Pilot Applicant",
+      "Country__c": "Australia",
+      "Region__c": "ANZ",
+      "Requested_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Application_Status__c": "Submitted",
+      "Decision__c": "Pending",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Name": "UAT-PILOT-APPLICATION-NEW"
+    }
+  },
+  {
+    "alias": "APPLICATION-MATCH",
+    "object": "Partner_Application__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-APPLICATION-MATCH",
+    "phase": "foundation",
+    "fields": {
+      "Company_Name__c": "UAT-PILOT-PARTNER-A",
+      "Business_Email__c": "uat-pilot-app-match@example.invalid",
+      "Submitted_By_Email__c": "uat-pilot-app-match@example.invalid",
+      "Submitted_By_Contact_Name__c": "Pilot Applicant",
+      "Country__c": "Australia",
+      "Region__c": "ANZ",
+      "Requested_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Application_Status__c": "Submitted",
+      "Decision__c": "Pending",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Name": "UAT-PILOT-APPLICATION-MATCH"
+    }
+  },
+  {
+    "alias": "APPLICATION-REJECTED",
+    "object": "Partner_Application__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-APPLICATION-REJECTED",
+    "phase": "foundation",
+    "fields": {
+      "Company_Name__c": "UAT-PILOT-Applicant-REJECTED",
+      "Business_Email__c": "uat-pilot-app-rejected@example.invalid",
+      "Submitted_By_Email__c": "uat-pilot-app-rejected@example.invalid",
+      "Submitted_By_Contact_Name__c": "Pilot Applicant",
+      "Country__c": "Australia",
+      "Region__c": "ANZ",
+      "Requested_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Application_Status__c": "Rejected",
+      "Decision__c": "Rejected",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Rejection_Reason__c": "Synthetic pilot territory mismatch",
+      "Name": "UAT-PILOT-APPLICATION-REJECTED"
+    }
+  },
+  {
+    "alias": "APPLICATION-BLOCKED",
+    "object": "Partner_Application__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-APPLICATION-BLOCKED",
+    "phase": "foundation",
+    "fields": {
+      "Company_Name__c": "UAT-PILOT-Applicant-BLOCKED",
+      "Business_Email__c": "uat-pilot-app-blocked@example.invalid",
+      "Submitted_By_Email__c": "uat-pilot-app-blocked@example.invalid",
+      "Submitted_By_Contact_Name__c": "Pilot Applicant",
+      "Country__c": "Australia",
+      "Region__c": "ANZ",
+      "Requested_Tier__c": "Gold",
+      "Partner_Type__c": "Reseller",
+      "Application_Status__c": "Approved",
+      "Decision__c": "Approved",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Name": "UAT-PILOT-APPLICATION-BLOCKED"
+    }
+  },
+  {
+    "alias": "OPPORTUNITY-ONE",
+    "object": "Opportunity",
+    "keyField": "Name",
+    "key": "UAT-PILOT-OPPORTUNITY-ONE",
+    "phase": "deals",
+    "fields": {
+      "AccountId": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "StageName": {
+        "opportunityStage": "open"
+      },
+      "CloseDate": {
+        "days": 45
+      },
+      "Amount": 25000,
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Name": "UAT-PILOT-OPPORTUNITY-ONE"
+    }
+  },
+  {
+    "alias": "OPPORTUNITY-TWO",
+    "object": "Opportunity",
+    "keyField": "Name",
+    "key": "UAT-PILOT-OPPORTUNITY-TWO",
+    "phase": "deals",
+    "fields": {
+      "AccountId": {
+        "ref": "CUSTOMER-TWO"
+      },
+      "StageName": {
+        "opportunityStage": "open"
+      },
+      "CloseDate": {
+        "days": 45
+      },
+      "Amount": 25000,
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Name": "UAT-PILOT-OPPORTUNITY-TWO"
+    }
+  },
+  {
+    "alias": "OPPORTUNITY-INELIGIBLE",
+    "object": "Opportunity",
+    "keyField": "Name",
+    "key": "UAT-PILOT-OPPORTUNITY-INELIGIBLE",
+    "phase": "deals",
+    "fields": {
+      "AccountId": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "StageName": {
+        "opportunityStage": "open"
+      },
+      "CloseDate": {
+        "days": 45
+      },
+      "Amount": 25000,
+      "Name": "UAT-PILOT-OPPORTUNITY-INELIGIBLE"
+    }
+  },
+  {
+    "alias": "DEAL-DRAFT",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-DRAFT",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Draft",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 25000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Deal_Name__c": "UAT-PILOT-DEAL-DRAFT"
+    }
+  },
+  {
+    "alias": "DEAL-SUBMITTED",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-SUBMITTED",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Submitted",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 26000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-SUBMITTED"
+    }
+  },
+  {
+    "alias": "DEAL-NEEDS-INFORMATION",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-NEEDS-INFORMATION",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Needs Information",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 27000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-NEEDS-INFORMATION"
+    }
+  },
+  {
+    "alias": "DEAL-UNDER-REVIEW",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-UNDER-REVIEW",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Under Review",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 28000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-UNDER-REVIEW"
+    }
+  },
+  {
+    "alias": "DEAL-APPROVED",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-APPROVED",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Approved",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 29000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Protection_Start_Date__c": {
+        "days": -30
+      },
+      "Protection_End_Date__c": {
+        "days": 60
+      },
+      "Approved_Date__c": {
+        "hours": -72
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-APPROVED"
+    }
+  },
+  {
+    "alias": "DEAL-REJECTED",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-REJECTED",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Rejected",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 30000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Rejection_Reason__c": "Synthetic pilot territory conflict",
+      "Deal_Name__c": "UAT-PILOT-DEAL-REJECTED"
+    }
+  },
+  {
+    "alias": "DEAL-EXPIRED",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-EXPIRED",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Expired",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 31000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Protection_Start_Date__c": {
+        "days": -30
+      },
+      "Protection_End_Date__c": {
+        "days": -1
+      },
+      "Approved_Date__c": {
+        "hours": -72
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-EXPIRED"
+    }
+  },
+  {
+    "alias": "DEAL-CLOSED-WON",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-CLOSED-WON",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Closed Won",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 32000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-CLOSED-WON"
+    }
+  },
+  {
+    "alias": "DEAL-CLOSED-LOST",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-CLOSED-LOST",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Closed Lost",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 33000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic pilot workflow exercise",
+      "Proposed_Solution__c": "Partner implementation and training",
+      "Submitted_On__c": {
+        "hours": -48
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-CLOSED-LOST"
+    }
+  },
+  {
+    "alias": "DEAL-CONFLICT",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-CONFLICT",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Submitted",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "Potential Conflict",
+      "Estimated_Revenue__c": 50000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic overlap and isolation test",
+      "Proposed_Solution__c": "Run conflict analysis in app",
+      "Submitted_On__c": {
+        "hours": -24
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-CONFLICT"
+    }
+  },
+  {
+    "alias": "DEAL-B-ISOLATION",
+    "object": "Deal_Registration__c",
+    "keyField": "Deal_Name__c",
+    "key": "UAT-PILOT-DEAL-B-ISOLATION",
+    "phase": "deals",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-B-USER"
+      },
+      "Customer_Account__c": {
+        "ref": "CUSTOMER-ONE"
+      },
+      "Customer_Name__c": "UAT-PILOT-CUSTOMER-ONE",
+      "Status__c": "Submitted",
+      "Stage__c": "Discovery",
+      "Conflict_Status__c": "None",
+      "Estimated_Revenue__c": 50000,
+      "Estimated_Close_Date__c": {
+        "days": 45
+      },
+      "Business_Problem__c": "Synthetic overlap and isolation test",
+      "Proposed_Solution__c": "Run conflict analysis in app",
+      "Submitted_On__c": {
+        "hours": -24
+      },
+      "Deal_Name__c": "UAT-PILOT-DEAL-B-ISOLATION"
+    }
+  },
+  {
+    "alias": "LEAD-ASSIGNED",
+    "object": "Lead",
+    "keyField": "Company",
+    "key": "UAT-PILOT-LEAD-ASSIGNED",
+    "phase": "leads",
+    "fields": {
+      "FirstName": "Pilot",
+      "LastName": "ASSIGNED",
+      "Email": "uat-pilot-lead-assigned@example.invalid",
+      "Status": {
+        "leadStatus": true
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Lead_Distribution_Status__c": "Assigned",
+      "Assigned_Date__c": {
+        "hours": -1
+      },
+      "Response_SLA_Hours__c": 24,
+      "SLA_Deadline__c": {
+        "hours": 23
+      },
+      "Company": "UAT-PILOT-LEAD-ASSIGNED"
+    }
+  },
+  {
+    "alias": "LEAD-ACCEPTED",
+    "object": "Lead",
+    "keyField": "Company",
+    "key": "UAT-PILOT-LEAD-ACCEPTED",
+    "phase": "leads",
+    "fields": {
+      "FirstName": "Pilot",
+      "LastName": "ACCEPTED",
+      "Email": "uat-pilot-lead-accepted@example.invalid",
+      "Status": {
+        "leadStatus": true
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Lead_Distribution_Status__c": "Accepted",
+      "Assigned_Date__c": {
+        "hours": -1
+      },
+      "Response_SLA_Hours__c": 24,
+      "SLA_Deadline__c": {
+        "hours": 23
+      },
+      "Accepted_Date__c": {
+        "hours": -1
+      },
+      "Company": "UAT-PILOT-LEAD-ACCEPTED"
+    }
+  },
+  {
+    "alias": "LEAD-REJECTED",
+    "object": "Lead",
+    "keyField": "Company",
+    "key": "UAT-PILOT-LEAD-REJECTED",
+    "phase": "leads",
+    "fields": {
+      "FirstName": "Pilot",
+      "LastName": "REJECTED",
+      "Email": "uat-pilot-lead-rejected@example.invalid",
+      "Status": {
+        "leadStatus": true
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Lead_Distribution_Status__c": "Rejected",
+      "Assigned_Date__c": {
+        "hours": -1
+      },
+      "Response_SLA_Hours__c": 24,
+      "SLA_Deadline__c": {
+        "hours": 23
+      },
+      "Rejected_Date__c": {
+        "hours": -1
+      },
+      "Company": "UAT-PILOT-LEAD-REJECTED"
+    }
+  },
+  {
+    "alias": "LEAD-OVERDUE",
+    "object": "Lead",
+    "keyField": "Company",
+    "key": "UAT-PILOT-LEAD-OVERDUE",
+    "phase": "leads",
+    "fields": {
+      "FirstName": "Pilot",
+      "LastName": "OVERDUE",
+      "Email": "uat-pilot-lead-overdue@example.invalid",
+      "Status": {
+        "leadStatus": true
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Lead_Distribution_Status__c": "Assigned",
+      "Assigned_Date__c": {
+        "hours": -48
+      },
+      "Response_SLA_Hours__c": 24,
+      "SLA_Deadline__c": {
+        "hours": -24
+      },
+      "Company": "UAT-PILOT-LEAD-OVERDUE"
+    }
+  },
+  {
+    "alias": "LEAD-B-ISOLATION",
+    "object": "Lead",
+    "keyField": "Company",
+    "key": "UAT-PILOT-LEAD-B-ISOLATION",
+    "phase": "leads",
+    "fields": {
+      "FirstName": "Pilot",
+      "LastName": "B-ISOLATION",
+      "Email": "uat-pilot-lead-b-isolation@example.invalid",
+      "Status": {
+        "leadStatus": true
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Partner_Contact__c": {
+        "ref": "CONTACT-B-USER"
+      },
+      "Lead_Distribution_Status__c": "Assigned",
+      "Assigned_Date__c": {
+        "hours": -1
+      },
+      "Response_SLA_Hours__c": 24,
+      "SLA_Deadline__c": {
+        "hours": 23
+      },
+      "Company": "UAT-PILOT-LEAD-B-ISOLATION"
+    }
+  },
+  {
+    "alias": "MDF-DRAFT",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-DRAFT",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Draft",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Draft",
+      "Expected_Leads__c": 20,
+      "Name": "UAT-PILOT-MDF-DRAFT"
+    }
+  },
+  {
+    "alias": "MDF-SUBMITTED",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-SUBMITTED",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Submitted",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Submitted",
+      "Expected_Leads__c": 20,
+      "Name": "UAT-PILOT-MDF-SUBMITTED"
+    }
+  },
+  {
+    "alias": "MDF-UNDER-REVIEW",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-UNDER-REVIEW",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Under Review",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Under Review",
+      "Expected_Leads__c": 20,
+      "Name": "UAT-PILOT-MDF-UNDER-REVIEW"
+    }
+  },
+  {
+    "alias": "MDF-APPROVED",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-APPROVED",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Approved",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Approved",
+      "Expected_Leads__c": 20,
+      "Approved_Amount__c": 1000,
+      "Name": "UAT-PILOT-MDF-APPROVED"
+    }
+  },
+  {
+    "alias": "MDF-REJECTED",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-REJECTED",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Rejected",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Rejected",
+      "Expected_Leads__c": 20,
+      "Approval_Comments__c": "Synthetic pilot budget rejection",
+      "Name": "UAT-PILOT-MDF-REJECTED"
+    }
+  },
+  {
+    "alias": "MDF-IN-PROGRESS",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-IN-PROGRESS",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-In Progress",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "In Progress",
+      "Expected_Leads__c": 20,
+      "Approved_Amount__c": 1000,
+      "Name": "UAT-PILOT-MDF-IN-PROGRESS"
+    }
+  },
+  {
+    "alias": "MDF-PROOF-SUBMITTED",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-PROOF-SUBMITTED",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Proof Submitted",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": -21
+      },
+      "Activity_End_Date__c": {
+        "days": -7
+      },
+      "Status__c": "Proof Submitted",
+      "Expected_Leads__c": 20,
+      "Approved_Amount__c": 1000,
+      "Spent_Amount__c": 900,
+      "Actual_Leads__c": 22,
+      "Proof_Submitted_Date__c": {
+        "days": -1
+      },
+      "Name": "UAT-PILOT-MDF-PROOF-SUBMITTED"
+    }
+  },
+  {
+    "alias": "MDF-REIMBURSED",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-REIMBURSED",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-A-ADMIN"
+      },
+      "Campaign_Name__c": "UAT-PILOT-Reimbursed",
+      "Campaign_Type__c": "Webinar",
+      "Requested_Amount__c": 1000,
+      "Activity_Start_Date__c": {
+        "days": -21
+      },
+      "Activity_End_Date__c": {
+        "days": -7
+      },
+      "Status__c": "Reimbursed",
+      "Expected_Leads__c": 20,
+      "Approved_Amount__c": 1000,
+      "Spent_Amount__c": 900,
+      "Actual_Leads__c": 22,
+      "Proof_Submitted_Date__c": {
+        "days": -1
+      },
+      "Reimbursement_Status__c": "Paid",
+      "Name": "UAT-PILOT-MDF-REIMBURSED"
+    }
+  },
+  {
+    "alias": "MDF-B-ISOLATION",
+    "object": "MDF_Request__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-MDF-B-ISOLATION",
+    "phase": "mdf",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Submitted_By__c": {
+        "ref": "CONTACT-B-USER"
+      },
+      "Campaign_Name__c": "UAT-PILOT-B Campaign",
+      "Campaign_Type__c": "Event",
+      "Requested_Amount__c": 500,
+      "Activity_Start_Date__c": {
+        "days": 14
+      },
+      "Activity_End_Date__c": {
+        "days": 21
+      },
+      "Status__c": "Draft",
+      "Name": "UAT-PILOT-MDF-B-ISOLATION"
+    }
+  },
+  {
+    "alias": "ONBOARDING",
+    "object": "Partner_Onboarding__c",
+    "keyField": "Onboarding_Key__c",
+    "key": "UAT-PILOT-ONBOARDING",
+    "phase": "lifecycle",
+    "fields": {
+      "Application__c": {
+        "ref": "APPLICATION-BLOCKED"
+      },
+      "Partner_Account__c": {
+        "ref": "PARTNER-BLOCKED"
+      },
+      "Status__c": "Onboarding",
+      "Current_Stage__c": "Readiness",
+      "Activation_Gate_Status__c": "Blocked",
+      "Version_Number__c": 1,
+      "Recertification_Due_On__c": {
+        "days": 30
+      },
+      "Onboarding_Key__c": "UAT-PILOT-ONBOARDING"
+    }
+  },
+  {
+    "alias": "RELATIONSHIP",
+    "object": "Partner_Relationship__c",
+    "keyField": "Relationship_Key__c",
+    "key": "UAT-PILOT-RELATIONSHIP",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Account__c": {
+        "ref": "PARTNER-BLOCKED"
+      },
+      "Programme_Key__c": "RESELLER",
+      "Status__c": "Pending Enablement",
+      "Relationship_Key__c": "UAT-PILOT-RELATIONSHIP"
+    }
+  },
+  {
+    "alias": "DOCUMENT-MISSING",
+    "object": "Partner_Document_Requirement__c",
+    "keyField": "Requirement_Key__c",
+    "key": "UAT-PILOT-DOCUMENT-MISSING",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Document_Type__c": "Business Registration MISSING",
+      "Requirement_Level__c": "Mandatory",
+      "Gate__c": "Activation",
+      "Status__c": "Awaiting Submission",
+      "Blocking__c": true,
+      "Due_On__c": {
+        "days": -2
+      },
+      "Requirement_Key__c": "UAT-PILOT-DOCUMENT-MISSING"
+    }
+  },
+  {
+    "alias": "DOCUMENT-REVIEW",
+    "object": "Partner_Document_Requirement__c",
+    "keyField": "Requirement_Key__c",
+    "key": "UAT-PILOT-DOCUMENT-REVIEW",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Document_Type__c": "Business Registration REVIEW",
+      "Requirement_Level__c": "Mandatory",
+      "Gate__c": "Activation",
+      "Status__c": "Under Review",
+      "Blocking__c": true,
+      "Due_On__c": {
+        "days": -2
+      },
+      "Requirement_Key__c": "UAT-PILOT-DOCUMENT-REVIEW"
+    }
+  },
+  {
+    "alias": "DOCUMENT-EXPIRED",
+    "object": "Partner_Document_Requirement__c",
+    "keyField": "Requirement_Key__c",
+    "key": "UAT-PILOT-DOCUMENT-EXPIRED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Document_Type__c": "Business Registration EXPIRED",
+      "Requirement_Level__c": "Mandatory",
+      "Gate__c": "Activation",
+      "Status__c": "Expired",
+      "Blocking__c": true,
+      "Due_On__c": {
+        "days": -2
+      },
+      "Requirement_Key__c": "UAT-PILOT-DOCUMENT-EXPIRED"
+    }
+  },
+  {
+    "alias": "ASSESSMENT",
+    "object": "Partner_Assessment__c",
+    "keyField": "Assessment_Key__c",
+    "key": "UAT-PILOT-ASSESSMENT",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Assessment_Type__c": "Sanctions",
+      "Status__c": "Failed",
+      "Blocking__c": true,
+      "Assessment_Key__c": "UAT-PILOT-ASSESSMENT"
+    }
+  },
+  {
+    "alias": "FINDING",
+    "object": "Partner_Assessment_Finding__c",
+    "keyField": "Finding_Key__c",
+    "key": "UAT-PILOT-FINDING",
+    "phase": "lifecycle",
+    "fields": {
+      "Assessment__c": {
+        "ref": "ASSESSMENT"
+      },
+      "Severity__c": "Critical",
+      "Status__c": "Open",
+      "Blocking__c": true,
+      "Description__c": "Synthetic pilot finding: resolve through approved review process",
+      "Finding_Key__c": "UAT-PILOT-FINDING"
+    }
+  },
+  {
+    "alias": "ACCESS",
+    "object": "Partner_Access_Request__c",
+    "keyField": "Request_Key__c",
+    "key": "UAT-PILOT-ACCESS",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Relationship__c": {
+        "ref": "RELATIONSHIP"
+      },
+      "Contact__c": {
+        "ref": "CONTACT-BLOCKED"
+      },
+      "Access_Bundle__c": "PSG_Partner_User",
+      "Status__c": "Pending Approval",
+      "Request_Key__c": "UAT-PILOT-ACCESS"
+    }
+  },
+  {
+    "alias": "TRAINING-ASSIGNED",
+    "object": "Partner_Training_Assignment__c",
+    "keyField": "Assignment_Key__c",
+    "key": "UAT-PILOT-TRAINING-ASSIGNED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Training_Key__c": "PILOT-ASSIGNED",
+      "Mandatory__c": true,
+      "Status__c": "Assigned",
+      "Due_On__c": {
+        "days": 7
+      },
+      "Assignment_Key__c": "UAT-PILOT-TRAINING-ASSIGNED"
+    }
+  },
+  {
+    "alias": "TRAINING-COMPLETED",
+    "object": "Partner_Training_Assignment__c",
+    "keyField": "Assignment_Key__c",
+    "key": "UAT-PILOT-TRAINING-COMPLETED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Training_Key__c": "PILOT-COMPLETED",
+      "Mandatory__c": true,
+      "Status__c": "Completed",
+      "Due_On__c": {
+        "days": 7
+      },
+      "Completed_On__c": {
+        "hours": -72
+      },
+      "Expires_On__c": {
+        "days": 90
+      },
+      "Assignment_Key__c": "UAT-PILOT-TRAINING-COMPLETED"
+    }
+  },
+  {
+    "alias": "TRAINING-EXPIRED",
+    "object": "Partner_Training_Assignment__c",
+    "keyField": "Assignment_Key__c",
+    "key": "UAT-PILOT-TRAINING-EXPIRED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Training_Key__c": "PILOT-EXPIRED",
+      "Mandatory__c": true,
+      "Status__c": "Expired",
+      "Due_On__c": {
+        "days": 7
+      },
+      "Completed_On__c": {
+        "hours": -72
+      },
+      "Expires_On__c": {
+        "days": -1
+      },
+      "Assignment_Key__c": "UAT-PILOT-TRAINING-EXPIRED"
+    }
+  },
+  {
+    "alias": "AGREEMENT-DRAFT",
+    "object": "Partner_Agreement__c",
+    "keyField": "Agreement_Key__c",
+    "key": "UAT-PILOT-AGREEMENT-DRAFT",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Agreement_Type__c": "Programme Agreement",
+      "Status__c": "Draft",
+      "Template_Key__c": "PILOT-SAMPLE",
+      "Template_Version__c": 1,
+      "Agreement_Key__c": "UAT-PILOT-AGREEMENT-DRAFT"
+    }
+  },
+  {
+    "alias": "AGREEMENT-INTERNAL-REVIEW",
+    "object": "Partner_Agreement__c",
+    "keyField": "Agreement_Key__c",
+    "key": "UAT-PILOT-AGREEMENT-INTERNAL-REVIEW",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Agreement_Type__c": "Programme Agreement",
+      "Status__c": "Internal Review",
+      "Template_Key__c": "PILOT-SAMPLE",
+      "Template_Version__c": 1,
+      "Agreement_Key__c": "UAT-PILOT-AGREEMENT-INTERNAL-REVIEW"
+    }
+  },
+  {
+    "alias": "TASK-NOT-STARTED",
+    "object": "Partner_Onboarding_Task__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-TASK-NOT-STARTED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Task_Type__c": "Readiness",
+      "Status__c": "Not Started",
+      "Blocking__c": true,
+      "Due_On__c": {
+        "hours": -24
+      },
+      "Assigned_To__c": {
+        "user": true
+      },
+      "Title__c": "UAT-PILOT-TASK-NOT-STARTED"
+    }
+  },
+  {
+    "alias": "TASK-BLOCKED",
+    "object": "Partner_Onboarding_Task__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-TASK-BLOCKED",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Task_Type__c": "Readiness",
+      "Status__c": "Blocked",
+      "Blocking__c": true,
+      "Due_On__c": {
+        "hours": -24
+      },
+      "Assigned_To__c": {
+        "user": true
+      },
+      "Title__c": "UAT-PILOT-TASK-BLOCKED"
+    }
+  },
+  {
+    "alias": "TASK-COMPLETE",
+    "object": "Partner_Onboarding_Task__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-TASK-COMPLETE",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Task_Type__c": "Readiness",
+      "Status__c": "Complete",
+      "Blocking__c": false,
+      "Due_On__c": {
+        "hours": -24
+      },
+      "Assigned_To__c": {
+        "user": true
+      },
+      "Title__c": "UAT-PILOT-TASK-COMPLETE"
+    }
+  },
+  {
+    "alias": "LIFECYCLE-EVENT",
+    "object": "Partner_Lifecycle_Event__c",
+    "keyField": "Idempotency_Key__c",
+    "key": "UAT-PILOT-LIFECYCLE-EVENT",
+    "phase": "lifecycle",
+    "fields": {
+      "Onboarding__c": {
+        "ref": "ONBOARDING"
+      },
+      "Event_Type__c": "Pilot fixture created",
+      "Stage__c": "Readiness",
+      "Summary__c": "Synthetic pilot blockers; not evidence of real activation",
+      "Occurred_On__c": {
+        "hours": 0
+      },
+      "Idempotency_Key__c": "UAT-PILOT-LIFECYCLE-EVENT"
+    }
+  },
+  {
+    "alias": "CONTENT-PUBLIC",
+    "object": "Partner_Content__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CONTENT-PUBLIC",
+    "phase": "engagement",
+    "fields": {
+      "Category__c": "Training",
+      "Visibility__c": "All Partners",
+      "Is_Active__c": true,
+      "Featured__c": true,
+      "Published_Date__c": {
+        "days": -1
+      },
+      "Description__c": "Synthetic pilot content. Upload a sample file through content administration before download testing.",
+      "Name": "UAT-PILOT-CONTENT-PUBLIC"
+    }
+  },
+  {
+    "alias": "CONTENT-GOLD",
+    "object": "Partner_Content__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CONTENT-GOLD",
+    "phase": "engagement",
+    "fields": {
+      "Category__c": "Training",
+      "Visibility__c": "Restricted",
+      "Is_Active__c": true,
+      "Featured__c": false,
+      "Published_Date__c": {
+        "days": -1
+      },
+      "Description__c": "Synthetic pilot content. Upload a sample file through content administration before download testing.",
+      "Partner_Tier__c": "Gold",
+      "Name": "UAT-PILOT-CONTENT-GOLD"
+    }
+  },
+  {
+    "alias": "CONTENT-DISTRIBUTOR",
+    "object": "Partner_Content__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CONTENT-DISTRIBUTOR",
+    "phase": "engagement",
+    "fields": {
+      "Category__c": "Training",
+      "Visibility__c": "Restricted",
+      "Is_Active__c": true,
+      "Featured__c": false,
+      "Published_Date__c": {
+        "days": -1
+      },
+      "Description__c": "Synthetic pilot content. Upload a sample file through content administration before download testing.",
+      "Partner_Type__c": "Distributor",
+      "Name": "UAT-PILOT-CONTENT-DISTRIBUTOR"
+    }
+  },
+  {
+    "alias": "CONTENT-INTERNAL",
+    "object": "Partner_Content__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CONTENT-INTERNAL",
+    "phase": "engagement",
+    "fields": {
+      "Category__c": "Training",
+      "Visibility__c": "Internal Only",
+      "Is_Active__c": true,
+      "Featured__c": false,
+      "Published_Date__c": {
+        "days": -1
+      },
+      "Description__c": "Synthetic pilot content. Upload a sample file through content administration before download testing.",
+      "Name": "UAT-PILOT-CONTENT-INTERNAL"
+    }
+  },
+  {
+    "alias": "CONTENT-INACTIVE",
+    "object": "Partner_Content__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-CONTENT-INACTIVE",
+    "phase": "engagement",
+    "fields": {
+      "Category__c": "Training",
+      "Visibility__c": "All Partners",
+      "Is_Active__c": false,
+      "Featured__c": false,
+      "Published_Date__c": {
+        "days": -1
+      },
+      "Description__c": "Synthetic pilot content. Upload a sample file through content administration before download testing.",
+      "Name": "UAT-PILOT-CONTENT-INACTIVE"
+    }
+  },
+  {
+    "alias": "AI-DRAFT",
+    "object": "AI_Insight__c",
+    "keyField": "Provider__c",
+    "key": "UAT-PILOT-AI-DRAFT",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Feature_Name__c": "LeadFitScoring",
+      "Provider__c": "UAT-PILOT-AI-DRAFT",
+      "Status__c": "Draft",
+      "Confidence__c": 82,
+      "Recommendation__c": "Synthetic recommendation: arrange a discovery call.",
+      "Insight_Text__c": "Synthetic pilot insight: prioritise partner follow-up."
+    }
+  },
+  {
+    "alias": "AI-REVIEWED",
+    "object": "AI_Insight__c",
+    "keyField": "Provider__c",
+    "key": "UAT-PILOT-AI-REVIEWED",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Feature_Name__c": "LeadFitScoring",
+      "Provider__c": "UAT-PILOT-AI-REVIEWED",
+      "Status__c": "Reviewed",
+      "Confidence__c": 82,
+      "Recommendation__c": "Synthetic recommendation: arrange a discovery call.",
+      "Insight_Text__c": "Synthetic pilot insight: prioritise partner follow-up."
+    }
+  },
+  {
+    "alias": "AI-ACCEPTED",
+    "object": "AI_Insight__c",
+    "keyField": "Provider__c",
+    "key": "UAT-PILOT-AI-ACCEPTED",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Feature_Name__c": "LeadFitScoring",
+      "Provider__c": "UAT-PILOT-AI-ACCEPTED",
+      "Status__c": "Accepted",
+      "Confidence__c": 82,
+      "Recommendation__c": "Synthetic recommendation: arrange a discovery call.",
+      "Insight_Text__c": "Synthetic pilot insight: prioritise partner follow-up."
+    }
+  },
+  {
+    "alias": "AI-DISMISSED",
+    "object": "AI_Insight__c",
+    "keyField": "Provider__c",
+    "key": "UAT-PILOT-AI-DISMISSED",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Feature_Name__c": "LeadFitScoring",
+      "Provider__c": "UAT-PILOT-AI-DISMISSED",
+      "Status__c": "Dismissed",
+      "Confidence__c": 82,
+      "Recommendation__c": "Synthetic recommendation: arrange a discovery call.",
+      "Insight_Text__c": "Synthetic pilot insight: prioritise partner follow-up."
+    }
+  },
+  {
+    "alias": "NOTIFICATION-UNREAD",
+    "object": "Partner_Notification__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-NOTIFICATION-UNREAD",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Recipient_User__c": {
+        "user": true
+      },
+      "Notification_Type__c": "System",
+      "Priority__c": "High",
+      "Message__c": "Synthetic pilot notification",
+      "Is_Read__c": false,
+      "Dismissed__c": false,
+      "Title__c": "UAT-PILOT-NOTIFICATION-UNREAD"
+    }
+  },
+  {
+    "alias": "NOTIFICATION-READ",
+    "object": "Partner_Notification__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-NOTIFICATION-READ",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Recipient_User__c": {
+        "user": true
+      },
+      "Notification_Type__c": "System",
+      "Priority__c": "Normal",
+      "Message__c": "Synthetic pilot notification",
+      "Is_Read__c": true,
+      "Dismissed__c": false,
+      "Read_On__c": {
+        "hours": -1
+      },
+      "Title__c": "UAT-PILOT-NOTIFICATION-READ"
+    }
+  },
+  {
+    "alias": "NOTIFICATION-DISMISSED",
+    "object": "Partner_Notification__c",
+    "keyField": "Title__c",
+    "key": "UAT-PILOT-NOTIFICATION-DISMISSED",
+    "phase": "engagement",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Recipient_User__c": {
+        "user": true
+      },
+      "Notification_Type__c": "System",
+      "Priority__c": "Normal",
+      "Message__c": "Synthetic pilot notification",
+      "Is_Read__c": true,
+      "Dismissed__c": true,
+      "Read_On__c": {
+        "hours": -1
+      },
+      "Title__c": "UAT-PILOT-NOTIFICATION-DISMISSED"
+    }
+  },
+  {
+    "alias": "ALERT-OPEN",
+    "object": "Partner_Operational_Alert__c",
+    "keyField": "Alert_Key__c",
+    "key": "UAT-PILOT-ALERT-OPEN",
+    "phase": "engagement",
+    "fields": {
+      "Alert_Type__c": "Overdue Work",
+      "Severity__c": "High",
+      "Status__c": "Open",
+      "Occurrence_Count__c": 1,
+      "First_Detected_On__c": {
+        "hours": -48
+      },
+      "Last_Detected_On__c": {
+        "hours": -1
+      },
+      "Source_Record_Id__c": {
+        "ref": "ONBOARDING"
+      },
+      "Message__c": "Synthetic pilot alert; not an actual job failure",
+      "Alert_Key__c": "UAT-PILOT-ALERT-OPEN"
+    }
+  },
+  {
+    "alias": "ALERT-ACKNOWLEDGED",
+    "object": "Partner_Operational_Alert__c",
+    "keyField": "Alert_Key__c",
+    "key": "UAT-PILOT-ALERT-ACKNOWLEDGED",
+    "phase": "engagement",
+    "fields": {
+      "Alert_Type__c": "Overdue Work",
+      "Severity__c": "High",
+      "Status__c": "Acknowledged",
+      "Occurrence_Count__c": 1,
+      "First_Detected_On__c": {
+        "hours": -48
+      },
+      "Last_Detected_On__c": {
+        "hours": -1
+      },
+      "Source_Record_Id__c": {
+        "ref": "ONBOARDING"
+      },
+      "Message__c": "Synthetic pilot alert; not an actual job failure",
+      "Acknowledged_On__c": {
+        "hours": -1
+      },
+      "Acknowledged_By__c": {
+        "user": true
+      },
+      "Alert_Key__c": "UAT-PILOT-ALERT-ACKNOWLEDGED"
+    }
+  },
+  {
+    "alias": "ALERT-RESOLVED",
+    "object": "Partner_Operational_Alert__c",
+    "keyField": "Alert_Key__c",
+    "key": "UAT-PILOT-ALERT-RESOLVED",
+    "phase": "engagement",
+    "fields": {
+      "Alert_Type__c": "Overdue Work",
+      "Severity__c": "High",
+      "Status__c": "Resolved",
+      "Occurrence_Count__c": 1,
+      "First_Detected_On__c": {
+        "hours": -48
+      },
+      "Last_Detected_On__c": {
+        "hours": -1
+      },
+      "Source_Record_Id__c": {
+        "ref": "ONBOARDING"
+      },
+      "Message__c": "Synthetic pilot alert; not an actual job failure",
+      "Resolved_On__c": {
+        "hours": -1
+      },
+      "Resolved_By__c": {
+        "user": true
+      },
+      "Alert_Key__c": "UAT-PILOT-ALERT-RESOLVED"
+    }
+  },
+  {
+    "alias": "PERFORMANCE-A-0",
+    "object": "Partner_Performance__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PERFORMANCE-A-0",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Reporting_Period_Start__c": {
+        "days": -30
+      },
+      "Reporting_Period_End__c": {
+        "days": 0
+      },
+      "Leads_Assigned__c": 10,
+      "Leads_Accepted__c": 7,
+      "Leads_Converted__c": 3,
+      "Opportunities_Created__c": 5,
+      "Opportunities_Won__c": 2,
+      "Pipeline_Value__c": 100000,
+      "Won_Value__c": 25000,
+      "MDF_Approved__c": 3000,
+      "MDF_Claimed__c": 2000,
+      "Content_Downloads__c": 12,
+      "Partner_Score__c": 80,
+      "Leaderboard_Rank__c": 1,
+      "Name": "UAT-PILOT-PERFORMANCE-A-0"
+    }
+  },
+  {
+    "alias": "PERFORMANCE-A-1",
+    "object": "Partner_Performance__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PERFORMANCE-A-1",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Reporting_Period_Start__c": {
+        "days": -60
+      },
+      "Reporting_Period_End__c": {
+        "days": -31
+      },
+      "Leads_Assigned__c": 10,
+      "Leads_Accepted__c": 7,
+      "Leads_Converted__c": 3,
+      "Opportunities_Created__c": 5,
+      "Opportunities_Won__c": 2,
+      "Pipeline_Value__c": 100000,
+      "Won_Value__c": 25000,
+      "MDF_Approved__c": 3000,
+      "MDF_Claimed__c": 2000,
+      "Content_Downloads__c": 12,
+      "Partner_Score__c": 80,
+      "Leaderboard_Rank__c": 1,
+      "Name": "UAT-PILOT-PERFORMANCE-A-1"
+    }
+  },
+  {
+    "alias": "BADGE-A",
+    "object": "Partner_Badge__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-BADGE-A",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-A"
+      },
+      "Badge_Name__c": "Pilot Enablement",
+      "Badge_Code__c": "PILOT",
+      "Awarded_On__c": {
+        "days": -1
+      },
+      "Active__c": true,
+      "Reason__c": "Synthetic pilot display fixture",
+      "Awarded_By_Process__c": "Pilot seed",
+      "Name": "UAT-PILOT-BADGE-A"
+    }
+  },
+  {
+    "alias": "PERFORMANCE-B-0",
+    "object": "Partner_Performance__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PERFORMANCE-B-0",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Reporting_Period_Start__c": {
+        "days": -30
+      },
+      "Reporting_Period_End__c": {
+        "days": 0
+      },
+      "Leads_Assigned__c": 10,
+      "Leads_Accepted__c": 7,
+      "Leads_Converted__c": 3,
+      "Opportunities_Created__c": 5,
+      "Opportunities_Won__c": 2,
+      "Pipeline_Value__c": 100000,
+      "Won_Value__c": 25000,
+      "MDF_Approved__c": 3000,
+      "MDF_Claimed__c": 2000,
+      "Content_Downloads__c": 12,
+      "Partner_Score__c": 65,
+      "Leaderboard_Rank__c": 2,
+      "Name": "UAT-PILOT-PERFORMANCE-B-0"
+    }
+  },
+  {
+    "alias": "PERFORMANCE-B-1",
+    "object": "Partner_Performance__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-PERFORMANCE-B-1",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Reporting_Period_Start__c": {
+        "days": -60
+      },
+      "Reporting_Period_End__c": {
+        "days": -31
+      },
+      "Leads_Assigned__c": 10,
+      "Leads_Accepted__c": 7,
+      "Leads_Converted__c": 3,
+      "Opportunities_Created__c": 5,
+      "Opportunities_Won__c": 2,
+      "Pipeline_Value__c": 100000,
+      "Won_Value__c": 25000,
+      "MDF_Approved__c": 3000,
+      "MDF_Claimed__c": 2000,
+      "Content_Downloads__c": 12,
+      "Partner_Score__c": 65,
+      "Leaderboard_Rank__c": 2,
+      "Name": "UAT-PILOT-PERFORMANCE-B-1"
+    }
+  },
+  {
+    "alias": "BADGE-B",
+    "object": "Partner_Badge__c",
+    "keyField": "Name",
+    "key": "UAT-PILOT-BADGE-B",
+    "phase": "analytics",
+    "fields": {
+      "Partner_Account__c": {
+        "ref": "PARTNER-B"
+      },
+      "Badge_Name__c": "Pilot Enablement",
+      "Badge_Code__c": "PILOT",
+      "Awarded_On__c": {
+        "days": -1
+      },
+      "Active__c": true,
+      "Reason__c": "Synthetic pilot display fixture",
+      "Awarded_By_Process__c": "Pilot seed",
+      "Name": "UAT-PILOT-BADGE-B"
+    }
+  }
+]

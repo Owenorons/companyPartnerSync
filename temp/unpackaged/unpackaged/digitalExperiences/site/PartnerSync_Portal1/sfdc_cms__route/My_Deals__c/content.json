@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "My Deals",
+  "contentBody" : {
+    "activeViewId" : "My_Deals",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-my-deals",
+    "urlPrefix" : "my-deals"
+  },
+  "urlName" : "my-deals"
+}

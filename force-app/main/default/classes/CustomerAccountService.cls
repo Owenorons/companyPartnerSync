@@ -1,4 +1,4 @@
-/*
+/**
  * Service for resolving a Lead (or raw company/email input) to a customer
  * Account, creating one only when no existing match is found. Two entry
  * points exist for two different callers: one takes a full Lead (used by
@@ -8,6 +8,14 @@
  * below.
  */
 public with sharing class CustomerAccountService {
+  /**
+   * Resolves a customer Account for the given Lead: reuses
+   * Customer_Account__c if already set, otherwise matches on company/email
+   * domain, and creates a new customer Account only if no match is found.
+   *
+   * @param lead The lead to resolve a customer account for.
+   * @return The matched or newly created customer account, with a flag indicating which.
+   */
   public static CustomerAccountMatchDTO findOrCreateCustomerAccount(Lead lead) {
     if (lead == null) {
       throw new PartnerSyncHandledException('Lead is required.');
@@ -58,6 +66,15 @@ public with sharing class CustomerAccountService {
     return toDTO((Account) sanitized[0], true);
   }
 
+  /**
+   * Resolves a customer Account for the given raw company name and email,
+   * matching on company/email domain and creating a new customer Account
+   * only if no match is found.
+   *
+   * @param companyName The company name to match or create an account for.
+   * @param email An email address whose domain is used to help match an existing account.
+   * @return The matched or newly created customer account, with a flag indicating which.
+   */
   public static CustomerAccountMatchDTO findOrCreateCustomerAccount(
     String companyName,
     String email

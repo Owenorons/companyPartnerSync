@@ -68,6 +68,17 @@ private class DealRegistrationServiceTest {
       System.assertNotEquals(null, result.dealRegistrationId);
     }
     Test.stopTest();
+
+    System.assertEquals(
+      1,
+      [
+        SELECT COUNT()
+        FROM Usage_Metric__c
+        WHERE
+          Partner_Account__c = :partner.Id
+          AND Metric_Type__c = 'Deal Submitted'
+      ]
+    );
   }
 
   @IsTest

@@ -1,4 +1,4 @@
-/*
+/**
  * Selector layer for Partner_Notification__c, used by both the query side
  * (NotificationQueryService) and the update side (NotificationUpdateService).
  * selectAccessibleNotification() is the one non-CRUD query here — it scopes
@@ -6,6 +6,13 @@
  * than plain retrieval.
  */
 public with sharing class NotificationSelector {
+  /**
+   * Returns a user's active (non-dismissed) notifications, most recent
+   * first.
+   *
+   * @param userId Id of the recipient user.
+   * @return Up to 100 active Partner_Notification__c records for that user.
+   */
   public static List<Partner_Notification__c> selectMyActiveNotifications(
     Id userId
   ) {
@@ -29,6 +36,12 @@ public with sharing class NotificationSelector {
     ];
   }
 
+  /**
+   * Counts a user's unread, non-dismissed notifications.
+   *
+   * @param userId Id of the recipient user.
+   * @return The number of unread, non-dismissed notifications for that user.
+   */
   public static Integer countUnreadForUser(Id userId) {
     SecurityUtil.assertReadable(Partner_Notification__c.SObjectType);
 
@@ -43,6 +56,12 @@ public with sharing class NotificationSelector {
     ];
   }
 
+  /**
+   * Returns a single notification for the mark-as-read update.
+   *
+   * @param notificationId Id of the Partner_Notification__c record to fetch.
+   * @return The matching Partner_Notification__c record.
+   */
   public static Partner_Notification__c selectForReadUpdate(Id notificationId) {
     SecurityUtil.assertReadable(Partner_Notification__c.SObjectType);
 
@@ -61,6 +80,12 @@ public with sharing class NotificationSelector {
     return rows[0];
   }
 
+  /**
+   * Returns a single notification for the dismiss update.
+   *
+   * @param notificationId Id of the Partner_Notification__c record to fetch.
+   * @return The matching Partner_Notification__c record.
+   */
   public static Partner_Notification__c selectForDismissUpdate(
     Id notificationId
   ) {
@@ -81,6 +106,15 @@ public with sharing class NotificationSelector {
     return rows[0];
   }
 
+  /**
+   * Returns a notification only if it belongs to the given partner
+   * account and recipient user, for access-checking purposes.
+   *
+   * @param notificationId Id of the Partner_Notification__c record to fetch.
+   * @param partnerAccountId Id of the partner account the notification must belong to.
+   * @param userId Id of the user the notification must be addressed to.
+   * @return The matching Partner_Notification__c record.
+   */
   public static Partner_Notification__c selectAccessibleNotification(
     Id notificationId,
     Id partnerAccountId,

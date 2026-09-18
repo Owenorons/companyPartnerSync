@@ -37,6 +37,17 @@ private class CoverageBusinessFlowTest {
       Assert.areEqual(2500, budget.usedBudget);
       Assert.areEqual(7500, budget.remainingBudget);
     }
+
+    Assert.areEqual(
+      1,
+      [
+        SELECT COUNT()
+        FROM Usage_Metric__c
+        WHERE
+          Partner_Account__c = :partner.Id
+          AND Metric_Type__c = 'MDF Request'
+      ]
+    );
   }
 
   @IsTest
@@ -90,6 +101,17 @@ private class CoverageBusinessFlowTest {
       Assert.areEqual(12, assigned.Response_SLA_Hours__c);
       Assert.isNotNull(assigned.SLA_Deadline__c);
     }
+
+    Assert.areEqual(
+      1,
+      [
+        SELECT COUNT()
+        FROM Usage_Metric__c
+        WHERE
+          Partner_Account__c = :partner.Id
+          AND Metric_Type__c = 'Lead Assigned'
+      ]
+    );
 
     User partnerUser = TestUserFactory.createExternalUser(contact.Id);
     TestUserFactory.assignPermissionSet(

@@ -1,4 +1,4 @@
-/*
+/**
  * Selector layer for the internal review workflow. Deliberately not scoped
  * to a single partner account — reviewers need visibility across all
  * partners' deals, so authorization here is enforced by
@@ -7,6 +7,11 @@
  * DealRegistrationSelector, which is intentionally scoped per partner.
  */
 public without sharing class DealReviewSelector {
+  /**
+   * Queries the internal review queue across all partners, oldest submission first.
+   *
+   * @return Up to 500 deal registrations in Submitted, Under Review, Approved, or Rejected status.
+   */
   public static List<Deal_Registration__c> selectReviewQueue() {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -32,6 +37,13 @@ public without sharing class DealReviewSelector {
     ];
   }
 
+  /**
+   * Queries a single deal registration, with the fields needed for the internal review detail
+   * screen, across all partners.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The Deal_Registration__c record.
+   */
   public static Deal_Registration__c selectForInternalReview(Id dealId) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -71,6 +83,15 @@ public without sharing class DealReviewSelector {
     return rows[0];
   }
 
+  /**
+   * Finds other deal registrations on the same customer account that still count as live
+   * conflicts at review time (including 'Under Review', unlike
+   * DealRegistrationSelector.findConflictingDeals).
+   *
+   * @param customerAccountId Id of the customer account to check for conflicts on.
+   * @param currentDealId Id of the deal being reviewed, excluded from the results.
+   * @return Up to 50 conflicting deal registrations, or an empty list if customerAccountId is null.
+   */
   public static List<Deal_Registration__c> selectConflictsForDeal(
     Id customerAccountId,
     Id currentDealId

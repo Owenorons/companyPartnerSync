@@ -1,4 +1,4 @@
-/*
+/**
  * Service layer for partner analytics. Orchestrates AnalyticsSelector +
  * AnalyticsDomain and is where permission gating is decided: getMyKPI is
  * self-service (a partner viewing their own account) so it only checks the
@@ -7,6 +7,12 @@
  * permission.
  */
 public with sharing class AnalyticsService {
+  /**
+   * Calculates the KPI summary for the running user's own partner account.
+   * Requires analytics to be enabled for the tenant.
+   *
+   * @return The current partner's KPI figures.
+   */
   public static PartnerKPIDTO getMyKPI() {
     if (!TenantConfigService.isAnalyticsEnabled()) {
       throw new PartnerSyncHandledException('Analytics is disabled.');
@@ -17,6 +23,13 @@ public with sharing class AnalyticsService {
     return calculatePartnerKPI(partnerAccountId);
   }
 
+  /**
+   * Calculates a KPI-based leaderboard row for every active partner
+   * account. Requires executive analytics access, since this exposes other
+   * partners' data.
+   *
+   * @return One leaderboard row per active partner.
+   */
   public static List<PartnerLeaderboardRowDTO> getPartnerLeaderboard() {
     // Cross-partner view, so gate on the executive permission rather than
     // the self-service tenant flag used by getMyKPI.
@@ -24,8 +37,15 @@ public with sharing class AnalyticsService {
 
     List<PartnerLeaderboardRowDTO> results = new List<PartnerLeaderboardRowDTO>();
 
-    for (Account partner : AnalyticsSelector.selectActivePartners()) {
-      PartnerKPIDTO kpi = calculatePartnerKPI(partner.Id);
+    List<Account> partners = AnalyticsSelector.selectActivePartners();
+    Map<Id, AnalyticsDomain.KpiTotals> totals = AnalyticsSelector.selectKpiTotals(
+      new Map<Id, Account>(partners).keySet()
+    );
+    for (Account partner : partners) {
+      PartnerKPIDTO kpi = AnalyticsDomain.calculatePartnerKPI(
+        totals.get(partner.Id),
+        partner
+      );
 
       results.add(AnalyticsDomain.buildLeaderboardRow(partner, kpi));
     }
@@ -33,6 +53,13 @@ public with sharing class AnalyticsService {
     return results;
   }
 
+  /**
+   * Aggregates closed-won, partner-sourced opportunity revenue grouped by
+   * customer account and partner account. Requires executive analytics
+   * access, since this exposes other partners' data.
+   *
+   * @return One row per distinct customer/partner account pairing with its total revenue and opportunity count.
+   */
   public static List<CustomerRevenueDTO> getCustomerRevenue() {
     PartnerPermissionService.assertCanViewExecutiveAnalytics();
 
@@ -74,9 +101,8 @@ public with sharing class AnalyticsService {
 
   private static PartnerKPIDTO calculatePartnerKPI(Id partnerAccountId) {
     return AnalyticsDomain.calculatePartnerKPI(
-      AnalyticsSelector.selectPartnerLeads(partnerAccountId),
-      AnalyticsSelector.selectPartnerDeals(partnerAccountId),
-      AnalyticsSelector.selectPartnerOpportunities(partnerAccountId),
+      AnalyticsSelector.selectKpiTotals(new Set<Id>{ partnerAccountId })
+        .get(partnerAccountId),
       AnalyticsSelector.selectPartnerBudget(partnerAccountId)
     );
   }

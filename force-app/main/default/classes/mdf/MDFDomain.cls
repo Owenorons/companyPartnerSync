@@ -1,10 +1,16 @@
-/*
+/**
  * Field-mapping and validation layer for MDF: turns MDFRequestDTO/
  * MDFDecisionDTO into MDF_Request__c (and back into list/budget DTOs),
  * and enforces the shape rules a submission or decision must satisfy
  * before MDFService/MDFApprovalService touch the database.
  */
 public with sharing class MDFDomain {
+  /**
+   * Validates that a new MDF request submission has all required
+   * fields and a sane date range, throwing if not.
+   *
+   * @param request The submission to validate.
+   */
   public static void validateSubmit(MDFRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException('MDF request is required.');
@@ -35,6 +41,13 @@ public with sharing class MDFDomain {
     }
   }
 
+  /**
+   * Validates that an internal reviewer's decision has all fields
+   * required for the chosen outcome (approve or reject), throwing if
+   * not.
+   *
+   * @param request The decision to validate.
+   */
   public static void validateDecision(MDFDecisionDTO request) {
     if (request == null || request.requestId == null) {
       throw new PartnerSyncHandledException('MDF decision request is invalid.');
@@ -61,6 +74,16 @@ public with sharing class MDFDomain {
     }
   }
 
+  /**
+   * Validates a submission and builds the MDF_Request__c record for it,
+   * mapping the DTO's generic roiTarget to Expected_Leads__c (the only
+   * ROI metric this object currently tracks).
+   *
+   * @param request The submission to convert.
+   * @param partnerAccountId Id of the submitting partner account.
+   * @param partnerContactId Id of the submitting partner contact.
+   * @return A new, unsaved MDF_Request__c populated from the request.
+   */
   public static MDF_Request__c buildRequest(
     MDFRequestDTO request,
     Id partnerAccountId,
@@ -91,6 +114,12 @@ public with sharing class MDFDomain {
     return record;
   }
 
+  /**
+   * Converts an MDF_Request__c record into its list-row DTO.
+   *
+   * @param record The MDF_Request__c record to convert.
+   * @return The corresponding list-row DTO.
+   */
   public static MDFListDTO toListDTO(MDF_Request__c record) {
     MDFListDTO dto = new MDFListDTO();
 
@@ -112,6 +141,13 @@ public with sharing class MDFDomain {
     return dto;
   }
 
+  /**
+   * Converts a partner Account's MDF budget fields into a budget DTO,
+   * computing the remaining budget as annual minus used.
+   *
+   * @param account The partner Account record with budget fields queried.
+   * @return The account's annual/used/remaining MDF budget.
+   */
   public static MDFBudgetDTO toBudgetDTO(Account account) {
     Decimal annual = account.MDF_Annual_Budget__c == null
       ? 0

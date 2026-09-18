@@ -1,8 +1,21 @@
+/**
+ * Orchestrates execution of a deal conflict lifecycle command: validates the
+ * command, enforces conflict-resolution authority, applies the requested
+ * status transition to the conflict record with optimistic-locking on its
+ * version, and emits the resulting lifecycle event.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealConflictCommandService {
   private static final String RESOLVE_PERMISSION = 'PartnerSync_Resolve_Deal_Conflict';
   private static final String CRITICAL_WAIVER_PERMISSION = 'PartnerSync_Waive_Critical_Conflict';
 
+  /**
+   * Executes the given deal conflict command end to end, returning the prior
+   * result unchanged if the same command key has already completed.
+   *
+   * @param command The deal conflict command to execute.
+   * @return The result of executing the command.
+   */
   public static DealConflictCommandResult execute(DealConflictCommand command) {
     command.validate();
     assertAuthority();

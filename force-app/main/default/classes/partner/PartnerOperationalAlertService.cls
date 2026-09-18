@@ -3,6 +3,18 @@ public without sharing class PartnerOperationalAlertService implements Schedulab
   @TestVisible
   private static Boolean testManageAuthority = false;
 
+  /**
+   * Scans onboarding v2 data (provisioning attempts, signature events,
+   * overdue tasks, expiring/overdue partner evidence, recertification
+   * breaches, and failed async governance jobs) and upserts one deduplicated
+   * Partner_Operational_Alert__c per distinct issue, keyed by Alert_Key__c.
+   * Re-detected issues bump Occurrence_Count__c instead of creating
+   * duplicates; alerts whose underlying issue is no longer active are marked
+   * Resolved. Triggers notifications for newly upserted alerts before
+   * returning them.
+   *
+   * @return The alerts upserted by this scan (empty if none were detected).
+   */
   public static List<Partner_Operational_Alert__c> scan() {
     Map<String, Partner_Operational_Alert__c> candidates = new Map<String, Partner_Operational_Alert__c>();
     Datetime nowValue = System.now();
@@ -216,6 +228,15 @@ public without sharing class PartnerOperationalAlertService implements Schedulab
       Database.update(resolved, AccessLevel.SYSTEM_MODE);
   }
 
+  /**
+   * Marks an operational alert Acknowledged by the running user. Requires
+   * the PartnerSync_Manage_Operational_Alerts custom permission (or a test
+   * context with testManageAuthority set), otherwise throws
+   * OperationalAlertException.
+   *
+   * @param alertId Id of the Partner_Operational_Alert__c to acknowledge.
+   * @return The updated alert record.
+   */
   public static Partner_Operational_Alert__c acknowledge(Id alertId) {
     if (
       !FeatureManagement.checkPermission(
@@ -241,6 +262,11 @@ public without sharing class PartnerOperationalAlertService implements Schedulab
     return alert;
   }
 
+  /**
+   * Scheduled entry point — runs a scan on the configured schedule.
+   *
+   * @param context The scheduled job execution context.
+   */
   public void execute(SchedulableContext context) {
     scan();
   }
@@ -270,6 +296,9 @@ public without sharing class PartnerOperationalAlertService implements Schedulab
     );
   }
 
+  /**
+   * Thrown when the running user lacks authority to manage operational alerts.
+   */
   public class OperationalAlertException extends Exception {
   }
 }

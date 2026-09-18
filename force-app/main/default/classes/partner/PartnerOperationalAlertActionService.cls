@@ -1,4 +1,15 @@
+/**
+ * Interactive resolve/reopen actions for a Partner_Operational_Alert__c
+ * record, gated behind the PartnerSync_Manage_Operational_Alerts custom
+ * permission.
+ */
 public without sharing class PartnerOperationalAlertActionService {
+  /**
+   * Marks an open operational alert as resolved by the running user.
+   *
+   * @param alertId Id of the Partner_Operational_Alert__c record to resolve.
+   * @return The updated, resolved alert record.
+   */
   public static Partner_Operational_Alert__c resolve(Id alertId) {
     assertAuthority();
     Partner_Operational_Alert__c alert = selectForUpdate(alertId);
@@ -13,6 +24,13 @@ public without sharing class PartnerOperationalAlertActionService {
     return alert;
   }
 
+  /**
+   * Reopens a previously resolved operational alert and resets it back to
+   * pending notification.
+   *
+   * @param alertId Id of the Partner_Operational_Alert__c record to reopen.
+   * @return The updated, reopened alert record.
+   */
   public static Partner_Operational_Alert__c reopen(Id alertId) {
     assertAuthority();
     Partner_Operational_Alert__c alert = selectForUpdate(alertId);
@@ -53,6 +71,11 @@ public without sharing class PartnerOperationalAlertActionService {
       );
   }
 
+  /**
+   * Thrown when an operational alert resolve/reopen action is attempted
+   * without authority, against a missing alert, or against an alert whose
+   * current status doesn't allow the requested action.
+   */
   public class AlertActionException extends Exception {
   }
 }

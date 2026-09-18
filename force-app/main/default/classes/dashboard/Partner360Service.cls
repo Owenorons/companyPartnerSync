@@ -1,4 +1,15 @@
+/**
+ * Assembles the internal "Partner 360" single-partner detail payload:
+ * onboarding standing, blockers, recent lifecycle events and open
+ * deal/MDF counts for one partner account.
+ */
 public without sharing class Partner360Service {
+  /**
+   * Builds the Partner 360 summary DTO for a given partner account.
+   *
+   * @param partnerAccountId Id of the partner Account to summarize.
+   * @return The assembled Partner 360 DTO.
+   */
   public static Partner360DTO getSummary(Id partnerAccountId) {
     PartnerAccessService.assertInternalUser();
     if (partnerAccountId == null)

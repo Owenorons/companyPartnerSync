@@ -1,9 +1,15 @@
-/*
+/**
  * Selector layer for the partner dashboard's Account lookup. Only reads
  * the fields the dashboard tile needs; broader partner Account access
  * lives elsewhere (e.g. PartnerAccessService).
  */
 public with sharing class PartnerDashboardSelector {
+  /**
+   * Reads the partner Account fields needed by the partner dashboard.
+   *
+   * @param partnerAccountId Id of the partner Account to read.
+   * @return The partner Account record with dashboard fields populated.
+   */
   public static Account selectPartnerAccount(Id partnerAccountId) {
     SecurityUtil.assertReadable(Account.SObjectType);
 

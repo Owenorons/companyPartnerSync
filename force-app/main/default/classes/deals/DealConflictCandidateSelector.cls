@@ -1,4 +1,11 @@
+/**
+ * Selector that finds other deal registrations that may be conflict candidates for a given
+ * deal, matched either by shared customer account or by customer identity fingerprint.
+ */
 public without sharing class DealConflictCandidateSelector {
+  /**
+   * Lightweight projection of a candidate deal registration considered during conflict analysis.
+   */
   public class Candidate {
     public Id dealId;
     public Id customerAccountId;
@@ -8,6 +15,13 @@ public without sharing class DealConflictCandidateSelector {
   }
 
   @SuppressWarnings('PMD.ApexCRUDViolation')
+  /**
+   * Queries other open deal registrations that share the deal's customer account or customer
+   * identity fingerprint, as candidates for conflict analysis.
+   *
+   * @param context Conflict analysis context, carrying the deal being analyzed and its identity.
+   * @return Up to 200 candidate deal registrations.
+   */
   public static List<Candidate> selectCandidates(DealConflictContext context) {
     List<Candidate> results = new List<Candidate>();
     for (Deal_Registration__c row : [

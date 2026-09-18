@@ -1,9 +1,15 @@
-/*
+/**
  * Selector layer for AI_Insight__c. selectPartnerInsights() backs the
  * partner-facing surfaces (portal insight list, next best actions) and
  * deliberately excludes Draft insights - see the status filter below.
  */
 public with sharing class AIInsightSelector {
+  /**
+   * Selects a partner's accepted AI insights, most recent first.
+   *
+   * @param partnerAccountId Id of the partner Account to select insights for.
+   * @return Accepted AI_Insight__c records for the partner, limited to 200.
+   */
   public static List<AI_Insight__c> selectPartnerInsights(Id partnerAccountId) {
     SecurityUtil.assertReadable(AI_Insight__c.SObjectType);
 
@@ -29,6 +35,12 @@ public with sharing class AIInsightSelector {
     ];
   }
 
+  /**
+   * Selects a single AI insight by Id.
+   *
+   * @param insightId Id of the AI_Insight__c to select.
+   * @return The matching AI_Insight__c record.
+   */
   public static AI_Insight__c selectById(Id insightId) {
     SecurityUtil.assertReadable(AI_Insight__c.SObjectType);
 

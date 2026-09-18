@@ -1,4 +1,4 @@
-/*
+/**
  * Selector layer for the partner-facing registration flow: opportunity
  * eligibility, duplicate-registration checks, a partner's own deals, and
  * the conflict lookup used at submission time. Everything here is scoped
@@ -7,6 +7,12 @@
  * across all partners.
  */
 public with sharing class DealRegistrationSelector {
+  /**
+   * Queries a single Opportunity for use during deal registration.
+   *
+   * @param opportunityId Id of the opportunity to load.
+   * @return The Opportunity record.
+   */
   public static Opportunity selectOpportunityForRegistration(Id opportunityId) {
     SecurityUtil.assertReadable(Opportunity.SObjectType);
 
@@ -31,6 +37,12 @@ public with sharing class DealRegistrationSelector {
     return rows[0];
   }
 
+  /**
+   * Queries opportunities belonging to a partner that don't already have a deal registration.
+   *
+   * @param partnerAccountId Id of the partner account whose opportunities are queried.
+   * @return Up to 100 eligible opportunities, ordered by close date ascending.
+   */
   public static List<Opportunity> selectEligibleOpportunitiesForPartner(
     Id partnerAccountId
   ) {
@@ -60,6 +72,12 @@ public with sharing class DealRegistrationSelector {
     ];
   }
 
+  /**
+   * Checks whether an opportunity already has a deal registration.
+   *
+   * @param opportunityId Id of the opportunity to check.
+   * @return True if at least one deal registration already exists for the opportunity.
+   */
   public static Boolean hasExistingRegistration(Id opportunityId) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -74,6 +92,12 @@ public with sharing class DealRegistrationSelector {
     return !existing.isEmpty();
   }
 
+  /**
+   * Queries a partner's own deal registrations for the "My Deals" list.
+   *
+   * @param partnerAccountId Id of the partner account whose deals are queried.
+   * @return Up to 200 deal registration rows, most recently created first.
+   */
   public static List<Deal_Registration__c> selectPartnerDeals(
     Id partnerAccountId
   ) {
@@ -102,6 +126,12 @@ public with sharing class DealRegistrationSelector {
   // 'Draft' is excluded (never submitted, doesn't count against the cap);
   // 'Rejected'/'Expired'/'Converted'/'Closed Won'/'Closed Lost' are terminal
   // and no longer occupy a slot.
+  /**
+   * Counts a partner's deal registrations that are still open (Submitted, Under Review, or Approved).
+   *
+   * @param partnerAccountId Id of the partner account whose deals are counted.
+   * @return Number of open deal registrations for the partner.
+   */
   public static Integer countOpenDealsForPartner(Id partnerAccountId) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -115,6 +145,12 @@ public with sharing class DealRegistrationSelector {
     ];
   }
 
+  /**
+   * Queries a single deal registration record by Id.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The Deal_Registration__c record.
+   */
   public static Deal_Registration__c selectById(Id dealId) {
     SecurityUtil.assertReadable(Deal_Registration__c.SObjectType);
 
@@ -147,6 +183,14 @@ public with sharing class DealRegistrationSelector {
     return rows[0];
   }
 
+  /**
+   * Finds other deal registrations on the same customer account that may conflict with a
+   * just-inserted deal, at submission time.
+   *
+   * @param customerAccountId Id of the customer account to check for conflicts on.
+   * @param currentDealId Id of the deal being analyzed, excluded from the results.
+   * @return Up to 20 potentially conflicting deal registrations.
+   */
   public static List<Deal_Registration__c> findConflictingDeals(
     Id customerAccountId,
     Id currentDealId

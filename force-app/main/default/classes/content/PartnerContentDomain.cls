@@ -1,10 +1,22 @@
-/*
+/**
  * Pure visibility and mapping rules for Partner_Content__c: decides which
  * content a given partner account may see and converts records to their
  * partner-facing / admin DTOs. No SOQL or DML, so the visibility rules can
  * be unit tested without inserting records.
  */
 public with sharing class PartnerContentDomain {
+  /**
+   * Determines whether a content record should be visible to the given
+   * partner account: it must be active, not marked Internal Only, and
+   * either visible to All Partners or (for Restricted content) match
+   * the partner's tier and/or type — a blank tier or type on the
+   * content record is treated as matching any partner on that
+   * dimension.
+   *
+   * @param content The content record to evaluate.
+   * @param partner The partner account's Account record.
+   * @return True if the content should be visible to the partner.
+   */
   public static Boolean isVisibleToPartner(
     Partner_Content__c content,
     Account partner
@@ -43,6 +55,12 @@ public with sharing class PartnerContentDomain {
     return false;
   }
 
+  /**
+   * Converts a Partner_Content__c record into its partner-facing DTO.
+   *
+   * @param content The content record to convert.
+   * @return The corresponding partner-facing DTO.
+   */
   public static PartnerContentDTO toDTO(Partner_Content__c content) {
     PartnerContentDTO dto = new PartnerContentDTO();
 
@@ -56,6 +74,13 @@ public with sharing class PartnerContentDomain {
     return dto;
   }
 
+  /**
+   * Converts a Partner_Content__c record into its admin DTO, including
+   * the visibility/targeting/lifecycle fields partners never see.
+   *
+   * @param content The content record to convert.
+   * @return The corresponding admin DTO.
+   */
   public static PartnerContentAdminDTO toAdminDTO(Partner_Content__c content) {
     PartnerContentAdminDTO dto = new PartnerContentAdminDTO();
 
@@ -73,6 +98,12 @@ public with sharing class PartnerContentDomain {
     return dto;
   }
 
+  /**
+   * Validates that an admin content save has the fields required to
+   * persist it, throwing if not.
+   *
+   * @param dto The admin content payload to validate.
+   */
   public static void validateAdminSave(PartnerContentAdminDTO dto) {
     if (dto == null || dto.contentId == null) {
       throw new PartnerSyncHandledException('Content Id is required.');
@@ -83,6 +114,14 @@ public with sharing class PartnerContentDomain {
     }
   }
 
+  /**
+   * Applies an admin DTO's editable fields onto a Partner_Content__c
+   * record, in place.
+   *
+   * @param content The content record to update.
+   * @param dto The admin payload whose fields should be applied.
+   * @return The same content record, updated with the DTO's fields.
+   */
   public static Partner_Content__c applyAdminUpdate(
     Partner_Content__c content,
     PartnerContentAdminDTO dto

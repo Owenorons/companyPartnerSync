@@ -1,9 +1,24 @@
+/**
+ * Creates the Deal_Event__c audit/history record for a completed lifecycle command, along with
+ * a matching Deal_Event_Outbox__c row that queues it for downstream publication.
+ */
 public without sharing class DealEventService {
+  /**
+   * Pairing of the event record just created and its corresponding outbox row.
+   */
   public class EventCreationResult {
     public Deal_Event__c eventRecord;
     public Deal_Event_Outbox__c outboxRecord;
   }
 
+  /**
+   * Builds and inserts a Deal_Event__c from the given command context (including a JSON payload
+   * merging standard transition fields with any context-supplied payload), plus a pending
+   * Deal_Event_Outbox__c row for it.
+   *
+   * @param context The command execution context describing the transition that occurred.
+   * @return The inserted event and outbox records.
+   */
   public static EventCreationResult createEvent(DealCommandContext context) {
     Map<String, Object> safePayload = new Map<String, Object>{
       'aggregateType' => context.command.aggregateType,

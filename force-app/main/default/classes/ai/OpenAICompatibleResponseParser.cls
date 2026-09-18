@@ -1,10 +1,23 @@
-/*
+/**
  * Shared response parser for any OpenAI-compatible chat completions API.
  * Used by both OpenAIProvider and AzureOpenAIProvider since Azure's REST
  * shape mirrors OpenAI's (choices[].message.content, usage.total_tokens),
  * so the parsing logic only needs to live in one place.
  */
 public with sharing class OpenAICompatibleResponseParser {
+  /**
+   * Parses an OpenAI-compatible chat completions HTTP response into a
+   * normalized AIProviderResponseDTO. Expects the first choice's message
+   * content to be a JSON object with summary/recommendation/rationale/
+   * confidence fields (optionally fenced in a ```json code block).
+   * Returns success=false (rather than throwing) for any non-200 status,
+   * missing/empty content, or malformed response shape.
+   *
+   * @param res The raw HTTP response from the chat completions endpoint.
+   * @param providerName Display name of the calling provider, used in the response and any error messages.
+   * @param fallbackModelName Model name to report if the response body omits its own "model" field.
+   * @return The normalized generation result, with success indicating whether parsing succeeded.
+   */
   public static AIProviderResponseDTO parse(
     HttpResponse res,
     String providerName,

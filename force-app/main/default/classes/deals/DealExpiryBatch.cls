@@ -1,4 +1,4 @@
-/*
+/**
  * Scheduled/batch job that expires Deal_Registration__c records past their
  * Protection_End_Date__c. Deliberately calls DealReviewService.expireProtection
  * rather than routing through processDecision() — the latter requires the
@@ -8,6 +8,12 @@
  * rest of the batch.
  */
 public with sharing class DealExpiryBatch implements Database.Batchable<SObject>, Schedulable {
+  /**
+   * Builds the query locator for active protection grants that are past their end date.
+   *
+   * @param context Batch execution context (unused).
+   * @return A query locator over active, current Deal_Protection_Grant__c rows past their end date.
+   */
   public Database.QueryLocator start(Database.BatchableContext context) {
     return Database.getQueryLocator(
       [
@@ -21,6 +27,13 @@ public with sharing class DealExpiryBatch implements Database.Batchable<SObject>
     );
   }
 
+  /**
+   * Expires each protection grant in scope via DealProtectionCommandService, logging and
+   * continuing past any single record's failure rather than failing the whole batch.
+   *
+   * @param context Batch execution context (unused).
+   * @param scope Batch of expired, active protection grants to process.
+   */
   public void execute(
     Database.BatchableContext context,
     List<Deal_Protection_Grant__c> scope
@@ -43,9 +56,19 @@ public with sharing class DealExpiryBatch implements Database.Batchable<SObject>
     }
   }
 
+  /**
+   * No post-processing is required after this batch runs.
+   *
+   * @param context Batch execution context (unused).
+   */
   public void finish(Database.BatchableContext context) {
   }
 
+  /**
+   * Scheduled entry point: launches this class as a batch job with a chunk size of 100.
+   *
+   * @param context Scheduled execution context (unused).
+   */
   public void execute(SchedulableContext context) {
     Database.executeBatch(new DealExpiryBatch(), 100);
   }

@@ -1,10 +1,16 @@
-/*
+/**
  * Domain layer for the assignment/decision half of the lead lifecycle:
  * validates assignment and accept/reject requests, and maps a Lead to its
  * partner-facing DTO. LeadConversionDomain is the counterpart for the later
  * step of turning an accepted lead into an Opportunity/Deal Registration.
  */
 public with sharing class LeadDistributionDomain {
+  /**
+   * Validates that a lead assignment request carries the fields required to
+   * proceed, throwing if any are missing.
+   *
+   * @param request The lead assignment request to validate.
+   */
   public static void validateAssignment(LeadAssignmentRequestDTO request) {
     if (request == null) {
       throw new PartnerSyncHandledException(
@@ -21,6 +27,12 @@ public with sharing class LeadDistributionDomain {
     }
   }
 
+  /**
+   * Validates that a lead decision request carries a lead Id and a
+   * supported decision value, throwing if not.
+   *
+   * @param request The lead decision request to validate.
+   */
   public static void validateDecision(LeadDecisionRequestDTO request) {
     if (request == null || request.leadId == null) {
       throw new PartnerSyncHandledException(
@@ -33,6 +45,12 @@ public with sharing class LeadDistributionDomain {
     }
   }
 
+  /**
+   * Maps a Lead record to its partner-facing distribution DTO.
+   *
+   * @param lead The Lead record to map.
+   * @return The mapped lead distribution DTO.
+   */
   public static LeadDistributionDTO toDTO(Lead lead) {
     LeadDistributionDTO dto = new LeadDistributionDTO();
 

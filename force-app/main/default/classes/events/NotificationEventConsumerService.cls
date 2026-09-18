@@ -1,4 +1,4 @@
-/*
+/**
  * Second of the two consumers PartnerSyncEventHandler dispatches a
  * PartnerSync_Event__e to (see AuditEventConsumerService for the other).
  * Translates a raw Event_Type__c into user-facing notification copy via the
@@ -34,6 +34,15 @@ public with sharing class NotificationEventConsumerService {
     'LeadConverted' => 'Lead'
   };
 
+  /**
+   * Notifies the given recipients of a business event, if its event type
+   * maps to notification copy. Event types not present in
+   * TITLE_BY_EVENT_TYPE are silently skipped. Throws when the event type
+   * does map to notification copy but no recipients were resolved.
+   *
+   * @param eventRecord The published platform event to notify recipients about.
+   * @param recipients The users to deliver the notification to.
+   */
   public static void notifyBusinessEvent(
     PartnerSync_Event__e eventRecord,
     List<User> recipients

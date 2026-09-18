@@ -1,4 +1,4 @@
-/*
+/**
  * DTO carrying a normalized generation request (prompt, context, model
  * params) into an AIProvider implementation, independent of which
  * backend ultimately serves it.

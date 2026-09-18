@@ -20,14 +20,14 @@
     <genericErrorPage>Exception</genericErrorPage>
     <inMaintenancePage>InMaintenance</inMaintenancePage>
     <indexPage>CommunitiesLanding</indexPage>
-    <masterLabel>PartnerSync Portal</masterLabel>
+    <masterLabel>PartnerSync_Portal</masterLabel>
     <redirectToCustomDomain>false</redirectToCustomDomain>
     <referrerPolicyOriginWhenCrossOrigin
   >true</referrerPolicyOriginWhenCrossOrigin>
     <selfRegPage>CommunitiesSelfReg</selfRegPage>
-    <siteAdmin>test-wll3efc1yzts@example.com</siteAdmin>
+    <siteAdmin>test-yywocsz4gusk@example.com</siteAdmin>
     <siteGuestRecordDefaultOwner
-  >test-wll3efc1yzts@example.com</siteGuestRecordDefaultOwner>
+  >test-yywocsz4gusk@example.com</siteGuestRecordDefaultOwner>
     <siteType>ChatterNetwork</siteType>
-    <urlPathPrefix>vforcesite</urlPathPrefix>
+    <urlPathPrefix>partnersyncportalvforcesite</urlPathPrefix>
 </CustomSite>

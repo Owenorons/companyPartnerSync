@@ -1,5 +1,18 @@
+/**
+ * Processes a decision (Approved, Approved with Conditions, Rejected, Returned) on a single
+ * pending Deal_Approval__c step: locks and validates the step, checks the assignee's decision
+ * authority against the deal amount, records the decision, creates a condition record when
+ * applicable, and coordinates the parent Deal_Approval_Plan__c's overall status.
+ */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealApprovalCommandService {
+  /**
+   * Completes a pending approval step with the given decision.
+   *
+   * @param command The approval decision command, including the approval Id, decision, expected
+   * version, and (when applicable) reason/condition details.
+   * @return The updated Deal_Approval__c step.
+   */
   public static Deal_Approval__c complete(DealApprovalCommand command) {
     if (
       command == null ||
@@ -140,6 +153,10 @@ public without sharing class DealApprovalCommandService {
     }
     Database.update(plan, AccessLevel.SYSTEM_MODE);
   }
+  /**
+   * Thrown when an approval command can't be completed, e.g. a stale version, a step that isn't
+   * pending, insufficient decision authority, or a missing required reason/condition.
+   */
   public class ApprovalCommandException extends Exception {
   }
 }

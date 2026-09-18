@@ -1,3 +1,8 @@
+/**
+ * Data carrier describing the outcome of executing (or attempting to execute) a DealCommand:
+ * whether it was accepted/completed, the resulting lifecycle state and version, and a
+ * human-readable message.
+ */
 public class DealCommandResult {
   @AuraEnabled
   public Boolean accepted;
@@ -26,6 +31,13 @@ public class DealCommandResult {
   @AuraEnabled
   public String message;
 
+  /**
+   * Builds a result representing a command that executed successfully and produced an event.
+   *
+   * @param context The command execution context the command completed under.
+   * @param eventId Id of the Deal_Event__c record created for this command.
+   * @return A completed, non-duplicate, non-retryable result.
+   */
   public static DealCommandResult completed(
     DealCommandContext context,
     Id eventId
@@ -47,6 +59,13 @@ public class DealCommandResult {
     return result;
   }
 
+  /**
+   * Builds a result representing a command that is already being processed by another,
+   * concurrent execution of the same command key.
+   *
+   * @param command The command that is already in progress.
+   * @return An accepted, duplicate, retryable, not-yet-completed result.
+   */
   public static DealCommandResult inProgress(DealCommand command) {
     DealCommandResult result = new DealCommandResult();
     result.accepted = true;

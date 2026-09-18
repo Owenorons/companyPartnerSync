@@ -8,6 +8,13 @@
  */
 @IsTest
 public class TestUserFactory {
+  /**
+   * Creates and inserts an internal User with an arbitrary Standard User
+   * profile (no implicit view/modify-all-data access and no business
+   * permission sets).
+   *
+   * @return The inserted internal User.
+   */
   public static User createInternalUser() {
     Profile profile = [
       SELECT Id
@@ -34,7 +41,7 @@ public class TestUserFactory {
     return user;
   }
 
-  /*
+  /**
    * A System Administrator has View/Modify All Data, so unlike
    * createInternalUser() (an arbitrary Standard-type profile with no implicit
    * data access), this user can read/write any record without needing
@@ -42,6 +49,8 @@ public class TestUserFactory {
    * org's business permission sets assigned. Use this to model a real admin
    * who schedules/runs a job but was never assigned a feature-specific
    * permission set, as opposed to a user blocked by data access entirely.
+   *
+   * @return The inserted internal System Administrator User.
    */
   public static User createInternalAdminUser() {
     Profile profile = [
@@ -69,6 +78,19 @@ public class TestUserFactory {
     return user;
   }
 
+  /**
+   * Creates an external/partner community User linked to the given
+   * contact, using whichever Experience Cloud profile is available in the
+   * org. If no Experience Cloud profile exists or the insert fails (e.g. in
+   * a build org without Experience Cloud enabled), falls back to an
+   * internal user with the partner identity simulated via
+   * PartnerAccessService's test overrides and a
+   * NotificationRecipientResolver test recipient entry. Also assigns the
+   * PartnerSync_Partner_Base_Data permission set.
+   *
+   * @param contactId The Id of the contact to link the user to.
+   * @return The inserted (real or simulated) partner User.
+   */
   public static User createExternalUser(Id contactId) {
     List<Profile> candidates = [
       SELECT Id, Name
@@ -152,6 +174,13 @@ public class TestUserFactory {
     return user;
   }
 
+  /**
+   * Assigns the named permission set to a user, running the insert as the
+   * current user.
+   *
+   * @param userId The Id of the user to assign the permission set to.
+   * @param permissionSetName The developer name of the permission set to assign.
+   */
   public static void assignPermissionSet(Id userId, String permissionSetName) {
     PermissionSet permissionSet = [
       SELECT Id
@@ -168,6 +197,14 @@ public class TestUserFactory {
     }
   }
 
+  /**
+   * Assigns the named permission set group to a user, forcing the group's
+   * test-context calculation first (in case metadata validation left it in
+   * an Updating status), then running the insert as the current user.
+   *
+   * @param userId The Id of the user to assign the permission set group to.
+   * @param permissionSetGroupName The developer name of the permission set group to assign.
+   */
   public static void assignPermissionSetGroup(
     Id userId,
     String permissionSetGroupName

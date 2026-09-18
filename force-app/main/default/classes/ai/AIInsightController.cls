@@ -1,18 +1,23 @@
-/*
+/**
  * Aura-enabled entry point for the internal-user AI insight admin UI:
  * generating an insight on demand, listing configured providers, and
  * testing a provider's connection. Restricted to internal users;
  * PartnerAIController is the equivalent surface for partner users.
  */
 public with sharing class AIInsightController {
+  /**
+   * Generates an AI insight for an internal user, asserting internal-user
+   * access before delegating to AIInsightGeneratorService.
+   *
+   * @param request The insight generation request.
+   * @return Id of the queued AsyncApexJob generating the insight.
+   */
   @AuraEnabled
-  public static AIInsightDTO generateInsight(AIInsightRequestDTO request) {
+  public static Id generateInsight(AIInsightRequestDTO request) {
     try {
       PartnerAccessService.assertInternalUser();
 
-      AI_Insight__c insight = AIInsightGeneratorService.generate(request);
-
-      return AIInsightDomain.toDTO(insight);
+      return AIInsightGeneratorService.generate(request);
     } catch (Exception ex) {
       throw ControllerExceptionMapper.toAura(
         'AIInsightController',
@@ -23,11 +28,19 @@ public with sharing class AIInsightController {
     }
   }
 
+  /**
+   * Queues AI insight generation for a permitted caller, asserting the
+   * generate-insights permission before delegating to
+   * AIInsightGeneratorService.
+   *
+   * @param request The insight generation request.
+   * @return Id of the queued AsyncApexJob generating the insight.
+   */
   @AuraEnabled
   public static Id enqueueInsight(AIInsightRequestDTO request) {
     try {
       PartnerPermissionService.assertCanGenerateAIInsights();
-      return System.enqueueJob(new AIInsightGenerationQueueable(request));
+      return AIInsightGeneratorService.generate(request);
     } catch (Exception ex) {
       throw ControllerExceptionMapper.toAura(
         'AIInsightController',
@@ -38,6 +51,11 @@ public with sharing class AIInsightController {
     }
   }
 
+  /**
+   * Lists AI insights awaiting human review.
+   *
+   * @return AI insights in Draft or Reviewed status, oldest first.
+   */
   @AuraEnabled(cacheable=true)
   public static List<AIInsightDTO> getPendingReview() {
     try {
@@ -52,6 +70,15 @@ public with sharing class AIInsightController {
     }
   }
 
+  /**
+   * Records a reviewer's accept/dismiss decision on a draft AI insight,
+   * optionally overriding its recommendation text.
+   *
+   * @param insightId Id of the AI_Insight__c to decide.
+   * @param decision The review decision, 'Accepted' or 'Dismissed'.
+   * @param recommendation Optional replacement recommendation text to apply on acceptance.
+   * @return The updated insight as a DTO.
+   */
   @AuraEnabled
   public static AIInsightDTO reviewInsight(
     Id insightId,
@@ -74,6 +101,11 @@ public with sharing class AIInsightController {
     }
   }
 
+  /**
+   * Lists configured AI providers along with their current connection status.
+   *
+   * @return AI provider status DTOs for the admin provider list UI.
+   */
   @AuraEnabled(cacheable=true)
   public static List<AIProviderStatusDTO> getProviders() {
     try {
@@ -88,6 +120,12 @@ public with sharing class AIInsightController {
     }
   }
 
+  /**
+   * Runs a live connection test against a configured AI provider.
+   *
+   * @param providerDeveloperName DeveloperName of the AI_Provider_Config__mdt to test.
+   * @return A success message when the test connection succeeds.
+   */
   @AuraEnabled
   public static String testProviderConnection(String providerDeveloperName) {
     try {
