@@ -1,15 +1,12 @@
 <template>
   <div class="top-nav">
     <div>
-      <p class="eyebrow">Partner Portal</p>
-      <p class="title">PartnerSync Accelerator</p>
+      <p class="eyebrow">{eyebrow}</p>
+      <p class="title">{title}</p>
     </div>
 
-    <lightning-button-icon
-      icon-name="utility:notification"
-      alternative-text="Notifications"
-      title="Notifications"
-    >
-    </lightning-button-icon>
+    <div class="right">
+      <c-ps-notification-bell></c-ps-notification-bell>
+    </div>
   </div>
 </template>

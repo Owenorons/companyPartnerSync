@@ -21,13 +21,11 @@ describe("c-ps-mdf-budget-card", () => {
 
     document.body.appendChild(element);
 
-    const progressBar = element.shadowRoot.querySelector(
-      "lightning-progress-bar"
-    );
+    const fill = element.shadowRoot.querySelector(".ledger-progress .fill");
     const stats = Array.from(element.shadowRoot.querySelectorAll("strong"));
 
     expect(element.shadowRoot.querySelector("h2").textContent).toBe("$10,000");
-    expect(progressBar.value).toBe(25);
+    expect(fill.style.width).toBe("25%");
     expect(stats.map((stat) => stat.textContent)).toEqual(["$2,500", "$7,500"]);
   });
 });

@@ -1,7 +1,10 @@
-import { LightningElement, wire } from "lwc";
+import { LightningElement, api, wire } from "lwc";
+import { NavigationMixin } from "lightning/navigation";
 import getMyDeals from "@salesforce/apex/DealRegistrationController.getMyDeals";
 
-export default class PsDealList extends LightningElement {
+export default class PsDealList extends NavigationMixin(LightningElement) {
+  @api registerDealPageName = "Register_Deal__c";
+
   deals = [];
   error;
   loading = true;
@@ -15,7 +18,7 @@ export default class PsDealList extends LightningElement {
         ...deal,
         formattedValue: this.formatCurrency(deal.dealValue),
         protectionEndLabel: deal.protectionEndDate || "Not protected",
-        badgeClass: this.getBadgeClass(deal.status)
+        badgeVariant: this.getBadgeVariant(deal.status)
       }));
       this.error = undefined;
     } else if (error) {
@@ -40,24 +43,33 @@ export default class PsDealList extends LightningElement {
     }).format(value);
   }
 
-  getBadgeClass(status) {
+  getBadgeVariant(status) {
     if (status === "Approved" || status === "Closed Won") {
-      return "badge badge-success";
+      return "success";
     }
 
     if (status === "Rejected" || status === "Closed Lost") {
-      return "badge badge-danger";
+      return "danger";
     }
 
     if (status === "Under Review" || status === "Submitted") {
-      return "badge badge-warning";
+      return "warning";
     }
 
-    return "badge badge-info";
+    return "info";
   }
 
   handleRegisterDeal() {
-    this.dispatchEvent(new CustomEvent("newdeal"));
+    if (!this.registerDealPageName) {
+      return;
+    }
+
+    this[NavigationMixin.Navigate]({
+      type: "comm__namedPage",
+      attributes: {
+        name: this.registerDealPageName
+      }
+    });
   }
 
   handleOpenDeal(event) {

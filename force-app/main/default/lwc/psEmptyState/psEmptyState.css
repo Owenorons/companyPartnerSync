@@ -2,14 +2,15 @@
   display: grid;
   place-items: center;
 
-  padding: 4rem var(--lwc-varSpacingXLarge, 2rem);
+  padding: 4rem 2rem;
 
   color: var(--ps-color-text-muted);
 }
 
 .empty-shell h2 {
-  font-size: var(--lwc-varFontSize7, 1.25rem);
-  font-weight: 900;
+  font-family: var(--ps-font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
   color: var(--ps-color-text);
 }
 
@@ -17,16 +18,14 @@
   max-width: 420px;
 }
 
-.empty-shell button {
-  margin-top: var(--lwc-varSpacingLarge, 1.5rem);
-
-  border: none;
-  border-radius: 1rem;
-
-  background: var(--ps-color-primary);
-  color: var(--lwc-colorTextBrandPrimary, rgb(255, 255, 255));
-
-  padding: 0.8rem 1.2rem;
-
-  font-weight: 900;
+.empty-shell lightning-button {
+  margin-top: 1.5rem;
+  display: block;
+  --slds-c-button-radius-border: var(--ps-radius-sm);
+  --slds-c-button-brand-color-background: transparent;
+  --slds-c-button-brand-color-background-hover: var(--ps-color-bg);
+  --slds-c-button-brand-color-border: var(--ps-color-text);
+  --slds-c-button-brand-text-color: var(--ps-color-text);
+  --slds-c-button-brand-text-color-hover: var(--ps-color-primary);
+  --slds-c-button-font-weight: 600;
 }

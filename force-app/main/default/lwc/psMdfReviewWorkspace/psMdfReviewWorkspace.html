@@ -1,0 +1,210 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Operations</p>
+        <h1>MDF Review</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium filter-panel">
+        <lightning-input type="search" label="Search" onchange={handleSearch}>
+        </lightning-input>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No requests found"
+            message="Adjust your search or check back later."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasFilteredRequests}>
+          <template for:each={filteredRequests} for:item="request">
+            <button
+              key={request.requestId}
+              class={request.rowClass}
+              data-id={request.requestId}
+              aria-label={request.requestNumber}
+              onclick={handleSelectRequest}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="request-number">{request.requestNumber}</span>
+                <span class={request.statusClass}>{request.status}</span>
+              </div>
+
+              <h3>{request.campaignName}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>{request.partnerName}</span>
+                <strong>{request.formattedRequested}</strong>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedRequest}>
+        <template if:true={decisionError}>
+          <c-ps-error-panel message={decisionError}></c-ps-error-panel>
+        </template>
+
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">MDF Request</p>
+            <h2>{selectedRequest.campaignName}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span>{selectedRequest.partnerName}</span>
+              <span>{selectedRequest.requestType}</span>
+              <span>{selectedRequest.formattedRequested}</span>
+            </div>
+          </div>
+
+          <template if:true={selectedRequest.isReviewable}>
+            <div class="slds-grid_vertical hero-actions">
+              <div class="slds-grid approve-row">
+                <lightning-input
+                  class="amount-input"
+                  type="number"
+                  label="Approved amount"
+                  variant="label-hidden"
+                  step="0.01"
+                  value={approvedAmountInput}
+                  onchange={handleApprovedAmountChange}
+                >
+                </lightning-input>
+
+                <button
+                  class="approve"
+                  aria-label="Approve MDF request"
+                  disabled={isApproveDisabled}
+                  onclick={handleApprove}
+                >
+                  Approve
+                </button>
+              </div>
+
+              <button
+                class="reject"
+                aria-label="Reject MDF request"
+                onclick={handleReject}
+              >
+                Reject
+              </button>
+            </div>
+          </template>
+
+          <template if:false={selectedRequest.isReviewable}>
+            <div class="stamp-wrap">
+              <span class={selectedRequest.stampClass}
+                >{selectedRequest.status}</span
+              >
+            </div>
+          </template>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Request Details</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Requested Amount</span>
+              <strong>{selectedRequest.formattedRequested}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Approved Amount</span>
+              <strong>{selectedRequest.formattedApproved}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Activity Window</span>
+              <strong
+                >{selectedRequest.startLabel} –
+                {selectedRequest.endLabel}</strong
+              >
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Campaign Type</span>
+              <strong>{selectedRequest.requestType}</strong>
+            </div>
+          </article>
+        </section>
+      </template>
+
+      <template if:false={selectedRequest}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:money" size="large">
+          </lightning-icon>
+
+          <h2>Select a request</h2>
+
+          <p>
+            Choose an MDF request from the review queue to begin assessment.
+          </p>
+        </div>
+      </template>
+    </main>
+  </div>
+
+  <template if:true={showRejectDialog}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="reject-dialog-heading"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="reject-dialog-heading" class="slds-modal__title">
+            Reject MDF Request
+          </h2>
+        </header>
+
+        <div class="slds-modal__content slds-var-p-around_medium">
+          <lightning-textarea
+            label="Rejection reason"
+            value={rejectionReason}
+            required
+            onchange={handleRejectionReasonChange}
+          >
+          </lightning-textarea>
+        </div>
+
+        <footer class="slds-modal__footer">
+          <lightning-button
+            variant="neutral"
+            label="Cancel"
+            onclick={handleCancelReject}
+          >
+          </lightning-button>
+
+          <lightning-button
+            class="slds-var-m-left_small"
+            variant="destructive"
+            label="Reject"
+            disabled={isRejectDisabled}
+            onclick={handleConfirmReject}
+          >
+          </lightning-button>
+        </footer>
+      </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>

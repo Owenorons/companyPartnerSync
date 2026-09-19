@@ -8,17 +8,21 @@
 
     <div class="body">
       <div class="slds-grid_align-spread slds-grid top-row">
-        <span class="category">{content.category}</span>
+        <span class="category">{category}</span>
 
-        <template if:true={content.featured}>
+        <template if:true={isFeatured}>
           <span class="featured">Featured</span>
         </template>
       </div>
 
-      <h3 class="slds-var-m-top_small">{content.title}</h3>
-      <p class="slds-m-top_x-small">{content.description}</p>
+      <h3 class="slds-var-m-top_small">{title}</h3>
+      <p class="slds-m-top_x-small">{description}</p>
 
-      <button class="slds-var-m-top_medium" onclick={handleDownload}>
+      <button
+        class="slds-var-m-top_medium"
+        disabled={isDownloadDisabled}
+        onclick={handleDownload}
+      >
         Download
       </button>
     </div>

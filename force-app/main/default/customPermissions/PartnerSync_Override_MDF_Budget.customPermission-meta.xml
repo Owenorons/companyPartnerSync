@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Override MDF Budget</label>
+    <description
+  >Allows approving an MDF request that exceeds the partner's remaining annual budget.</description>
+</CustomPermission>

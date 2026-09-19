@@ -1,20 +1,18 @@
 .error-shell {
-  display: flex;
-  gap: 1rem;
-
-  background: #fef2f2;
-  color: #991b1b;
-
-  border: var(--lwc-borderWidthThin, 1px) solid #fecaca;
-  border-radius: var(--lwc-varSpacingMedium, 1rem);
-
-  padding: var(--lwc-varSpacingMedium, 1rem);
+  background: var(--ps-color-danger-bg);
+  color: var(--ps-color-danger);
+  border-left: 2px solid var(--ps-color-danger);
+  padding: 1rem;
 }
 
 .error-shell h2 {
-  font-weight: 900;
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .error-shell p {
-  margin-top: 0.3rem;
+  margin-top: var(--slds-g-spacing-1, 0.25rem);
 }

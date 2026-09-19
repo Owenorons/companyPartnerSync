@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>PartnerSync Command Operations</label>
+  <description
+  >Operational inspection and recovery authority for the deal command ledger. Does not grant lifecycle decision authority.</description>
+  <hasActivationRequired>false</hasActivationRequired>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_View_Command_Ledger</name></customPermissions>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Retry_Failed_Command</name></customPermissions>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Release_Stale_Command_Lease</name></customPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate><allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit><allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Command_Execution__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+</PermissionSet>

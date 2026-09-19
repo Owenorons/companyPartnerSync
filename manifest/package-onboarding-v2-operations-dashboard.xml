@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>InternalDashboardDTO</members><members
+    >InternalDashboardService</members><members
+    >InternalDashboardServiceTest</members><members
+    >InternalPortalController</members><members
+    >InternalPortalControllerTest</members><members
+    >OperationalAlertDTO</members><members>OnboardingWorkItemDTO</members><name
+    >ApexClass</name></types>
+  <types><members>psInternalDashboard</members><name
+    >LightningComponentBundle</name></types>
+  <types><members>PartnerSync_Channel_Manager</members><members
+    >PartnerSync_Internal_Admin</members><name>PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

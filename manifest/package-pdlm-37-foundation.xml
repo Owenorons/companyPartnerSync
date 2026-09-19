@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>DealProtectionCommand</members>
+    <members>DealProtectionCommandService</members>
+    <members>DealProtectionCommandServiceTest</members>
+    <members>DealExpiryBatch</members>
+    <members>DealExpiryBatchTest</members>
+    <members>RegistrationLifecycleCommandHandler</members>
+    <members>RegistrationLifecycleCommandHandlerTest</members>
+    <name>ApexClass</name>
+  </types>
+  <types>
+    <members>Deal_Protection_Grant__c</members>
+    <members>Deal_Protection_Extension__c</members>
+    <members>Deal_Protection_Action__c</members>
+    <members>Deal_Protection_Policy__mdt</members>
+    <name>CustomObject</name>
+  </types>
+  <types>
+    <members>Deal_Protection_Policy.Default</members>
+    <name>CustomMetadata</name>
+  </types>
+  <version>66.0</version>
+</Package>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Finalise_Partner_Approval</name></customPermissions>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Waive_Partner_Risk</name></customPermissions>
+  <hasActivationRequired>false</hasActivationRequired><label
+  >PartnerSync Onboarding Approval Authority</label>
+</PermissionSet>

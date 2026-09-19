@@ -1,0 +1,72 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Home",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"bb2ceadf-242d-4a2e-a6a9-c3dd86eb047e\",\"columns\":[{\"UUID\":\"d581890a-ed72-46d8-9ade-93894d7e887f\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "contentHubPageName" : "Content-Hub",
+                "leadsPageName" : "Leads",
+                "mdfPageName" : "MDF",
+                "registerDealPageName" : "Register-Deal"
+              },
+              "definition" : "psync:psHomeDashboard",
+              "id" : "2724995d-fafd-4fc2-8784-a1e688a046cb",
+              "type" : "component"
+            } ],
+            "id" : "d581890a-ed72-46d8-9ade-93894d7e887f",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "bb2ceadf-242d-4a2e-a6a9-c3dd86eb047e",
+          "type" : "component"
+        } ],
+        "id" : "d21b8053-b8ba-49b2-9d05-c09c46f00c89",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Home",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "15e59a3d-667f-4b1a-862d-594537cc9630",
+          "type" : "component"
+        } ],
+        "id" : "e2eaa752-efa4-48b2-9648-9e5ddf803599",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "ca3e8ed4-e6de-4433-a93a-ddf577d71b01",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "gzVgeXQWqvUNxR7F9LoVZxoyHuVOre",
+    "viewType" : "custom-partner-portal"
+  },
+  "urlName" : "partner-portal"
+}

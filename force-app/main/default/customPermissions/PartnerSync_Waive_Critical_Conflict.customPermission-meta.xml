@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata"><label
+  >Waive Critical Deal Conflict</label><description
+  >Allows an authorised internal reviewer to waive a critical conflict with complete audit evidence.</description></CustomPermission>

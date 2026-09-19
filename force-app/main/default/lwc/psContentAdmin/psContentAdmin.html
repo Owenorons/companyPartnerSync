@@ -1,0 +1,173 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Content Administration</p>
+        <h1>Manage Content</h1>
+        <p>
+          Control which content assets are published, who can see them, and how
+          they're organized in the Content Hub.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state message="Loading content..."></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <template if:true={hasContent}>
+        <div class="ps-card content-table">
+          <div class="table-header table-row">
+            <span>Title</span>
+            <span>Category</span>
+            <span>Visibility</span>
+            <span>Status</span>
+            <span>Featured</span>
+            <span></span>
+          </div>
+
+          <template for:each={rows} for:item="row">
+            <div key={row.contentId} class="table-row">
+              <span class="cell-title">{row.title}</span>
+              <span>{row.category}</span>
+              <span>{row.visibility}</span>
+              <c-ps-status-badge
+                label={row.statusLabel}
+                variant={row.statusVariant}
+              ></c-ps-status-badge>
+              <span>{row.featured}</span>
+              <span class="row-actions">
+                <lightning-button
+                  label={row.statusLabel}
+                  data-id={row.contentId}
+                  disabled={saving}
+                  onclick={handleToggleActive}
+                >
+                </lightning-button>
+                <lightning-button
+                  label="Edit"
+                  data-id={row.contentId}
+                  onclick={handleEdit}
+                >
+                </lightning-button>
+              </span>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasContent}>
+        <c-ps-empty-state
+          title="No content yet"
+          message="Content assets created for the Content Hub will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+
+    <template if:true={isModalOpen}>
+      <c-ps-modal title="Edit Content" onclose={handleCloseModal}>
+        <div class="edit-form">
+          <lightning-input
+            name="title"
+            label="Title"
+            value={draft.title}
+            onchange={handleInputChange}
+            required
+          >
+          </lightning-input>
+
+          <lightning-textarea
+            name="description"
+            label="Description"
+            value={draft.description}
+            onchange={handleInputChange}
+          >
+          </lightning-textarea>
+
+          <lightning-combobox
+            name="category"
+            label="Category"
+            value={draft.category}
+            options={categoryOptions}
+            onchange={handleComboboxChange}
+          >
+          </lightning-combobox>
+
+          <lightning-combobox
+            name="visibility"
+            label="Visibility"
+            value={draft.visibility}
+            options={visibilityOptions}
+            onchange={handleComboboxChange}
+          >
+          </lightning-combobox>
+
+          <lightning-combobox
+            name="partnerTier"
+            label="Partner Tier (Restricted visibility only)"
+            value={draft.partnerTier}
+            options={partnerTierOptions}
+            onchange={handleComboboxChange}
+          >
+          </lightning-combobox>
+
+          <lightning-combobox
+            name="partnerType"
+            label="Partner Type (Restricted visibility only)"
+            value={draft.partnerType}
+            options={partnerTypeOptions}
+            onchange={handleComboboxChange}
+          >
+          </lightning-combobox>
+
+          <lightning-input
+            name="sortOrder"
+            label="Sort Order"
+            type="number"
+            value={draft.sortOrder}
+            onchange={handleInputChange}
+          >
+          </lightning-input>
+
+          <lightning-input
+            name="featured"
+            label="Featured"
+            type="checkbox"
+            checked={draft.featured}
+            onchange={handleCheckboxChange}
+          >
+          </lightning-input>
+
+          <lightning-input
+            name="isActive"
+            label="Active"
+            type="checkbox"
+            checked={draft.isActive}
+            onchange={handleCheckboxChange}
+          >
+          </lightning-input>
+        </div>
+
+        <div slot="footer">
+          <lightning-button
+            label="Cancel"
+            onclick={handleCloseModal}
+          ></lightning-button>
+          <lightning-button
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label="Save"
+            disabled={saving}
+            onclick={handleSaveDraft}
+          ></lightning-button>
+        </div>
+      </c-ps-modal>
+    </template>
+  </div>
+</template>

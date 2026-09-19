@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>EventPublicationService</members>
+    <members>NotificationRecipientResolver</members>
+    <members>NotificationEventConsumerService</members>
+    <members>PartnerSyncEventHandler</members>
+    <members>PartnerSyncEventHandlerTest</members>
+    <members>PlatformEventPublisherService</members>
+    <members>PlatformEventPublisherServiceTest</members>
+    <name>ApexClass</name>
+  </types>
+  <types><members>Event_Publication__c</members><name
+    >CustomObject</name></types>
+  <types><members>PartnerSync_Event__e</members><members
+    >NotificationCreatedEvent__e</members><name>CustomObject</name></types>
+  <types><members>PartnerSync_Event__e.*</members><members
+    >NotificationCreatedEvent__e.*</members><name>CustomField</name></types>
+  <types><members>PartnerSync_Event_Operations</members><name
+    >PermissionSet</name></types>
+  <version>65.0</version>
+</Package>

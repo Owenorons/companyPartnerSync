@@ -1,6 +1,6 @@
 <template>
   <div class="slds-var-p-around_large ps-page">
-    <section class="slds-var-m-bottom_large page-header leads-header">
+    <section class="slds-var-m-bottom_large page-header">
       <div>
         <p class="slds-text-body_small eyebrow">Lead Distribution</p>
         <h1>Assigned Leads</h1>
@@ -32,7 +32,10 @@
                 <p class="slds-var-m-top_xx-small lead-name">{lead.leadName}</p>
               </div>
 
-              <span class={lead.badgeClass}>{lead.status}</span>
+              <c-ps-status-badge
+                label={lead.status}
+                variant={lead.badgeVariant}
+              ></c-ps-status-badge>
             </div>
 
             <div class="slds-var-m-top_medium lead-details">
@@ -46,7 +49,11 @@
               </div>
               <div>
                 <span class="slds-text-body_small">SLA Deadline</span>
-                <strong>{lead.slaLabel}</strong>
+                <c-ps-status-badge
+                  label={lead.slaLabel}
+                  variant={lead.slaVariant}
+                  size="sm"
+                ></c-ps-status-badge>
               </div>
             </div>
 

@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.ps-notification-center {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.note-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.note-item {
+  position: relative;
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.note-row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0.65rem;
+  padding: 0.85rem 2.25rem 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.note-row:hover {
+  background: var(--ps-color-bg);
+}
+
+.note-row.unread {
+  background: color-mix(
+    in srgb,
+    var(--ps-color-primary) 6%,
+    var(--ps-color-card)
+  );
+}
+
+.note-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  margin-top: 0.4rem;
+  flex-shrink: 0;
+  background: transparent;
+}
+
+.note-row.unread .note-dot {
+  background: var(--ps-color-primary);
+}
+
+.note-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.note-title {
+  font-size: var(--ps-font-sm);
+  font-weight: 700;
+  color: var(--ps-color-text);
+}
+
+.note-message {
+  margin-top: 0.15rem;
+  font-size: var(--ps-font-sm);
+  color: var(--ps-color-text-muted);
+}
+
+.note-time {
+  margin-top: 0.3rem;
+  font-family: var(--ps-font-mono);
+  font-size: 0.68rem;
+  color: var(--ps-color-text-muted);
+}
+
+.note-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--ps-color-text-muted);
+  font-size: var(--ps-font-lg);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  flex-shrink: 0;
+}
+
+.note-dismiss:hover {
+  color: var(--ps-color-danger);
+}

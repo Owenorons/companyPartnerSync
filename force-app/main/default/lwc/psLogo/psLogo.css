@@ -1,0 +1,32 @@
+:host {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-link.is-static {
+  cursor: default;
+  pointer-events: none;
+}
+
+.logo-image {
+  height: 2rem;
+  width: auto;
+  display: block;
+}
+
+.logo-wordmark {
+  font-family: var(--ps-font-display);
+  font-size: var(--ps-font-lg, 1.1rem);
+  font-weight: 400;
+  color: var(--ps-color-text, #1a1b1e);
+  white-space: nowrap;
+}

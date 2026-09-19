@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+<types><members>DealReviewPlanService</members><members
+    >DealReviewPlanServiceTest</members><members
+    >DealReviewCommand</members><members
+    >DealReviewCommandService</members><members
+    >DealReviewCommandServiceTest</members><name>ApexClass</name></types>
+<types><members>Deal_Review_Plan__c</members><members
+    >Deal_Review__c</members><members
+    >Deal_Information_Request__c</members><members
+    >Deal_Review_Routing_Rule__mdt</members><name>CustomObject</name></types>
+<types><members>Deal_Review_Routing_Rule.Channel_Review</members><members
+    >Deal_Review_Routing_Rule.Commercial_Review</members><name
+    >CustomMetadata</name></types>
+<version>66.0</version></Package>

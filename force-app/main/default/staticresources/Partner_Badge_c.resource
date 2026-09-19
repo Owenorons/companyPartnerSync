@@ -1,0 +1,131 @@
+[
+  {
+    "apiName": "Partner_Badge__c",
+    "label": "Partner Badge",
+    "pluralLabel": "Partner Badges",
+    "sharingModel": "Private",
+    "defaultFieldPermissionSet": "PartnerSync_Internal_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true,
+    "nameFieldType": "Text",
+    "nameFieldLabel": "Partner Badge Name",
+    "fields": [
+      {
+        "apiName": "Active__c",
+        "label": "Active",
+        "type": "Checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "apiName": "Awarded_By_Process__c",
+        "label": "Awarded By Process",
+        "description": "Process or automation that awarded the badge.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Awarded_On__c",
+        "label": "Awarded On",
+        "description": "Date when the badge was awarded.",
+        "type": "Date",
+        "required": false
+      },
+      {
+        "apiName": "Badge_Code__c",
+        "label": "Badge Code",
+        "description": "Unique code identifying the partner badge.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Badge_Name__c",
+        "label": "Badge Name",
+        "description": "Display name for the partner badge.",
+        "type": "Text",
+        "length": 255,
+        "required": false,
+        "unique": false,
+        "externalId": false
+      },
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "description": "Partner account awarded the badge.",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Account",
+        "relationshipName": "Partner_Badges"
+      },
+      {
+        "apiName": "Reason__c",
+        "label": "Reason",
+        "description": "Reason the badge was awarded.",
+        "type": "LongTextArea",
+        "length": 32768,
+        "visibleLines": 5
+      }
+    ],
+    "objectPermissions": [
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "objectApiName": "Partner_Badge__c",
+        "allowRead": true,
+        "allowCreate": true,
+        "allowEdit": true,
+        "allowDelete": false,
+        "viewAllRecords": false,
+        "modifyAllRecords": false
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Active__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Awarded_By_Process__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Awarded_On__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Badge_Code__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Badge_Name__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Reason__c",
+        "readable": true,
+        "editable": true
+      }
+    ]
+  }
+]

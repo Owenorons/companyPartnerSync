@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label>Deal Protection Action</label><nameField
+  ><displayFormat>DPA-{000000}</displayFormat><label
+    >Protection Action Number</label><type
+    >AutoNumber</type></nameField><pluralLabel
+  >Deal Protection Actions</pluralLabel><sharingModel
+  >ReadWrite</sharingModel></CustomObject>

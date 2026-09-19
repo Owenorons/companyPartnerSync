@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>PartnerAccessProvisioningService</members><members
+    >PartnerAccessProvisioningServiceTest</members><members
+    >PartnerOnboardingSecurityTest</members><name>ApexClass</name></types>
+  <types><members>Partner_Onboarding__c.Partner_Account__c</members><name
+    >CustomField</name></types>
+  <types><members>PartnerSync_Partner_Base_Data</members><name
+    >PermissionSet</name></types>
+  <types><members>PSG_Partner_Administrator</members><members
+    >PSG_Partner_User</members><name>PermissionSetGroup</name></types>
+  <version>66.0</version>
+</Package>

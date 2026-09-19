@@ -35,6 +35,10 @@ export default class PsMdfBudgetCard extends LightningElement {
     return Math.min((this.used / this.annual) * 100, 100);
   }
 
+  get progressFillStyle() {
+    return `width: ${this.usedPercent}%`;
+  }
+
   formatCurrency(value) {
     return new Intl.NumberFormat("en-AU", {
       style: "currency",

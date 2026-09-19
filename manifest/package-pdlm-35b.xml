@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+<types>
+<members>DealConflictAnalysisService</members>
+<members>DealConflictAnalysisServiceTest</members>
+<members>DealConflictApprovalGuard</members>
+<members>DealConflictCandidateSelector</members>
+<members>RegistrationLifecycleCommandHandler</members>
+<members>RegistrationLifecycleCommandHandlerTest</members><name
+    >ApexClass</name></types>
+<types><members>Deal_Conflict_Scoring_Rule.Existing_Registration</members><name
+    >CustomMetadata</name></types>
+<types><members>Deal_Conflict__c</members><members
+    >Deal_Conflict_Analysis_Run__c</members><members
+    >Deal_Conflict_Scoring_Rule__mdt</members><name>CustomObject</name></types>
+<version>66.0</version>
+</Package>

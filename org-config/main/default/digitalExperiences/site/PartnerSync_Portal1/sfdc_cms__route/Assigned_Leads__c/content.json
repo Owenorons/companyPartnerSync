@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Assigned Leads",
+  "contentBody" : {
+    "activeViewId" : "Assigned_Leads",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-assigned-leads",
+    "urlPrefix" : "assigned-leads"
+  },
+  "urlName" : "assigned-leads"
+}

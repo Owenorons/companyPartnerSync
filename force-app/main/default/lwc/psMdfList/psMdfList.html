@@ -2,6 +2,58 @@
   <section class="request-list">
     <p class="eyebrow">Request History</p>
     <h2>MDF Requests</h2>
-    <p class="empty-state">No MDF requests to display.</p>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading MDF requests..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasRequests}>
+      <ul class="request-items">
+        <template for:each={requests} for:item="request">
+          <li key={request.requestId} class="request-item">
+            <div class="request-top">
+              <div>
+                <p class="request-number">{request.requestNumber}</p>
+                <h3>{request.campaignName}</h3>
+              </div>
+              <c-ps-status-badge
+                label={request.status}
+                variant={request.badgeVariant}
+              ></c-ps-status-badge>
+            </div>
+
+            <div class="request-meta">
+              <div>
+                <span>Requested</span>
+                <strong>{request.requestedLabel}</strong>
+              </div>
+              <div>
+                <span>Approved</span>
+                <strong>{request.approvedLabel}</strong>
+              </div>
+              <div>
+                <span>Type</span>
+                <strong>{request.requestType}</strong>
+              </div>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template if:false={hasRequests}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="No MDF requests yet"
+          message="Submit your first request above to see it here."
+        ></c-ps-empty-state>
+      </template>
+    </template>
   </section>
 </template>

@@ -4,13 +4,11 @@
     <h2>{annualLabel}</h2>
     <div class="subtitle">Annual Allocation</div>
 
-    <div class="slds-var-m-top_x-large budget-bars">
-      <lightning-progress-bar
-        class="budget-progress"
-        value={usedPercent}
-        size="large"
-      >
-      </lightning-progress-bar>
+    <div class="slds-var-m-top_x-large ledger-progress">
+      <span class="fill" style={progressFillStyle}></span>
+      <span class="tick" style="left: 25%"></span>
+      <span class="tick" style="left: 50%"></span>
+      <span class="tick" style="left: 75%"></span>
     </div>
 
     <div class="slds-grid_align-spread slds-grid budget-stats">

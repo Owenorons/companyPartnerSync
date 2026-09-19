@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Retry Failed Command</label>
+  <description
+  >Allows an authorised operator to retry a failed deal command.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

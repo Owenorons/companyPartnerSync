@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Confidentiality__c</fullName><label>Confidentiality</label><type
+  >Picklist</type><valueSet><valueSetDefinition><sorted>false</sorted><value
+      ><fullName>Partner</fullName><default>true</default><label
+        >Partner</label></value><value><fullName>Internal</fullName><default
+        >false</default><label>Internal</label></value><value><fullName
+        >Confidential</fullName><default>false</default><label
+        >Confidential</label></value><value><fullName
+        >Restricted</fullName><default>false</default><label
+        >Restricted</label></value></valueSetDefinition></valueSet></CustomField>

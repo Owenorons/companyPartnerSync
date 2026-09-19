@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Provider__c</fullName>
+    <description>AI provider that generated the insight.</description>
+    <label>Provider</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OpenAI</fullName>
+                <default>false</default>
+                <label>OpenAI</label>
+            </value>
+            <value>
+                <fullName>Azure OpenAI</fullName>
+                <default>false</default>
+                <label>Azure OpenAI</label>
+            </value>
+            <value>
+                <fullName>Einstein</fullName>
+                <default>false</default>
+                <label>Einstein</label>
+            </value>
+            <value>
+                <fullName>Agentforce</fullName>
+                <default>false</default>
+                <label>Agentforce</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

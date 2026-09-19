@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Alert_Type__c</fullName>
+    <label>Alert Type</label>
+    <type>Picklist</type>
+    <required>true</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Scheduled Job Failure</fullName><default
+        >false</default><label>Scheduled Job Failure</label></value>
+            <value><fullName>Provisioning Failure</fullName><default
+        >false</default><label>Provisioning Failure</label></value>
+            <value><fullName>Signature Event Failure</fullName><default
+        >false</default><label>Signature Event Failure</label></value>
+            <value><fullName>Overdue Work</fullName><default
+        >false</default><label>Overdue Work</label></value>
+            <value><fullName>Recertification Breach</fullName><default
+        >false</default><label>Recertification Breach</label></value>
+            <value><fullName>Expired Partner Evidence</fullName><default
+        >false</default><label>Expired Partner Evidence</label></value>
+            <value><fullName>Partner Evidence Expiring</fullName><default
+        >false</default><label>Partner Evidence Expiring</label></value>
+            <value><fullName>Overdue Partner Evidence</fullName><default
+        >false</default><label>Overdue Partner Evidence</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

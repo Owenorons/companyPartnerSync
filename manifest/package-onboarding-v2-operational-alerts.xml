@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>PartnerOperationalAlertService</members><members
+    >PartnerOperationalAlertServiceTest</members><name>ApexClass</name></types>
+  <types><members>PartnerSync_Manage_Operational_Alerts</members><name
+    >CustomPermission</name></types>
+  <types><members>Partner_Operational_Alert__c</members><name
+    >CustomObject</name></types>
+  <types><members>PartnerSync_Operational_Alert_Manager</members><name
+    >PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

@@ -1,7 +1,7 @@
 .request-form {
   display: grid;
-  gap: var(--lwc-varSpacingMedium, 1rem);
-  padding: var(--lwc-varSpacingLarge, 1.5rem);
+  gap: 1rem;
+  padding: 1.5rem;
   border: 1px solid var(--ps-color-border);
   border-radius: var(--ps-radius-md);
   background: var(--ps-color-card);
@@ -10,14 +10,16 @@
 
 .eyebrow {
   color: var(--ps-color-text-muted);
-  font-size: var(--ps-font-xs);
-  font-weight: 900;
-  letter-spacing: 0.12em;
+  font-family: var(--ps-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 h2 {
   color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
   font-size: var(--ps-font-lg);
-  font-weight: 900;
+  font-weight: 400;
 }

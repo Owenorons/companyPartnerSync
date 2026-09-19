@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Status__c</fullName><label>Status</label><type>Picklist</type><valueSet
+  ><valueSetDefinition><sorted>false</sorted><value><fullName
+        >Awaiting Submission</fullName><default>true</default><label
+        >Awaiting Submission</label></value><value><fullName
+        >Submitted</fullName><default>false</default><label
+        >Submitted</label></value><value><fullName
+        >Under Review</fullName><default>false</default><label
+        >Under Review</label></value><value><fullName
+        >Accepted</fullName><default>false</default><label
+        >Accepted</label></value><value><fullName
+        >Replacement Required</fullName><default>false</default><label
+        >Replacement Required</label></value><value><fullName
+        >Waived</fullName><default>false</default><label
+        >Waived</label></value><value><fullName>Expired</fullName><default
+        >false</default><label>Expired</label></value><value><fullName
+        >Not Applicable</fullName><default>false</default><label
+        >Not Applicable</label></value></valueSetDefinition></valueSet></CustomField>

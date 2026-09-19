@@ -1,1 +1,30 @@
-<template> </template>
+<template>
+  <section
+    class="drawer-backdrop"
+    onclick={handleBackdropClick}
+    role="presentation"
+  >
+    <div class={panelClass} role="dialog" aria-modal="true" aria-label={title}>
+      <header class="drawer-header">
+        <h2>{title}</h2>
+        <lightning-button-icon
+          class="drawer-close"
+          icon-name="utility:close"
+          variant="bare"
+          size="small"
+          alternative-text="Close panel"
+          title="Close panel"
+          onclick={handleClose}
+        ></lightning-button-icon>
+      </header>
+
+      <div class="drawer-body">
+        <slot></slot>
+      </div>
+
+      <footer class="drawer-footer">
+        <slot name="footer"></slot>
+      </footer>
+    </div>
+  </section>
+</template>

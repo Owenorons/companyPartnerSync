@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "MDF Workspace",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"74df99c1-118d-4e2a-8d7d-20aa127a1949\",\"columns\":[{\"UUID\":\"45903bbc-63d6-45a6-998e-085b60bdd4e1\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psMdfWorkspace",
+              "id" : "5c4c691e-11f8-4e0c-8180-98e32a8bcd7a",
+              "type" : "component"
+            } ],
+            "id" : "45903bbc-63d6-45a6-998e-085b60bdd4e1",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "74df99c1-118d-4e2a-8d7d-20aa127a1949",
+          "type" : "component"
+        } ],
+        "id" : "d6920cd3-4b10-41a1-8acc-c9d3cb28ca67",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "MDF Workspace",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "3285f1b1-50c9-4239-b7f2-9095afccee38",
+          "type" : "component"
+        } ],
+        "id" : "2bc9f581-6d0e-4798-95b8-ebc7d9f95346",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "8de1bda7-cf30-401c-9cfe-87ced7d9e7f0",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "gzVgeXQWqvUNxR7F9LoVZxoyHuVOre",
+    "viewType" : "custom-mdf-workspace"
+  },
+  "urlName" : "mdf-workspace"
+}

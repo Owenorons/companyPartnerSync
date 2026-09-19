@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Territory</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Assign_To_User_Id__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Assignment_Method__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Capacity_Max__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Capacity_Min__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Country__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Distribution_Method__c</field>
+        <value xsi:type="xsd:string">Territory</value>
+    </values>
+    <values>
+        <field>Industry__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Partner_Account_Key__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Partner_Tier__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Partner_Type__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Priority__c</field>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>Region__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Rule_Name__c</field>
+        <value xsi:type="xsd:string">Territory</value>
+    </values>
+</CustomMetadata>

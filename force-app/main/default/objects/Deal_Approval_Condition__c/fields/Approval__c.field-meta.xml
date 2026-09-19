@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Approval__c</fullName><deleteConstraint>SetNull</deleteConstraint><label
+  >Approval</label><referenceTo>Deal_Approval__c</referenceTo><relationshipLabel
+  >Conditions</relationshipLabel><relationshipName
+  >Conditions</relationshipName><type>Lookup</type></CustomField>

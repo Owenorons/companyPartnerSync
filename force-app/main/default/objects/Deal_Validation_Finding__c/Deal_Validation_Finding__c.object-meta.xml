@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label>Deal Validation Finding</label><pluralLabel
+  >Deal Validation Findings</pluralLabel><nameField><displayFormat
+    >DVF-{00000000}</displayFormat><label>Finding Number</label><type
+    >AutoNumber</type></nameField><sharingModel
+  >ControlledByParent</sharingModel><enableReports
+  >true</enableReports><enableActivities>false</enableActivities></CustomObject>

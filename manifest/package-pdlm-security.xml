@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>PartnerSync_Release_Stale_Command_Lease</members>
+    <members>PartnerSync_Retry_Failed_Command</members>
+    <members>PartnerSync_View_Command_Ledger</members>
+    <members>PartnerSync_View_Event_Payload</members>
+    <name>CustomPermission</name>
+  </types>
+  <types>
+    <members>PartnerSync_Command_Operations</members>
+    <members>PartnerSync_Critical_Conflict_Authority</members>
+    <members>PartnerSync_Deal_Reviewer</members>
+    <members>PartnerSync_Event_Operations</members>
+    <members>PartnerSync_PDLM_Admin</members>
+    <name>PermissionSet</name>
+  </types>
+  <types>
+    <members>PSG_Channel_Manager</members>
+    <members>PSG_Internal_Administrator</members>
+    <name>PermissionSetGroup</name>
+  </types>
+  <version>66.0</version>
+</Package>

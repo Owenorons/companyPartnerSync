@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types><members>PartnerAgreementService</members><members
+    >PartnerAgreementServiceTest</members><members
+    >PartnerSignatureProvider</members><name>ApexClass</name></types>
+  <types><members>Partner_Agreement__c</members><members
+    >Partner_Agreement_Signatory__c</members><members
+    >Partner_Signature_Event__c</members><name>CustomObject</name></types>
+  <types><members>PartnerSync_Activate_Partner_Agreement</members><name
+    >CustomPermission</name></types>
+  <types><members>PartnerSync_Onboarding_Contract_Manager</members><members
+    >PartnerSync_Agreement_Activation_Authority</members><name
+    >PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

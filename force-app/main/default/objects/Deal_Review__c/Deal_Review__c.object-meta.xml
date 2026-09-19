@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label>Deal Review</label><pluralLabel
+  >Deal Reviews</pluralLabel><nameField><displayFormat
+    >DRV-{00000000}</displayFormat><label>Deal Review Number</label><type
+    >AutoNumber</type></nameField><sharingModel
+  >Private</sharingModel><enableReports>true</enableReports><enableActivities
+  >false</enableActivities></CustomObject>

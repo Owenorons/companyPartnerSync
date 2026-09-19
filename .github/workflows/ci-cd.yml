@@ -1,0 +1,332 @@
+name: Salesforce CI/CD
+
+on:
+  push:
+    branches: [feature, main]
+  workflow_dispatch:
+    inputs:
+      full_deploy:
+        description: Deploy all force-app metadata instead of the Git delta
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: salesforce-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+  SALESFORCE_CLI_VERSION: "2.143.6"
+  SGD_VERSION: "6.44.4"
+  DEPLOY_WAIT_MINUTES: "90"
+
+jobs:
+  ci:
+    name: CI quality gate
+    uses: ./.github/workflows/ci.yml
+
+  artifact:
+    name: Build immutable deployment artifact
+    needs: ci
+    if: github.ref_name == 'feature' || github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      has_changes: ${{ steps.metadata.outputs.has_changes }}
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Salesforce CLI and delta plugin
+        run: |
+          npm install --global "@salesforce/cli@${SALESFORCE_CLI_VERSION}"
+          echo y | sf plugins install "sfdx-git-delta@${SGD_VERSION}"
+
+      - name: Build deltas from successful environment deployments
+        id: metadata
+        uses: actions/github-script@v7
+        env:
+          FULL_DEPLOY: ${{ inputs.full_deploy || false }}
+        with:
+          script: |
+            const { buildArtifacts } = require('./scripts/ci/deployment-baseline.js');
+            await buildArtifacts({ github, context, core });
+            core.setOutput('artifact_name', `salesforce-deployment-${context.runId}-${process.env.GITHUB_RUN_ATTEMPT}`);
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: |
+            .delta
+            .deployment
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 10
+
+  deploy-staging:
+    name: Deploy feature branch to staging
+    if: github.ref_name == 'feature' && needs.artifact.outputs.has_changes == 'true'
+    needs: artifact
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    concurrency:
+      group: salesforce-staging
+      cancel-in-progress: false
+    environment:
+      name: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+
+      - name: Install Salesforce CLI
+        run: npm install --global "@salesforce/cli@${SALESFORCE_CLI_VERSION}"
+
+      - name: Authenticate staging
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          test -n "${SFDX_AUTH_URL}" || {
+            echo "::error::The staging environment is missing SFDX_AUTH_URL."
+            exit 1
+          }
+          auth_file="$(mktemp)"
+          trap 'rm -f "${auth_file}"' EXIT
+          printf '%s' "${SFDX_AUTH_URL}" > "${auth_file}"
+          sf org login sfdx-url \
+            --sfdx-url-file "${auth_file}" \
+            --alias staging \
+            --set-default
+
+      - name: Deploy to staging and run Apex tests
+        run: |
+          source .deployment/staging.env
+          if [[ "${HAS_CHANGES}" != "true" ]]; then
+            echo "No metadata changes for staging."
+            exit 0
+          fi
+          if [[ "${DEPLOY_MODE}" == "full" ]]; then
+            sf project deploy start \
+              --source-dir force-app \
+              --target-org staging \
+              --test-level RunLocalTests \
+              --wait "${DEPLOY_WAIT_MINUTES}"
+          else
+            sf project deploy start \
+              --manifest .delta/staging/package/package.xml \
+              --post-destructive-changes .delta/staging/destructiveChanges/destructiveChanges.xml \
+              --target-org staging \
+              --test-level RunLocalTests \
+              --wait "${DEPLOY_WAIT_MINUTES}"
+          fi
+
+      - name: Staging smoke test
+        run: sf apex run --file scripts/apex/post-deployment-smoke.apex --target-org staging
+
+      - name: Record successful deployment baseline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { recordSuccess } = require('./scripts/ci/deployment-baseline.js');
+            await recordSuccess({ github, context, environment: 'staging' });
+
+  promote-full-sandbox:
+    name: Approve staging tests and deploy to full sandbox
+    if: github.ref_name == 'feature' && needs.artifact.outputs.has_changes == 'true'
+    needs: [artifact, deploy-staging]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: salesforce-full-sandbox
+      cancel-in-progress: false
+    environment:
+      name: full-sandbox
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+
+      - name: Install Salesforce CLI
+        run: npm install --global "@salesforce/cli@${SALESFORCE_CLI_VERSION}"
+
+      - name: Authenticate full sandbox
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          test -n "${SFDX_AUTH_URL}" || {
+            echo "::error::The full-sandbox environment is missing SFDX_AUTH_URL."
+            exit 1
+          }
+          auth_file="$(mktemp)"
+          trap 'rm -f "${auth_file}"' EXIT
+          printf '%s' "${SFDX_AUTH_URL}" > "${auth_file}"
+          sf org login sfdx-url \
+            --sfdx-url-file "${auth_file}" \
+            --alias full-sandbox \
+            --set-default
+
+      - name: Deploy full sandbox delta from the release artifact
+        run: |
+          source .deployment/full-sandbox.env
+          if [[ "${HAS_CHANGES}" != "true" ]]; then
+            echo "No metadata changes for full-sandbox."
+            exit 0
+          fi
+          if [[ "${DEPLOY_MODE}" == "full" ]]; then
+            sf project deploy start \
+              --source-dir force-app \
+              --target-org full-sandbox \
+              --test-level RunLocalTests \
+              --wait "${DEPLOY_WAIT_MINUTES}"
+          else
+            sf project deploy start \
+              --manifest .delta/full-sandbox/package/package.xml \
+              --post-destructive-changes .delta/full-sandbox/destructiveChanges/destructiveChanges.xml \
+              --target-org full-sandbox \
+              --test-level RunLocalTests \
+              --wait "${DEPLOY_WAIT_MINUTES}"
+          fi
+
+      - name: Full sandbox smoke test
+        run: sf apex run --file scripts/apex/post-deployment-smoke.apex --target-org full-sandbox
+
+      - name: Record successful deployment baseline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { recordSuccess } = require('./scripts/ci/deployment-baseline.js');
+            await recordSuccess({ github, context, environment: 'full-sandbox' });
+
+  deploy-production:
+    name: Validate and deploy main to production
+    if: github.ref_name == 'main' && needs.artifact.outputs.has_changes == 'true'
+    needs: artifact
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: salesforce-production
+      cancel-in-progress: false
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+
+      - name: Install Salesforce CLI
+        run: npm install --global "@salesforce/cli@${SALESFORCE_CLI_VERSION}"
+
+      - name: Authenticate production
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          test -n "${SFDX_AUTH_URL}" || {
+            echo "::error::The production environment is missing SFDX_AUTH_URL."
+            exit 1
+          }
+          auth_file="$(mktemp)"
+          trap 'rm -f "${auth_file}"' EXIT
+          printf '%s' "${SFDX_AUTH_URL}" > "${auth_file}"
+          sf org login sfdx-url \
+            --sfdx-url-file "${auth_file}" \
+            --alias production \
+            --set-default
+
+      - name: Validate production and run Apex tests
+        id: validate
+        run: |
+          source .deployment/production.env
+          if [[ "${HAS_CHANGES}" != "true" ]]; then
+            echo "No metadata changes for production."
+            exit 0
+          fi
+          if [[ "${DEPLOY_MODE}" == "full" ]]; then
+            validation_json="$(
+              sf project deploy validate \
+                --source-dir force-app \
+                --target-org production \
+                --test-level RunLocalTests \
+                --wait "${DEPLOY_WAIT_MINUTES}" \
+                --json
+            )"
+          else
+            validation_json="$(
+              sf project deploy validate \
+                --manifest .delta/production/package/package.xml \
+                --post-destructive-changes .delta/production/destructiveChanges/destructiveChanges.xml \
+                --target-org production \
+                --test-level RunLocalTests \
+                --wait "${DEPLOY_WAIT_MINUTES}" \
+                --json
+            )"
+          fi
+
+          validation_id="$(jq -r '.result.id // empty' <<< "${validation_json}")"
+          test -n "${validation_id}" || {
+            jq . <<< "${validation_json}"
+            echo "::error::Salesforce validation returned no deployment ID."
+            exit 1
+          }
+          echo "Validation succeeded: ${validation_id}"
+          echo "validation_id=${validation_id}" >> "$GITHUB_OUTPUT"
+
+      - name: Quick deploy validated production artifact
+        if: steps.validate.outputs.validation_id != ''
+        run: |
+          sf project deploy quick \
+            --job-id "${{ steps.validate.outputs.validation_id }}" \
+            --target-org production \
+            --wait "${DEPLOY_WAIT_MINUTES}"
+
+      - name: Production smoke test
+        run: sf apex run --file scripts/apex/post-deployment-smoke.apex --target-org production
+
+      - name: Record successful deployment baseline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { recordSuccess } = require('./scripts/ci/deployment-baseline.js');
+            await recordSuccess({ github, context, environment: 'production' });
+
+  no-metadata:
+    name: No Salesforce deployment required
+    if: needs.artifact.outputs.has_changes != 'true'
+    needs: artifact
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No deployable Salesforce metadata changed."

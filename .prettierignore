@@ -3,6 +3,8 @@
 #
 
 **/staticresources/**
+**/digitalExperiences/**
+tools/metadata-builder/codeSamples/**
 .localdevserver
 .sfdx
 .sf

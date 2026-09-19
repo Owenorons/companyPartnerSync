@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+.ps-card {
+  background: var(--ps-color-card);
+  border: 1px solid var(--ps-color-border);
+}
+
+.deal-form {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 42rem;
+}
+
+.reg-fieldset {
+  border: 1px solid var(--ps-color-border);
+  padding: 1.1rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.reg-fieldset legend {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ps-color-primary);
+  padding: 0 0.4rem;
+}
+
+.field-row {
+  gap: 1.1rem;
+}
+
+.field-row lightning-input {
+  flex: 1 1 12rem;
+}
+
+.success-card {
+  margin-top: 1.5rem;
+  max-width: 32rem;
+  padding: 1.5rem;
+}
+
+.success-card h2 {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.success-card p {
+  color: var(--ps-color-text-muted);
+}

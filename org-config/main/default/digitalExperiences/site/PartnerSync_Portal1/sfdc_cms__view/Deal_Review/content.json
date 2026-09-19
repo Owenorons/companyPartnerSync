@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Deal Review",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"667b6eae-169d-4fe6-91d3-cc30ab349150\",\"columns\":[{\"UUID\":\"3c7632b5-30b5-4617-a6c2-5973a0147cb1\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psDealReviewWorkspace",
+              "id" : "4574d0e1-26e3-47f2-ac90-d81049e850b6",
+              "type" : "component"
+            } ],
+            "id" : "3c7632b5-30b5-4617-a6c2-5973a0147cb1",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "667b6eae-169d-4fe6-91d3-cc30ab349150",
+          "type" : "component"
+        } ],
+        "id" : "eb099fd3-cdd4-4758-8ef8-c6e46fe81061",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Deal Review",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "1472c04c-844f-4487-bf61-563c135b6733",
+          "type" : "component"
+        } ],
+        "id" : "22e66eef-21ea-4b6c-b54c-2f74063815a6",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "88cb7ed9-b432-4e08-95c7-52be6df93a7d",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "gzVgeXQWqvUNxR7F9LoVZxoyHuVOre",
+    "viewType" : "custom-deal-review"
+  },
+  "urlName" : "deal-review"
+}

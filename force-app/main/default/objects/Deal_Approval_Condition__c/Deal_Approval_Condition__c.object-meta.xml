@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label>Deal Approval Condition</label><nameField
+  ><displayFormat>DAC-{000000}</displayFormat><label
+    >Condition Number</label><type>AutoNumber</type></nameField><pluralLabel
+  >Deal Approval Conditions</pluralLabel><sharingModel
+  >ReadWrite</sharingModel></CustomObject>

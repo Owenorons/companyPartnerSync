@@ -7,4 +7,36 @@
         <target>lightningCommunity__Default</target>
         <target>lightning__AppPage</target>
     </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default,lightning__AppPage">
+            <property
+        name="registerDealPageName"
+        type="String"
+        default="Register-Deal"
+        label="Register Deal page name"
+        description="Experience Builder / App Page API name to navigate to for the Register Deal quick action"
+      />
+            <property
+        name="leadsPageName"
+        type="String"
+        default="Leads"
+        label="Leads page name"
+        description="Experience Builder / App Page API name to navigate to for the View Leads quick action"
+      />
+            <property
+        name="mdfPageName"
+        type="String"
+        default="MDF"
+        label="MDF page name"
+        description="Experience Builder / App Page API name to navigate to for the Request MDF quick action"
+      />
+            <property
+        name="contentHubPageName"
+        type="String"
+        default="Content-Hub"
+        label="Content Hub page name"
+        description="Experience Builder / App Page API name to navigate to for the Content Hub quick action"
+      />
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

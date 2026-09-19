@@ -1,4 +1,21 @@
+/**
+ * Service for resolving a Lead (or raw company/email input) to a customer
+ * Account, creating one only when no existing match is found. Two entry
+ * points exist for two different callers: one takes a full Lead (used by
+ * lead conversion, which may already carry a Customer_Account__c lookup),
+ * the other takes bare companyName/email for flows that don't have a Lead
+ * record to draw from. Both funnel through the same matching/creation logic
+ * below.
+ */
 public with sharing class CustomerAccountService {
+  /**
+   * Resolves a customer Account for the given Lead: reuses
+   * Customer_Account__c if already set, otherwise matches on company/email
+   * domain, and creates a new customer Account only if no match is found.
+   *
+   * @param lead The lead to resolve a customer account for.
+   * @return The matched or newly created customer account, with a flag indicating which.
+   */
   public static CustomerAccountMatchDTO findOrCreateCustomerAccount(Lead lead) {
     if (lead == null) {
       throw new PartnerSyncHandledException('Lead is required.');
@@ -29,6 +46,11 @@ public with sharing class CustomerAccountService {
       return toDTO(matches[0], false);
     }
 
+    // No locking between this match check and the insert below, so two
+    // concurrent conversions for the same company (e.g. two admins
+    // converting different leads at the same moment) can each miss the
+    // other's match and create duplicate Accounts. Accepted as a narrow,
+    // low-probability tradeoff rather than something to guard against here.
     SecurityUtil.assertCreateable(Account.SObjectType);
 
     Account customer = new Account();
@@ -39,11 +61,20 @@ public with sharing class CustomerAccountService {
       new List<SObject>{ customer }
     );
 
-    insert sanitized;
+    Database.insert(sanitized, AccessLevel.USER_MODE);
 
     return toDTO((Account) sanitized[0], true);
   }
 
+  /**
+   * Resolves a customer Account for the given raw company name and email,
+   * matching on company/email domain and creating a new customer Account
+   * only if no match is found.
+   *
+   * @param companyName The company name to match or create an account for.
+   * @param email An email address whose domain is used to help match an existing account.
+   * @return The matched or newly created customer account, with a flag indicating which.
+   */
   public static CustomerAccountMatchDTO findOrCreateCustomerAccount(
     String companyName,
     String email
@@ -65,6 +96,8 @@ public with sharing class CustomerAccountService {
       return toDTO(matches[0], false);
     }
 
+    // Same match-then-insert race as the Lead overload above — see its
+    // comment for details.
     SecurityUtil.assertCreateable(Account.SObjectType);
 
     Account customer = new Account();
@@ -75,7 +108,7 @@ public with sharing class CustomerAccountService {
       new List<SObject>{ customer }
     );
 
-    insert sanitized;
+    Database.insert(sanitized, AccessLevel.USER_MODE);
 
     return toDTO((Account) sanitized[0], true);
   }

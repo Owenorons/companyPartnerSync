@@ -1,0 +1,69 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Register Deal",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"6404c539-503f-4c2e-b42e-f92297f786b0\",\"columns\":[{\"UUID\":\"b1535572-7510-4a8c-9e74-a42868d60994\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "dealsPageName" : "My-Deals"
+              },
+              "definition" : "psync:psDealRegistrationForm",
+              "id" : "84c56959-5b85-4982-a162-90164d754cac",
+              "type" : "component"
+            } ],
+            "id" : "b1535572-7510-4a8c-9e74-a42868d60994",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "6404c539-503f-4c2e-b42e-f92297f786b0",
+          "type" : "component"
+        } ],
+        "id" : "cac7bb06-1753-45bb-bc50-ff5f4c8cba39",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Register Deal",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "3815780e-d2fa-40f2-afe3-d7b8b32685ee",
+          "type" : "component"
+        } ],
+        "id" : "5e4903e0-7414-485d-88fb-5cf10d17b711",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "cac17231-a0da-4440-9615-040dbc96c3bd",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "gzVgeXQWqvUNxR7F9LoVZxoyHuVOre",
+    "viewType" : "custom-register-deal"
+  },
+  "urlName" : "register-deal"
+}

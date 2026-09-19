@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Metric_Type__c</fullName>
+    <description>Type of billable partner activity being tracked.</description>
+    <label>Metric Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>AI Request</fullName>
+                <default>false</default>
+                <label>AI Request</label>
+            </value>
+            <value>
+                <fullName>Deal Submitted</fullName>
+                <default>false</default>
+                <label>Deal Submitted</label>
+            </value>
+            <value>
+                <fullName>MDF Request</fullName>
+                <default>false</default>
+                <label>MDF Request</label>
+            </value>
+            <value>
+                <fullName>Lead Assigned</fullName>
+                <default>false</default>
+                <label>Lead Assigned</label>
+            </value>
+            <value>
+                <fullName>Content Download</fullName>
+                <default>false</default>
+                <label>Content Download</label>
+            </value>
+            <value>
+                <fullName>Notification Sent</fullName>
+                <default>false</default>
+                <label>Notification Sent</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

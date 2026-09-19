@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>Partner360Controller</members><members>Partner360DTO</members>
+    <members>Partner360EventDTO</members><members>Partner360Service</members>
+    <members>Partner360ServiceTest</members><name>ApexClass</name>
+  </types>
+  <types><members>psPartner360</members><name
+    >LightningComponentBundle</name></types>
+  <types><members>PartnerSync_Channel_Manager</members><members
+    >PartnerSync_Internal_Admin</members><name>PermissionSet</name></types>
+  <version>66.0</version>
+</Package>

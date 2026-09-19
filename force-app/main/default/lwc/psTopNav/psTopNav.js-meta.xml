@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
-    <isExposed>false</isExposed>
+    <isExposed>true</isExposed>
+    <masterLabel>PartnerSync Top Navigation</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+        name="eyebrow"
+        type="String"
+        default="Partner Portal"
+        label="Eyebrow"
+        description="Small label above the title, e.g. 'Partner Portal'"
+      />
+            <property
+        name="title"
+        type="String"
+        default="PartnerSync Accelerator"
+        label="Title"
+        description="Main branding title shown in the top bar"
+      />
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

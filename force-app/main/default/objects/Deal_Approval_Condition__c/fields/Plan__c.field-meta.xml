@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Plan__c</fullName><deleteConstraint>Cascade</deleteConstraint><label
+  >Plan</label><referenceTo
+  >Deal_Approval_Plan__c</referenceTo><relationshipLabel
+  >Conditions</relationshipLabel><relationshipName
+  >Conditions</relationshipName><required>true</required><type
+  >Lookup</type></CustomField>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>PartnerSync Event Operations</label>
+  <description
+  >Operational visibility and replay authority for deal events and the publication outbox. Does not grant deal decision authority.</description>
+  <hasActivationRequired>false</hasActivationRequired>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Replay_Deal_Event</name></customPermissions>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_View_Internal_Deal_Events</name></customPermissions>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_View_Event_Payload</name></customPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate><allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit><allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Registration__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate><allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit><allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords><object>Deal_Event__c</object>
+    <viewAllFields>true</viewAllFields><viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate><allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit><allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Event_Outbox__c</object>
+    <viewAllFields>true</viewAllFields><viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate><allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit><allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords><object
+    >Event_Publication__c</object>
+    <viewAllFields>true</viewAllFields><viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+</PermissionSet>
