@@ -29,21 +29,27 @@ public with sharing class MDFApprovalService {
 
     SecurityUtil.assertUpdateable(MDF_Request__c.SObjectType);
     for (
-      String fieldName : new List<String>{
-        'Status__c',
-        'Approval_Comments__c',
-        'Approver__c'
+      Schema.SObjectField field : new List<Schema.SObjectField>{
+        MDF_Request__c.Status__c,
+        MDF_Request__c.Approval_Comments__c,
+        MDF_Request__c.Approver__c
       }
     ) {
-      SecurityUtil.assertFieldUpdateable(MDF_Request__c.SObjectType, fieldName);
+      SecurityUtil.assertFieldUpdateable(
+        MDF_Request__c.SObjectType,
+        field.getDescribe().getName()
+      );
     }
     if (request.decision == 'Approved') {
       SecurityUtil.assertFieldUpdateable(
         MDF_Request__c.SObjectType,
-        'Approved_Amount__c'
+        MDF_Request__c.Approved_Amount__c.getDescribe().getName()
       );
       SecurityUtil.assertUpdateable(Account.SObjectType);
-      SecurityUtil.assertFieldUpdateable(Account.SObjectType, 'MDF_Used__c');
+      SecurityUtil.assertFieldUpdateable(
+        Account.SObjectType,
+        Account.MDF_Used__c.getDescribe().getName()
+      );
     }
 
     // Roll back budget consumption even if a caller catches a later request

@@ -54,3 +54,24 @@ for 6,000. The second command must wait and then reject the approval; the final
 consumption must be 8,500, with only the first request approved. Repeat with both
 commands targeting the same request to verify that a stale decision cannot
 consume the budget again.
+
+## Validation on 19 September 2026
+
+- Namespaced scratch org: `psync-functional-fixes-v2`.
+- All 31 tests passed across `AnalyticsDomainTest`, `AnalyticsServiceTest`,
+  `MDFApprovalServiceTest`, `MDFDomainTest`, `MDFSelectorTest`,
+  `ControllerErrorContractTest`, and `CoverageBusinessFlowTest`.
+  Successful deployment/test job: `0Af8s00000eRWrCCAW`.
+- Separate concurrent requests: one approval succeeded, the other waited and
+  failed the budget check. Persisted consumption was 8,500 with one approved
+  request and one submitted request.
+- Concurrent decisions on the same request: one approval succeeded; the other
+  waited and was rejected because the request was already decided. Persisted
+  consumption remained 8,500.
+- Formatting, project configuration, and whitespace checks passed.
+
+Validation deployed the core source without permission-set groups because the
+repository's existing unqualified group membership references failed in the
+namespaced scratch-org source deployment. The tested roles were assigned their
+permission sets directly. This validates the fixes, not a new 2GP version,
+subscriber installation, or upgrade; no package version was published.

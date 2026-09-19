@@ -261,8 +261,8 @@ private class MDFApprovalServiceTest {
         Assert.fail('Expected the oversized comment to fail DML.');
       } catch (DmlException expected) {
         Assert.areEqual(
-          StatusCode.STRING_TOO_LONG,
-          expected.getDmlStatusCode(0)
+          'STRING_TOO_LONG',
+          String.valueOf(expected.getDmlStatusCode(0))
         );
       }
       Assert.areEqual(
