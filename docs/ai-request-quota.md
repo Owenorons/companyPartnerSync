@@ -20,6 +20,12 @@ Reservations are counted even when unlimited, so enabling a limit later in the
 same day includes those requests. On the first reservation of a day, existing
 insights from that UTC day seed the counter to account for pre-upgrade usage.
 
+**Upgrade note:** prior to this reservation system, a `Value__c` of `"0"` was
+treated as unlimited (only positive values were enforced). Any org that has
+already set `Value__c` to `"0"` will see AI generation fully blocked after
+upgrading to this version, with no other change required to trigger it.
+Confirm the configured value before upgrading a subscriber org.
+
 Failed or aborted jobs retain their slot: provider work may already have been
 billed even if Salesforce could not persist its result. Deleting an insight
 does not restore quota. A job that starts on a later UTC day expires without

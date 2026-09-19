@@ -136,6 +136,31 @@ private class AIUsageServiceTest {
     }
   }
 
+  @IsTest
+  static void parseLimitTreatsZeroAsABlockingLimitAndNegativeAsUnlimited() {
+    // Exercises the actual metadata-string parsing (unlike the other tests
+    // here, which use testDailyLimit to bypass it) since Apex tests cannot
+    // insert a Tenant_Config__mdt record to drive this through getDailyLimit().
+    Assert.areEqual(
+      0,
+      AIUsageService.parseLimit('0'),
+      'A configured limit of zero must block every request, not be treated as unlimited.'
+    );
+    Assert.areEqual(
+      500,
+      AIUsageService.parseLimit('500'),
+      'A positive configured limit must parse to its numeric value.'
+    );
+    Assert.isNull(
+      AIUsageService.parseLimit('-1'),
+      'A negative value is not a valid limit and must retain unlimited behavior.'
+    );
+    Assert.isNull(
+      AIUsageService.parseLimit('not-a-number'),
+      'A nonnumeric value must retain unlimited behavior rather than fail closed.'
+    );
+  }
+
   private static void enableAI(Integer dailyLimit) {
     TenantConfigService.setConfigForTest(
       new Tenant_Config__mdt(Enable_AI__c = true)

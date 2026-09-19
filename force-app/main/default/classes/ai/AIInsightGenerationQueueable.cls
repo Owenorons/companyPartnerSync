@@ -90,9 +90,13 @@ public without sharing class AIInsightGenerationQueueable implements Queueable, 
     AI_Insight__c insight = buildInsight(request, providerResponse);
 
     SecurityUtil.assertCreateable(AI_Insight__c.SObjectType);
-    // execute validates generation permission and account access. These output
-    // fields are built here, never copied from a caller-supplied SObject. They
-    // intentionally remain read-only to users so they cannot bypass review.
+    // Deliberate, privileged FLS bypass, not an incidental side effect of
+    // `without sharing`: sharing only controls record-level visibility, and
+    // plain DML always bypasses FLS regardless of it. This is safe here only
+    // because every field is built internally in buildInsight() from the
+    // provider response, never copied from caller-supplied input, and every
+    // field is editable=false in permission sets so this queueable is the
+    // only write path, keeping the record in Draft until a reviewer decides.
     insert insight;
 
     UsageMetricService.log(

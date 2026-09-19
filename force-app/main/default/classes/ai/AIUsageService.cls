@@ -96,8 +96,23 @@ public without sharing class AIUsageService {
     ) {
       return null;
     }
+    return parseLimit(setting.Value__c);
+  }
+
+  /**
+   * Parses the raw AI_Daily_Request_Limit metadata value. Zero is a valid,
+   * deliberate limit that blocks every request; negative and nonnumeric
+   * values are treated as unset (no limit enforced). Exposed directly so
+   * tests can cover this parsing without deploying a "0" custom-metadata
+   * record, which Apex tests cannot insert.
+   *
+   * @param rawValue The metadata record's Value__c field.
+   * @return The parsed limit, or null if negative or unparseable.
+   */
+  @TestVisible
+  private static Integer parseLimit(String rawValue) {
     try {
-      Integer parsed = Integer.valueOf(setting.Value__c);
+      Integer parsed = Integer.valueOf(rawValue);
       return parsed >= 0 ? parsed : null;
     } catch (Exception ignored) {
       return null;

@@ -32,7 +32,38 @@ private class AIInsightGeneratorServiceTest {
   }
 
   @IsTest
+  static void generateThrowsWhenUserLacksGeneratePermission() {
+    // No PartnerSync_AI_Admin (or any other) permission set assigned, so this
+    // user holds none of the PartnerSync_Generate_AI_Insights custom
+    // permission that AIInsightGeneratorService.validate() requires.
+    User unauthorizedUser = TestUserFactory.createInternalUser();
+    AIInsightRequestDTO request = new AIInsightRequestDTO();
+    request.insightType = 'LeadFitScoring';
+
+    System.runAs(unauthorizedUser) {
+      TenantConfigService.setConfigForTest(
+        new Tenant_Config__mdt(Enable_AI__c = true)
+      );
+      try {
+        AIInsightGeneratorService.generate(request);
+        Assert.fail('A user without generate permission must be rejected.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.areEqual(
+          'You do not have permission to generate AI insights.',
+          expected.getMessage()
+        );
+      }
+      TenantConfigService.clearCacheForTest();
+    }
+  }
+
+  @IsTest
   static void validatesRequestAndPersistsGovernedStructuredOutcome() {
+    // PartnerSync_AI_Admin grants editable=false on every AI_Insight__c
+    // field, so this run also proves the queueable's deliberate FLS bypass:
+    // the insert below succeeds for a user with zero field-level create
+    // access on the object, because that bypass is what the review
+    // boundary depends on.
     User adminUser = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSet(adminUser.Id, 'PartnerSync_AI_Admin');
     System.runAs(adminUser) {

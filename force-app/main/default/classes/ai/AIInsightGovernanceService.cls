@@ -108,9 +108,15 @@ public with sharing class AIInsightGovernanceService {
     return AIInsightDomain.toDTO(insight);
   }
 
-  // Only decide calls this, after reviewer permission, user-mode record access,
-  // row locking, and transition validation. Status and recommendation stay
-  // read-only in permission sets to prevent edits outside the review boundary.
+  // Deliberate, privileged FLS bypass: Status__c and Recommendation__c are
+  // editable=false in every permission set (including PartnerSync_AI_Admin),
+  // by design, so only this reviewer-permission-gated write path can change
+  // them. The recommendation text is reviewer-supplied, not system-computed,
+  // so this write is authorized by assertCanReviewAIInsights() and the row
+  // lock/transition validation above it, not by any claim that the data is
+  // trusted. Plain DML always bypasses FLS; `with sharing` only enforces
+  // record-level visibility, not field-level security, so it does not make
+  // this write safe on its own.
   @SuppressWarnings('PMD.ApexCRUDViolation')
   private static void persistDecision(AI_Insight__c insight, String decision) {
     AI_Insight__c changes = new AI_Insight__c(

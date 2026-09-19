@@ -1,7 +1,34 @@
 @IsTest
 private class AIInsightGovernanceServiceTest {
   @IsTest
+  static void decideThrowsWhenUserLacksReviewPermission() {
+    // No permission set assigned, so this user holds none of the
+    // PartnerSync_Review_AI_Insights custom permission that decide() requires.
+    User unauthorizedUser = TestUserFactory.createInternalUser();
+    System.runAs(unauthorizedUser) {
+      try {
+        AIInsightGovernanceService.decide(
+          '000000000000000AAA',
+          'Accepted',
+          null
+        );
+        Assert.fail('A user without review permission must be rejected.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.areEqual(
+          'You do not have permission to review AI insights.',
+          expected.getMessage()
+        );
+      }
+    }
+  }
+
+  @IsTest
   static void reviewerAcceptsAndDismissesDraftInsights() {
+    // PartnerSync_AI_Admin grants editable=false on Status__c and
+    // Recommendation__c, so this also proves persistDecision()'s deliberate
+    // FLS bypass: the write below succeeds for a reviewer with zero
+    // field-level edit access on either field, because that bypass is what
+    // the review boundary depends on.
     User reviewer = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSet(reviewer.Id, 'PartnerSync_AI_Admin');
     System.runAs(reviewer) {
