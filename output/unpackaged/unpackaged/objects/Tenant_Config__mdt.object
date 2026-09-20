@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Active__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Active</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Active</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Deal_Expiry_Days__c</fullName>
+        <description>Default number of days before deal protection expires.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Deal Expiry Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Description__c</fullName>
+        <description>Description</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Description</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Edition__c</fullName>
+        <description>Product edition for this tenant.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Edition</label>
+        <required>false</required>
+        <type>Picklist</type>
+        <valueSet>
+            <restricted>true</restricted>
+            <valueSetDefinition>
+                <sorted>false</sorted>
+                <value>
+                    <fullName>Bronze</fullName>
+                    <default>false</default>
+                    <label>Bronze</label>
+                </value>
+                <value>
+                    <fullName>Silver</fullName>
+                    <default>false</default>
+                    <label>Silver</label>
+                </value>
+                <value>
+                    <fullName>Gold</fullName>
+                    <default>false</default>
+                    <label>Gold</label>
+                </value>
+                <value>
+                    <fullName>Enterprise</fullName>
+                    <default>false</default>
+                    <label>Enterprise</label>
+                </value>
+            </valueSetDefinition>
+        </valueSet>
+    </fields>
+    <fields>
+        <fullName>Enable_AI__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether AI functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable AI</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Analytics__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether partner analytics functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable Analytics</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Content__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether Content Hub functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable Content</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Deals__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether deal registration functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable Deals</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Leads__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether lead distribution functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable Leads</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_MDF__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Indicates whether MDF functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable MDF</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Onboarding__c</fullName>
+        <defaultValue>true</defaultValue>
+        <description>Indicates whether partner onboarding functionality is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enable Onboarding</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Health_Deal_Win_Weight__c</fullName>
+        <description>Relative weight assigned to deal win rate in the partner health score.</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Health Deal Win Weight</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Health_Lead_Acceptance_Weight__c</fullName>
+        <description>Relative weight assigned to partner lead acceptance in the health score.</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Health Lead Acceptance Weight</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Health_Lead_Conversion_Weight__c</fullName>
+        <description>Relative weight assigned to partner lead conversion in the health score.</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Health Lead Conversion Weight</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Health_MDF_Weight__c</fullName>
+        <description>Relative weight assigned to MDF utilisation in the partner health score.</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Health MDF Weight</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Health_Revenue_Weight__c</fullName>
+        <description>Relative weight assigned to pipeline-to-revenue realisation in the partner health score.</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Health Revenue Weight</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Lead_SLA_Hours__c</fullName>
+        <description>Default number of hours before an assigned lead breaches SLA.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Lead SLA Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Max_Open_Deals_Per_Partner__c</fullName>
+        <description>Max number of open (Submitted/Under Review/Approved) deal registrations a single partner account may have at once. Blank means unlimited.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Max Open Deals Per Partner</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Setting_Name__c</fullName>
+        <description>Setting Name</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Setting Name</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Value__c</fullName>
+        <description>Value</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Value</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>Tenant Config</label>
+    <pluralLabel>Tenant Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

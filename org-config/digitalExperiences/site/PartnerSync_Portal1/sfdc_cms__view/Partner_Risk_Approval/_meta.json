@@ -1,0 +1,5 @@
+{
+  "apiName" : "Partner_Risk_Approval",
+  "type" : "sfdc_cms__view",
+  "path" : "views"
+}

@@ -23,11 +23,22 @@ public class ControllerExceptionMapper {
     String safeMessage,
     Exception exceptionValue
   ) {
+    // AuraHandledException's constructor argument alone only reaches the
+    // client (error.body.message in the LWC); getMessage() on the exception
+    // itself returns a generic "Script-thrown exception" unless setMessage()
+    // is also called. Tests that catch this exception in Apex and assert on
+    // getMessage() need that explicit call as much as the client does.
     if (exceptionValue instanceof PartnerSyncHandledException) {
-      return new AuraHandledException(exceptionValue.getMessage());
+      AuraHandledException handled = new AuraHandledException(
+        exceptionValue.getMessage()
+      );
+      handled.setMessage(exceptionValue.getMessage());
+      return handled;
     }
 
     LoggingService.error(component, logMessage, exceptionValue);
-    return new AuraHandledException(safeMessage);
+    AuraHandledException safe = new AuraHandledException(safeMessage);
+    safe.setMessage(safeMessage);
+    return safe;
   }
 }

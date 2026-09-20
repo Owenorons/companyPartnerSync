@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "My Documents",
+  "contentBody" : {
+    "activeViewId" : "Onboarding_Documents",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-onboarding-documents",
+    "urlPrefix" : "onboarding-documents"
+  },
+  "urlName" : "onboarding-documents"
+}

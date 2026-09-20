@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Partner 360",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"4d93c11f-3693-4547-a7e0-2fed4243eed1\",\"columns\":[{\"UUID\":\"fb2af12c-9ac2-46e8-983c-1ebc306e46d0\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:psPartner360",
+              "id" : "483cf857-b582-4c00-b8d2-a9d0d2ea3bfc",
+              "type" : "component"
+            } ],
+            "id" : "fb2af12c-9ac2-46e8-983c-1ebc306e46d0",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "4d93c11f-3693-4547-a7e0-2fed4243eed1",
+          "type" : "component"
+        } ],
+        "id" : "4a7da9d7-b8a0-43c6-8cc8-322721d1df13",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Partner 360",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "ab40c65e-0908-4396-83e1-b490bc0932db",
+          "type" : "component"
+        } ],
+        "id" : "8e9a8f0f-6d06-453c-a796-20c108f6248f",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "192d4ea0-e318-42d6-849c-6827719aeb3a",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-partner-360"
+  },
+  "urlName" : "partner-360"
+}

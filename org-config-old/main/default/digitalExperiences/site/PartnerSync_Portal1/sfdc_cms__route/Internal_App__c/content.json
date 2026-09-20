@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Internal App",
+  "contentBody" : {
+    "activeViewId" : "Internal_App",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-internal-app",
+    "urlPrefix" : "internal-app"
+  },
+  "urlName" : "internal-app"
+}

@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Leads",
+  "contentBody" : {
+    "activeViewId" : "Leads",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-leads",
+    "urlPrefix" : "leads"
+  },
+  "urlName" : "leads"
+}

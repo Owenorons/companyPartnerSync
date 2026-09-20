@@ -1,0 +1,159 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Onboarding</p>
+        <h1>Document Review</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium filter-panel">
+        <lightning-input type="search" label="Search" onchange={handleSearch}>
+        </lightning-input>
+
+        <lightning-combobox
+          label="Status"
+          value={selectedStatus}
+          options={statusOptions}
+          onchange={handleStatus}
+        >
+        </lightning-combobox>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No documents found"
+            message="Adjust the queue filters or check back later."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasFilteredDocuments}>
+          <template for:each={filteredDocuments} for:item="doc">
+            <button
+              key={doc.documentId}
+              class={doc.rowClass}
+              data-id={doc.documentId}
+              onclick={handleSelectDocument}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="deal-number">{doc.documentType}</span>
+                <span class={doc.statusClass}>{doc.status}</span>
+              </div>
+
+              <h3>{doc.partnerName}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>Version {doc.version}</span>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedDocument}>
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">
+              {selectedDocument.documentType}
+            </p>
+            <h2>{selectedDocument.partnerName}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span class={selectedDocument.statusClass}
+                >{selectedDocument.status}</span
+              >
+              <span>Version {selectedDocument.version}</span>
+              <span>Submitted {selectedDocument.submittedOnLabel}</span>
+              <span>{selectedDocument.confidentiality}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Evidence File</h3>
+
+            <template if:true={selectedDocument.downloadUrl}>
+              <a
+                class="download-link"
+                href={selectedDocument.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <lightning-icon icon-name="utility:preview" size="x-small">
+                </lightning-icon>
+                Open Document
+              </a>
+            </template>
+            <template if:false={selectedDocument.downloadUrl}>
+              <div class="decision-state">No file reference on record.</div>
+            </template>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Record a Decision</h3>
+
+            <template if:true={isDecidable}>
+              <lightning-combobox
+                label="Outcome"
+                value={outcome}
+                options={outcomeOptions}
+                onchange={handleOutcomeChange}
+              >
+              </lightning-combobox>
+
+              <lightning-textarea
+                class="slds-var-m-top_small"
+                label="Reason"
+                value={reason}
+                onchange={handleReasonChange}
+              >
+              </lightning-textarea>
+
+              <template if:true={submitError}>
+                <c-ps-error-panel message={submitError}></c-ps-error-panel>
+              </template>
+
+              <lightning-button
+                class="slds-var-m-top_medium"
+                variant="brand"
+                label="Submit Decision"
+                disabled={isSubmitDisabled}
+                onclick={handleSubmit}
+              >
+              </lightning-button>
+            </template>
+
+            <template if:false={isDecidable}>
+              <div class="decision-state">
+                This document has already been decided.
+              </div>
+            </template>
+          </article>
+        </section>
+      </template>
+
+      <template if:false={selectedDocument}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:file" size="large">
+          </lightning-icon>
+
+          <h2>Select a document</h2>
+
+          <p>Choose a document from the queue to review its evidence.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+</template>

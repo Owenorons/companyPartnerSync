@@ -34,7 +34,9 @@ String runKey = Datetime.now().formatGmt('yyyyMMdd-HHmmss');
 List<psync__PartnerSync_Event__e> events = new List<psync__PartnerSync_Event__e>();
 
 for (Integer index = 0; index < eventTypes.size(); index++) {
-  Id partnerAccountId = partnerAccountIds[Math.mod(index, partnerAccountIds.size())];
+  Id partnerAccountId = partnerAccountIds[
+    Math.mod(index, partnerAccountIds.size())
+  ];
   String eventType = eventTypes[index];
   String eventId = EncodingUtil.convertToHex(Crypto.generateAesKey(128));
   events.add(
@@ -43,7 +45,10 @@ for (Integer index = 0; index < eventTypes.size(); index++) {
       psync__Record_Id__c = String.valueOf(partnerAccountId),
       psync__Object_Name__c = 'Account',
       psync__Partner_Account_Id__c = String.valueOf(partnerAccountId),
-      psync__Summary__c = 'Notification platform seed ' + runKey + ': ' + eventType,
+      psync__Summary__c = 'Notification platform seed ' +
+        runKey +
+        ': ' +
+        eventType,
       psync__Severity__c = index == 1 || index == 3 ? 'High' : 'Info',
       psync__Occurred_On__c = System.now(),
       psync__Event_Id__c = eventId,
@@ -58,7 +63,9 @@ Account noRecipientAccount = new Account(
   Name = 'Notification Seed - No Recipient - ' + runKey
 );
 insert noRecipientAccount;
-String noRecipientEventId = EncodingUtil.convertToHex(Crypto.generateAesKey(128));
+String noRecipientEventId = EncodingUtil.convertToHex(
+  Crypto.generateAesKey(128)
+);
 events.add(
   new psync__PartnerSync_Event__e(
     psync__Event_Type__c = 'DealApproved',
@@ -85,17 +92,22 @@ for (Integer index = 0; index < results.size(); index++) {
     for (Database.Error error : results[index].getErrors())
       failures.add(
         (eventTypes.size() > index ? eventTypes[index] : 'NoRecipient') +
-        ': ' +
-        error.getMessage()
+          ': ' +
+          error.getMessage()
       );
   }
 }
 
 System.debug(
   LoggingLevel.INFO,
-  'NOTIFICATION_SEED run=' + runKey +
-  ' partnerAccounts=' + partnerAccountIds.size() +
-  ' eventsAccepted=' + accepted +
-  ' failures=' + JSON.serialize(failures) +
-  ' noRecipientAccount=' + noRecipientAccount.Id
+  'NOTIFICATION_SEED run=' +
+    runKey +
+    ' partnerAccounts=' +
+    partnerAccountIds.size() +
+    ' eventsAccepted=' +
+    accepted +
+    ' failures=' +
+    JSON.serialize(failures) +
+    ' noRecipientAccount=' +
+    noRecipientAccount.Id
 );

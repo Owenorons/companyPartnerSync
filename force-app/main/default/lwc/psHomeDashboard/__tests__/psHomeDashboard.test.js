@@ -49,13 +49,15 @@ describe("c-ps-home-dashboard", () => {
       "Register Deal",
       "View Leads",
       "Request MDF",
-      "Content Hub"
+      "Content Hub",
+      "My Documents"
     ]);
     expect(buttons.map((button) => button.iconName)).toEqual([
       "utility:add",
       "utility:lead",
       "utility:money",
-      "utility:file"
+      "utility:file",
+      "utility:attach"
     ]);
     expect(buttons.every((button) => button.type === "button")).toBe(true);
   });

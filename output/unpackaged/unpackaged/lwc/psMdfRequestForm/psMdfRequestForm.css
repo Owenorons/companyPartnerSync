@@ -1,0 +1,25 @@
+.request-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--ps-color-border);
+  border-radius: var(--ps-radius-md);
+  background: var(--ps-color-card);
+  box-shadow: var(--ps-shadow-sm);
+}
+
+.eyebrow {
+  color: var(--ps-color-text-muted);
+  font-family: var(--ps-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2 {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
+  font-size: var(--ps-font-lg);
+  font-weight: 400;
+}

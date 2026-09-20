@@ -1,0 +1,6 @@
+{
+  "apiName" : "Partner_360__c",
+  "type" : "sfdc_cms__route",
+  "parentId" : "sfdc_cms__route/Internal_App__c",
+  "path" : "routes"
+}

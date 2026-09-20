@@ -2,6 +2,10 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <classAccesses><apexClass>PartnerRiskApprovalService</apexClass><enabled
     >true</enabled></classAccesses>
+  <classAccesses><apexClass>PartnerRiskApprovalController</apexClass><enabled
+    >true</enabled></classAccesses>
+  <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Decide_Approval_Step</name></customPermissions>
   <fieldPermissions><editable>true</editable><field
     >Partner_Assessment__c.Assessed_By__c</field><readable
     >true</readable></fieldPermissions>

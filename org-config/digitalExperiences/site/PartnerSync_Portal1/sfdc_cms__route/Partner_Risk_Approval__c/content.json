@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Partner Risk Approval",
+  "contentBody" : {
+    "activeViewId" : "Partner_Risk_Approval",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-partner-risk-approval",
+    "urlPrefix" : "partner-risk-approval"
+  },
+  "urlName" : "partner-risk-approval"
+}

@@ -1,0 +1,73 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Internal App",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"8f001965-4f78-4328-a5e4-5ee1aab9325c\",\"columns\":[{\"UUID\":\"baced8ff-511a-4126-9060-efcb4ffe0a5c\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "contentAdminTabName" : "Content_Administration__c",
+                "dealReviewTabName" : "Deal_Review__c",
+                "mdfReviewTabName" : "MDF_Review__c",
+                "notificationsTabName" : "Notification_Center__c",
+                "partner360TabName" : "Partner_360__c"
+              },
+              "definition" : "c:psInternalDashboard",
+              "id" : "3d47e13e-a68b-49f4-bef5-5b7cbb49e7bc",
+              "type" : "component"
+            } ],
+            "id" : "baced8ff-511a-4126-9060-efcb4ffe0a5c",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "8f001965-4f78-4328-a5e4-5ee1aab9325c",
+          "type" : "component"
+        } ],
+        "id" : "e300941b-25bc-4135-a5b2-d3e7abe2326a",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Internal App",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "bfce1f85-de61-4df4-bd61-3f37712b3d25",
+          "type" : "component"
+        } ],
+        "id" : "c83a5817-0739-4cd2-8673-b10551864cdd",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "732dac52-b1bf-4713-b7cb-499d7b00fb10",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-internal-app"
+  },
+  "urlName" : "internal-app"
+}

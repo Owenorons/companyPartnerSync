@@ -53,7 +53,10 @@ private class PartnerAlertNotificationServiceTest {
     ];
     System.assertEquals('Notified', alert.Notification_Status__c);
     System.assertNotEquals(null, alert.Notified_On__c);
-    System.assertEquals(2, emailInvocations);
+    // One Messaging.sendEmail() call batches both recipients; the second
+    // notifyNewAlerts() call is a no-op since the alert is already Notified
+    // and not yet due for a reminder, so exactly one invocation is expected.
+    System.assertEquals(1, emailInvocations);
     List<Partner_Notification__c> notifications = [
       SELECT
         Recipient_User__r.Alias,

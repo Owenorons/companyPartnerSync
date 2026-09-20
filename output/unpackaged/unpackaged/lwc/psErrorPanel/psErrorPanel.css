@@ -1,0 +1,18 @@
+.error-shell {
+  background: var(--ps-color-danger-bg);
+  color: var(--ps-color-danger);
+  border-left: 2px solid var(--ps-color-danger);
+  padding: 1rem;
+}
+
+.error-shell h2 {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.error-shell p {
+  margin-top: var(--slds-g-spacing-1, 0.25rem);
+}

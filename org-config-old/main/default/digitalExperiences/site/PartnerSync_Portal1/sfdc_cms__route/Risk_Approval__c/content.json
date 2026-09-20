@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Risk Approval",
+  "contentBody" : {
+    "activeViewId" : "Risk_Approval",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-risk-approval",
+    "urlPrefix" : "risk-approval"
+  },
+  "urlName" : "risk-approval"
+}

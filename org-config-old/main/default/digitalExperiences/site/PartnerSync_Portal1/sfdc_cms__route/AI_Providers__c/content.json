@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "AI Providers",
+  "contentBody" : {
+    "activeViewId" : "AI_Providers",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-ai-providers",
+    "urlPrefix" : "ai-providers"
+  },
+  "urlName" : "ai-providers"
+}

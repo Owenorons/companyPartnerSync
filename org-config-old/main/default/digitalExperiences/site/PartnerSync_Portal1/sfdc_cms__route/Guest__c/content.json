@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Guest",
+  "contentBody" : {
+    "activeViewId" : "Guest",
+    "configurationTags" : [ ],
+    "pageAccess" : "Public",
+    "routeType" : "custom-guest",
+    "urlPrefix" : "guest"
+  },
+  "urlName" : "guest"
+}

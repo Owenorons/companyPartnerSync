@@ -149,7 +149,9 @@ if (!existing.isEmpty()) {
 
   System.debug(
     LoggingLevel.INFO,
-    'PARTNER_360_UAT created; partnerAccountId=' + partner.Id +
-    ' onboardingId=' + onboarding.Id
+    'PARTNER_360_UAT created; partnerAccountId=' +
+      partner.Id +
+      ' onboardingId=' +
+      onboarding.Id
   );
 }

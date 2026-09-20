@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Partner Scores",
+  "contentBody" : {
+    "activeViewId" : "Partner_Scores",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-partner-scores",
+    "urlPrefix" : "partner-scores"
+  },
+  "urlName" : "partner-scores"
+}

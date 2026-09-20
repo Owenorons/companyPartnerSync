@@ -1,0 +1,121 @@
+[
+  {
+    "apiName": "Content_Usage_Log__c",
+    "label": "Content Usage Log",
+    "pluralLabel": "Content Usage Logs",
+    "sharingModel": "Private",
+    "nameFieldType": "AutoNumber",
+    "nameFieldLabel": "Content Usage Log Number",
+    "displayFormat": "CUL-{000000}",
+    "fields": [
+      {
+        "apiName": "Action__c",
+        "label": "Action",
+        "type": "Picklist",
+        "required": false,
+        "values": [
+          "Viewed",
+          "Downloaded",
+          "Recommended",
+          "Clicked Recommendation"
+        ]
+      },
+      {
+        "apiName": "Partner_Account__c",
+        "label": "Partner Account",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Account",
+        "relationshipName": "Content_Usage_Logs",
+        "relationshipLabel": "Content Usage Logs"
+      },
+      {
+        "apiName": "Partner_Contact__c",
+        "label": "Partner Contact",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Contact",
+        "relationshipName": "Content_Usage_Logs",
+        "relationshipLabel": "Content Usage Logs"
+      },
+      {
+        "apiName": "Partner_Content__c",
+        "label": "Partner Content",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "Partner_Content__c",
+        "relationshipName": "Usage_Logs",
+        "relationshipLabel": "Usage Logs"
+      },
+      {
+        "apiName": "Performed_By__c",
+        "label": "Performed By",
+        "description": "User who performed the content usage action.",
+        "type": "Lookup",
+        "required": false,
+        "referenceTo": "User",
+        "relationshipName": "Performed_Content_Usage_Logs",
+        "relationshipLabel": "Content Usage Logs"
+      },
+      {
+        "apiName": "Performed_On__c",
+        "label": "Performed On",
+        "type": "DateTime",
+        "required": false
+      }
+    ],
+    "objectPermissions": [
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "objectApiName": "Content_Usage_Log__c",
+        "allowRead": true,
+        "allowCreate": true,
+        "allowEdit": true,
+        "allowDelete": false,
+        "viewAllRecords": false,
+        "modifyAllRecords": false
+      }
+    ],
+    "fieldPermissions": [
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Action__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Partner_Account__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Partner_Contact__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Partner_Content__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Performed_By__c",
+        "readable": true,
+        "editable": true
+      },
+      {
+        "permissionSet": "PartnerSync_Internal_Admin",
+        "field": "Performed_On__c",
+        "readable": true,
+        "editable": true
+      }
+    ],
+    "defaultFieldPermissionSet": "PartnerSync_Internal_Admin",
+    "defaultFieldReadable": true,
+    "defaultFieldEditable": true
+  }
+]

@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "MDF Review",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"7e51fef9-b8ce-4b77-8ddb-c4fc16014e3a\",\"columns\":[{\"UUID\":\"b61df7a2-0cda-4401-9b0f-d71865ed6e61\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:psMdfReviewWorkspace",
+              "id" : "bb79c538-00de-4255-a03a-52c37a9a4786",
+              "type" : "component"
+            } ],
+            "id" : "b61df7a2-0cda-4401-9b0f-d71865ed6e61",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "7e51fef9-b8ce-4b77-8ddb-c4fc16014e3a",
+          "type" : "component"
+        } ],
+        "id" : "4d74f563-a38f-4241-834c-69a04d883d8b",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "MDF Review",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "0d36da95-bc27-4bfe-8fde-500842becaa1",
+          "type" : "component"
+        } ],
+        "id" : "fc6e377c-a42f-4112-bb37-ff5bd63c5513",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "e235eddd-ee17-49ac-b9bb-0772ebe60aaf",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-mdf-review"
+  },
+  "urlName" : "mdf-review"
+}

@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Notification Center",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"0591f616-40a2-47e1-a00c-fb247c73606d\",\"columns\":[{\"UUID\":\"4417a346-80af-4a50-b763-4f4ebe1eb253\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:psNotificationCenter",
+              "id" : "2755bfba-3f07-487d-b99a-ec3e89064044",
+              "type" : "component"
+            } ],
+            "id" : "4417a346-80af-4a50-b763-4f4ebe1eb253",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "0591f616-40a2-47e1-a00c-fb247c73606d",
+          "type" : "component"
+        } ],
+        "id" : "96393842-9767-4795-a05c-f006ebca7a48",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Notification Center",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "e18b3912-7a70-44a7-8bd9-9ab0564d8874",
+          "type" : "component"
+        } ],
+        "id" : "c7d4791a-5760-45be-abcd-b1ee22959b54",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "715714dd-3748-453d-af62-de10a885cd09",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-notification-center"
+  },
+  "urlName" : "notification-center"
+}

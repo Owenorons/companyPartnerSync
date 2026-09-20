@@ -1,0 +1,135 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Onboarding</p>
+        <h1>My Documents</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyState}>
+          <c-ps-empty-state
+            title="No document requirements"
+            message="You have no outstanding onboarding documents right now."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasRequirements}>
+          <template for:each={requirementRows} for:item="requirement">
+            <button
+              key={requirement.requirementId}
+              class={requirement.rowClass}
+              data-id={requirement.requirementId}
+              onclick={handleSelectRequirement}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="deal-number">{requirement.requirementLevel}</span>
+                <span class={requirement.statusClass}
+                  >{requirement.status}</span
+                >
+              </div>
+
+              <h3>{requirement.documentType}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>Due {requirement.dueOnLabel}</span>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedRequirement}>
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">
+              {selectedRequirement.requirementLevel} Requirement
+            </p>
+            <h2>{selectedRequirement.documentType}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span class={selectedRequirement.statusClass}
+                >{selectedRequirement.status}</span
+              >
+              <span>Due {selectedRequirement.dueOnLabel}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Latest Submission</h3>
+
+            <template if:true={selectedRequirement.hasLatestDocument}>
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Version</span>
+                <strong>{selectedRequirement.latestVersion}</strong>
+              </div>
+
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Status</span>
+                <strong>{selectedRequirement.latestDocumentStatus}</strong>
+              </div>
+
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Submitted</span>
+                <strong>{selectedRequirement.submittedOnLabel}</strong>
+              </div>
+            </template>
+
+            <template if:false={selectedRequirement.hasLatestDocument}>
+              <div class="decision-state">No document submitted yet.</div>
+            </template>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Submit Evidence</h3>
+
+            <template if:true={selectedRequirement.canUpload}>
+              <lightning-file-upload
+                label="Upload document"
+                name="onboardingDocument"
+                accept={acceptedFormats}
+                disabled={submitting}
+                onuploadfinished={handleUploadFinished}
+              >
+              </lightning-file-upload>
+
+              <template if:true={submitError}>
+                <c-ps-error-panel message={submitError}></c-ps-error-panel>
+              </template>
+            </template>
+
+            <template if:false={selectedRequirement.canUpload}>
+              <div class="decision-state">
+                This requirement has already been accepted.
+              </div>
+            </template>
+          </article>
+        </section>
+      </template>
+
+      <template if:false={selectedRequirement}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:file" size="large">
+          </lightning-icon>
+
+          <h2>Select a requirement</h2>
+
+          <p>Choose a document requirement to submit evidence for.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+</template>

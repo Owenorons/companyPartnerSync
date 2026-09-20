@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Enabled__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Whether this AI feature is enabled.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Enabled</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Feature_Name__c</fullName>
+        <description>Display name for this AI feature.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Feature Name</label>
+        <length>100</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Model_Override__c</fullName>
+        <description>Optional model name overriding the provider&apos;s default for this feature.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Model Override</label>
+        <length>100</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Prompt_Template__c</fullName>
+        <description>Prompt sent to the provider. Use {context} as the substitution placeholder for request context data.</description>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Prompt Template</label>
+        <length>32768</length>
+        <type>LongTextArea</type>
+        <visibleLines>5</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Provider_Name__c</fullName>
+        <description>Developer name of the AI_Provider_Config__mdt record to route this feature to.</description>
+        <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
+        <label>Provider Name</label>
+        <length>100</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>AI Feature Config</label>
+    <pluralLabel>AI Feature Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

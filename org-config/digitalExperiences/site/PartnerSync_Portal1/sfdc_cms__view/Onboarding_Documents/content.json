@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Onboarding Documents",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"77bca5d8-2fac-4945-9d7d-f53ee3514b65\",\"columns\":[{\"UUID\":\"a0b5ca8d-c20d-4f86-8f0a-ffe22694a949\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:psOnboardingDocuments",
+              "id" : "f696c653-2346-4445-b752-47fb9359575b",
+              "type" : "component"
+            } ],
+            "id" : "a0b5ca8d-c20d-4f86-8f0a-ffe22694a949",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "77bca5d8-2fac-4945-9d7d-f53ee3514b65",
+          "type" : "component"
+        } ],
+        "id" : "c00bb6bc-4997-458d-b956-8a637900c153",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Onboarding Documents",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "ccfc7da4-da02-4620-af22-53054690f816",
+          "type" : "component"
+        } ],
+        "id" : "18fd036f-d751-402e-aafb-f4c3d284ba98",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "427faae1-956f-440c-8b41-40a733f5b35e",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-onboarding-documents"
+  },
+  "urlName" : "onboarding-documents"
+}

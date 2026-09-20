@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Partner Risk Approval",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"741404b2-d20e-40f2-8ec1-b0313c05398d\",\"columns\":[{\"UUID\":\"5a8bfc71-edc0-490c-92f0-f4180d513870\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "c:psPartnerRiskApprovalWorkspace",
+              "id" : "cd426556-93bd-42e5-ae99-43a4d9da503b",
+              "type" : "component"
+            } ],
+            "id" : "5a8bfc71-edc0-490c-92f0-f4180d513870",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "741404b2-d20e-40f2-8ec1-b0313c05398d",
+          "type" : "component"
+        } ],
+        "id" : "92e5c083-210e-4cc1-af28-914e0b4de28e",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Partner Risk Approval",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "7c3c2a2a-2ff1-439a-8373-6f5dc133a5ab",
+          "type" : "component"
+        } ],
+        "id" : "a4f50004-1f23-445e-ba8c-342cf7b23ff2",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "2fa5faff-24fe-4af9-9890-cfbaf245a514",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-partner-risk-approval"
+  },
+  "urlName" : "partner-risk-approval"
+}

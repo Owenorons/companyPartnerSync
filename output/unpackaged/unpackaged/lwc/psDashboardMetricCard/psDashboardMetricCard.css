@@ -1,0 +1,36 @@
+.metric-card {
+  background: transparent;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-wrap {
+  height: 2.25rem;
+  width: 2.25rem;
+  border: 1px solid var(--ps-color-border);
+  color: var(--ps-color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.label {
+  color: var(--ps-color-text-muted);
+  font-family: var(--ps-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.value {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.15rem;
+}

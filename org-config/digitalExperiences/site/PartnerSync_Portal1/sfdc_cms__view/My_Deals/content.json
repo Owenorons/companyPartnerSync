@@ -1,0 +1,69 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "My Deals",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"aba0a8fc-563d-44e9-bd7b-893eb5eb99a1\",\"columns\":[{\"UUID\":\"d0d9e126-3783-40fb-a49f-45696b0d8afb\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "registerDealPageName" : "Register_Deal__c"
+              },
+              "definition" : "c:psDealList",
+              "id" : "3c8c4c05-74e0-4618-bd4b-dd054d748f27",
+              "type" : "component"
+            } ],
+            "id" : "d0d9e126-3783-40fb-a49f-45696b0d8afb",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "aba0a8fc-563d-44e9-bd7b-893eb5eb99a1",
+          "type" : "component"
+        } ],
+        "id" : "b61df889-34f7-4fa1-8e03-92a3dbaf2776",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "My Deals",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "17573107-8d8b-44d0-980e-f75872b14223",
+          "type" : "component"
+        } ],
+        "id" : "b26b4d89-c4d4-4d85-82ba-f4e275f74649",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "c6f5179b-d77f-48c3-90fa-135db3c1e269",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-my-deals"
+  },
+  "urlName" : "my-deals"
+}

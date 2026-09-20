@@ -245,7 +245,7 @@ sf org create scratch \
   --alias psync-package-test \
   --no-namespace \
   --no-ancestors \
-  --duration-days 7 \
+  --duration-days 30 \
   --target-dev-hub evosphereSolutions \
   --wait 30
 ```

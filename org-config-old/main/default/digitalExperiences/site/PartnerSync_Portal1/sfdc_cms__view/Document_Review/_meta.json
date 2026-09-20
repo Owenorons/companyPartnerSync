@@ -1,0 +1,5 @@
+{
+  "apiName" : "Document_Review",
+  "type" : "sfdc_cms__view",
+  "path" : "views"
+}

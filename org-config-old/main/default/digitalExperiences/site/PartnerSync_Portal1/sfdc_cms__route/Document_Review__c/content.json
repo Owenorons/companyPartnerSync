@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Document Review",
+  "contentBody" : {
+    "activeViewId" : "Document_Review",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-document-review",
+    "urlPrefix" : "document-review"
+  },
+  "urlName" : "document-review"
+}

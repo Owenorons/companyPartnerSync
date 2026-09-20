@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.content-card {
+  background: var(--ps-color-card);
+  padding: 1.1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+}
+
+.icon {
+  height: 2.5rem;
+  width: 2.5rem;
+  border: 1px solid var(--ps-color-border);
+  color: var(--ps-color-text-muted);
+}
+
+.top-row {
+  gap: 0.5rem;
+}
+
+.category,
+.featured {
+  font-family: var(--ps-font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0;
+  border-bottom: 2px solid currentColor;
+}
+
+.category {
+  color: var(--ps-color-primary);
+}
+
+.featured {
+  color: var(--ps-color-tier-gold);
+}
+
+h3 {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+p {
+  color: var(--ps-color-text-muted);
+  min-height: 3rem;
+}
+
+button {
+  border: 1px solid var(--ps-color-text);
+  background: transparent;
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  font-size: 0.68rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--ps-color-primary);
+  color: var(--ps-color-primary);
+}

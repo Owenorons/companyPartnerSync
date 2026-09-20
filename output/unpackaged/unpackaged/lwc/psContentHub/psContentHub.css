@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+h2 {
+  color: var(--ps-color-text);
+  font-family: var(--ps-font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.filter-card {
+  background: var(--ps-color-card);
+  border: 1px solid var(--ps-color-text);
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr;
+}
+
+.filter-card lightning-input,
+.filter-card lightning-combobox {
+  --slds-c-input-radius-border: 0;
+  --slds-c-input-color-border: transparent;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--ps-color-border);
+  border: 1px solid var(--ps-color-border);
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-card,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}

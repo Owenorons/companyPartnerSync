@@ -1,0 +1,31 @@
+.empty-shell {
+  display: grid;
+  place-items: center;
+
+  padding: 4rem 2rem;
+
+  color: var(--ps-color-text-muted);
+}
+
+.empty-shell h2 {
+  font-family: var(--ps-font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ps-color-text);
+}
+
+.empty-shell p {
+  max-width: 420px;
+}
+
+.empty-shell lightning-button {
+  margin-top: 1.5rem;
+  display: block;
+  --slds-c-button-radius-border: var(--ps-radius-sm);
+  --slds-c-button-brand-color-background: transparent;
+  --slds-c-button-brand-color-background-hover: var(--ps-color-bg);
+  --slds-c-button-brand-color-border: var(--ps-color-text);
+  --slds-c-button-brand-text-color: var(--ps-color-text);
+  --slds-c-button-brand-text-color-hover: var(--ps-color-primary);
+  --slds-c-button-font-weight: 600;
+}
