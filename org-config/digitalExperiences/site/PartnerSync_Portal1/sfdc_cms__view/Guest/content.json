@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psPartnerApplicationForm",
+              "definition" : "psync:psPartnerApplicationForm",
               "id" : "3e97b3cd-d986-474d-bed6-bf7d76acb9a3",
               "type" : "component"
             } ],

@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psMdfReviewWorkspace",
+              "definition" : "psync:psMdfReviewWorkspace",
               "id" : "bb79c538-00de-4255-a03a-52c37a9a4786",
               "type" : "component"
             } ],

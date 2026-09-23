@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psPartnerKpiDashboard",
+              "definition" : "psync:psPartnerKpiDashboard",
               "id" : "5e4b68eb-8e75-41d0-863d-86de44fbbd5f",
               "type" : "component"
             } ],

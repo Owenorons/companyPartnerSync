@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psPartnerApplicationReview",
+              "definition" : "psync:psPartnerApplicationReview",
               "id" : "fff88857-9626-428e-9cd5-74c0126eabc9",
               "type" : "component"
             } ],

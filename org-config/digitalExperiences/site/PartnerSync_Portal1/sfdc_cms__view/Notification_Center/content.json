@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psNotificationCenter",
+              "definition" : "psync:psNotificationCenter",
               "id" : "2755bfba-3f07-487d-b99a-ec3e89064044",
               "type" : "component"
             } ],

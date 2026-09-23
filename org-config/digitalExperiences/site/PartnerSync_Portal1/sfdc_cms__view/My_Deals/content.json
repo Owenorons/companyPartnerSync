@@ -23,7 +23,7 @@
               "attributes" : {
                 "registerDealPageName" : "Register_Deal__c"
               },
-              "definition" : "c:psDealList",
+              "definition" : "psync:psDealList",
               "id" : "3c8c4c05-74e0-4618-bd4b-dd054d748f27",
               "type" : "component"
             } ],

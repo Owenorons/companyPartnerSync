@@ -14,12 +14,12 @@ Every naming mistake in this project's history came from guessing a
 metadata full name instead of checking it. Before retrieving anything:
 
 ```bash
-sf org list metadata --metadata-type Network --target-org <alias>
-sf org list metadata --metadata-type CustomSite --target-org <alias>
-sf org list metadata --metadata-type DigitalExperienceConfig --target-org <alias>
-sf org list metadata --metadata-type DigitalExperienceBundle --target-org <alias>
-sf org list metadata --metadata-type NavigationMenu --target-org <alias>
-sf org list metadata --metadata-type NetworkBranding --target-org <alias>
+sf org list metadata --metadata-type Network --target-org psync-package-test
+sf org list metadata --metadata-type CustomSite --target-org psync-package-test
+sf org list metadata --metadata-type DigitalExperienceConfig --target-org psync-package-test
+sf org list metadata --metadata-type DigitalExperienceBundle --target-org psync-package-test
+sf org list metadata --metadata-type NavigationMenu --target-org psync-package-test
+sf org list metadata --metadata-type NetworkBranding --target-org psync-package-test
 ```
 
 Use the exact `Full Name` column value from the output as the `--metadata`
@@ -30,9 +30,9 @@ member below. `DigitalExperienceBundle` full names are shaped like
 
 ```bash
 sf project retrieve start \
-  --metadata "Network:PartnerSync_Portal" \
-  --target-metadata-dir /tmp/retrieve --unzip \
-  --target-org <alias>
+  --metadata "Network:PartnerSync_Portal1" \
+  --target-metadata-dir temp2 --unzip \
+  --target-org psync-functional-fixes-v2
 ```
 
 → place at `org-config/main/default/networks/PartnerSync_Portal.network-meta.xml`.
@@ -44,9 +44,9 @@ The `sites` folder / `.site-meta.xml` suffix maps to metadata type
 
 ```bash
 sf project retrieve start \
-  --metadata "CustomSite:PartnerSync_Portal" \
-  --target-metadata-dir /tmp/retrieve --unzip \
-  --target-org <alias>
+  --metadata "CustomSite:PartnerSync_Portal1" \
+  --target-metadata-dir /temp2/retrieve --unzip \
+  --target-org psync-functional-fixes-v2
 ```
 
 → `org-config/main/default/sites/PartnerSync_Portal.site-meta.xml`.
@@ -75,9 +75,9 @@ cat > /tmp/digx-manifest.xml <<'EOF'
 EOF
 
 sf project retrieve start \
-  --manifest /tmp/digx-manifest.xml \
-  --target-metadata-dir /tmp/retrieve --unzip \
-  --target-org <alias>
+  --manifest temp2/digx-manifest.xml \
+  --target-metadata-dir temp2 --unzip \
+  --target-org psync-functional-fixes-v2
 ```
 
 **Do not use `ExperienceBundle` for this type of site.** This site is an

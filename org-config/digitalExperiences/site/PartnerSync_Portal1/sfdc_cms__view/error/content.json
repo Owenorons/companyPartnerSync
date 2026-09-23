@@ -53,7 +53,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psErrorPanel",
+              "definition" : "psync:psErrorPanel",
               "id" : "74ea7f71-015c-4882-9884-0ecb02328c2f",
               "type" : "component"
             } ],

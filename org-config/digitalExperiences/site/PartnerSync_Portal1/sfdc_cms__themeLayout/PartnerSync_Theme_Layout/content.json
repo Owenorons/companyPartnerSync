@@ -26,7 +26,7 @@
                 "menuName" : "Internal_Navigation",
                 "wordmark" : "PartnerSync"
               },
-              "definition" : "c:psHeader",
+              "definition" : "psync:psHeader",
               "id" : "f3ce2773-1e60-474b-b945-45ff00f5fc07",
               "type" : "component"
             } ],
@@ -64,7 +64,7 @@
                 "companyName" : "PartnerSync",
                 "footerMenuName" : "Footer"
               },
-              "definition" : "c:psFooter",
+              "definition" : "psync:psFooter",
               "id" : "05fa71c3-a315-4b74-92e2-804663f6b638",
               "type" : "component"
             } ],
@@ -86,7 +86,7 @@
         "name" : "default",
         "type" : "region"
       } ],
-      "definition" : "c:partnerSyncThemeLayout",
+      "definition" : "psync:partnerSyncThemeLayout",
       "id" : "db9be46b-0ed3-4e34-b803-797462d44a8c",
       "type" : "component"
     }

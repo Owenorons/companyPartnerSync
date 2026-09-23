@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psPartnerRiskApprovalWorkspace",
+              "definition" : "psync:psPartnerRiskApprovalWorkspace",
               "id" : "cd426556-93bd-42e5-ae99-43a4d9da503b",
               "type" : "component"
             } ],

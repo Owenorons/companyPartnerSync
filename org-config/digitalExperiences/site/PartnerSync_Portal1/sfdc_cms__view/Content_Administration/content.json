@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psContentAdmin",
+              "definition" : "psync:psContentAdmin",
               "id" : "2ff85c6c-813d-435f-85fd-1228c5e9b1e4",
               "type" : "component"
             } ],

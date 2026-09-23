@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psAiInsightPanel",
+              "definition" : "psync:psAiInsightPanel",
               "id" : "4159b670-ee40-417f-a03e-e544194a2308",
               "type" : "component"
             } ],

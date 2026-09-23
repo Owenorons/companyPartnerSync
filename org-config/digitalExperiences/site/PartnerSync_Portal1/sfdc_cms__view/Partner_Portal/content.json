@@ -26,7 +26,7 @@
                 "mdfPageName" : "MDF",
                 "registerDealPageName" : "Register-Deal"
               },
-              "definition" : "c:psHomeDashboard",
+              "definition" : "psync:psHomeDashboard",
               "id" : "209e281d-3179-4104-ab18-191e53dd08e5",
               "type" : "component"
             } ],

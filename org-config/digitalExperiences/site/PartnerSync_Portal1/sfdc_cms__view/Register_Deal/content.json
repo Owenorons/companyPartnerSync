@@ -23,7 +23,7 @@
               "attributes" : {
                 "dealsPageName" : "My_Deals__c"
               },
-              "definition" : "c:psDealRegistrationForm",
+              "definition" : "psync:psDealRegistrationForm",
               "id" : "4b6eba07-8e47-44ce-9d64-7920874b78d8",
               "type" : "component"
             } ],

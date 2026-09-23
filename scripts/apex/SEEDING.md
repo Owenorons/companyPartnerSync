@@ -3,9 +3,9 @@
 Run the scripts as three separate Salesforce CLI commands and in this order:
 
 ```sh
-sf apex run --file scripts/apex/seed-access-groups.apex --target-org <org>
-sf apex run --file scripts/apex/seed-business-data.apex --target-org <org>
-sf apex run --file scripts/apex/seed-partner-users.apex --target-org <org>
+sf apex run --file scripts/apex/seed-access-groups.apex --target-org psync-package-test
+sf apex run --file scripts/apex/seed-business-data.apex --target-org psync-package-test
+sf apex run --file scripts/apex/seed-partner-users.apex --target-org psync-package-test
 ```
 
 The transaction boundary is required because Salesforce prohibits setup-object
@@ -26,8 +26,8 @@ exist.
 To create the Partner 360 rollout fixture, run:
 
 ```sh
-sf apex run --file scripts/apex/seed-partner-360-uat.apex --target-org <org>
-sf apex run --file scripts/apex/verify-partner-360-uat.apex --target-org <org>
+sf apex run --file scripts/apex/seed-partner-360-uat.apex --target-org psync-package-test
+sf apex run --file scripts/apex/verify-partner-360-uat.apex --target-org psync-package-test
 ```
 
 This rerun-safe script creates a dedicated blocked partner with onboarding,

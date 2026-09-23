@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psOnboardingDocuments",
+              "definition" : "psync:psOnboardingDocuments",
               "id" : "f696c653-2346-4445-b752-47fb9359575b",
               "type" : "component"
             } ],

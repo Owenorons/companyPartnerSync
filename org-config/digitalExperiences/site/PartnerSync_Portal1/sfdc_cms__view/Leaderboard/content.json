@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psPartnerLeaderboard",
+              "definition" : "psync:psPartnerLeaderboard",
               "id" : "e63a0b2c-0ded-4707-8d61-5d57c0937f94",
               "type" : "component"
             } ],

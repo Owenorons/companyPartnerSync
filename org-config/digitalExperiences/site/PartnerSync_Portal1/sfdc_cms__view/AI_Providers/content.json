@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psAiProviderAdmin",
+              "definition" : "psync:psAiProviderAdmin",
               "id" : "17ed8425-d9c5-4a9e-99cd-9a85d27f928a",
               "type" : "component"
             } ],

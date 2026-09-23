@@ -27,7 +27,7 @@
                 "notificationsTabName" : "Notification_Center__c",
                 "partner360TabName" : "Partner_360__c"
               },
-              "definition" : "c:psInternalDashboard",
+              "definition" : "psync:psInternalDashboard",
               "id" : "3d47e13e-a68b-49f4-bef5-5b7cbb49e7bc",
               "type" : "component"
             } ],

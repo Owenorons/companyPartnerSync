@@ -21,7 +21,7 @@
           "children" : [ {
             "children" : [ {
               "attributes" : { },
-              "definition" : "c:psContentHub",
+              "definition" : "psync:psContentHub",
               "id" : "44041abe-a5bb-49bd-abe1-73fa2ee8730f",
               "type" : "component"
             } ],
