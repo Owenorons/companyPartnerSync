@@ -11,6 +11,22 @@ public with sharing class AIInsightDTO {
   public Id insightId { get; set; }
 
   /**
+   * Id of the partner Account this insight is about.
+   */
+  @AuraEnabled
+  public Id partnerAccountId { get; set; }
+
+  /**
+   * Name of the partner Account this insight is about. Only populated by
+   * queries that traverse the relationship (e.g. the internal governance
+   * queue, which reviews insights across many partners); the partner-
+   * facing surfaces don't need it since they're already scoped to one
+   * partner's own insights.
+   */
+  @AuraEnabled
+  public String partnerName { get; set; }
+
+  /**
    * The AI feature/insight type that produced this record (Feature_Name__c).
    */
   @AuraEnabled

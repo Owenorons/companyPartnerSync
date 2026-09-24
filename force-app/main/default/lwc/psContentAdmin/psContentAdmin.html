@@ -1,6 +1,8 @@
 <template>
   <div class="slds-var-p-around_large ps-page">
-    <section class="slds-var-m-bottom_large page-header">
+    <section
+      class="slds-var-m-bottom_large slds-grid slds-grid_align-spread page-header"
+    >
       <div>
         <p class="slds-text-body_small eyebrow">Content Administration</p>
         <h1>Manage Content</h1>
@@ -9,6 +11,13 @@
           they're organized in the Content Hub.
         </p>
       </div>
+
+      <lightning-button
+        variant="brand"
+        label="Add New Content"
+        onclick={handleAddNew}
+      >
+      </lightning-button>
     </section>
 
     <template if:true={loading}>
@@ -71,7 +80,7 @@
     </template>
 
     <template if:true={isModalOpen}>
-      <c-ps-modal title="Edit Content" onclose={handleCloseModal}>
+      <c-ps-modal title={modalTitle} onclose={handleCloseModal}>
         <div class="edit-form">
           <lightning-input
             name="title"
@@ -81,6 +90,20 @@
             required
           >
           </lightning-input>
+
+          <div class="file-upload-field">
+            <lightning-file-upload
+              label="Content File"
+              name="contentFile"
+              accept={acceptedFormats}
+              onuploadfinished={handleUploadFinished}
+            >
+            </lightning-file-upload>
+
+            <template if:true={attachedFileLabel}>
+              <p class="file-status">{attachedFileLabel}</p>
+            </template>
+          </div>
 
           <lightning-textarea
             name="description"
@@ -163,7 +186,7 @@
             class="slds-var-m-left_x-small"
             variant="brand"
             label="Save"
-            disabled={saving}
+            disabled={isSaveDisabled}
             onclick={handleSaveDraft}
           ></lightning-button>
         </div>

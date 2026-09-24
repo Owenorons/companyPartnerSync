@@ -16,6 +16,7 @@ public with sharing class AIInsightGovernanceService {
       SELECT
         Id,
         Partner_Account__c,
+        Partner_Account__r.Name,
         Feature_Name__c,
         Provider__c,
         Confidence__c,

@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "AI Governance",
+  "contentBody" : {
+    "activeViewId" : "AI_Governance",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-ai-governance",
+    "urlPrefix" : "ai-governance"
+  },
+  "urlName" : "ai-governance"
+}

@@ -81,6 +81,16 @@ public with sharing class TenantConfigService {
   }
 
   /**
+   * Indicates whether outbound webhook dispatch is enabled for the
+   * tenant.
+   *
+   * @return True if webhook dispatch is enabled; false if disabled or unset.
+   */
+  public static Boolean isWebhooksEnabled() {
+    return getBoolean(getConfig().Enable_Webhooks__c);
+  }
+
+  /**
    * Indicates whether the analytics feature module is enabled for the
    * tenant.
    *

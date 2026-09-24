@@ -214,6 +214,65 @@ private class DealCommandServiceTest {
     }
   }
 
+  @IsTest
+  static void rollsBackReservationDealAndEventWhenCompletionFails() {
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Lifecycle_Phase__c = 'Registration',
+      Version_Number__c = 0
+    );
+    insert deal;
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Administer_PDLM',
+      true
+    );
+
+    DealCommandService.simulateCompletionFailure = true;
+    try {
+      try {
+        DealCommandService.execute(
+          buildCommand(deal.Id, 'rollback-command', 0)
+        );
+        Assert.fail('Expected the simulated completion failure.');
+      } catch (DealLifecycleException expected) {
+        Assert.isTrue(expected.getMessage().contains('Simulated'));
+      }
+    } finally {
+      DealCommandService.simulateCompletionFailure = false;
+      DealLifecyclePermissionService.clearTestPermissions();
+    }
+
+    Deal_Registration__c reloaded = [
+      SELECT Status__c, Version_Number__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+    Assert.areEqual(
+      'Draft',
+      reloaded.Status__c,
+      'The deal state transition should have rolled back with the failed completion.'
+    );
+    Assert.areEqual(0, reloaded.Version_Number__c);
+    Assert.areEqual(
+      0,
+      [
+        SELECT COUNT()
+        FROM Deal_Command_Execution__c
+        WHERE Command_Key__c = 'rollback-command'
+      ],
+      'The reservation should have rolled back, allowing a clean retry.'
+    );
+    Assert.areEqual(
+      0,
+      [
+        SELECT COUNT()
+        FROM Deal_Event__c
+        WHERE Command_Key__c = 'rollback-command'
+      ],
+      'The lifecycle event should have rolled back with the failed completion.'
+    );
+  }
+
   private static void assertLifecycleFailure(
     DealCommand command,
     String expectedMessage

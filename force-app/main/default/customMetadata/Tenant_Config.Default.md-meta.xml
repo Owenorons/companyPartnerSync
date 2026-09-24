@@ -51,6 +51,10 @@
         <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
+        <field>Enable_Webhooks__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
         <field>Lead_SLA_Hours__c</field>
         <value xsi:type="xsd:double">48.0</value>
     </values>

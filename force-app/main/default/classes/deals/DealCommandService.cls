@@ -7,6 +7,8 @@
 public without sharing class DealCommandService {
   @TestVisible
   static Boolean useSystemModeForTests = true;
+  @TestVisible
+  private static Boolean simulateCompletionFailure = false;
 
   /**
    * Executes the given deal lifecycle command end to end, returning the
@@ -28,56 +30,78 @@ public without sharing class DealCommandService {
       return prior;
     }
 
-    Deal_Command_Execution__c execution = DealCommandRepository.reserve(
-      command
-    );
-    if (execution == null) {
-      prior = DealCommandRepository.completedResult(command.commandKey);
-      return prior == null ? DealCommandResult.inProgress(command) : prior;
-    }
-
-    Deal_Registration__c deal = selectDealForUpdate(command.dealId);
-    if (command.aggregateId != deal.Id) {
-      throw new DealLifecycleException(
-        'The aggregate does not belong to the requested deal.'
-      );
-    }
-
-    DealCommandContext context = DealStateEngine.evaluate(deal, command);
-    DealCommandHandler handler = DealCommandHandlerFactory.getHandler(
-      context.transition.handlerClass
-    );
-    handler.validate(context);
-    handler.execute(context);
-
-    deal.Status__c = context.newState;
-    deal.Version_Number__c = context.newVersion;
-    deal.Last_Lifecycle_Change__c = System.now();
-    deal.Last_Lifecycle_Event__c = context.eventType;
-
-    DealLifecycleMutationContext.beginControlledMutation();
+    // Reserving, the handler's own writes, the deal update, the event/
+    // outbox insert, and completing the reservation are five-plus separate
+    // DML statements. An uncaught exception here only auto-rolls-back the
+    // whole transaction if it's left uncaught all the way to the
+    // transaction boundary — a caller that catches and continues (e.g. a
+    // batch processing many commands, matching the isolate-and-continue
+    // pattern used elsewhere in this codebase) would otherwise leave a
+    // stuck 'in progress' reservation behind: reserve() treats an existing
+    // uncompleted reservation as a duplicate in-flight command and refuses
+    // to reserve again, so a stuck reservation would permanently block
+    // every future retry of that command key.
+    Savepoint sp = Database.setSavepoint();
     try {
-      // Check-only deployments run tests before the permission set in this
-      // package can grant FLS for the new lifecycle fields. Runtime commands
-      // continue to enforce user-mode DML after deployment.
-      if (Test.isRunningTest() && useSystemModeForTests) {
-        update deal;
-      } else {
-        Database.update(deal, AccessLevel.USER_MODE);
+      Deal_Command_Execution__c execution = DealCommandRepository.reserve(
+        command
+      );
+      if (execution == null) {
+        prior = DealCommandRepository.completedResult(command.commandKey);
+        return prior == null ? DealCommandResult.inProgress(command) : prior;
       }
-    } finally {
-      DealLifecycleMutationContext.endControlledMutation();
-    }
 
-    DealEventService.EventCreationResult eventResult = DealEventService.createEvent(
-      context
-    );
-    DealCommandResult result = DealCommandResult.completed(
-      context,
-      eventResult.eventRecord.Id
-    );
-    DealCommandRepository.complete(execution, result);
-    return result;
+      Deal_Registration__c deal = selectDealForUpdate(command.dealId);
+      if (command.aggregateId != deal.Id) {
+        throw new DealLifecycleException(
+          'The aggregate does not belong to the requested deal.'
+        );
+      }
+
+      DealCommandContext context = DealStateEngine.evaluate(deal, command);
+      DealCommandHandler handler = DealCommandHandlerFactory.getHandler(
+        context.transition.handlerClass
+      );
+      handler.validate(context);
+      handler.execute(context);
+
+      deal.Status__c = context.newState;
+      deal.Version_Number__c = context.newVersion;
+      deal.Last_Lifecycle_Change__c = System.now();
+      deal.Last_Lifecycle_Event__c = context.eventType;
+
+      DealLifecycleMutationContext.beginControlledMutation();
+      try {
+        // Check-only deployments run tests before the permission set in this
+        // package can grant FLS for the new lifecycle fields. Runtime commands
+        // continue to enforce user-mode DML after deployment.
+        if (Test.isRunningTest() && useSystemModeForTests) {
+          update deal;
+        } else {
+          Database.update(deal, AccessLevel.USER_MODE);
+        }
+      } finally {
+        DealLifecycleMutationContext.endControlledMutation();
+      }
+
+      DealEventService.EventCreationResult eventResult = DealEventService.createEvent(
+        context
+      );
+      DealCommandResult result = DealCommandResult.completed(
+        context,
+        eventResult.eventRecord.Id
+      );
+      if (Test.isRunningTest() && simulateCompletionFailure) {
+        throw new DealLifecycleException('Simulated completion failure.');
+      }
+      DealCommandRepository.complete(execution, result);
+      return result;
+    } catch (Exception ex) {
+      Database.rollback(sp);
+      throw ex;
+    } finally {
+      Database.releaseSavepoint(sp);
+    }
   }
 
   private static void assertSupportedAggregate(DealCommand command) {

@@ -15,6 +15,7 @@ private class AIInsightDomainTest {
     AIInsightDTO dto = AIInsightDomain.toDTO(insight);
 
     System.assertEquals(insight.Id, dto.insightId);
+    System.assertEquals(partner.Id, dto.partnerAccountId);
     System.assertEquals('Deal Risk', dto.insightType);
     System.assertEquals('Rules', dto.provider);
     System.assertEquals(85, dto.confidence);

@@ -6,6 +6,122 @@
     <p class="slds-var-m-bottom_medium">
       Model output remains private until an authorized reviewer accepts it.
     </p>
+
+    <section
+      class="slds-box slds-theme_default slds-var-m-bottom_large requests-section"
+      aria-labelledby="ai-requests-title"
+    >
+      <h2 id="ai-requests-title" class="slds-text-heading_medium">
+        Partner Requests
+      </h2>
+
+      <template lwc:if={requestsError}>
+        <c-ps-error-panel message={requestsError}></c-ps-error-panel>
+      </template>
+
+      <template lwc:if={hasRequests}>
+        <template for:each={requests} for:item="request">
+          <div
+            key={request.requestId}
+            class="slds-grid slds-wrap slds-grid_align-spread slds-var-p-vertical_x-small request-row"
+          >
+            <div>
+              <strong>{request.partnerName}</strong>
+              <span class="slds-var-m-left_x-small"
+                >{request.insightTypeLabel}</span
+              >
+              <p class="slds-text-body_small request-notes">{request.notes}</p>
+            </div>
+            <div class="slds-button-group" role="group">
+              <lightning-button
+                data-id={request.requestId}
+                label="Dismiss"
+                disabled={requestActionId}
+                onclick={handleDismissRequest}
+              ></lightning-button>
+              <lightning-button
+                data-id={request.requestId}
+                label="Action"
+                variant="brand"
+                disabled={requestActionId}
+                onclick={handleActionRequest}
+              ></lightning-button>
+            </div>
+          </div>
+        </template>
+      </template>
+
+      <template lwc:else>
+        <p class="slds-text-body_small">No partner requests waiting.</p>
+      </template>
+    </section>
+
+    <section
+      class="slds-box slds-theme_default slds-var-m-bottom_large generate-section"
+      aria-labelledby="ai-generate-title"
+    >
+      <h2 id="ai-generate-title" class="slds-text-heading_medium">
+        Generate New Insight
+      </h2>
+
+      <div class="slds-grid slds-wrap slds-gutters slds-var-m-top_small">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-record-picker
+            label="Partner"
+            object-api-name="Account"
+            value={selectedPartnerAccountId}
+            filter={partnerAccountFilter}
+            onrecordselect={handlePartnerChange}
+          ></lightning-record-picker>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-combobox
+            label="Insight Type"
+            placeholder="Select an insight type"
+            options={insightTypeOptions}
+            value={selectedInsightType}
+            onchange={handleInsightTypeChange}
+          ></lightning-combobox>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-input
+            label="Context Notes (optional)"
+            value={generateContext}
+            onchange={handleContextChange}
+          ></lightning-input>
+        </div>
+      </div>
+
+      <div class="slds-var-m-top_medium">
+        <lightning-button
+          variant="brand"
+          label="Generate"
+          disabled={isGenerateDisabled}
+          onclick={handleGenerate}
+        ></lightning-button>
+
+        <template lwc:if={generating}>
+          <lightning-spinner
+            alternative-text="Generating"
+            size="small"
+            class="generate-spinner"
+          ></lightning-spinner>
+        </template>
+      </div>
+
+      <template lwc:if={generateStatusMessage}>
+        <p class="slds-var-m-top_small generate-status">
+          {generateStatusMessage}
+        </p>
+      </template>
+
+      <template lwc:if={generateError}>
+        <c-ps-error-panel message={generateError}></c-ps-error-panel>
+      </template>
+    </section>
+
     <template lwc:if={loading}>
       <c-ps-loading-state
         message="Loading AI insights for review"

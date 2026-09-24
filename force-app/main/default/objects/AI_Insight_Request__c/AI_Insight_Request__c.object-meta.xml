@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata"><deploymentStatus
+  >Deployed</deploymentStatus><label>AI Insight Request</label><pluralLabel
+  >AI Insight Requests</pluralLabel><nameField><displayFormat
+    >AIR-{000000}</displayFormat><label>Request Number</label><type
+    >AutoNumber</type></nameField><sharingModel
+  >Private</sharingModel><enableReports>true</enableReports></CustomObject>

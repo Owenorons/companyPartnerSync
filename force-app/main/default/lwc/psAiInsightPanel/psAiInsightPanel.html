@@ -9,6 +9,51 @@
       <div class="ai-badge">AI Enabled</div>
     </div>
 
+    <div class="request-panel">
+      <h3>Request an AI Insight</h3>
+
+      <lightning-combobox
+        label="Insight Type"
+        placeholder="Select an insight type"
+        options={insightTypeOptions}
+        value={requestInsightType}
+        onchange={handleRequestTypeChange}
+      ></lightning-combobox>
+
+      <lightning-textarea
+        label="Notes (optional)"
+        value={requestNotes}
+        onchange={handleRequestNotesChange}
+      ></lightning-textarea>
+
+      <lightning-button
+        class="request-submit"
+        variant="brand"
+        label="Submit Request"
+        disabled={isRequestDisabled}
+        onclick={handleSubmitRequest}
+      ></lightning-button>
+
+      <template lwc:if={requestConfirmation}>
+        <p class="request-confirmation">{requestConfirmation}</p>
+      </template>
+
+      <template lwc:if={requestError}>
+        <c-ps-error-panel message={requestError}></c-ps-error-panel>
+      </template>
+
+      <template lwc:if={hasMyRequests}>
+        <ul class="my-requests">
+          <template for:each={myRequestRows} for:item="request">
+            <li key={request.requestId}>
+              <span class={request.statusClass}>{request.status}</span>
+              <span class="my-request-type">{request.insightTypeLabel}</span>
+            </li>
+          </template>
+        </ul>
+      </template>
+    </div>
+
     <template lwc:if={isLoading}>
       <c-ps-loading-state message="Loading AI insights"></c-ps-loading-state>
     </template>

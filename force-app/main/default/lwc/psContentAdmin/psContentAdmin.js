@@ -34,12 +34,23 @@ const PARTNER_TYPE_OPTIONS = [
 ];
 
 export default class PsContentAdmin extends LightningElement {
+  acceptedFormats = [
+    ".pdf",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".docx",
+    ".pptx",
+    ".xlsx"
+  ];
+
   content = [];
   error;
   loading = true;
   saving = false;
   isModalOpen = false;
   draft = {};
+  uploadedFileName;
 
   categoryOptions = CATEGORY_OPTIONS;
   visibilityOptions = VISIBILITY_OPTIONS;
@@ -76,6 +87,36 @@ export default class PsContentAdmin extends LightningElement {
     }));
   }
 
+  get isNewContent() {
+    return !this.draft.contentId;
+  }
+
+  get modalTitle() {
+    return this.isNewContent ? "New Content" : "Edit Content";
+  }
+
+  get hasAttachedFile() {
+    return Boolean(this.draft.contentDocumentId);
+  }
+
+  get attachedFileLabel() {
+    if (this.uploadedFileName) {
+      return `Uploaded: ${this.uploadedFileName}`;
+    }
+
+    return this.hasAttachedFile ? "A file is already attached." : "";
+  }
+
+  get isSaveDisabled() {
+    return this.saving || (this.isNewContent && !this.draft.contentDocumentId);
+  }
+
+  handleAddNew() {
+    this.draft = {};
+    this.uploadedFileName = undefined;
+    this.isModalOpen = true;
+  }
+
   handleEdit(event) {
     const contentId = event.currentTarget.dataset.id;
     const item = this.content.find((row) => row.contentId === contentId);
@@ -85,7 +126,22 @@ export default class PsContentAdmin extends LightningElement {
     }
 
     this.draft = { ...item };
+    this.uploadedFileName = undefined;
     this.isModalOpen = true;
+  }
+
+  handleUploadFinished(event) {
+    const uploadedFiles = event.detail.files;
+
+    if (!uploadedFiles || uploadedFiles.length === 0) {
+      return;
+    }
+
+    this.draft = {
+      ...this.draft,
+      contentDocumentId: uploadedFiles[0].documentId
+    };
+    this.uploadedFileName = uploadedFiles[0].name;
   }
 
   handleInputChange(event) {
@@ -109,6 +165,7 @@ export default class PsContentAdmin extends LightningElement {
   handleCloseModal() {
     this.isModalOpen = false;
     this.draft = {};
+    this.uploadedFileName = undefined;
   }
 
   async handleSaveDraft() {
@@ -117,6 +174,7 @@ export default class PsContentAdmin extends LightningElement {
     if (!this.error) {
       this.isModalOpen = false;
       this.draft = {};
+      this.uploadedFileName = undefined;
     }
   }
 

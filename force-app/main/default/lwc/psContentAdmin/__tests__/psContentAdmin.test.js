@@ -112,4 +112,89 @@ describe("c-ps-content-admin", () => {
       })
     });
   });
+
+  it("opens an empty New Content modal with Save disabled until a file is attached", async () => {
+    const element = createElement("c-ps-content-admin", {
+      is: PsContentAdmin
+    });
+
+    document.body.appendChild(element);
+
+    getAllContent.emit(CONTENT);
+    await flushPromises();
+
+    Array.from(element.shadowRoot.querySelectorAll("lightning-button"))
+      .find((button) => button.label === "Add New Content")
+      .click();
+    await flushPromises();
+
+    const modal = element.shadowRoot.querySelector("c-ps-modal");
+    expect(modal.title).toBe("New Content");
+
+    const titleInput = element.shadowRoot.querySelector(
+      "c-ps-modal lightning-input"
+    );
+    expect(titleInput.value).toBeFalsy();
+
+    const saveButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Save");
+    expect(saveButton.disabled).toBe(true);
+  });
+
+  it("creates new content once a file is uploaded", async () => {
+    saveContent.mockResolvedValue({
+      contentId: "content-2",
+      title: "New Asset",
+      contentDocumentId: "069xx0000000009AAA"
+    });
+
+    const element = createElement("c-ps-content-admin", {
+      is: PsContentAdmin
+    });
+
+    document.body.appendChild(element);
+
+    getAllContent.emit(CONTENT);
+    await flushPromises();
+
+    Array.from(element.shadowRoot.querySelectorAll("lightning-button"))
+      .find((button) => button.label === "Add New Content")
+      .click();
+    await flushPromises();
+
+    const titleInput = element.shadowRoot.querySelector(
+      "c-ps-modal lightning-input"
+    );
+    titleInput.value = "New Asset";
+    titleInput.dispatchEvent(new CustomEvent("change"));
+
+    const fileUpload = element.shadowRoot.querySelector(
+      "lightning-file-upload"
+    );
+    fileUpload.dispatchEvent(
+      new CustomEvent("uploadfinished", {
+        detail: {
+          files: [{ documentId: "069xx0000000009AAA", name: "asset.pdf" }]
+        }
+      })
+    );
+    await flushPromises();
+
+    const saveButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Save");
+    expect(saveButton.disabled).toBe(false);
+
+    saveButton.click();
+    await flushPromises();
+
+    expect(saveContent).toHaveBeenCalledWith({
+      content: expect.objectContaining({
+        title: "New Asset",
+        contentDocumentId: "069xx0000000009AAA"
+      })
+    });
+    expect(saveContent.mock.calls[0][0].content.contentId).toBeUndefined();
+  });
 });

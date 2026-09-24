@@ -381,4 +381,38 @@
     <field>Partner_Consent__c.Revoked_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>AI_Insight_Request__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>AI_Insight_Request__c.Partner_Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>AI_Insight_Request__c.Insight_Type__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>AI_Insight_Request__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>AI_Insight_Request__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>AI_Insight_Request__c.Requested_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
 </PermissionSet>

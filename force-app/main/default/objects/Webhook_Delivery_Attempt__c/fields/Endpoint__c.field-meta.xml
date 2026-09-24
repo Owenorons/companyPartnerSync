@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Endpoint__c</fullName><description>DeveloperName of the
+  Webhook_Endpoint__mdt this attempt was delivered to. A plain text
+  reference, not a relationship field, since Apex cannot create Lookup
+  fields to custom metadata types.</description><label>Endpoint</label><type
+  >Text</type><length>100</length><required>true</required></CustomField>

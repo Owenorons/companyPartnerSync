@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>URL__c</fullName>
-    <description>Webhook endpoint URL.</description>
+    <description>Webhook endpoint URL. Add a matching Setup &gt; Remote Site
+  Settings entry for this URL's domain before activating the endpoint —
+  outbound Apex callouts are blocked by the platform until the destination
+  is allow-listed there.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>URL</label>
     <required>false</required>

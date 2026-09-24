@@ -94,29 +94,41 @@ public with sharing class PartnerContentDomain {
     dto.partnerTier = content.Partner_Tier__c;
     dto.partnerType = content.Partner_Type__c;
     dto.sortOrder = content.Sort_Order__c;
+    dto.contentDocumentId = content.Content_Document_Id__c;
 
     return dto;
   }
 
   /**
    * Validates that an admin content save has the fields required to
-   * persist it, throwing if not.
+   * persist it, throwing if not. A new record (contentId blank) also
+   * requires a file, since content with nothing to download isn't a
+   * usable asset; an update to an existing record may omit the file to
+   * leave the previously attached one in place.
    *
    * @param dto The admin content payload to validate.
    */
   public static void validateAdminSave(PartnerContentAdminDTO dto) {
-    if (dto == null || dto.contentId == null) {
-      throw new PartnerSyncHandledException('Content Id is required.');
+    if (dto == null) {
+      throw new PartnerSyncHandledException('Content details are required.');
     }
 
     if (String.isBlank(dto.title)) {
       throw new PartnerSyncHandledException('Title is required.');
     }
+
+    if (dto.contentId == null && dto.contentDocumentId == null) {
+      throw new PartnerSyncHandledException(
+        'A file upload is required for new content.'
+      );
+    }
   }
 
   /**
    * Applies an admin DTO's editable fields onto a Partner_Content__c
-   * record, in place.
+   * record, in place. The attached file is only replaced when the DTO
+   * carries a contentDocumentId; leaving it blank on an update keeps the
+   * record's existing file.
    *
    * @param content The content record to update.
    * @param dto The admin payload whose fields should be applied.
@@ -135,6 +147,9 @@ public with sharing class PartnerContentDomain {
     content.Partner_Tier__c = dto.partnerTier;
     content.Partner_Type__c = dto.partnerType;
     content.Sort_Order__c = dto.sortOrder;
+    if (dto.contentDocumentId != null) {
+      content.Content_Document_Id__c = dto.contentDocumentId;
+    }
 
     return content;
   }

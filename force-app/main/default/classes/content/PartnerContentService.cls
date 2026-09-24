@@ -83,8 +83,13 @@ public with sharing class PartnerContentService {
   }
 
   /**
-   * Saves changes to a content record from the admin UI. Requires the
-   * manage-content permission; validates the payload before updating.
+   * Creates or saves changes to a content record from the admin UI.
+   * Requires the manage-content permission; validates the payload before
+   * persisting. A blank dto.contentId creates a new record; a new or
+   * changed dto.contentDocumentId also shares the uploaded file so it's
+   * actually downloadable by whoever can see the content record —
+   * ContentDocumentLink defaults to internal-only visibility, which
+   * would otherwise silently block every partner from the file.
    *
    * @param dto The content fields to save.
    * @return The saved content as an admin DTO.
@@ -93,16 +98,76 @@ public with sharing class PartnerContentService {
     PartnerPermissionService.assertCanManageContent();
     PartnerContentDomain.validateAdminSave(dto);
 
-    Partner_Content__c content = PartnerContentSelector.selectById(
-      dto.contentId
-    );
+    Boolean isCreate = dto.contentId == null;
+    Partner_Content__c content = isCreate
+      ? new Partner_Content__c()
+      : PartnerContentSelector.selectById(dto.contentId);
 
+    String previousDocumentId = content.Content_Document_Id__c;
     PartnerContentDomain.applyAdminUpdate(content, dto);
 
-    SecurityUtil.assertUpdateable(Partner_Content__c.SObjectType);
-    update SecurityUtil.stripForUpdate(new List<SObject>{ content });
+    // The record save and the file-sharing link are separate DML
+    // statements; without a savepoint, a link failure after a successful
+    // save would leave content published with a file nobody but the
+    // uploader can actually download.
+    Savepoint sp = Database.setSavepoint();
+    try {
+      if (isCreate) {
+        SecurityUtil.assertCreateable(Partner_Content__c.SObjectType);
+        insert SecurityUtil.stripForCreate(new List<SObject>{ content });
+      } else {
+        SecurityUtil.assertUpdateable(Partner_Content__c.SObjectType);
+        update SecurityUtil.stripForUpdate(new List<SObject>{ content });
+      }
+
+      if (
+        content.Content_Document_Id__c != null &&
+        content.Content_Document_Id__c != previousDocumentId
+      ) {
+        shareDocument(content.Id, content.Content_Document_Id__c);
+      }
+    } catch (Exception ex) {
+      Database.rollback(sp);
+      throw ex;
+    } finally {
+      Database.releaseSavepoint(sp);
+    }
 
     return PartnerContentDomain.toAdminDTO(content);
+  }
+
+  /**
+   * Links an uploaded ContentDocument to its Partner_Content__c record
+   * with AllUsers visibility, so the file's access follows the record's
+   * own sharing instead of defaulting to internal-only. A no-op if the
+   * link already exists (e.g. re-saving without changing the file).
+   *
+   * @param contentId Id of the Partner_Content__c record to link the file to.
+   * @param contentDocumentId Id of the uploaded ContentDocument.
+   */
+  private static void shareDocument(Id contentId, Id contentDocumentId) {
+    List<ContentDocumentLink> existing = [
+      SELECT Id
+      FROM ContentDocumentLink
+      WHERE
+        ContentDocumentId = :contentDocumentId
+        AND LinkedEntityId = :contentId
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    if (!existing.isEmpty()) {
+      return;
+    }
+
+    Database.insert(
+      new ContentDocumentLink(
+        ContentDocumentId = contentDocumentId,
+        LinkedEntityId = contentId,
+        ShareType = 'I',
+        Visibility = 'AllUsers'
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
   }
 
   /**

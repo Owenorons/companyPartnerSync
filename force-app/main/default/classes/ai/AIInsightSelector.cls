@@ -36,6 +36,22 @@ public with sharing class AIInsightSelector {
   }
 
   /**
+   * Selects the active AI feature configs available to generate an
+   * insight against, ordered by display name.
+   *
+   * @return Active AI_Feature_Config__mdt records.
+   */
+  public static List<AI_Feature_Config__mdt> selectActiveFeatureTypes() {
+    return [
+      SELECT DeveloperName, Feature_Name__c
+      FROM AI_Feature_Config__mdt
+      WHERE Enabled__c = TRUE
+      WITH SYSTEM_MODE
+      ORDER BY Feature_Name__c ASC
+    ];
+  }
+
+  /**
    * Selects a single AI insight by Id.
    *
    * @param insightId Id of the AI_Insight__c to select.
@@ -54,6 +70,83 @@ public with sharing class AIInsightSelector {
 
     if (rows.isEmpty()) {
       throw new PartnerSyncHandledException('AI insight not found.');
+    }
+
+    return rows[0];
+  }
+
+  /**
+   * Selects a partner's own AI insight requests, most recent first.
+   *
+   * @param partnerAccountId Id of the partner Account whose requests are queried.
+   * @return AI_Insight_Request__c records for the partner, limited to 100.
+   */
+  public static List<AI_Insight_Request__c> selectRequestsForPartner(
+    Id partnerAccountId
+  ) {
+    SecurityUtil.assertReadable(AI_Insight_Request__c.SObjectType);
+
+    return [
+      SELECT
+        Id,
+        Partner_Account__c,
+        Insight_Type__c,
+        Notes__c,
+        Status__c,
+        Requested_On__c
+      FROM AI_Insight_Request__c
+      WHERE Partner_Account__c = :partnerAccountId
+      WITH USER_MODE
+      ORDER BY Requested_On__c DESC
+      LIMIT 100
+    ];
+  }
+
+  /**
+   * Selects requests awaiting internal action, oldest first.
+   *
+   * @return New AI_Insight_Request__c records, limited to 200.
+   */
+  public static List<AI_Insight_Request__c> selectPendingRequests() {
+    SecurityUtil.assertReadable(AI_Insight_Request__c.SObjectType);
+
+    return [
+      SELECT
+        Id,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Insight_Type__c,
+        Notes__c,
+        Status__c,
+        Requested_On__c
+      FROM AI_Insight_Request__c
+      WHERE Status__c = 'New'
+      WITH SYSTEM_MODE
+      ORDER BY Requested_On__c ASC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Selects a single AI insight request by Id.
+   *
+   * @param requestId Id of the AI_Insight_Request__c to select.
+   * @return The matching AI_Insight_Request__c record.
+   */
+  public static AI_Insight_Request__c selectRequestById(Id requestId) {
+    SecurityUtil.assertReadable(AI_Insight_Request__c.SObjectType);
+
+    List<AI_Insight_Request__c> rows = [
+      SELECT Id, Partner_Account__c, Insight_Type__c, Status__c
+      FROM AI_Insight_Request__c
+      WHERE Id = :requestId
+      WITH SYSTEM_MODE
+      LIMIT 1
+      FOR UPDATE
+    ];
+
+    if (rows.isEmpty()) {
+      throw new PartnerSyncHandledException('AI insight request not found.');
     }
 
     return rows[0];

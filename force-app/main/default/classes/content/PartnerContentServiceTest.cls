@@ -94,4 +94,85 @@ private class PartnerContentServiceTest {
       );
     }
   }
+
+  @IsTest
+  static void contentAdministratorCreatesNewContentAndSharesTheUploadedFile() {
+    User administrator = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      administrator.Id,
+      'PartnerSync_Content_Admin'
+    );
+    System.runAs(administrator) {
+      ContentVersion version = new ContentVersion(
+        Title = 'New Asset',
+        PathOnClient = 'new-asset.pdf',
+        VersionData = Blob.valueOf('Content Body')
+      );
+      insert version;
+      Id contentDocumentId = [
+        SELECT ContentDocumentId
+        FROM ContentVersion
+        WHERE Id = :version.Id
+      ]
+      .ContentDocumentId;
+
+      PartnerContentAdminDTO createRequest = new PartnerContentAdminDTO();
+      createRequest.title = 'New Asset';
+      createRequest.category = 'Sales Deck';
+      createRequest.visibility = 'All Partners';
+      createRequest.isActive = true;
+      createRequest.contentDocumentId = contentDocumentId;
+
+      PartnerContentAdminDTO created = PartnerContentController.saveContent(
+        createRequest
+      );
+      Assert.isNotNull(created.contentId);
+      Assert.areEqual(contentDocumentId, created.contentDocumentId);
+
+      ContentDocumentLink link = [
+        SELECT Visibility, ShareType
+        FROM ContentDocumentLink
+        WHERE
+          ContentDocumentId = :contentDocumentId
+          AND LinkedEntityId = :created.contentId
+        LIMIT 1
+      ];
+      Assert.areEqual('AllUsers', link.Visibility);
+      Assert.areEqual('I', link.ShareType);
+
+      // Re-saving without a new file must not create a duplicate link.
+      PartnerContentAdminDTO resave = created;
+      resave.contentDocumentId = null;
+      PartnerContentController.saveContent(resave);
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM ContentDocumentLink
+          WHERE
+            ContentDocumentId = :contentDocumentId
+            AND LinkedEntityId = :created.contentId
+        ]
+      );
+    }
+  }
+
+  @IsTest
+  static void newContentWithoutAFileIsRejected() {
+    User administrator = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      administrator.Id,
+      'PartnerSync_Content_Admin'
+    );
+    System.runAs(administrator) {
+      PartnerContentAdminDTO invalid = new PartnerContentAdminDTO();
+      invalid.title = 'No File';
+      try {
+        PartnerContentController.saveContent(invalid);
+        Assert.fail('Expected a missing-file validation failure.');
+      } catch (AuraHandledException expected) {
+        Assert.isTrue(true);
+      }
+    }
+  }
 }

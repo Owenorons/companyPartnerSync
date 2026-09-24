@@ -41,4 +41,85 @@ public with sharing class PartnerAIController {
       );
     }
   }
+
+  /**
+   * Lists the active AI feature types a partner may request an insight
+   * for.
+   *
+   * @return Active insight type label/value pairs.
+   */
+  @AuraEnabled(cacheable=true)
+  public static List<AIInsightTypeDTO> getInsightTypes() {
+    try {
+      List<AIInsightTypeDTO> results = new List<AIInsightTypeDTO>();
+      for (
+        AI_Feature_Config__mdt feature : AIInsightSelector.selectActiveFeatureTypes()
+      ) {
+        results.add(AIInsightDomain.toTypeDTO(feature));
+      }
+      return results;
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'PartnerAIController',
+        'Unable to load AI insight types.',
+        'Unable to load AI insight types.',
+        ex
+      );
+    }
+  }
+
+  /**
+   * Submits an AI insight request for the running partner's own account.
+   * Generation itself is internal-only; this lands in the governance
+   * console's pending-requests queue for a reviewer to action.
+   *
+   * @param insightType DeveloperName of the requested AI_Feature_Config__mdt.
+   * @param notes The partner's free-text context for the request.
+   */
+  @AuraEnabled
+  public static void submitInsightRequest(String insightType, String notes) {
+    try {
+      AIInsightRequestService.submitRequest(insightType, notes);
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'PartnerAIController',
+        'Unable to submit AI insight request.',
+        'Unable to submit AI insight request.',
+        ex
+      );
+    }
+  }
+
+  /**
+   * Lists the running partner user's own AI insight requests.
+   *
+   * @return The caller's own requests as list DTOs.
+   */
+  @AuraEnabled(cacheable=true)
+  public static List<AIInsightRequestListDTO> getMyInsightRequests() {
+    try {
+      List<AIInsightRequestListDTO> results = new List<AIInsightRequestListDTO>();
+      for (
+        AI_Insight_Request__c request : AIInsightRequestService.getMyRequests()
+      ) {
+        AI_Feature_Config__mdt feature = AI_Feature_Config__mdt.getInstance(
+          request.Insight_Type__c
+        );
+        results.add(
+          AIInsightDomain.toRequestDTO(
+            request,
+            feature == null ? request.Insight_Type__c : feature.Feature_Name__c
+          )
+        );
+      }
+      return results;
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'PartnerAIController',
+        'Unable to load AI insight requests.',
+        'Unable to load AI insight requests.',
+        ex
+      );
+    }
+  }
 }

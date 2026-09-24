@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Insight_Type__c</fullName><description>DeveloperName of the requested
+  AI_Feature_Config__mdt.</description><label>Insight Type</label><type
+  >Text</type><length>100</length><required>true</required></CustomField>

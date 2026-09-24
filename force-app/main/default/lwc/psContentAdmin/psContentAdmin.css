@@ -88,3 +88,14 @@ h1 {
   display: grid;
   gap: 1rem;
 }
+
+.file-upload-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.file-status {
+  font-family: var(--ps-font-mono);
+  font-size: 0.78rem;
+  color: var(--ps-color-text-muted);
+}

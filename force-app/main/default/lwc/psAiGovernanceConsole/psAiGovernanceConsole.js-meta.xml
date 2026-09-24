@@ -4,6 +4,8 @@
     <isExposed>true</isExposed>
     <masterLabel>PartnerSync AI Governance Console</masterLabel>
     <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
         <target>lightning__AppPage</target>
         <target>lightning__HomePage</target>
     </targets>

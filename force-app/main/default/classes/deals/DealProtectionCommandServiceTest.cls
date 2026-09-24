@@ -85,6 +85,57 @@ private class DealProtectionCommandServiceTest {
     );
   }
 
+  @IsTest
+  static void expireRollsBackGrantAndDealWhenActionRecordInsertFails() {
+    Deal_Registration__c deal = approvedDeal(false);
+    Deal_Protection_Grant__c grant = DealProtectionCommandService.execute(
+      command(deal.Id, 'Activate Protection', 'activate-rollback', null)
+    );
+    grant.End_Date__c = Date.today().addDays(-1);
+    update grant;
+
+    DealProtectionCommandService.simulateActionInsertFailure = true;
+    try {
+      try {
+        DealProtectionCommandService.execute(
+          command(deal.Id, 'Expire Protection', 'expire-rollback', 0)
+        );
+        Assert.fail('Expected the simulated action-insert failure.');
+      } catch (DealProtectionCommandService.ProtectionCommandException expected) {
+        Assert.isTrue(expected.getMessage().contains('Simulated'));
+      }
+    } finally {
+      DealProtectionCommandService.simulateActionInsertFailure = false;
+    }
+
+    Deal_Protection_Grant__c reloadedGrant = [
+      SELECT Status__c, Current__c
+      FROM Deal_Protection_Grant__c
+      WHERE Id = :grant.Id
+    ];
+    Assert.areEqual(
+      'Active',
+      reloadedGrant.Status__c,
+      'The grant mutation should have rolled back with the failed action insert.'
+    );
+    Assert.isTrue(reloadedGrant.Current__c);
+    Assert.areEqual(
+      'Approved',
+      [SELECT Status__c FROM Deal_Registration__c WHERE Id = :deal.Id]
+      .Status__c,
+      'The deal mutation should have rolled back with the failed action insert.'
+    );
+    Assert.areEqual(
+      0,
+      [
+        SELECT COUNT()
+        FROM Deal_Protection_Action__c
+        WHERE Command_Key__c = 'expire-rollback'
+      ],
+      'No action record should exist for the failed command.'
+    );
+  }
+
   private static Deal_Registration__c approvedDeal(Boolean blockingCondition) {
     Deal_Registration__c deal = new Deal_Registration__c(
       Status__c = blockingCondition ? 'Approved with Conditions' : 'Approved',

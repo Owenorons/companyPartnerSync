@@ -37,7 +37,10 @@ private class AIInsightGovernanceServiceTest {
       AI_Insight__c accepted = draft(partner.Id, 'Publish this action.');
       AI_Insight__c dismissed = draft(partner.Id, 'Dismiss this action.');
       insert new List<AI_Insight__c>{ accepted, dismissed };
-      Assert.areEqual(2, AIInsightGovernanceService.getPendingReview().size());
+      List<AIInsightDTO> pending = AIInsightGovernanceService.getPendingReview();
+      Assert.areEqual(2, pending.size());
+      Assert.areEqual(partner.Id, pending[0].partnerAccountId);
+      Assert.areEqual('AI Review', pending[0].partnerName);
       AIInsightDTO result = AIInsightGovernanceService.decide(
         accepted.Id,
         'Accepted',
@@ -95,6 +98,43 @@ private class AIInsightGovernanceServiceTest {
       Test.stopTest();
       Assert.isNotNull(jobId);
       TenantConfigService.clearCacheForTest();
+    }
+  }
+
+  @IsTest
+  static void getInsightTypesListsActiveFeaturesForInternalUsers() {
+    User admin = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(admin.Id, 'PartnerSync_AI_Admin');
+    System.runAs(admin) {
+      List<AIInsightTypeDTO> types = AIInsightController.getInsightTypes();
+      Assert.isTrue(
+        types.size() > 0,
+        'At least one active AI feature type should be available.'
+      );
+      for (AIInsightTypeDTO type : types) {
+        Assert.isNotNull(type.developerName);
+        Assert.isNotNull(type.label);
+      }
+    }
+  }
+
+  @IsTest
+  static void getInsightTypesRejectsExternalUsers() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'AI Types Partner'
+    );
+    insert partner;
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    insert contact;
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+
+    System.runAs(partnerUser) {
+      try {
+        AIInsightController.getInsightTypes();
+        Assert.fail('Expected an internal-user-only failure.');
+      } catch (AuraHandledException expected) {
+        Assert.isTrue(true);
+      }
     }
   }
 

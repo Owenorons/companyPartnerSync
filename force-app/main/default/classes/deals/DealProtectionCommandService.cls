@@ -5,6 +5,9 @@
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealProtectionCommandService {
+  @TestVisible
+  private static Boolean simulateActionInsertFailure = false;
+
   /**
    * Executes a protection command, dispatching to the matching action (activate, extend,
    * release, or expire) and recording a Deal_Protection_Action__c for idempotency.
@@ -44,40 +47,64 @@ public without sharing class DealProtectionCommandService {
       WHERE Id = :command.dealId
       FOR UPDATE
     ];
-    Deal_Protection_Grant__c grant;
-    if (command.action == 'Activate Protection')
-      grant = activate(deal);
-    else {
-      grant = currentGrant(deal.Id);
-      if (
-        command.expectedVersion == null ||
-        grant.Version_Number__c != command.expectedVersion
-      )
+
+    // The grant/deal mutation below and the idempotency action record are
+    // separate DML statements. Callers such as DealExpiryBatch catch and
+    // log per-record failures so one bad row doesn't block the rest of a
+    // batch, which means an uncaught exception here would NOT roll back
+    // whatever already committed (Salesforce only auto-rolls-back when the
+    // exception is left uncaught all the way to the transaction boundary).
+    // Without this savepoint, a failure on the action-record insert could
+    // leave a grant/deal expired, extended, or released with no
+    // corresponding Deal_Protection_Action__c row to show for it, silently
+    // breaking the idempotency check on any retry.
+    Savepoint sp = Database.setSavepoint();
+    try {
+      Deal_Protection_Grant__c grant;
+      if (command.action == 'Activate Protection')
+        grant = activate(deal);
+      else {
+        grant = currentGrant(deal.Id);
+        if (
+          command.expectedVersion == null ||
+          grant.Version_Number__c != command.expectedVersion
+        )
+          throw new ProtectionCommandException(
+            'The protection grant changed. Refresh and retry.'
+          );
+        if (command.action == 'Extend Protection')
+          extend(deal, grant, command);
+        else if (command.action == 'Release Protection')
+          release(deal, grant, command);
+        else if (command.action == 'Expire Protection')
+          expire(deal, grant);
+        else
+          throw new ProtectionCommandException(
+            'Unsupported protection action: ' + command.action
+          );
+      }
+      if (Test.isRunningTest() && simulateActionInsertFailure) {
         throw new ProtectionCommandException(
-          'The protection grant changed. Refresh and retry.'
+          'Simulated action-insert failure.'
         );
-      if (command.action == 'Extend Protection')
-        extend(deal, grant, command);
-      else if (command.action == 'Release Protection')
-        release(deal, grant, command);
-      else if (command.action == 'Expire Protection')
-        expire(deal, grant);
-      else
-        throw new ProtectionCommandException(
-          'Unsupported protection action: ' + command.action
-        );
+      }
+      Database.insert(
+        new Deal_Protection_Action__c(
+          Deal__c = deal.Id,
+          Grant__c = grant.Id,
+          Command_Key__c = command.commandKey,
+          Action__c = command.action,
+          Occurred_On__c = System.now()
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      return grant;
+    } catch (Exception ex) {
+      Database.rollback(sp);
+      throw ex;
+    } finally {
+      Database.releaseSavepoint(sp);
     }
-    Database.insert(
-      new Deal_Protection_Action__c(
-        Deal__c = deal.Id,
-        Grant__c = grant.Id,
-        Command_Key__c = command.commandKey,
-        Action__c = command.action,
-        Occurred_On__c = System.now()
-      ),
-      AccessLevel.SYSTEM_MODE
-    );
-    return grant;
   }
 
   private static Deal_Protection_Grant__c activate(Deal_Registration__c deal) {

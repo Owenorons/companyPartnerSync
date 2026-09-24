@@ -58,4 +58,11 @@ public with sharing class PartnerContentAdminDTO {
    */
   @AuraEnabled
   public Decimal sortOrder { get; set; }
+  /**
+   * Id of the uploaded ContentDocument for this asset's file, from the
+   * file-upload flow. Required when creating new content; optional on an
+   * update, where it replaces the previously attached file.
+   */
+  @AuraEnabled
+  public Id contentDocumentId { get; set; }
 }

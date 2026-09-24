@@ -78,6 +78,7 @@ public without sharing class PartnerContentSelector {
         Visibility__c,
         Partner_Tier__c,
         Partner_Type__c,
+        Content_Document_Id__c,
         Is_Active__c,
         Featured__c,
         Sort_Order__c

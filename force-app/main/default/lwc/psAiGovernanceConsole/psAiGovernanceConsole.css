@@ -1,3 +1,35 @@
 .review-list {
   max-width: 64rem;
 }
+
+.generate-section {
+  max-width: 64rem;
+  position: relative;
+}
+
+.generate-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 1rem;
+}
+
+.generate-status {
+  color: var(--ps-color-text-muted);
+  font-size: 0.85rem;
+}
+
+.requests-section {
+  max-width: 64rem;
+}
+
+.request-row {
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.request-row:last-child {
+  border-bottom: none;
+}
+
+.request-notes {
+  color: var(--ps-color-text-muted);
+}
