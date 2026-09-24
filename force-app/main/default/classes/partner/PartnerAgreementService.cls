@@ -121,6 +121,50 @@ public without sharing class PartnerAgreementService {
   }
 
   /**
+   * Sends an approved agreement to the active e-signature provider and
+   * releases it, recording the resulting envelope reference. This is the
+   * orchestration entry point that actually calls out to a provider;
+   * releaseForSignature remains available directly for callers that
+   * already hold a provider-issued envelope id (e.g. a manual or
+   * provider-side reconciliation path).
+   *
+   * @param agreementId Id of the Partner_Agreement__c to send.
+   * @return The updated Partner_Agreement__c record, now in Sent status.
+   */
+  public static Partner_Agreement__c sendForSignature(Id agreementId) {
+    Partner_Agreement__c agreement = [
+      SELECT Id, Status__c, Template_Key__c
+      FROM Partner_Agreement__c
+      WHERE Id = :agreementId
+      WITH SYSTEM_MODE
+      LIMIT 1
+      FOR UPDATE
+    ];
+    if (agreement.Status__c != 'Approved for Signature') {
+      throw new PartnerAgreementException(
+        'Agreement must be approved for signature before release.'
+      );
+    }
+    List<Partner_Agreement_Signatory__c> signatories = [
+      SELECT Id, Name__c, Email__c, Role__c, Signing_Order__c
+      FROM Partner_Agreement_Signatory__c
+      WHERE Agreement__c = :agreementId
+      WITH SYSTEM_MODE
+      ORDER BY Signing_Order__c ASC
+    ];
+    if (signatories.isEmpty()) {
+      throw new PartnerAgreementException(
+        'At least one signatory is required.'
+      );
+    }
+
+    PartnerSignatureProvider provider = PartnerSignatureProviderRouter.getProvider();
+    String envelopeId = provider.sendEnvelope(agreement, signatories);
+    String providerName = PartnerSignatureProviderRouter.getActiveProviderName();
+    return releaseForSignature(agreementId, providerName, envelopeId);
+  }
+
+  /**
    * Releases an approved agreement to the e-signature provider, recording
    * the provider's envelope reference.
    *

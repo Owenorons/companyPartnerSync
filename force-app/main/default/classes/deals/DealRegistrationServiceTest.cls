@@ -82,6 +82,154 @@ private class DealRegistrationServiceTest {
   }
 
   @IsTest
+  static void getDealDetailReturnsDealForOwningPartner() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Detail Partner'
+    );
+    insert partner;
+
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Detail Customer'
+    );
+    insert customer;
+
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    contact.Can_Submit_Deals__c = true;
+    insert contact;
+
+    Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+      customer.Id,
+      partner.Id,
+      contact.Id
+    );
+    insert opportunity;
+
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+    if (
+      !PartnerAccessService.testPartnerAccountIdsByUser.containsKey(
+        partnerUser.Id
+      )
+    ) {
+      insert new OpportunityShare(
+        OpportunityId = opportunity.Id,
+        UserOrGroupId = partnerUser.Id,
+        OpportunityAccessLevel = 'Read',
+        RowCause = Schema.OpportunityShare.RowCause.Manual
+      );
+    }
+
+    Tenant_Config__mdt config = new Tenant_Config__mdt(
+      Enable_Deals__c = true,
+      Max_Open_Deals_Per_Partner__c = 5
+    );
+
+    Test.startTest();
+    System.runAs(partnerUser) {
+      TenantConfigService.setConfigForTest(config);
+
+      DealRegistrationResultDTO created = DealRegistrationService.createDealRegistration(
+        buildRequest(opportunity.Id)
+      );
+
+      DealRegistrationDetailDTO detail = DealRegistrationService.getDealDetail(
+        created.dealRegistrationId
+      );
+
+      System.assertEquals(created.dealRegistrationId, detail.dealId);
+      System.assertEquals('Need partner coverage', detail.businessProblem);
+      System.assertEquals('Joint solution', detail.proposedSolution);
+      System.assertEquals(25000, detail.dealValue);
+      System.assertNotEquals(null, detail.events);
+    }
+    Test.stopTest();
+  }
+
+  @IsTest
+  static void getDealDetailRejectsAnotherPartner() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Owning Partner'
+    );
+    insert partner;
+
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Owning Customer'
+    );
+    insert customer;
+
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    contact.Can_Submit_Deals__c = true;
+    insert contact;
+
+    Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+      customer.Id,
+      partner.Id,
+      contact.Id
+    );
+    insert opportunity;
+
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+    if (
+      !PartnerAccessService.testPartnerAccountIdsByUser.containsKey(
+        partnerUser.Id
+      )
+    ) {
+      insert new OpportunityShare(
+        OpportunityId = opportunity.Id,
+        UserOrGroupId = partnerUser.Id,
+        OpportunityAccessLevel = 'Read',
+        RowCause = Schema.OpportunityShare.RowCause.Manual
+      );
+    }
+
+    Tenant_Config__mdt config = new Tenant_Config__mdt(
+      Enable_Deals__c = true,
+      Max_Open_Deals_Per_Partner__c = 5
+    );
+
+    Id dealId;
+    System.runAs(partnerUser) {
+      TenantConfigService.setConfigForTest(config);
+      dealId = DealRegistrationService.createDealRegistration(
+          buildRequest(opportunity.Id)
+        )
+        .dealRegistrationId;
+    }
+
+    Account otherPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Other Partner'
+    );
+    insert otherPartner;
+    Contact otherContact = PartnerSyncTestDataFactory.partnerContact(
+      otherPartner.Id
+    );
+    insert otherContact;
+    User otherPartnerUser = TestUserFactory.createExternalUser(otherContact.Id);
+    TestUserFactory.assignPermissionSet(
+      otherPartnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+
+    Test.startTest();
+    System.runAs(otherPartnerUser) {
+      try {
+        DealRegistrationService.getDealDetail(dealId);
+        System.assert(false, 'Expected an access failure.');
+      } catch (Exception expected) {
+        System.assert(true);
+      }
+    }
+    Test.stopTest();
+  }
+
+  @IsTest
   static void createDealRegistrationBlockedWhenPartnerAtOpenDealCap() {
     Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
     insert partner;

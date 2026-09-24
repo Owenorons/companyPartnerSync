@@ -132,4 +132,55 @@ public with sharing class DealRegistrationDomain {
 
     return dto;
   }
+
+  /**
+   * Maps a Deal_Registration__c and its partner-visible events to the
+   * detail view shown when a partner drills into a single deal.
+   *
+   * @param record Deal registration record to map.
+   * @param events The deal's partner-visible lifecycle events, most recent first.
+   * @return The mapped DealRegistrationDetailDTO.
+   */
+  public static DealRegistrationDetailDTO toDetailDTO(
+    Deal_Registration__c record,
+    List<Deal_Event__c> events
+  ) {
+    DealRegistrationDetailDTO dto = new DealRegistrationDetailDTO();
+
+    dto.dealId = record.Id;
+    dto.dealNumber = record.Name;
+
+    dto.customerName = record.Customer_Account__r?.Name;
+    dto.partnerName = record.Partner_Account__r?.Name;
+    dto.stage = record.Opportunity__r?.StageName;
+
+    dto.status = record.Status__c;
+    dto.conflictStatus = record.Conflict_Status__c;
+
+    dto.dealValue = record.Estimated_Revenue__c;
+    dto.estimatedCloseDate = record.Estimated_Close_Date__c;
+    dto.protectionEndDate = record.Protection_End_Date__c;
+
+    dto.businessProblem = record.Business_Problem__c;
+    dto.proposedSolution = record.Proposed_Solution__c;
+    dto.notes = record.Notes__c;
+
+    dto.lifecyclePhase = record.Lifecycle_Phase__c;
+    dto.lifecycleHealth = record.Lifecycle_Health__c;
+    dto.currentActionRequired = record.Current_Action_Required__c;
+    dto.nextActionDue = record.Next_Action_Due__c;
+
+    dto.createdDate = record.CreatedDate;
+
+    dto.events = new List<DealTimelineEventDTO>();
+    for (Deal_Event__c event : events) {
+      DealTimelineEventDTO eventDto = new DealTimelineEventDTO();
+      eventDto.eventType = event.Event_Type__c;
+      eventDto.summary = event.Summary__c;
+      eventDto.occurredOn = event.Occurred_On__c;
+      dto.events.add(eventDto);
+    }
+
+    return dto;
+  }
 }

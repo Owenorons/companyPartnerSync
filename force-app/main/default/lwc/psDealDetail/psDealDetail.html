@@ -1,0 +1,106 @@
+<template>
+  <div class="ps-page">
+    <template if:true={loading}>
+      <c-ps-loading-state message="Loading deal..."></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasDetail}>
+      <section class="hero-card">
+        <div>
+          <p class="eyebrow">{detail.dealNumber}</p>
+          <h1>{detail.customerName}</h1>
+
+          <div class="hero-meta">
+            <c-ps-status-badge
+              label={detail.status}
+              variant={badgeVariant}
+            ></c-ps-status-badge>
+            <span>{detail.conflictStatus}</span>
+            <strong class="deal-value">{formattedValue}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-grid">
+        <article class="panel-card">
+          <h2>Deal Details</h2>
+
+          <div class="status-row">
+            <span>Partner</span>
+            <strong>{detail.partnerName}</strong>
+          </div>
+          <div class="status-row">
+            <span>Opportunity Stage</span>
+            <strong>{detail.stage}</strong>
+          </div>
+          <div class="status-row">
+            <span>Estimated Close</span>
+            <strong>{estimatedCloseDateLabel}</strong>
+          </div>
+          <div class="status-row">
+            <span>Protection Ends</span>
+            <strong>{protectionEndDateLabel}</strong>
+          </div>
+
+          <h3>Business Problem</h3>
+          <p class="body-copy">{detail.businessProblem}</p>
+
+          <h3>Proposed Solution</h3>
+          <p class="body-copy">{detail.proposedSolution}</p>
+
+          <template if:true={detail.notes}>
+            <h3>Notes</h3>
+            <p class="body-copy">{detail.notes}</p>
+          </template>
+        </article>
+
+        <article class="panel-card">
+          <h2>Lifecycle</h2>
+
+          <div class="status-row">
+            <span>Phase</span>
+            <strong>{detail.lifecyclePhase}</strong>
+          </div>
+          <div class="status-row">
+            <span>Health</span>
+            <strong>{detail.lifecycleHealth}</strong>
+          </div>
+          <div class="status-row">
+            <span>Next Action Due</span>
+            <strong>{nextActionDueLabel}</strong>
+          </div>
+
+          <template if:true={detail.currentActionRequired}>
+            <div class="action-banner">{detail.currentActionRequired}</div>
+          </template>
+
+          <h2 class="slds-var-m-top_large">Recent Activity</h2>
+
+          <template if:true={hasEvents}>
+            <ul class="timeline">
+              <template for:each={eventRows} for:item="event">
+                <li key={event.occurredOnLabel} class="timeline-row">
+                  <strong>{event.eventType}</strong>
+                  <span>{event.summary}</span>
+                  <span class="timeline-date">{event.occurredOnLabel}</span>
+                </li>
+              </template>
+            </ul>
+          </template>
+
+          <template if:false={hasEvents}>
+            <c-ps-empty-state
+              title="No activity yet"
+              message="No lifecycle history is available for this deal."
+            >
+            </c-ps-empty-state>
+          </template>
+        </article>
+      </section>
+    </template>
+  </div>
+</template>

@@ -30,6 +30,7 @@ private class ControllerErrorContractTest {
     assertAura(new CalloutCase('registerDeal'));
     assertAura(new CalloutCase('eligibleDeals'));
     assertAura(new CalloutCase('myDeals'));
+    assertAura(new CalloutCase('myDealDetail'));
   }
 
   @IsTest
@@ -111,6 +112,8 @@ private class ControllerErrorContractTest {
         DealRegistrationController.getEligibleOpportunities();
       else if (name == 'myDeals')
         DealRegistrationController.getMyDeals();
+      else if (name == 'myDealDetail')
+        DealRegistrationController.getDealDetail(null);
       else if (name == 'availableContent')
         PartnerContentController.getAvailableContent();
       else if (name == 'contentCategories')

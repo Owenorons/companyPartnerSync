@@ -48,6 +48,26 @@ public with sharing class DealRegistrationController {
   }
 
   /**
+   * Loads a single deal registration's detail view.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The mapped DealRegistrationDetailDTO.
+   */
+  @AuraEnabled(cacheable=true)
+  public static DealRegistrationDetailDTO getDealDetail(Id dealId) {
+    try {
+      return DealRegistrationService.getDealDetail(dealId);
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'DealRegistrationController',
+        'Unable to load deal detail.',
+        'Unable to load deal detail.',
+        ex
+      );
+    }
+  }
+
+  /**
    * Lists the current partner's own deal registrations for the "My Deals" list.
    *
    * @return Row shapes for the current partner's deal registrations.

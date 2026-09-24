@@ -116,6 +116,25 @@ public with sharing class DealRegistrationService {
   }
 
   /**
+   * Loads a single deal registration's detail view, including its
+   * partner-visible lifecycle events. Internal users can view any deal;
+   * partner users can only view deals belonging to their own account.
+   *
+   * @param dealId Id of the deal registration to load.
+   * @return The mapped DealRegistrationDetailDTO.
+   */
+  public static DealRegistrationDetailDTO getDealDetail(Id dealId) {
+    PartnerRecordAccessService.assertPartnerAccessToDeal(dealId);
+
+    Deal_Registration__c record = DealRegistrationSelector.selectById(dealId);
+    List<Deal_Event__c> events = DealRegistrationSelector.selectPartnerVisibleEvents(
+      dealId
+    );
+
+    return DealRegistrationDomain.toDetailDTO(record, events);
+  }
+
+  /**
    * Builds, sanitizes, and inserts the deal registration record, then routes it through the
    * submit command (lifecycle transition, conflict routing, event and idempotency ledger),
    * publishes a submission platform event, and logs the outcome.

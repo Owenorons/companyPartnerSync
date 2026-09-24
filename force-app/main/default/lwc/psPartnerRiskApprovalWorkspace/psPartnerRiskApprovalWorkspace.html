@@ -140,6 +140,12 @@
             </template>
           </article>
         </section>
+
+        <section class="slds-var-m-top_large">
+          <c-ps-partner-exception-panel
+            target-onboarding-id={selectedStep.onboardingId}
+          ></c-ps-partner-exception-panel>
+        </section>
       </template>
 
       <template if:false={selectedStep}>

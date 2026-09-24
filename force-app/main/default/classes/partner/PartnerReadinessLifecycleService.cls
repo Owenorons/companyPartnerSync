@@ -64,6 +64,130 @@ public without sharing class PartnerReadinessLifecycleService {
   }
 
   /**
+   * The set of gate keys a Partner_Exception__c may waive, matching the
+   * keys evaluate() populates in GateResult.gates.
+   */
+  private static final Set<String> VALID_GATES = new Set<String>{
+    'documents',
+    'risk',
+    'approval',
+    'agreements',
+    'relationship',
+    'access',
+    'training'
+  };
+
+  /**
+   * Lists the exceptions granted against an onboarding, most recent
+   * first. Requires partner lifecycle management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c to list exceptions for.
+   * @return The onboarding's Partner_Exception__c records.
+   */
+  public static List<Partner_Exception__c> getExceptions(Id onboardingId) {
+    assertLifecycleAuthority();
+    return [
+      SELECT
+        Id,
+        Gate__c,
+        Reason__c,
+        Status__c,
+        Effective_On__c,
+        Expires_On__c,
+        Approved_By__r.Name,
+        CreatedDate
+      FROM Partner_Exception__c
+      WHERE Onboarding__c = :onboardingId
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate DESC
+    ];
+  }
+
+  /**
+   * Grants a time-bounded exception waiving one activation gate for an
+   * onboarding. While active and current (on or after Effective_On__c,
+   * and before Expires_On__c if set), evaluate() treats the named gate as
+   * passed regardless of its underlying condition. Requires partner
+   * lifecycle management authority.
+   *
+   * @param onboardingId Id of the Partner_Onboarding__c the exception applies to.
+   * @param gate The gate key to waive (see VALID_GATES).
+   * @param reason Reason the exception was granted.
+   * @param effectiveOn Date the exception starts applying.
+   * @param expiresOn Date the exception stops applying, if any.
+   * @return The created Partner_Exception__c record.
+   */
+  public static Partner_Exception__c grantException(
+    Id onboardingId,
+    String gate,
+    String reason,
+    Date effectiveOn,
+    Date expiresOn
+  ) {
+    assertLifecycleAuthority();
+    if (!VALID_GATES.contains(gate)) {
+      throw new IllegalArgumentException('Unsupported gate: ' + gate);
+    }
+    if (String.isBlank(reason) || effectiveOn == null) {
+      throw new IllegalArgumentException(
+        'A reason and effective date are required.'
+      );
+    }
+    if (expiresOn != null && expiresOn < effectiveOn) {
+      throw new IllegalArgumentException(
+        'Expiry date cannot be before the effective date.'
+      );
+    }
+    Partner_Exception__c exception = new Partner_Exception__c(
+      Onboarding__c = onboardingId,
+      Exception_Key__c = onboardingId +
+        ':' +
+        gate +
+        ':' +
+        Datetime.now().getTime(),
+      Gate__c = gate,
+      Reason__c = reason,
+      Approved_By__c = UserInfo.getUserId(),
+      Status__c = 'Active',
+      Effective_On__c = effectiveOn,
+      Expires_On__c = expiresOn
+    );
+    Database.insert(exception, AccessLevel.SYSTEM_MODE);
+    return exception;
+  }
+
+  /**
+   * Revokes a previously granted exception; the gate it was waiving
+   * reverts to its normal, underlying condition on the next evaluate().
+   * Requires partner lifecycle management authority.
+   *
+   * @param exceptionId Id of the Partner_Exception__c to revoke.
+   * @param reason Reason the exception is being revoked.
+   * @return The updated, now-Revoked Partner_Exception__c record.
+   */
+  public static Partner_Exception__c revokeException(
+    Id exceptionId,
+    String reason
+  ) {
+    assertLifecycleAuthority();
+    if (String.isBlank(reason)) {
+      throw new IllegalArgumentException('A revocation reason is required.');
+    }
+    Partner_Exception__c exception = [
+      SELECT Id, Status__c, Reason__c
+      FROM Partner_Exception__c
+      WHERE Id = :exceptionId
+      WITH SYSTEM_MODE
+      LIMIT 1
+      FOR UPDATE
+    ];
+    exception.Status__c = 'Revoked';
+    exception.Reason__c = exception.Reason__c + '\nRevoked: ' + reason;
+    Database.update(exception, AccessLevel.SYSTEM_MODE);
+    return exception;
+  }
+
+  /**
    * Evaluates all activation gates (documents, risk, approval, agreements,
    * relationship, access, training) for an onboarding, persists a
    * readiness assessment and updates the onboarding's gate status.
@@ -83,6 +207,20 @@ public without sharing class PartnerReadinessLifecycleService {
       FOR UPDATE
     ];
     GateResult result = new GateResult();
+    Set<String> waivedGates = new Set<String>();
+    for (Partner_Exception__c activeException : [
+      SELECT Gate__c
+      FROM Partner_Exception__c
+      WHERE
+        Onboarding__c = :onboardingId
+        AND Status__c = 'Active'
+        AND Effective_On__c <= TODAY
+        AND (Expires_On__c = NULL
+        OR Expires_On__c >= TODAY)
+      WITH SYSTEM_MODE
+    ]) {
+      waivedGates.add(activeException.Gate__c);
+    }
     Integer documentTotal = [
       SELECT COUNT()
       FROM Partner_Document_Requirement__c
@@ -101,7 +239,8 @@ public without sharing class PartnerReadinessLifecycleService {
     put(
       result,
       'documents',
-      documentTotal > 0 && documentOpen == 0,
+      (documentTotal > 0 && documentOpen == 0) ||
+      waivedGates.contains('documents'),
       'Mandatory documents are incomplete.'
     );
     Integer openFindings = [
@@ -116,7 +255,7 @@ public without sharing class PartnerReadinessLifecycleService {
     put(
       result,
       'risk',
-      openFindings == 0,
+      openFindings == 0 || waivedGates.contains('risk'),
       'Blocking risk findings remain open.'
     );
     put(
@@ -130,7 +269,7 @@ public without sharing class PartnerReadinessLifecycleService {
           AND Current__c = TRUE
           AND Status__c = 'Approved for Contracting'
         WITH SYSTEM_MODE
-      ] == 1,
+      ] == 1 || waivedGates.contains('approval'),
       'Final approval is incomplete.'
     );
     put(
@@ -141,7 +280,7 @@ public without sharing class PartnerReadinessLifecycleService {
         FROM Partner_Agreement__c
         WHERE Onboarding__c = :onboardingId AND Status__c = 'Effective'
         WITH SYSTEM_MODE
-      ] > 0,
+      ] > 0 || waivedGates.contains('agreements'),
       'Required agreement is not effective.'
     );
     Boolean partnerEnabled =
@@ -159,7 +298,7 @@ public without sharing class PartnerReadinessLifecycleService {
     put(
       result,
       'relationship',
-      partnerEnabled,
+      partnerEnabled || waivedGates.contains('relationship'),
       'Partner relationship or Salesforce partner enablement is incomplete.'
     );
     put(
@@ -170,7 +309,7 @@ public without sharing class PartnerReadinessLifecycleService {
         FROM Partner_Access_Request__c
         WHERE Onboarding__c = :onboardingId AND Status__c = 'Provisioned'
         WITH SYSTEM_MODE
-      ] > 0,
+      ] > 0 || waivedGates.contains('access'),
       'Approved access has not been provisioned.'
     );
     Integer trainingTotal = [
@@ -191,7 +330,8 @@ public without sharing class PartnerReadinessLifecycleService {
     put(
       result,
       'training',
-      trainingTotal > 0 && trainingOpen == 0,
+      (trainingTotal > 0 && trainingOpen == 0) ||
+      waivedGates.contains('training'),
       'Mandatory training is incomplete.'
     );
     result.ready = result.blockers.isEmpty();

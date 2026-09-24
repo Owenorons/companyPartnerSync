@@ -165,6 +165,95 @@ private class PartnerReadinessLifecycleServiceTest {
   }
 
   @IsTest
+  static void exceptionWaivesGateUntilItLapses() {
+    Context value = context(false);
+    PartnerReadinessLifecycleService.testLifecycleAuthority = true;
+    Partner_Exception__c granted = PartnerReadinessLifecycleService.grantException(
+      value.onboarding.Id,
+      'training',
+      'Training platform outage; partner cleared to proceed.',
+      Date.today(),
+      null
+    );
+    System.assertEquals('Active', granted.Status__c);
+
+    PartnerReadinessLifecycleService.GateResult waived = PartnerReadinessLifecycleService.evaluate(
+      value.onboarding.Id
+    );
+    System.assertEquals(true, waived.gates.get('training'));
+    System.assertEquals(false, waived.ready);
+
+    PartnerReadinessLifecycleService.revokeException(
+      granted.Id,
+      'Training platform restored.'
+    );
+    PartnerReadinessLifecycleService.GateResult reverted = PartnerReadinessLifecycleService.evaluate(
+      value.onboarding.Id
+    );
+    System.assertEquals(false, reverted.gates.get('training'));
+    System.assertEquals(
+      'Revoked',
+      [
+        SELECT Status__c
+        FROM Partner_Exception__c
+        WHERE Id = :granted.Id
+      ]
+      .Status__c
+    );
+  }
+
+  @IsTest
+  static void grantExceptionValidatesGateAndDates() {
+    Context value = context(false);
+    PartnerReadinessLifecycleService.testLifecycleAuthority = true;
+    try {
+      PartnerReadinessLifecycleService.grantException(
+        value.onboarding.Id,
+        'not-a-real-gate',
+        'Reason',
+        Date.today(),
+        null
+      );
+      System.assert(false, 'Expected an unsupported-gate failure.');
+    } catch (IllegalArgumentException expected) {
+      System.assert(expected.getMessage().contains('gate'));
+    }
+    try {
+      PartnerReadinessLifecycleService.grantException(
+        value.onboarding.Id,
+        'training',
+        'Reason',
+        Date.today(),
+        Date.today().addDays(-1)
+      );
+      System.assert(false, 'Expected an invalid-date-range failure.');
+    } catch (IllegalArgumentException expected) {
+      System.assert(expected.getMessage().contains('Expiry'));
+    }
+  }
+
+  @IsTest
+  static void grantExceptionRequiresAuthority() {
+    Context value = context(false);
+    User unprivilegedUser = TestUserFactory.createInternalUser();
+    System.runAs(unprivilegedUser) {
+      PartnerReadinessLifecycleService.testLifecycleAuthority = false;
+      try {
+        PartnerReadinessLifecycleService.grantException(
+          value.onboarding.Id,
+          'training',
+          'Reason',
+          Date.today(),
+          null
+        );
+        System.assert(false, 'Expected an authority failure.');
+      } catch (PartnerReadinessLifecycleService.LifecycleException expected) {
+        System.assert(expected.getMessage().contains('authority'));
+      }
+    }
+  }
+
+  @IsTest
   static void terminationClosesRelationshipAndAccess() {
     Context value = context(true);
     PartnerReadinessLifecycleService.testLifecycleAuthority = true;

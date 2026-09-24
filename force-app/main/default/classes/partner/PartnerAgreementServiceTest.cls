@@ -57,6 +57,103 @@ private class PartnerAgreementServiceTest {
     );
   }
 
+  private static Partner_Agreement__c approvedForSignatureAgreement() {
+    Partner_Onboarding__c record = onboarding(true);
+    Partner_Agreement__c agreement = PartnerAgreementService.createAgreement(
+      record.Id,
+      'Programme Agreement',
+      record.Id + ':PROGRAMME:SEND',
+      'PROGRAMME-AU',
+      3
+    );
+    PartnerAgreementService.addSignatory(
+      agreement.Id,
+      agreement.Id + ':PARTNER',
+      'Partner Signer',
+      'signer@example.test',
+      'Partner',
+      1
+    );
+    agreement.Status__c = 'Approved for Signature';
+    update agreement;
+    return agreement;
+  }
+
+  @IsTest
+  static void sendForSignatureRoutesThroughActiveProviderAndReleases() {
+    Partner_Agreement__c agreement = approvedForSignatureAgreement();
+    Test.setMock(
+      HttpCalloutMock.class,
+      PartnerSignatureCalloutMock.success('envelope-777')
+    );
+    try {
+      PartnerSignatureProviderRouter.providerConfigForTest = new Signature_Provider_Config__mdt(
+        Active__c = true,
+        Provider_Name__c = 'DocuSign',
+        Provider_Type__c = 'DocuSign'
+      );
+      Test.startTest();
+      Partner_Agreement__c sent = PartnerAgreementService.sendForSignature(
+        agreement.Id
+      );
+      Test.stopTest();
+      System.assertEquals('Sent', sent.Status__c);
+      System.assertEquals('DocuSign', sent.Provider__c);
+      System.assertEquals('envelope-777', sent.Provider_Envelope_Id__c);
+    } finally {
+      PartnerSignatureProviderRouter.providerConfigForTest = null;
+    }
+  }
+
+  @IsTest
+  static void sendForSignatureThrowsWhenNoProviderConfigured() {
+    Partner_Agreement__c agreement = approvedForSignatureAgreement();
+    try {
+      PartnerAgreementService.sendForSignature(agreement.Id);
+      System.assert(false, 'Expected a disabled-provider failure.');
+    } catch (PartnerAgreementService.PartnerAgreementException expected) {
+      System.assert(expected.getMessage().contains('not configured'));
+    }
+  }
+
+  @IsTest
+  static void sendForSignatureRequiresApprovedStatus() {
+    Partner_Onboarding__c record = onboarding(true);
+    Partner_Agreement__c agreement = PartnerAgreementService.createAgreement(
+      record.Id,
+      'NDA',
+      record.Id + ':NDA:SEND',
+      'NDA-AU',
+      1
+    );
+    try {
+      PartnerAgreementService.sendForSignature(agreement.Id);
+      System.assert(false, 'Expected an approval-status failure.');
+    } catch (PartnerAgreementService.PartnerAgreementException expected) {
+      System.assert(expected.getMessage().contains('approved for signature'));
+    }
+  }
+
+  @IsTest
+  static void sendForSignatureRequiresAtLeastOneSignatory() {
+    Partner_Onboarding__c record = onboarding(true);
+    Partner_Agreement__c agreement = PartnerAgreementService.createAgreement(
+      record.Id,
+      'NDA',
+      record.Id + ':NDA:NOSIGNER',
+      'NDA-AU',
+      1
+    );
+    agreement.Status__c = 'Approved for Signature';
+    update agreement;
+    try {
+      PartnerAgreementService.sendForSignature(agreement.Id);
+      System.assert(false, 'Expected a signatory requirement failure.');
+    } catch (PartnerAgreementService.PartnerAgreementException expected) {
+      System.assert(expected.getMessage().contains('signatory'));
+    }
+  }
+
   @IsTest
   static void contractingRequiresFinalApprovalAndIsIdempotent() {
     Partner_Onboarding__c blocked = onboarding(false);

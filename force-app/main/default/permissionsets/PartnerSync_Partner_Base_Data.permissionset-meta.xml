@@ -342,4 +342,43 @@
     <object>Partner_Training_Assignment__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Partner_Consent__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Policy_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Policy_Version__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Accepted_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Accepted_By__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Partner_Consent__c.Revoked_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
 </PermissionSet>

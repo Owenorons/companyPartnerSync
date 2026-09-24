@@ -1,0 +1,43 @@
+<template>
+  <article class="panel-card consent-panel">
+    <h3 class="slds-var-m-bottom_medium">{policyLabel}</h3>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={error}>
+      <template if:true={isAccepted}>
+        <div class="slds-grid slds-grid_align-spread status-row">
+          <span class="ps-badge ps-badge-success">Accepted</span>
+          <span>{acceptedOnLabel}</span>
+        </div>
+
+        <lightning-button
+          class="slds-var-m-top_small"
+          label="Revoke"
+          variant="destructive-text"
+          disabled={submitting}
+          onclick={handleRevoke}
+        ></lightning-button>
+      </template>
+
+      <template if:false={isAccepted}>
+        <p class="slds-var-m-bottom_small policy-copy">
+          You must accept {policyLabel} ({policyVersion}) to continue.
+        </p>
+
+        <lightning-button
+          label="Accept"
+          variant="brand"
+          disabled={submitting}
+          onclick={handleAccept}
+        ></lightning-button>
+      </template>
+
+      <template if:true={actionError}>
+        <c-ps-error-panel message={actionError}></c-ps-error-panel>
+      </template>
+    </template>
+  </article>
+</template>

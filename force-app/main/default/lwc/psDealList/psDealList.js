@@ -4,6 +4,7 @@ import getMyDeals from "@salesforce/apex/DealRegistrationController.getMyDeals";
 
 export default class PsDealList extends NavigationMixin(LightningElement) {
   @api registerDealPageName = "Register_Deal__c";
+  @api dealDetailPageName = "Deal_Detail__c";
 
   deals = [];
   error;
@@ -73,10 +74,24 @@ export default class PsDealList extends NavigationMixin(LightningElement) {
   }
 
   handleOpenDeal(event) {
+    const dealId = event.currentTarget.dataset.id;
+
     this.dispatchEvent(
       new CustomEvent("opendeal", {
-        detail: { dealId: event.currentTarget.dataset.id }
+        detail: { dealId }
       })
     );
+
+    if (!this.dealDetailPageName) {
+      return;
+    }
+
+    this[NavigationMixin.Navigate]({
+      type: "comm__namedPage",
+      attributes: {
+        name: this.dealDetailPageName
+      },
+      state: { dealId }
+    });
   }
 }

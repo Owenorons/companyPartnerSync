@@ -1,0 +1,77 @@
+<template>
+  <article class="panel-card exception-panel">
+    <h3 class="slds-var-m-bottom_medium">Activation Gate Exceptions</h3>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasExceptions}>
+      <template for:each={exceptionRows} for:item="exception">
+        <div key={exception.Id} class={exception.rowClass}>
+          <div class="slds-grid slds-grid_align-spread">
+            <span class="ps-badge">{exception.Gate__c}</span>
+            <span class="ps-badge ps-badge-warning">{exception.Status__c}</span>
+          </div>
+          <p class="reason-text">{exception.Reason__c}</p>
+          <template if:true={exception.isActive}>
+            <lightning-button
+              label="Revoke"
+              variant="destructive-text"
+              data-id={exception.Id}
+              disabled={submitting}
+              onclick={handleRevoke}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
+    </template>
+
+    <template if:false={hasExceptions}>
+      <p class="empty-copy">No exceptions granted for this onboarding.</p>
+    </template>
+
+    <div class="slds-var-m-top_medium grant-form">
+      <lightning-combobox
+        label="Gate"
+        options={gateOptions}
+        value={gate}
+        onchange={handleGateChange}
+      ></lightning-combobox>
+
+      <lightning-textarea
+        label="Reason"
+        value={reason}
+        onchange={handleReasonChange}
+      ></lightning-textarea>
+
+      <div class="slds-grid date-fields">
+        <lightning-input
+          type="date"
+          label="Effective On"
+          value={effectiveOn}
+          onchange={handleEffectiveOnChange}
+        ></lightning-input>
+
+        <lightning-input
+          type="date"
+          label="Expires On"
+          value={expiresOn}
+          onchange={handleExpiresOnChange}
+        ></lightning-input>
+      </div>
+
+      <lightning-button
+        class="slds-var-m-top_small"
+        label="Grant Exception"
+        variant="brand"
+        disabled={isGrantDisabled}
+        onclick={handleGrant}
+      ></lightning-button>
+
+      <template if:true={actionError}>
+        <c-ps-error-panel message={actionError}></c-ps-error-panel>
+      </template>
+    </div>
+  </article>
+</template>

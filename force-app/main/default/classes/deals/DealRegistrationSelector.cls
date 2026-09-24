@@ -159,8 +159,11 @@ public with sharing class DealRegistrationSelector {
         Id,
         Name,
         Opportunity__c,
+        Opportunity__r.StageName,
         Customer_Account__c,
+        Customer_Account__r.Name,
         Partner_Account__c,
+        Partner_Account__r.Name,
         Partner_Contact__c,
         Status__c,
         Conflict_Status__c,
@@ -169,7 +172,12 @@ public with sharing class DealRegistrationSelector {
         Protection_End_Date__c,
         Business_Problem__c,
         Proposed_Solution__c,
-        Notes__c
+        Notes__c,
+        Lifecycle_Phase__c,
+        Lifecycle_Health__c,
+        Current_Action_Required__c,
+        Next_Action_Due__c,
+        CreatedDate
       FROM Deal_Registration__c
       WHERE Id = :dealId
       WITH USER_MODE
@@ -181,6 +189,27 @@ public with sharing class DealRegistrationSelector {
     }
 
     return rows[0];
+  }
+
+  /**
+   * Queries a deal's partner-visible lifecycle events for the deal detail
+   * timeline, most recent first. Internal-only events (Partner_Visible__c
+   * = false) are excluded.
+   *
+   * @param dealId Id of the deal registration whose events are queried.
+   * @return Up to 50 partner-visible Deal_Event__c records.
+   */
+  public static List<Deal_Event__c> selectPartnerVisibleEvents(Id dealId) {
+    SecurityUtil.assertReadable(Deal_Event__c.SObjectType);
+
+    return [
+      SELECT Id, Event_Type__c, Summary__c, Occurred_On__c
+      FROM Deal_Event__c
+      WHERE Deal__c = :dealId AND Partner_Visible__c = TRUE
+      WITH USER_MODE
+      ORDER BY Occurred_On__c DESC
+      LIMIT 50
+    ];
   }
 
   /**

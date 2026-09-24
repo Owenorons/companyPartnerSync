@@ -120,4 +120,37 @@ describe("c-ps-deal-list", () => {
 
     expect(mockNavigate).not.toHaveBeenCalled();
   });
+
+  it("dispatches opendeal and navigates to the Deal Detail page when a deal is opened", async () => {
+    const element = createElement("c-ps-deal-list", { is: PsDealList });
+    const openDealHandler = jest.fn();
+    element.addEventListener("opendeal", openDealHandler);
+
+    document.body.appendChild(element);
+
+    getMyDeals.emit([
+      {
+        dealId: "a02xx0000000001",
+        dealNumber: "DR-001",
+        customerName: "Acme",
+        status: "Submitted",
+        dealValue: 25000,
+        protectionEndDate: null,
+        conflictStatus: "None"
+      }
+    ]);
+    await flushPromises();
+
+    element.shadowRoot.querySelector(".deal-footer button").click();
+
+    expect(openDealHandler).toHaveBeenCalled();
+    expect(openDealHandler.mock.calls[0][0].detail).toEqual({
+      dealId: "a02xx0000000001"
+    });
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: "comm__namedPage",
+      attributes: { name: "Deal_Detail__c" },
+      state: { dealId: "a02xx0000000001" }
+    });
+  });
 });
