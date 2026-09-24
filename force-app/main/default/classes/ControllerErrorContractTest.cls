@@ -12,6 +12,11 @@ private class ControllerErrorContractTest {
     assertAura(new CalloutCase('testProvider'));
     assertAura(new CalloutCase('partnerInsights'));
     assertAura(new CalloutCase('partnerActions'));
+    assertAura(new CalloutCase('pendingAiRequests'));
+    assertAura(new CalloutCase('actionAiRequest'));
+    assertAura(new CalloutCase('dismissAiRequest'));
+    assertAura(new CalloutCase('submitAiRequest'));
+    assertAura(new CalloutCase('myAiRequests'));
   }
 
   @IsTest
@@ -84,6 +89,16 @@ private class ControllerErrorContractTest {
         PartnerAIController.getMyInsights();
       else if (name == 'partnerActions')
         PartnerAIController.getMyNextBestActions();
+      else if (name == 'pendingAiRequests')
+        AIInsightController.getPendingRequests();
+      else if (name == 'actionAiRequest')
+        AIInsightController.actionRequest(null);
+      else if (name == 'dismissAiRequest')
+        AIInsightController.dismissRequest(null);
+      else if (name == 'submitAiRequest')
+        PartnerAIController.submitInsightRequest(null, null);
+      else if (name == 'myAiRequests')
+        PartnerAIController.getMyInsightRequests();
       else if (name == 'assignLead')
         LeadDistributionController.assignLeadToPartner(null);
       else if (name == 'myLeads')

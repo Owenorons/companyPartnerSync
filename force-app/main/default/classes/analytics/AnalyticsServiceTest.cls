@@ -154,6 +154,78 @@ private class AnalyticsServiceTest {
   }
 
   @IsTest
+  static void kpiTotalsSplitWonRevenueByAttributionType() {
+    User executiveUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      executiveUser.Id,
+      'PartnerSync_Executive_User'
+    );
+    System.runAs(executiveUser) {
+      Account partner = PartnerSyncTestDataFactory.partnerAccount(
+        'Attribution Partner'
+      );
+      Account customer = PartnerSyncTestDataFactory.customerAccount(
+        'Attribution Customer'
+      );
+      insert new List<Account>{ partner, customer };
+
+      Opportunity sourcedOpp = new Opportunity(
+        Name = 'Sourced Won',
+        AccountId = customer.Id,
+        Partner_Account__c = partner.Id,
+        StageName = 'Closed Won',
+        CloseDate = Date.today(),
+        Amount = 3000
+      );
+      Opportunity coSellOpp = new Opportunity(
+        Name = 'Co-Sell Won',
+        AccountId = customer.Id,
+        Partner_Account__c = partner.Id,
+        StageName = 'Closed Won',
+        CloseDate = Date.today(),
+        Amount = 7000
+      );
+      insert new List<Opportunity>{ sourcedOpp, coSellOpp };
+
+      insert new List<Deal_Registration__c>{
+        new Deal_Registration__c(
+          Partner_Account__c = partner.Id,
+          Status__c = 'Approved',
+          Opportunity__c = sourcedOpp.Id,
+          Attribution_Type__c = DealAttributionEngine.PARTNER_SOURCED
+        ),
+        new Deal_Registration__c(
+          Partner_Account__c = partner.Id,
+          Status__c = 'Approved',
+          Opportunity__c = coSellOpp.Id,
+          Attribution_Type__c = DealAttributionEngine.CO_SELL
+        )
+      };
+
+      AnalyticsDomain.KpiTotals totals = AnalyticsSelector.selectKpiTotals(
+          new Set<Id>{ partner.Id }
+        )
+        .get(partner.Id);
+      PartnerKPIDTO kpi = AnalyticsDomain.calculatePartnerKPI(totals, partner);
+      Assert.areEqual(3000, kpi.partnerSourcedRevenue);
+      Assert.areEqual(1, kpi.partnerSourcedWonDeals);
+      Assert.areEqual(7000, kpi.coSellRevenue);
+      Assert.areEqual(1, kpi.coSellWonDeals);
+
+      List<PartnerLeaderboardRowDTO> leaderboard = AnalyticsService.getPartnerLeaderboard();
+      PartnerLeaderboardRowDTO partnerRow;
+      for (PartnerLeaderboardRowDTO row : leaderboard) {
+        if (row.partnerAccountId == partner.Id) {
+          partnerRow = row;
+        }
+      }
+      Assert.isNotNull(partnerRow);
+      Assert.areEqual(3000, partnerRow.partnerSourcedRevenue);
+      Assert.areEqual(7000, partnerRow.coSellRevenue);
+    }
+  }
+
+  @IsTest
   static void leaderboardScalesAndKeepsPartnerMetricsIsolated() {
     User executiveUser = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSet(
@@ -228,8 +300,8 @@ private class AnalyticsServiceTest {
       Test.stopTest();
       Assert.areEqual(31, rows.size());
       Assert.isTrue(
-        queriesUsed <= 13,
-        'Expected nine data queries plus four permission checks, got ' +
+        queriesUsed <= 14,
+        'Expected ten data queries plus four permission checks, got ' +
         queriesUsed
       );
       Map<Id, PartnerLeaderboardRowDTO> byPartner = new Map<Id, PartnerLeaderboardRowDTO>();

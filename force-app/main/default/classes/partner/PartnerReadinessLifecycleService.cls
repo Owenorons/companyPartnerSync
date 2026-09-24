@@ -64,6 +64,45 @@ public without sharing class PartnerReadinessLifecycleService {
   }
 
   /**
+   * Assigns (or re-assigns) a training item directly to a partner account,
+   * independent of any onboarding record - for certifications tracked after
+   * onboarding has completed. Requires partner lifecycle management
+   * authority.
+   *
+   * @param partnerAccountId Id of the partner Account the training is
+   * assigned to.
+   * @param trainingKey Key identifying the training item.
+   * @param mandatory Whether completing the training is mandatory.
+   * @param dueOn Date the training assignment is due.
+   * @param expiresOn Date the completed training/certification expires.
+   * @return The created or updated Partner_Training_Assignment__c record.
+   */
+  public static Partner_Training_Assignment__c assignTraining(
+    Id partnerAccountId,
+    String trainingKey,
+    Boolean mandatory,
+    Date dueOn,
+    Date expiresOn
+  ) {
+    assertLifecycleAuthority();
+    Partner_Training_Assignment__c assignment = new Partner_Training_Assignment__c(
+      Partner_Account__c = partnerAccountId,
+      Assignment_Key__c = partnerAccountId + ':' + trainingKey,
+      Training_Key__c = trainingKey,
+      Mandatory__c = mandatory,
+      Status__c = 'Assigned',
+      Due_On__c = dueOn,
+      Expires_On__c = expiresOn
+    );
+    Database.upsert(
+      assignment,
+      Partner_Training_Assignment__c.Fields.Assignment_Key__c,
+      AccessLevel.SYSTEM_MODE
+    );
+    return assignment;
+  }
+
+  /**
    * The set of gate keys a Partner_Exception__c may waive, matching the
    * keys evaluate() populates in GateResult.gates.
    */

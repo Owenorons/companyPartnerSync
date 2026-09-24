@@ -1,8 +1,9 @@
 /**
  * Processes a decision (Approved, Approved with Conditions, Rejected, Returned) on a single
- * pending Deal_Approval__c step: locks and validates the step, checks the assignee's decision
- * authority against the deal amount, records the decision, creates a condition record when
- * applicable, and coordinates the parent Deal_Approval_Plan__c's overall status.
+ * pending Deal_Approval__c step: locks and validates the step, checks the deciding user's
+ * authority (either an exact Assigned_To__c match, or holding the step's Approver_Permission_Set__c)
+ * against the deal amount, records the decision, creates a condition record when applicable, and
+ * coordinates the parent Deal_Approval_Plan__c's overall status.
  */
 @SuppressWarnings('PMD.ApexCRUDViolation')
 public without sharing class DealApprovalCommandService {
@@ -30,6 +31,7 @@ public without sharing class DealApprovalCommandService {
         Step_Key__c,
         Status__c,
         Assigned_To__c,
+        Approver_Permission_Set__c,
         Authority_Limit__c,
         Version_Number__c,
         Deal__r.Estimated_Revenue__c
@@ -112,9 +114,12 @@ public without sharing class DealApprovalCommandService {
     Decimal amount = step.Deal__r.Estimated_Revenue__c == null
       ? 0
       : step.Deal__r.Estimated_Revenue__c;
+    Boolean hasRoutedAuthority = step.Assigned_To__c != null
+      ? step.Assigned_To__c == UserInfo.getUserId()
+      : String.isNotBlank(step.Approver_Permission_Set__c) &&
+        PermissionService.hasPermissionSet(step.Approver_Permission_Set__c);
     if (
-      step.Assigned_To__c == null ||
-      step.Assigned_To__c != UserInfo.getUserId() ||
+      !hasRoutedAuthority ||
       (step.Authority_Limit__c != null &&
       amount > step.Authority_Limit__c)
     )

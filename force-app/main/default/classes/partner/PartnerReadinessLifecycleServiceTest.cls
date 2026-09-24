@@ -1,5 +1,60 @@
 @IsTest
 private class PartnerReadinessLifecycleServiceTest {
+  @IsTest
+  static void assignTrainingDirectlyToPartnerAccountSetsAccountNotOnboarding() {
+    PartnerReadinessLifecycleService.testLifecycleAuthority = true;
+    Account partner = new Account(Name = 'Post-Onboarding Partner');
+    insert partner;
+
+    Partner_Training_Assignment__c assignment = PartnerReadinessLifecycleService.assignTraining(
+      partner.Id,
+      'ANNUAL-RECERT',
+      true,
+      Date.today().addDays(14),
+      Date.today().addYears(1)
+    );
+
+    Assert.areEqual(partner.Id, assignment.Partner_Account__c);
+    Assert.isNull(assignment.Onboarding__c);
+    Assert.areEqual(
+      partner.Id + ':ANNUAL-RECERT',
+      assignment.Assignment_Key__c
+    );
+    Assert.areEqual(Date.today().addYears(1), assignment.Expires_On__c);
+
+    Partner_Training_Assignment__c stored = [
+      SELECT Partner_Account__c, Onboarding__c, Status__c, Expires_On__c
+      FROM Partner_Training_Assignment__c
+      WHERE Id = :assignment.Id
+    ];
+    Assert.areEqual(partner.Id, stored.Partner_Account__c);
+    Assert.isNull(stored.Onboarding__c);
+    Assert.areEqual('Assigned', stored.Status__c);
+    PartnerReadinessLifecycleService.testLifecycleAuthority = false;
+  }
+
+  @IsTest
+  static void assignTrainingDirectlyToPartnerAccountRequiresAuthority() {
+    Account partner = new Account(Name = 'Unauthorised Partner');
+    insert partner;
+
+    try {
+      PartnerReadinessLifecycleService.assignTraining(
+        partner.Id,
+        'ANNUAL-RECERT',
+        true,
+        Date.today().addDays(14),
+        Date.today().addYears(1)
+      );
+      Assert.fail('Expected lifecycle authority to be required.');
+    } catch (PartnerReadinessLifecycleService.LifecycleException expected) {
+      Assert.areEqual(
+        'Partner lifecycle authority is required.',
+        expected.getMessage()
+      );
+    }
+  }
+
   private class Context {
     Partner_Onboarding__c onboarding;
     Partner_Relationship__c relationship;

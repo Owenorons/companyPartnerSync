@@ -115,6 +115,13 @@ public with sharing class DealReviewDetailDTO {
   public String conflictResolutionNotes { get; set; }
 
   /**
+   * Attribution classification (Partner-Sourced or Co-Sell), computed at
+   * submission by DealAttributionEngine and overridable by a reviewer.
+   */
+  @AuraEnabled
+  public String attributionType { get; set; }
+
+  /**
    * Computed risk score for the deal, from DealRiskScoringService.
    */
   @AuraEnabled

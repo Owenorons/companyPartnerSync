@@ -74,6 +74,43 @@ public with sharing class PermissionService {
   }
 
   /**
+   * Returns every permission set the running user holds, either by direct
+   * assignment or via a permission set group they belong to.
+   *
+   * @return Developer names of all permission sets the running user holds.
+   */
+  public static Set<String> getPermissionSetNames() {
+    Set<String> names = new Set<String>();
+    Set<Id> assignedGroupIds = new Set<Id>();
+    for (PermissionSetAssignment assignment : [
+      SELECT PermissionSet.Name, PermissionSetGroupId
+      FROM PermissionSetAssignment
+      WHERE AssigneeId = :UserInfo.getUserId()
+      WITH USER_MODE
+    ]) {
+      if (assignment.PermissionSet.Name != null) {
+        names.add(assignment.PermissionSet.Name);
+      }
+      if (assignment.PermissionSetGroupId != null) {
+        assignedGroupIds.add(assignment.PermissionSetGroupId);
+      }
+    }
+
+    if (!assignedGroupIds.isEmpty()) {
+      for (PermissionSetGroupComponent component : [
+        SELECT PermissionSet.Name
+        FROM PermissionSetGroupComponent
+        WHERE PermissionSetGroupId IN :assignedGroupIds
+        WITH USER_MODE
+      ]) {
+        names.add(component.PermissionSet.Name);
+      }
+    }
+
+    return names;
+  }
+
+  /**
    * Checks whether the running user has a named custom permission, granted
    * either directly, via a permission set group, or via
    * FeatureManagement.checkPermission.

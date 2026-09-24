@@ -41,6 +41,11 @@ public with sharing class DealRegistrationDetailDTO {
    */
   @AuraEnabled
   public String conflictStatus { get; set; }
+  /**
+   * Attribution classification (Partner-Sourced or Co-Sell).
+   */
+  @AuraEnabled
+  public String attributionType { get; set; }
 
   /**
    * Estimated revenue value of the deal.

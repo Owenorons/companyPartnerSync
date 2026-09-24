@@ -3,6 +3,12 @@ import { refreshApex } from "@salesforce/apex";
 import getReviewQueue from "@salesforce/apex/DealReviewController.getReviewQueue";
 import getReviewDetail from "@salesforce/apex/DealReviewController.getReviewDetail";
 import processDecision from "@salesforce/apex/DealReviewController.processDecision";
+import overrideAttribution from "@salesforce/apex/DealReviewController.overrideAttribution";
+
+const ATTRIBUTION_OPTIONS = [
+  { label: "Partner-Sourced", value: "Partner-Sourced" },
+  { label: "Co-Sell", value: "Co-Sell" }
+];
 
 const STATUS_OPTIONS = [
   { label: "All Statuses", value: "" },
@@ -35,9 +41,12 @@ export default class PsDealReviewWorkspace extends LightningElement {
   showRejectDialog = false;
   rejectionReason = "";
   wiredQueueResult;
+  savingAttribution = false;
+  attributionError;
 
   statusOptions = STATUS_OPTIONS;
   conflictOptions = CONFLICT_OPTIONS;
+  attributionOptions = ATTRIBUTION_OPTIONS;
 
   @wire(getReviewQueue)
   wiredReviewQueue(result) {
@@ -99,6 +108,15 @@ export default class PsDealReviewWorkspace extends LightningElement {
     return !this.rejectionReason.trim();
   }
 
+  get isSaveAttributionDisabled() {
+    return (
+      this.savingAttribution ||
+      !this.selectedDeal?.pendingAttributionType ||
+      this.selectedDeal?.pendingAttributionType ===
+        this.selectedDeal?.attributionType
+    );
+  }
+
   get showNoDecisionPermission() {
     return Boolean(
       this.selectedDeal?.isReviewable &&
@@ -152,6 +170,46 @@ export default class PsDealReviewWorkspace extends LightningElement {
 
     if (wasSubmitted) {
       this.handleCancelReject();
+    }
+  }
+
+  handleAttributionChange(event) {
+    if (!this.selectedDeal) {
+      return;
+    }
+
+    this.selectedDeal = {
+      ...this.selectedDeal,
+      pendingAttributionType: event.detail.value
+    };
+  }
+
+  async handleSaveAttribution() {
+    if (
+      !this.selectedDealId ||
+      !this.selectedDeal?.pendingAttributionType ||
+      this.savingAttribution
+    ) {
+      return;
+    }
+
+    this.savingAttribution = true;
+    this.attributionError = undefined;
+
+    try {
+      await overrideAttribution({
+        dealId: this.selectedDealId,
+        attributionType: this.selectedDeal.pendingAttributionType
+      });
+
+      await this.loadDeal(this.selectedDealId);
+    } catch (error) {
+      this.attributionError = this.getErrorMessage(
+        error,
+        "Unable to update deal attribution."
+      );
+    } finally {
+      this.savingAttribution = false;
     }
   }
 
@@ -232,6 +290,7 @@ export default class PsDealReviewWorkspace extends LightningElement {
       ...this.toQueueViewModel(deal),
       stage: deal.implementationTimeline || "Review",
       notes: deal.notes || "No notes provided.",
+      pendingAttributionType: deal.attributionType,
       conflicts,
       conflictCount: conflicts.length,
       hasConflicts: conflicts.length > 0,

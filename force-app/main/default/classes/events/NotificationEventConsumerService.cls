@@ -13,7 +13,9 @@ public with sharing class NotificationEventConsumerService {
     'MDFSubmitted' => 'MDF Request Submitted',
     'MDFApproved' => 'MDF Request Approved',
     'LeadAccepted' => 'Lead Accepted',
-    'LeadConverted' => 'Lead Converted'
+    'LeadConverted' => 'Lead Converted',
+    'CertificationExpiringSoon' => 'Certification Expiring Soon',
+    'CertificationExpired' => 'Certification Expired'
   };
 
   private static final Map<String, String> MESSAGE_BY_EVENT_TYPE = new Map<String, String>{
@@ -22,7 +24,9 @@ public with sharing class NotificationEventConsumerService {
     'MDFSubmitted' => 'A new MDF request has been submitted for review.',
     'MDFApproved' => 'Your MDF request has been approved.',
     'LeadAccepted' => 'A partner has accepted an assigned lead.',
-    'LeadConverted' => 'A lead has been converted to a deal registration.'
+    'LeadConverted' => 'A lead has been converted to a deal registration.',
+    'CertificationExpiringSoon' => 'A partner certification expires in 30 days.',
+    'CertificationExpired' => 'A partner certification has expired.'
   };
 
   private static final Map<String, String> NOTIFICATION_TYPE_BY_EVENT_TYPE = new Map<String, String>{
@@ -31,7 +35,9 @@ public with sharing class NotificationEventConsumerService {
     'MDFSubmitted' => 'MDF',
     'MDFApproved' => 'MDF',
     'LeadAccepted' => 'Lead',
-    'LeadConverted' => 'Lead'
+    'LeadConverted' => 'Lead',
+    'CertificationExpiringSoon' => 'Training',
+    'CertificationExpired' => 'Training'
   };
 
   /**

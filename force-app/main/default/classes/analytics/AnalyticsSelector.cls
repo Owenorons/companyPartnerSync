@@ -6,9 +6,10 @@
  */
 public with sharing class AnalyticsSelector {
   /**
-   * Loads KPI totals in eight queries regardless of the number of partners.
-   * Group only by account so each result stays within the leaderboard's
-   * 1,000-account bound, even when every partner has every lifecycle status.
+   * Loads KPI totals in nine queries regardless of the number of partners.
+   * Group only by account (plus attribution type for the attribution
+   * breakdown) so each result stays within the leaderboard's 1,000-account
+   * bound, even when every partner has every lifecycle status.
    *
    * @param partnerAccountIds Visible partner accounts to summarise (at most 1,000).
    * @return Zero-initialised totals for every requested account, including inactive ones.
@@ -133,6 +134,40 @@ public with sharing class AnalyticsSelector {
         ) == null
         ? 0
         : (Decimal) row.get('totalAmount');
+    }
+    // One bulk-bounded query for both attribution categories: grouping by
+    // Partner_Account__c and Attribution_Type__c together keeps this to a
+    // single aggregate call regardless of partner count, same as every
+    // other total above.
+    for (AggregateResult row : [
+      SELECT
+        Partner_Account__c partnerId,
+        Attribution_Type__c attributionType,
+        COUNT(Id) recordCount,
+        SUM(Opportunity__r.Amount) totalAmount
+      FROM Deal_Registration__c
+      WHERE
+        Partner_Account__c IN :partnerAccountIds
+        AND Opportunity__r.IsWon = TRUE
+      WITH USER_MODE
+      GROUP BY Partner_Account__c, Attribution_Type__c
+    ]) {
+      AnalyticsDomain.KpiTotals rowTotals = totals.get(
+        (Id) row.get('partnerId')
+      );
+      Decimal amount = row.get('totalAmount') == null
+        ? 0
+        : (Decimal) row.get('totalAmount');
+      Integer count = (Integer) row.get('recordCount');
+      if (row.get('attributionType') == DealAttributionEngine.CO_SELL) {
+        rowTotals.coSellRevenue = amount;
+        rowTotals.coSellWonDeals = count;
+      } else if (
+        row.get('attributionType') == DealAttributionEngine.PARTNER_SOURCED
+      ) {
+        rowTotals.partnerSourcedRevenue = amount;
+        rowTotals.partnerSourcedWonDeals = count;
+      }
     }
     return totals;
   }

@@ -33,6 +33,35 @@
           "definition" : "community_layout:section",
           "id" : "e937decf-ae27-4812-b15d-2e0049ed505e",
           "type" : "component"
+        }, {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"3ebbccf9-7e35-41ab-866c-2114a990d74d\",\"columns\":[{\"UUID\":\"4887ac63-7e6a-42dc-96a6-6ae8942d820c\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psDealApprovalWorkspace",
+              "id" : "6bad0a88-d851-4ff8-a416-6e12e66939d7",
+              "type" : "component"
+            } ],
+            "id" : "4887ac63-7e6a-42dc-96a6-6ae8942d820c",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "3ebbccf9-7e35-41ab-866c-2114a990d74d",
+          "type" : "component"
         } ],
         "id" : "87159f79-633b-4a4b-b5fe-a0dd6097dd25",
         "name" : "content",

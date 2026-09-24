@@ -49,11 +49,13 @@ private class RegistrationLifecycleCommandHandlerTest {
       'PartnerSync_Approve_Deal',
       true
     );
-    DealApprovalPlanService.generate(new Set<Id>{ deal.Id });
+    // No manual DealApprovalPlanService.generate() call here - RESUBMIT above
+    // already auto-generated the current plan via routeSubmission(), which is
+    // exactly the production code path this test is proving works end to end.
     Deal_Approval__c approval = [
       SELECT Id, Version_Number__c
       FROM Deal_Approval__c
-      WHERE Deal__c = :deal.Id
+      WHERE Deal__c = :deal.Id AND Plan__r.Current__c = TRUE
       LIMIT 1
     ];
     DealApprovalCommand approvalCommand = new DealApprovalCommand();
@@ -62,7 +64,16 @@ private class RegistrationLifecycleCommandHandlerTest {
       approval.Version_Number__c
     );
     approvalCommand.decision = 'Approved';
-    DealApprovalCommandService.complete(approvalCommand);
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+    System.runAs(channelManager) {
+      DealApprovalCommandService.complete(approvalCommand);
+    }
+
     DealCommand command = command(
       deal.Id,
       DealRegistrationLifecycleConstants.FINALISE_APPROVAL,
@@ -210,6 +221,71 @@ private class RegistrationLifecycleCommandHandlerTest {
     Assert.isTrue(findings.size() >= 1);
     Assert.isTrue(findings[0].Blocking__c);
     Assert.isNotNull(findings[0].Partner_Message__c);
+  }
+
+  @IsTest
+  static void classifiesAttributionTypeUsingLinkedOpportunityAgeOnSubmit() {
+    Account customer = new Account(Name = 'Attribution Customer');
+    insert customer;
+    Opportunity opportunity = new Opportunity(
+      Name = 'Attribution Opportunity',
+      AccountId = customer.Id,
+      StageName = 'Qualification',
+      CloseDate = Date.today().addDays(30),
+      Amount = 50000
+    );
+    insert opportunity;
+    Test.setCreatedDate(opportunity.Id, Datetime.now().addDays(-30));
+
+    Deal_Registration__c coSellDeal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Conflict_Status__c = 'None',
+      Customer_Account__c = customer.Id,
+      Customer_Name__c = 'Attribution Customer',
+      Estimated_Revenue__c = 10000,
+      Opportunity__c = opportunity.Id,
+      Version_Number__c = 0
+    );
+    Deal_Registration__c partnerSourcedDeal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Conflict_Status__c = 'None',
+      Customer_Account__c = customer.Id,
+      Customer_Name__c = 'Attribution Customer',
+      Estimated_Revenue__c = 10000,
+      Version_Number__c = 0
+    );
+    insert new List<Deal_Registration__c>{ coSellDeal, partnerSourcedDeal };
+
+    execute(
+      coSellDeal.Id,
+      DealRegistrationLifecycleConstants.SUBMIT,
+      0,
+      '34b-attribution-cosell',
+      null
+    );
+    execute(
+      partnerSourcedDeal.Id,
+      DealRegistrationLifecycleConstants.SUBMIT,
+      0,
+      '34b-attribution-sourced',
+      null
+    );
+
+    Map<Id, Deal_Registration__c> stored = new Map<Id, Deal_Registration__c>(
+      [
+        SELECT Attribution_Type__c
+        FROM Deal_Registration__c
+        WHERE Id IN (:coSellDeal.Id, :partnerSourcedDeal.Id)
+      ]
+    );
+    Assert.areEqual(
+      DealAttributionEngine.CO_SELL,
+      stored.get(coSellDeal.Id).Attribution_Type__c
+    );
+    Assert.areEqual(
+      DealAttributionEngine.PARTNER_SOURCED,
+      stored.get(partnerSourcedDeal.Id).Attribution_Type__c
+    );
   }
 
   private static DealCommandResult execute(

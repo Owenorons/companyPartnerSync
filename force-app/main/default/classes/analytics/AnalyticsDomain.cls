@@ -23,6 +23,10 @@ public with sharing class AnalyticsDomain {
     public Integer closedOpportunities = 0;
     public Decimal totalPipeline = 0;
     public Decimal totalRevenue = 0;
+    public Decimal partnerSourcedRevenue = 0;
+    public Integer partnerSourcedWonDeals = 0;
+    public Decimal coSellRevenue = 0;
+    public Integer coSellWonDeals = 0;
   }
 
   /**
@@ -111,6 +115,11 @@ public with sharing class AnalyticsDomain {
     dto.totalPipeline = totals.totalPipeline;
     dto.totalRevenue = totals.totalRevenue;
 
+    dto.partnerSourcedRevenue = totals.partnerSourcedRevenue;
+    dto.partnerSourcedWonDeals = totals.partnerSourcedWonDeals;
+    dto.coSellRevenue = totals.coSellRevenue;
+    dto.coSellWonDeals = totals.coSellWonDeals;
+
     dto.leadAcceptanceRate = totals.totalLeads == 0
       ? 0
       : Decimal.valueOf(totals.acceptedLeads) / totals.totalLeads;
@@ -164,6 +173,9 @@ public with sharing class AnalyticsDomain {
 
     dto.revenue = kpi.totalRevenue;
     dto.conversionRate = kpi.dealWinRate;
+
+    dto.partnerSourcedRevenue = kpi.partnerSourcedRevenue;
+    dto.coSellRevenue = kpi.coSellRevenue;
 
     // Use the same explainable 0-100 score shown to the partner so internal
     // rankings and partner-facing performance guidance cannot drift apart.

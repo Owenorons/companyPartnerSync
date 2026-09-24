@@ -48,6 +48,29 @@ public with sharing class PartnerKPIDTO {
   public Decimal totalRevenue { get; set; }
 
   /**
+   * Won revenue from deals classified Partner-Sourced (the partner brought
+   * a customer that didn't exist in the vendor's pipeline before).
+   */
+  @AuraEnabled
+  public Decimal partnerSourcedRevenue { get; set; }
+  /**
+   * Count of won deals classified Partner-Sourced.
+   */
+  @AuraEnabled
+  public Integer partnerSourcedWonDeals { get; set; }
+  /**
+   * Won revenue from deals classified Co-Sell (the vendor's own sales team
+   * already had the opportunity; the partner worked it alongside them).
+   */
+  @AuraEnabled
+  public Decimal coSellRevenue { get; set; }
+  /**
+   * Count of won deals classified Co-Sell.
+   */
+  @AuraEnabled
+  public Integer coSellWonDeals { get; set; }
+
+  /**
    * Rate of leads accepted out of total leads.
    */
   @AuraEnabled

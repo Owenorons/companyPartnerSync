@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Partner_Account__c</fullName><description>Partner account the training
+  assignment belongs to. Set directly for assignments created independent of
+  an onboarding record; onboarding-scoped assignments may leave this blank
+  and resolve their partner via Onboarding__r.Partner_Account__c
+  instead.</description><label>Partner Account</label><type
+  >Lookup</type><referenceTo>Account</referenceTo><relationshipName
+  >Partner_Training_Assignments</relationshipName><deleteConstraint
+  >SetNull</deleteConstraint><required>false</required></CustomField>

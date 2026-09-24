@@ -20,6 +20,9 @@
     >Partner_Training_Assignment__c.Mandatory__c</field><readable
     >true</readable></fieldPermissions>
   <fieldPermissions><editable>true</editable><field
+    >Partner_Training_Assignment__c.Partner_Account__c</field><readable
+    >true</readable></fieldPermissions>
+  <fieldPermissions><editable>true</editable><field
     >Partner_Onboarding__c.Activated_On__c</field><readable
     >true</readable></fieldPermissions>
   <fieldPermissions><editable>true</editable><field

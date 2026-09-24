@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
-  >Assignment_Type__c</fullName><fieldManageability
-  >DeveloperControlled</fieldManageability><label>Assignment Type</label><length
-  >40</length><type>Text</type></CustomField>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assignment_Type__c</fullName>
+    <description>How this step's approver is resolved. 'Current User' assigns
+  the user who generated the plan. 'Permission Set' routes the step to any
+  internal user holding the permission set named in Approver_Permission_Set__c
+  (no single assignee is picked).</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Assignment Type</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted
+      >false</sorted><value><fullName>Permission Set</fullName><default
+        >true</default><label>Permission Set</label></value><value><fullName
+        >Current User</fullName><default>false</default><label
+        >Current User</label></value></valueSetDefinition></valueSet>
+</CustomField>

@@ -205,7 +205,52 @@ research review.
 - Extend `psPartnerKpiDashboard`/`psPartnerLeaderboard` using the existing
   `psDashboardMetricCard` child component.
 
-## Phase 8 (Medium) — Training/Certification Extension
+## Phase 8 (Medium) — Deal Approval Engine Completion + Training/Certification Extension
+
+**Phase 8a — Deal Approval Engine Completion (folded in 2026-09-24):**
+
+**Problem:** while scoping vendor-configurable approval steps, found that the
+multi-step engine (`Deal_Approval_Step_Rule__mdt` → `Deal_Approval_Plan__c`/
+`Deal_Approval__c`) already had the right shape but was unwired —
+`DealApprovalPlanService.generate()` had zero production callers, so
+`DealApprovalFinalisationGuard.assertReady()` always threw and every real
+"Approve" click in `psDealReviewWorkspace` failed. Two dead, unwired CMDT
+types (`Approval_Routing_Config__mdt`, `Approval_Rule__mdt`) also existed
+with an `Approver_Role__c` concept that pointed at real permission sets.
+
+**What shipped:**
+
+- Role resolution repurposed into `Deal_Approval_Step_Rule__mdt` itself:
+  `Assignment_Type__c` (now a picklist: `Permission Set` default, `Current
+User`) + new `Approver_Permission_Set__c`. `Deal_Approval__c` snapshots the
+  permission set; any internal user holding it can decide the step — no
+  single pre-picked assignee. `Approval_Routing_Config__mdt`/
+  `Approval_Rule__mdt` deleted (fully redundant once merged in).
+- `DealApprovalCommandService.assertAuthority()` checks permission-set
+  membership (`PermissionService.hasPermissionSet`, new
+  `getPermissionSetNames()` helper) when there's no exact `Assigned_To__c`.
+- `RegistrationLifecycleCommandHandler.routeSubmission()` now calls
+  `DealApprovalPlanService.generate()` automatically on submit/resubmit —
+  the fix for the broken Approve path. Required a version-override overload
+  on `generate()` since the deal's own version bump hasn't persisted yet at
+  that point in the transaction.
+- New workspace for step-deciders who aren't full deal reviewers:
+  `DealApprovalController`/`DealApprovalWorkspaceService`/
+  `DealApprovalSelector`/`DealApprovalDomain` + DTOs, and LWC
+  `psDealApprovalWorkspace`, added alongside `psDealReviewWorkspace` on the
+  `Deal_Review` Experience Cloud CMS page.
+- Permission sets `PartnerSync_Channel_Manager`/`PartnerSync_Internal_Admin`/
+  `PartnerSync_Deal_Reviewer` granted `Deal_Approval__c`/
+  `Deal_Approval_Plan__c` access + the new controller.
+
+**Explicitly out of scope:** `Deal_Review__c`/`DealReviewPlanService` (a
+separate, equally-unwired review-checklist engine — not blocking today since
+zero active review rules means zero blocking reviews); making
+`Sequence__c`/`Parallel_Group__c` actually gate step ordering (all steps in
+a plan remain independently decidable; the plan completes once all are
+`Completed`).
+
+**Phase 8b — Training/Certification Extension:**
 
 **Problem:** `Partner_Training_Assignment__c` already has `Expires_On__c` —
 the foundation exists, it's just scoped to onboarding only, and nothing acts

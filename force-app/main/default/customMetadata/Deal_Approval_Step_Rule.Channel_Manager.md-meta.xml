@@ -21,7 +21,13 @@
       xsi:type="xsd:string"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >Current User</value></values><values><field>Maximum_Amount__c</field><value
+    >Permission Set</value></values><values><field
+    >Approver_Permission_Set__c</field><value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >PartnerSync_Channel_Manager</value></values><values><field
+    >Maximum_Amount__c</field><value
       xsi:type="xsd:double"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema"

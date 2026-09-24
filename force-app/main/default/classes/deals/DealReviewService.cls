@@ -52,6 +52,44 @@ public without sharing class DealReviewService {
   }
 
   /**
+   * Overrides a deal's attribution classification. DealAttributionEngine
+   * computes this automatically at submission from a timestamp heuristic;
+   * a reviewer may correct it for cases the heuristic gets wrong (e.g. a
+   * lead that technically predates the Opportunity but was actually
+   * partner-generated).
+   *
+   * @param dealId Id of the deal registration to update.
+   * @param attributionType The corrected classification ('Partner-Sourced' or 'Co-Sell').
+   * @return The updated deal registration record.
+   */
+  public static Deal_Registration__c overrideAttribution(
+    Id dealId,
+    String attributionType
+  ) {
+    PartnerPermissionService.assertCanReviewDeals();
+    if (
+      attributionType != DealAttributionEngine.PARTNER_SOURCED &&
+      attributionType != DealAttributionEngine.CO_SELL
+    ) {
+      throw new PartnerSyncHandledException(
+        'A valid attribution type is required.'
+      );
+    }
+
+    Deal_Registration__c record = [
+      SELECT Id, Attribution_Type__c
+      FROM Deal_Registration__c
+      WHERE Id = :dealId
+      WITH SYSTEM_MODE
+      LIMIT 1
+      FOR UPDATE
+    ];
+    record.Attribution_Type__c = attributionType;
+    Database.update(record, AccessLevel.SYSTEM_MODE);
+    return record;
+  }
+
+  /**
    * Processes an internal reviewer's decision on a deal: checks the reviewer's permission for
    * the requested decision, validates the request, and dispatches to the matching branch
    * (approve, reject, resolve conflict, or extend protection), publishing a platform event on

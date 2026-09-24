@@ -171,6 +171,29 @@
           </article>
 
           <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Attribution</h3>
+
+            <lightning-combobox
+              label="Classification"
+              options={attributionOptions}
+              value={selectedDeal.pendingAttributionType}
+              onchange={handleAttributionChange}
+            ></lightning-combobox>
+
+            <lightning-button
+              class="slds-var-m-top_small"
+              label="Save Attribution"
+              variant="brand"
+              disabled={isSaveAttributionDisabled}
+              onclick={handleSaveAttribution}
+            ></lightning-button>
+
+            <template if:true={attributionError}>
+              <c-ps-error-panel message={attributionError}></c-ps-error-panel>
+            </template>
+          </article>
+
+          <article class="panel-card">
             <h3 class="slds-var-m-bottom_medium">AI Deal Risk</h3>
 
             <div class={selectedDeal.riskScoreClass}>

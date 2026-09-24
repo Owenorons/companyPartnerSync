@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Approver_Permission_Set__c</fullName><description>API name of the
+  permission set snapshotted from the originating Deal_Approval_Step_Rule__mdt
+  record. When Assigned_To__c is blank, any internal user holding this
+  permission set has authority to decide this step.</description><label
+  >Approver Permission Set</label><length>255</length><type
+  >Text</type></CustomField>

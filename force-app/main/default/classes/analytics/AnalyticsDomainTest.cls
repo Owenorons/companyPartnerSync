@@ -85,6 +85,45 @@ private class AnalyticsDomainTest {
   }
 
   @IsTest
+  static void buildLeaderboardRowMapsAttributionSplit() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    PartnerKPIDTO kpi = new PartnerKPIDTO();
+    kpi.totalRevenue = 10000;
+    kpi.partnerSourcedRevenue = 4000;
+    kpi.partnerSourcedWonDeals = 1;
+    kpi.coSellRevenue = 6000;
+    kpi.coSellWonDeals = 2;
+    kpi.healthScore = 50;
+
+    PartnerLeaderboardRowDTO row = AnalyticsDomain.buildLeaderboardRow(
+      partner,
+      kpi
+    );
+
+    Assert.areEqual(4000, row.partnerSourcedRevenue);
+    Assert.areEqual(6000, row.coSellRevenue);
+  }
+
+  @IsTest
+  static void calculatePartnerKpiMapsAttributionTotalsFromKpiTotals() {
+    AnalyticsDomain.KpiTotals totals = new AnalyticsDomain.KpiTotals();
+    totals.partnerSourcedRevenue = 1500;
+    totals.partnerSourcedWonDeals = 2;
+    totals.coSellRevenue = 2500;
+    totals.coSellWonDeals = 3;
+
+    PartnerKPIDTO dto = AnalyticsDomain.calculatePartnerKPI(
+      totals,
+      new Account()
+    );
+
+    Assert.areEqual(1500, dto.partnerSourcedRevenue);
+    Assert.areEqual(2, dto.partnerSourcedWonDeals);
+    Assert.areEqual(2500, dto.coSellRevenue);
+    Assert.areEqual(3, dto.coSellWonDeals);
+  }
+
+  @IsTest
   static void healthScoreIsBoundedAndTiered() {
     PartnerKPIDTO kpi = new PartnerKPIDTO();
     kpi.leadAcceptanceRate = 2;

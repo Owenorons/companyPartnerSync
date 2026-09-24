@@ -38,7 +38,17 @@ private class DealApprovalServiceTest {
     command.decision = 'Approved with Conditions';
     command.conditionType = 'Protection Blocking';
     command.conditionDescription = 'Obtain signed customer confirmation';
-    DealApprovalCommandService.complete(command);
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealApprovalCommandService.complete(command);
+    }
+
     Deal_Approval__c completed = [
       SELECT Status__c, Authority_Snapshot__c
       FROM Deal_Approval__c
@@ -70,12 +80,84 @@ private class DealApprovalServiceTest {
         : Integer.valueOf(deal.Version_Number__c)
     );
     Assert.areEqual('Approved with Conditions', finalPlan.Status__c);
-    try {
-      DealApprovalCommandService.complete(command);
-      Assert.fail('Expected stale command rejection.');
-    } catch (DealApprovalCommandService.ApprovalCommandException expected) {
-      Assert.isTrue(expected.getMessage().contains('changed'));
+    System.runAs(channelManager) {
+      try {
+        DealApprovalCommandService.complete(command);
+        Assert.fail('Expected stale command rejection.');
+      } catch (DealApprovalCommandService.ApprovalCommandException expected) {
+        Assert.isTrue(expected.getMessage().contains('changed'));
+      }
     }
+  }
+
+  @IsTest
+  static void permissionSetHolderCanCompleteRoleRoutedStep() {
+    Deal_Registration__c deal = deal(100000);
+    DealApprovalPlanService.generate(new Set<Id>{ deal.Id });
+    Deal_Approval__c step = [
+      SELECT Id, Version_Number__c, Assigned_To__c, Approver_Permission_Set__c
+      FROM Deal_Approval__c
+      WHERE Deal__c = :deal.Id
+      LIMIT 1
+    ];
+    Assert.isNull(step.Assigned_To__c);
+    Assert.areEqual(
+      'PartnerSync_Channel_Manager',
+      step.Approver_Permission_Set__c
+    );
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    DealApprovalCommand command = new DealApprovalCommand();
+    command.approvalId = step.Id;
+    command.expectedVersion = Integer.valueOf(step.Version_Number__c);
+    command.decision = 'Approved';
+
+    System.runAs(channelManager) {
+      DealApprovalCommandService.complete(command);
+    }
+
+    Assert.areEqual(
+      'Completed',
+      [SELECT Status__c FROM Deal_Approval__c WHERE Id = :step.Id].Status__c
+    );
+  }
+
+  @IsTest
+  static void nonHolderCannotCompleteRoleRoutedStep() {
+    Deal_Registration__c deal = deal(100000);
+    DealApprovalPlanService.generate(new Set<Id>{ deal.Id });
+    Deal_Approval__c step = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Approval__c
+      WHERE Deal__c = :deal.Id
+      LIMIT 1
+    ];
+
+    User plainInternalUser = TestUserFactory.createInternalUser();
+
+    DealApprovalCommand command = new DealApprovalCommand();
+    command.approvalId = step.Id;
+    command.expectedVersion = Integer.valueOf(step.Version_Number__c);
+    command.decision = 'Approved';
+
+    System.runAs(plainInternalUser) {
+      try {
+        DealApprovalCommandService.complete(command);
+        Assert.fail('Expected authority rejection.');
+      } catch (DealApprovalCommandService.ApprovalCommandException expected) {
+        Assert.isTrue(expected.getMessage().contains('lacks authority'));
+      }
+    }
+
+    Assert.areEqual(
+      'Pending',
+      [SELECT Status__c FROM Deal_Approval__c WHERE Id = :step.Id].Status__c
+    );
   }
 
   @IsTest

@@ -41,6 +41,14 @@ export default class PsPartnerKpiDashboard extends LightningElement {
     return this.formatCurrency(this.kpi?.totalRevenue);
   }
 
+  get partnerSourcedRevenueLabel() {
+    return this.formatCurrency(this.kpi?.partnerSourcedRevenue);
+  }
+
+  get coSellRevenueLabel() {
+    return this.formatCurrency(this.kpi?.coSellRevenue);
+  }
+
   get leadConversionLabel() {
     return this.formatPercent(this.kpi?.leadConversionRate);
   }

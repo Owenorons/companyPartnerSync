@@ -69,7 +69,8 @@ public without sharing class DealReviewSelector {
         Approval_Notes__c,
         Rejection_Reason__c,
         Conflict_Resolution_Notes__c,
-        Notes__c
+        Notes__c,
+        Attribution_Type__c
       FROM Deal_Registration__c
       WHERE Id = :dealId
       WITH SYSTEM_MODE

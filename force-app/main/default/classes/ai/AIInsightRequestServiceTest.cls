@@ -96,4 +96,16 @@ private class AIInsightRequestServiceTest {
       }
     }
   }
+
+  @IsTest
+  static void partnerCanListInsightTypes() {
+    User partner = partnerUser();
+    System.runAs(partner) {
+      List<AIInsightTypeDTO> types = PartnerAIController.getInsightTypes();
+      Assert.isTrue(
+        types.size() > 0,
+        'At least one active AI feature type should be available to partners.'
+      );
+    }
+  }
 }

@@ -37,6 +37,12 @@
             <span>Opportunity Stage</span>
             <strong>{detail.stage}</strong>
           </div>
+          <template if:true={detail.attributionType}>
+            <div class="status-row">
+              <span>Attribution</span>
+              <strong>{detail.attributionType}</strong>
+            </div>
+          </template>
           <div class="status-row">
             <span>Estimated Close</span>
             <strong>{estimatedCloseDateLabel}</strong>

@@ -156,6 +156,7 @@ public with sharing class DealRegistrationDomain {
 
     dto.status = record.Status__c;
     dto.conflictStatus = record.Conflict_Status__c;
+    dto.attributionType = record.Attribution_Type__c;
 
     dto.dealValue = record.Estimated_Revenue__c;
     dto.estimatedCloseDate = record.Estimated_Close_Date__c;

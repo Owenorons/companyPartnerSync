@@ -16,7 +16,15 @@ public with sharing class PartnerSyncSetupController {
     'PartnerSync Operational Alerts Hourly' => '0 0 * * * ?',
     'PartnerSync Provisioning Reconciliation' => '0 15 * * * ?',
     'PartnerSync Deal Expiry' => '0 30 2 * * ?',
-    'PartnerSync Partner Share Cleanup' => '0 45 2 * * ?'
+    'PartnerSync Partner Share Cleanup' => '0 45 2 * * ?',
+    // Runs before "Lifecycle Governance Daily" (02:00) - that batch also
+    // silently expires onboarding-scoped training assignments past
+    // Expires_On__c but never publishes an event. Running first here means
+    // this batch is always the one to flip status and fire
+    // CertificationExpired for onboarding-scoped assignments; the
+    // governance batch's later pass then finds nothing left to do for rows
+    // already expired.
+    'PartnerSync Certification Reminder' => '0 0 1 * * ?'
   };
 
   /**
@@ -338,7 +346,8 @@ public with sharing class PartnerSyncSetupController {
       'PartnerSync Operational Alerts Hourly' => new PartnerOperationalAlertService(),
       'PartnerSync Provisioning Reconciliation' => new PartnerProvisioningReconciler(),
       'PartnerSync Deal Expiry' => new DealExpiryBatch(),
-      'PartnerSync Partner Share Cleanup' => new PartnerShareCleanupBatch()
+      'PartnerSync Partner Share Cleanup' => new PartnerShareCleanupBatch(),
+      'PartnerSync Certification Reminder' => new PartnerCertificationReminderBatch()
     };
   }
 

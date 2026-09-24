@@ -47,6 +47,26 @@ public with sharing class DealReviewController {
   }
 
   /**
+   * Overrides a deal's attribution classification.
+   *
+   * @param dealId Id of the deal registration to update.
+   * @param attributionType The corrected classification ('Partner-Sourced' or 'Co-Sell').
+   */
+  @AuraEnabled
+  public static void overrideAttribution(Id dealId, String attributionType) {
+    try {
+      DealReviewService.overrideAttribution(dealId, attributionType);
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'DealReviewController',
+        'Unable to update deal attribution.',
+        'Unable to update deal attribution.',
+        ex
+      );
+    }
+  }
+
+  /**
    * Processes an internal reviewer's decision on a deal.
    *
    * @param request The reviewer's decision request.

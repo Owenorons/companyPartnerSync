@@ -294,6 +294,94 @@ private class DealReviewServiceTest {
     }
   }
 
+  @IsTest
+  static void channelManagerCanOverrideAttribution() {
+    Deal_Registration__c deal = createSubmittedDeal();
+
+    User channelManager = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealReviewService.overrideAttribution(
+        deal.Id,
+        DealAttributionEngine.CO_SELL
+      );
+    }
+
+    Deal_Registration__c updated = [
+      SELECT Attribution_Type__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+    System.assertEquals(
+      DealAttributionEngine.CO_SELL,
+      updated.Attribution_Type__c
+    );
+  }
+
+  @IsTest
+  static void executiveCannotOverrideAttribution() {
+    Deal_Registration__c deal = createSubmittedDeal();
+
+    User executiveUser = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      executiveUser.Id,
+      'PartnerSync_Executive_User'
+    );
+
+    System.runAs(executiveUser) {
+      Boolean threw = false;
+      try {
+        DealReviewService.overrideAttribution(
+          deal.Id,
+          DealAttributionEngine.CO_SELL
+        );
+      } catch (PartnerSyncHandledException ex) {
+        threw = true;
+      }
+      System.assertEquals(
+        true,
+        threw,
+        'A view-only reviewer should not be able to override attribution.'
+      );
+    }
+  }
+
+  @IsTest
+  static void channelManagerCannotOverrideAttributionWithInvalidValue() {
+    Deal_Registration__c deal = createSubmittedDeal();
+
+    User channelManager = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      Boolean threw = false;
+      try {
+        DealReviewService.overrideAttribution(deal.Id, 'Not A Real Value');
+      } catch (PartnerSyncHandledException ex) {
+        threw = true;
+        System.assertEquals(
+          'A valid attribution type is required.',
+          ex.getMessage()
+        );
+      }
+      System.assertEquals(
+        true,
+        threw,
+        'An invalid attribution type should be rejected.'
+      );
+    }
+  }
+
   private static void completeApprovalPlan(Id dealId) {
     DealApprovalPlanService.generate(new Set<Id>{ dealId });
     Deal_Approval__c approval = [

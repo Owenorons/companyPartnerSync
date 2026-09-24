@@ -3,6 +3,7 @@ import PsDealReviewWorkspace from "c/psDealReviewWorkspace";
 import getReviewQueue from "@salesforce/apex/DealReviewController.getReviewQueue";
 import getReviewDetail from "@salesforce/apex/DealReviewController.getReviewDetail";
 import processDecision from "@salesforce/apex/DealReviewController.processDecision";
+import overrideAttribution from "@salesforce/apex/DealReviewController.overrideAttribution";
 
 jest.mock(
   "@salesforce/apex/DealReviewController.getReviewQueue",
@@ -25,6 +26,14 @@ jest.mock(
 
 jest.mock(
   "@salesforce/apex/DealReviewController.processDecision",
+  () => ({
+    default: jest.fn()
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@salesforce/apex/DealReviewController.overrideAttribution",
   () => ({
     default: jest.fn()
   }),
@@ -281,5 +290,96 @@ describe("c-ps-deal-review-workspace", () => {
     expect(
       element.shadowRoot.querySelector(".decision-state").textContent
     ).toContain("You do not have permission to decide this deal.");
+  });
+
+  it("disables Save Attribution until the classification actually changes", async () => {
+    getReviewDetail.mockResolvedValue({
+      dealId: "a02xx0000000004",
+      customerName: "Delta",
+      partnerName: "West Partner",
+      status: "Submitted",
+      conflictStatus: "None",
+      attributionType: "Partner-Sourced"
+    });
+
+    const element = createElement("c-ps-deal-review-workspace", {
+      is: PsDealReviewWorkspace
+    });
+    document.body.appendChild(element);
+
+    getReviewQueue.emit([
+      {
+        dealId: "a02xx0000000004",
+        customerName: "Delta",
+        partnerName: "West Partner",
+        status: "Submitted",
+        conflictStatus: "None"
+      }
+    ]);
+    await flushPromises();
+    await flushPromises();
+
+    const saveButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Save Attribution");
+    expect(saveButton.disabled).toBe(true);
+
+    Array.from(element.shadowRoot.querySelectorAll("lightning-combobox"))
+      .find((combobox) => combobox.label === "Classification")
+      .dispatchEvent(
+        new CustomEvent("change", { detail: { value: "Co-Sell" } })
+      );
+    await flushPromises();
+
+    expect(saveButton.disabled).toBe(false);
+  });
+
+  it("saves an attribution override and reloads the deal detail", async () => {
+    getReviewDetail.mockResolvedValue({
+      dealId: "a02xx0000000005",
+      customerName: "Epsilon",
+      partnerName: "North Partner",
+      status: "Submitted",
+      conflictStatus: "None",
+      attributionType: "Partner-Sourced"
+    });
+    overrideAttribution.mockResolvedValue();
+
+    const element = createElement("c-ps-deal-review-workspace", {
+      is: PsDealReviewWorkspace
+    });
+    document.body.appendChild(element);
+
+    getReviewQueue.emit([
+      {
+        dealId: "a02xx0000000005",
+        customerName: "Epsilon",
+        partnerName: "North Partner",
+        status: "Submitted",
+        conflictStatus: "None"
+      }
+    ]);
+    await flushPromises();
+    await flushPromises();
+
+    Array.from(element.shadowRoot.querySelectorAll("lightning-combobox"))
+      .find((combobox) => combobox.label === "Classification")
+      .dispatchEvent(
+        new CustomEvent("change", { detail: { value: "Co-Sell" } })
+      );
+    await flushPromises();
+
+    const saveButton = Array.from(
+      element.shadowRoot.querySelectorAll("lightning-button")
+    ).find((button) => button.label === "Save Attribution");
+    saveButton.click();
+    await flushPromises();
+    await flushPromises();
+
+    expect(overrideAttribution).toHaveBeenCalledWith({
+      dealId: "a02xx0000000005",
+      attributionType: "Co-Sell"
+    });
+    expect(getReviewDetail).toHaveBeenCalledTimes(2);
   });
 });

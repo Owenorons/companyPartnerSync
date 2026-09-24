@@ -57,6 +57,7 @@ export default class PsPartnerLeaderboard extends LightningElement {
 
   toViewModel(partner, index) {
     const revenue = Number(partner.revenue || 0);
+    const coSellRevenue = Number(partner.coSellRevenue || 0);
     const conversionRate = Number(partner.conversionRate || 0);
     const score = Number(partner.score || 0);
 
@@ -70,9 +71,11 @@ export default class PsPartnerLeaderboard extends LightningElement {
       partnerTier,
       wonDeals: partner.wonDeals || 0,
       revenue,
+      coSellRevenue,
       numericScore: score,
       score: Math.round(score),
       revenueLabel: this.formatCurrency(revenue),
+      coSellRevenueLabel: this.formatCurrency(coSellRevenue),
       conversionLabel: this.formatPercent(conversionRate),
       medallionClass: `medallion medallion-${tierModifier}`,
       tierChipClass: `tier-chip tier-${tierModifier}`

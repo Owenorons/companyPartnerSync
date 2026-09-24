@@ -89,6 +89,8 @@ public with sharing class DealReviewDomain {
     dto.rejectionReason = record.Rejection_Reason__c;
     dto.conflictResolutionNotes = record.Conflict_Resolution_Notes__c;
 
+    dto.attributionType = record.Attribution_Type__c;
+
     dto.conflicts = new List<DealConflictDetailDTO>();
 
     for (Deal_Registration__c conflict : conflicts) {

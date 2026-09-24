@@ -167,6 +167,7 @@ public with sharing class DealRegistrationSelector {
         Partner_Contact__c,
         Status__c,
         Conflict_Status__c,
+        Attribution_Type__c,
         Estimated_Revenue__c,
         Estimated_Close_Date__c,
         Protection_End_Date__c,

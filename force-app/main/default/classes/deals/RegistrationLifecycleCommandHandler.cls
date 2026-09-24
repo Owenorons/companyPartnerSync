@@ -124,6 +124,18 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     }
     context.deal.Current_Action_Owner__c = UserInfo.getUserId();
     context.deal.Submitted_On__c = System.now();
+    context.deal.Attribution_Type__c = DealAttributionEngine.classify(
+      submissionDeal.Opportunity__r?.CreatedDate,
+      context.deal.Submitted_On__c
+    );
+    // Generate against the version the deal is about to become (context.newVersion), not the
+    // stale Version_Number__c still on the locked row - that increment hasn't persisted yet, and
+    // DealApprovalFinalisationGuard later compares the plan's snapshot against the deal's
+    // then-current (post-submit) version.
+    DealApprovalPlanService.generate(
+      new Set<Id>{ context.deal.Id },
+      new Map<Id, Integer>{ context.deal.Id => context.newVersion }
+    );
   }
 
   private static Deal_Registration__c selectSubmissionDeal(Id dealId) {
@@ -136,7 +148,8 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
           Customer_Account__c,
           Customer_Name__c,
           Estimated_Revenue__c,
-          Opportunity__c
+          Opportunity__c,
+          Opportunity__r.CreatedDate
         FROM Deal_Registration__c
         WHERE Id = :dealId
       ];
@@ -147,7 +160,8 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
         Customer_Account__c,
         Customer_Name__c,
         Estimated_Revenue__c,
-        Opportunity__c
+        Opportunity__c,
+        Opportunity__r.CreatedDate
       FROM Deal_Registration__c
       WHERE Id = :dealId
       WITH USER_MODE
