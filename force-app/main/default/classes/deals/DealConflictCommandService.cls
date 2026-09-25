@@ -211,6 +211,20 @@ public without sharing class DealConflictCommandService {
     DealConflictAnalysisService.analyze(context);
   }
 
+  /**
+   * Public entry point for a material-change re-trigger of conflict
+   * analysis (e.g. a Sprint 38 co-sell participant change), distinct from
+   * this class's own internal post-waiver reanalyse() call. Safe to call
+   * repeatedly for the same deal state - DealConflictAnalysisService's
+   * input-hash check makes a redundant call a cheap no-op rather than a
+   * new analysis run.
+   *
+   * @param dealId Id of the deal to reanalyse.
+   */
+  public static void reanalyseForMaterialChange(Id dealId) {
+    reanalyse(dealId);
+  }
+
   private static void requireStatus(
     Deal_Conflict__c conflict,
     Set<String> allowed

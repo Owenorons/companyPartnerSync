@@ -19,6 +19,12 @@
     >PartnerSync_Resolve_Deal_Conflict</name></customPermissions>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_Waive_Critical_Conflict</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Approve_Shared_Protection</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Transfer_Deal_Ownership</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Override_Participant_Policy</name></customPermissions>
     <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Phase__c</field><readable
     >true</readable></fieldPermissions>

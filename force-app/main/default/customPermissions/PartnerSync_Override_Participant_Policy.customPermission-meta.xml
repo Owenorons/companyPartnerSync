@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Override Participant Policy</label>
+    <description
+  >Allows overriding participant access/change policy defaults.</description>
+</CustomPermission>

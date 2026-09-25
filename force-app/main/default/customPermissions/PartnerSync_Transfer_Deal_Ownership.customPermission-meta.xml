@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Transfer Deal Ownership</label>
+    <description
+  >Allows transferring a deal registration's primary/originating partner to a new partner account.</description>
+</CustomPermission>

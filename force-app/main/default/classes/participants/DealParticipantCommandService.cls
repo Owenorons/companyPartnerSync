@@ -174,6 +174,12 @@ public without sharing class DealParticipantCommandService {
 
     Boolean autoAccept = command.autoAccept == true;
     Datetime now = System.now();
+    Datetime respondBy = command.respondBy != null
+      ? command.respondBy
+      : DealParticipantSlaService.computeRespondBy(
+          command.participantType,
+          now
+        );
 
     Deal_Participant__c participant = new Deal_Participant__c(
       Deal__c = command.dealId,
@@ -186,7 +192,7 @@ public without sharing class DealParticipantCommandService {
       Invited_By__c = UserInfo.getUserId(),
       Invited_On__c = now,
       Accepted_On__c = autoAccept ? now : null,
-      Respond_By__c = command.respondBy,
+      Respond_By__c = autoAccept ? null : respondBy,
       Invitation_Reason__c = command.reason,
       Active_Participant_Key__c = activeKey,
       Last_Activity_On__c = now,
@@ -197,6 +203,12 @@ public without sharing class DealParticipantCommandService {
     // surface as a DmlException from this insert - the friendly pre-check
     // above is the common-case UX, this is the hard backstop.
     Database.insert(participant, AccessLevel.SYSTEM_MODE);
+
+    DealParticipantChangePolicyService.evaluate(
+      command.dealId,
+      'ParticipantAdded',
+      participant.Id
+    );
 
     PlatformEventPublisherService.publish(
       'DealParticipantInvited',
@@ -375,6 +387,12 @@ public without sharing class DealParticipantCommandService {
     participant.Removal_Reason__c = command.reason;
     participant.Active_Participant_Key__c = null;
 
+    DealParticipantChangePolicyService.evaluate(
+      participant.Deal__c,
+      'ParticipantRemoved',
+      participant.Id
+    );
+
     PlatformEventPublisherService.publish(
       'DealParticipantRemoved',
       participant.Deal__c,
@@ -394,12 +412,9 @@ public without sharing class DealParticipantCommandService {
   // Known Adaptations.
   private static void assertRemovable(Deal_Participant__c participant) {
     if (
-      [
-        SELECT COUNT()
-        FROM Deal_Protection_Participant__c
-        WHERE Deal_Participant__c = :participant.Id AND Status__c = 'Active'
-        WITH SYSTEM_MODE
-      ] > 0
+      DealProtectionParticipantSelector.selectActiveForParticipant(
+        participant.Id
+      )
     ) {
       throw new PartnerSyncHandledException(
         'This participant has an active shared protection interest and must be unlinked from protection before removal.'
@@ -459,6 +474,12 @@ public without sharing class DealParticipantCommandService {
     }
     participant.Participant_Role__c = command.participantRole;
     participant.Last_Activity_On__c = System.now();
+
+    DealParticipantChangePolicyService.evaluate(
+      participant.Deal__c,
+      'RoleChanged',
+      participant.Id
+    );
 
     PlatformEventPublisherService.publish(
       'DealParticipantRoleChanged',

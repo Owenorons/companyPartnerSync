@@ -16,6 +16,26 @@
         <enabled>true</enabled>
         <name>PartnerSync_Resolve_Deal_Conflict</name>
     </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Invite_Deal_Participant</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Remove_Deal_Participant</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Change_Participant_Role</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Change_Participant_Access</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Manage_CoSell</name>
+    </customPermissions>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_Review_Onboarding_Documents</name></customPermissions>
     <classAccesses>
@@ -1438,6 +1458,46 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Partner_Lead_Assignment__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Deal_Participant__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Partner_Account_Relationship__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Deal_Participant_Contribution__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Deal_Protection_Participant__c</object>
         <viewAllFields>true</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>

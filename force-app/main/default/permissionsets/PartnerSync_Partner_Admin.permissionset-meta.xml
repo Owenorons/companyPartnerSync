@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Invite_Partner_Team_Member</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Manage_Partner_Participants</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Request_Shared_Protection</name>
+    </customPermissions>
     <classAccesses>
         <apexClass>AnalyticsController</apexClass>
         <enabled>true</enabled>

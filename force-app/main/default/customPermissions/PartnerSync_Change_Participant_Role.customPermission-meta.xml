@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Change Participant Role</label>
+    <description>Allows changing a deal participant's role.</description>
+</CustomPermission>
