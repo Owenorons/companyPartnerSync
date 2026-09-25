@@ -38,6 +38,7 @@ public without sharing class DealReviewCommandService {
           Status__c,
           Outcome__c,
           Assigned_To__c,
+          Approver_Permission_Set__c,
           Version_Number__c,
           Blocking__c
         FROM Deal_Review__c
@@ -76,6 +77,18 @@ public without sharing class DealReviewCommandService {
     List<Deal_Information_Request__c> requests
   ) {
     String action = command.action.trim();
+    // 'Reassign' is the recovery path for a review nobody is routed to
+    // (Routing Failed, or a deliberate handoff), so it's gated by general
+    // review-management authority instead of assertAuthority() - the
+    // routed-assignee/permission-set check that action exists to fix would
+    // otherwise make a Routing Failed review permanently unreassignable.
+    // Every other action requires the specific authority the review was
+    // actually routed to.
+    if (action == 'Reassign') {
+      PartnerPermissionService.assertCanReviewDeals();
+    } else {
+      assertAuthority(review);
+    }
     if (action == 'Start') {
       requireStatus(review, new Set<String>{ 'Ready', 'Escalated' });
       review.Status__c = 'In Progress';
@@ -141,6 +154,17 @@ public without sharing class DealReviewCommandService {
         'Unsupported review action: ' + action
       );
     }
+  }
+
+  private static void assertAuthority(Deal_Review__c review) {
+    Boolean hasRoutedAuthority = review.Assigned_To__c != null
+      ? review.Assigned_To__c == UserInfo.getUserId()
+      : String.isNotBlank(review.Approver_Permission_Set__c) &&
+        PermissionService.hasPermissionSet(review.Approver_Permission_Set__c);
+    if (!hasRoutedAuthority)
+      throw new DealReviewCommandException(
+        'Current user lacks authority for this review step.'
+      );
   }
 
   private static void releaseDependencies(Set<Id> planIds) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Access_Level__c</fullName>
+    <description
+  >Resolved by Deal_Participant_Access_Policy_Resolver at activation time
+  (or set explicitly by the inviter's requested access level) - not
+  directly user-editable. Drives DealParticipantSharingService's Read/Edit
+  mapping for Apex Managed Sharing.</description>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Summary</fullName><default>false</default><label
+        >Summary</label></value>
+            <value><fullName>Contributor</fullName><default
+        >false</default><label>Contributor</label></value>
+            <value><fullName>Collaborator</fullName><default
+        >false</default><label>Collaborator</label></value>
+            <value><fullName>Commercial</fullName><default>false</default><label
+        >Commercial</label></value>
+            <value><fullName>Full Partner</fullName><default
+        >false</default><label>Full Partner</label></value>
+            <value><fullName>Internal Only</fullName><default
+        >false</default><label>Internal Only</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

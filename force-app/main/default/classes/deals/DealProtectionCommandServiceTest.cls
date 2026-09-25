@@ -143,19 +143,21 @@ private class DealProtectionCommandServiceTest {
       Version_Number__c = 1
     );
     insert deal;
-    Deal_Approval_Plan__c plan = new Deal_Approval_Plan__c(
-      Deal__c = deal.Id,
+    Approval_Plan__c plan = new Approval_Plan__c(
+      Object_Name__c = 'Deal_Registration__c',
+      Target_Record_Id__c = deal.Id,
       Current__c = true,
-      Current_Plan_Key__c = String.valueOf(deal.Id),
+      Current_Plan_Key__c = 'Deal_Registration__c:' + deal.Id,
       Version_Number__c = 1,
-      Deal_Version__c = 1,
+      Target_Version__c = 1,
       Status__c = blockingCondition ? 'Approved with Conditions' : 'Approved',
       Approval_Model__c = 'Sequential'
     );
     insert plan;
     if (blockingCondition)
-      insert new Deal_Approval_Condition__c(
-        Deal__c = deal.Id,
+      insert new Approval_Condition__c(
+        Object_Name__c = 'Deal_Registration__c',
+        Target_Record_Id__c = deal.Id,
         Plan__c = plan.Id,
         Condition_Type__c = 'Protection Blocking',
         Description__c = 'Signed confirmation required',

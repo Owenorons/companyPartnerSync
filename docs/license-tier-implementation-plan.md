@@ -1,108 +1,108 @@
 # License and Tier Implementation Plan
 
-**Status: design/planning only — not scheduled.** Per owner decision (2026-07-31, reaffirmed 2026-09-09), tier/license enforcement is intentionally deferred until core PRM functionality has been validated end-to-end as a product, so monetization isn't hardened around a shape that might still change. This document exists so that decision can be revisited quickly and implemented consistently later — it does not authorize starting the work now.
+**Status: Phase 1 executed (2026-09-25).** Per owner decision (2026-07-31, reaffirmed 2026-09-09), tier/license enforcement was deferred until core PRM functionality was validated end-to-end. The owner explicitly authorized starting this work on 2026-09-25, satisfying this document's own Phase 0 readiness gate. This revision also corrects the plan against `architecture-design-and-enhancement.md`'s licensing ADR (ADR-043-LIC-001, added to that document after this plan's original 2026-09-09 draft), which uses a different commercial model and metadata-retirement list than this plan originally assumed.
 
 ## 1. Purpose
 
-Capture, in one place, what tier/license scaffolding already exists in the schema, what's actually live, and what a consistent implementation would look like — so that whoever picks this up later (possibly a future session with no memory of these conversations) isn't rediscovering the same inventory from scratch or inventing a second, parallel mechanism.
+Capture, in one place, what tier/license scaffolding exists in the schema, what's actually live, and what a consistent implementation looks like — so whoever picks this up next isn't rediscovering the inventory from scratch or inventing a second, parallel mechanism.
 
 ## 2. Two separate "tier" concepts — do not conflate them
 
-The schema currently has two unrelated axes both called "tier." Any implementation must keep them separate.
-
 | Axis             | What it means                                                                                                                                                   | Values                                                                                       | Where it lives                                                                                                                     |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **License tier** | What the _subscriber org_ pays PartnerSync for — a SaaS plan that caps usage and unlocks features                                                               | Trial / Starter / Professional / Enterprise                                                  | `PartnerSync_License_Tier__mdt` (schema only, unwired)                                                                             |
+| **License tier** | What the _subscriber org_ pays PartnerSync for — a SaaS plan that caps usage and unlocks features                                                               | Core / Growth / Enterprise (+ Add-ons)                                                       | `PartnerSync_License_Tier__mdt` (now live, see §3)                                                                                 |
 | **Partner tier** | Where an individual _partner account_ sits in the subscriber's own channel program — a business concept the subscriber manages, not something PartnerSync sells | Bronze / Silver / Gold / Platinum / Elite / Strategic (Registered used in one config object) | `Account.Partner_Tier__c` (live picklist, actively read) + `Partner_Tier_Config__mdt` / `Partner_Tier__mdt` (schema only, unwired) |
 
 Partner tier already works today for its actual purpose (dashboard, content visibility, analytics, lead scoring all read `Account.Partner_Tier__c` directly). It is out of scope for this plan — this plan is about **license tier only**.
 
-## 3. Current state inventory
+## 3. Corrected commercial model (per ADR-043-LIC-001)
 
-Verified by reading the code directly (2026-09-09), not by assumption:
+The master architecture doc's earlier draft used "Trial / Starter / Professional / Enterprise" — the same naming this plan originally used. Its own later self-correction explicitly supersedes that:
 
-| Component                                            | Status               | Notes                                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `TenantConfigService` + `Tenant_Config__mdt.Default` | **Live**             | Boolean feature toggles (`Enable_Deals__c`, `Enable_MDF__c`, `Enable_AI__c`, etc.) and numeric caps (`Deal_Expiry_Days__c`, `Max_Open_Deals_Per_Partner__c`, `Lead_SLA_Hours__c`) — called from `DealRegistrationService`, `MDFService`, `PartnerContentService`, `AnalyticsService`, `AIInsightGeneratorService`, and others. |
-| `TenantConfigService.getEdition()`                   | **Dead**             | Reads `Tenant_Config__mdt.Edition__c` (Bronze/Silver/Gold/Enterprise). Only caller is a coverage test, not production logic.                                                                                                                                                                                                   |
-| `AIUsageService` + `AI_Usage_Day__c`                 | **Live**             | Row-locked (`FOR UPDATE`) daily reservation counter, one flat org-wide cap read from `Tenant_Config__mdt.AI_Daily_Request_Limit`. Not tier-aware — it's a single global number regardless of plan. See [ai-request-quota.md](ai-request-quota.md).                                                                             |
-| `PartnerSync_License_Tier__mdt`                      | **Dead**             | 4 records (Trial/Starter/Professional/Enterprise), zero Apex/LWC references. Every `Enable_*` flag is `false` and every `Max_*` cap is `null` on every record — the seed data itself was never finished. No field anywhere points from a tenant to one of these records.                                                       |
-| `PartnerSync_Config__mdt`                            | **Dead + duplicate** | Near field-for-field duplicate of `Tenant_Config__mdt`. Looks like `Tenant_Config__mdt` superseded it and it was never deleted.                                                                                                                                                                                                |
-| `Feature_Flag__mdt`                                  | **Dead**             | 7 seeded records (AI, Agentforce, Analytics, Content*Hub, Leaderboards, MDF, Notifications, Webhooks) with `Enabled__c` + `License_Tier__c`. Zero Apex/JS references — functionally a second, unwired copy of what `Tenant_Config__mdt`'s `Enable*\*` fields already do live.                                                  |
-| `AI_Usage_Limit__mdt`                                | **Dead**             | Per-tier `Daily_Request_Limit__c`/`Monthly_Request_Limit__c` records (Starter/Professional/Enterprise). Zero references — `AIUsageService` reads `Tenant_Config__mdt` instead, entirely bypassing this object.                                                                                                                 |
-| `Usage_Metric__c.License_Tier__c`                    | **Dead**             | Field exists with FLS grants in two permission sets, but zero Apex/LWC reads `Usage_Metric__c` at all.                                                                                                                                                                                                                         |
-| `AIProviderRouter`                                   | **Not tier-aware**   | Routes purely by feature name → provider config (`AI_Feature_Config__mdt` → `AI_Provider_Config__mdt`). No plan/tier branching.                                                                                                                                                                                                |
-| `AIInsightGovernanceService`                         | **Not tier-aware**   | Enforces reviewer _permission_, not caps or tier.                                                                                                                                                                                                                                                                              |
+> "Retain Core, Growth, Enterprise and Add-ons as the only PartnerSync commercial licensing model. The following historical labels are superseded and must not be used as parallel commercial editions: Trial / Starter / Professional / Enterprise; Essentials / Professional / Enterprise; AI Core / Intelligence / Advanced Intelligence. Trial remains a subscription status, not an edition."
 
-**Bottom line:** every piece of tier-specific schema in the app is unwired. The only real enforcement today is flat, org-wide, and tier-blind.
+Canonical edition matrix (from the doc):
 
-## 4. Reusable patterns already proven in this codebase
+| Capability                       | Core     | Growth   | Enterprise | Optional add-on    |
+| -------------------------------- | -------- | -------- | ---------- | ------------------ |
+| Partner onboarding and workspace | Included | Included | Included   | —                  |
+| Deal registration and protection | Included | Included | Included   | —                  |
+| Basic Content Hub                | Included | Included | Included   | —                  |
+| Notifications                    | Included | Included | Included   | —                  |
+| Lead distribution                | —        | Included | Included   | —                  |
+| MDF management                   | —        | Included | Included   | —                  |
+| Performance analytics            | —        | Included | Included   | Enhanced Analytics |
+| Advanced workflow automation     | —        | Included | Included   | —                  |
+| AI summaries and recommendations | —        | Optional | Included   | AI                 |
+| Advanced integrations / webhooks | —        | Optional | Included   | Integration Pack   |
 
-Two patterns already work in production and should be extended rather than replaced:
+This plan seeds that matrix as-is; exact numeric caps (`Max_Partners__c`, `Max_Deals_Per_Month__c`, etc.) remain a pricing/business decision, not an engineering one — see §8.
 
-1. **Named-record + cached static getter** (`TenantConfigService` reading `Tenant_Config__mdt.Default`) — good for simple booleans and single numeric caps.
-2. **Row-locked reservation ledger** (`AIUsageService` + `AI_Usage_Day__c`, `FOR UPDATE`, unique day key, seed-from-history on first use) — good for anything metered per period (daily/monthly request counts).
+## 4. Corrected metadata ownership (per ADR-043-LIC-001)
 
-A license-tier implementation should reuse both rather than introducing a third mechanism.
+The 2026-09-09 draft of this plan recommended retiring `PartnerSync_Config__mdt`, `Feature_Flag__mdt`, and `AI_Usage_Limit__mdt` outright. The doc's correction retains the first two for reasons distinct from this app's original duplication problem, and merges (not just deletes) the third:
 
-## 5. Proposed model: resolve tier into flat values, don't branch on tier at runtime
+| Component                       | 2026-09-09 plan said                                       | Doc's correction says                                                                                                                        | What this revision does                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PartnerSync_License_Tier__mdt` | Fix seed data, keep as catalog                             | Central source of truth for Core/Growth/Enterprise                                                                                           | **Done.** Seed data rewritten from 4 unfinished Trial/Starter/Professional/Enterprise records to 3 accurate Core/Growth/Enterprise records; added missing `Enable_Leads__c` field. See §5.                                                                                                                                                                                                                                                                      |
+| `PartnerSync_Config__mdt`       | Retire (dead + duplicate of `Tenant_Config__mdt`)          | Retain, "global defaults and kill switches"                                                                                                  | **Not touched — flagged as an open decision, not silently overridden.** Verified again this pass: still a zero-reference, field-for-field duplicate of `Tenant_Config__mdt`, which already fulfills that exact role live. The doc's author most likely reused a plausible name without knowing this org already has a wired object doing this job. See §8.                                                                                                      |
+| `Feature_Flag__mdt`             | Retire (dead, superseded by `Tenant_Config__mdt.Enable_*`) | Retain as an operational rollout/kill-switch layer, distinct from commercial entitlement (`PartnerSync_Feature_Entitlement__mdt`, not built) | **Retained, untouched, no code changes.** The doc's distinction (entitlement = "did they buy it," feature flag = "is it operationally on") is real and not something `Tenant_Config__mdt.Enable_*` covers. Left unwired until an actual operational-rollout need exists — wiring it up with no real caller would repeat the exact "engine built, no consumer" anti-pattern already fixed elsewhere in this codebase this phase.                                 |
+| `AI_Usage_Limit__mdt`           | Retire (dead)                                              | Merge into a new `AI_Usage_Policy__mdt`                                                                                                      | **Deleted, not merged.** `AI_Usage_Policy__mdt` does not exist and building it — plus rewiring the live `AIUsageService` from its current flat `Tenant_Config__mdt` key-value record onto a new per-edition policy object — is a real, separate change to a working system. Deferred to Phase 3 (§7) rather than bundled into this pass. The old object had zero references and unfinished (null/false) seed data either way, so deleting it now loses nothing. |
 
-Two designs are possible:
+## 5. What Phase 1 shipped (2026-09-25)
 
-- **(A) Live tier lookup:** Apex reads the org's current tier, looks up `PartnerSync_License_Tier__mdt` by that tier name, and branches on the result at call time.
-- **(B) Resolved-value:** provisioning (install/upgrade time, not request time) writes the _resolved_ caps directly into `Tenant_Config__mdt` fields, the same way `AI_Daily_Request_Limit` already works today. Runtime Apex never needs to know what tier produced the number.
+- **`Tenant_Config__mdt.Edition__c`** — restricted picklist values corrected from the stale `Bronze/Silver/Gold/Enterprise` set to `Core/Growth/Enterprise`; the `Default` record's value corrected from the leftover junk value `Bronze` to `Core`. This field is not cosmetic: `UsageMetricService.log()` already stamps `Usage_Metric__c.License_Tier__c = TenantConfigService.getEdition()` on every usage metric row today, so the stale value was live, silently-wrong telemetry, not just dead schema.
+- **`PartnerSync_License_Tier__mdt`** — added the missing `Enable_Leads__c` field (Growth's defining difference from Core in the matrix wasn't representable before), and replaced the 4 unfinished Trial/Starter/Professional/Enterprise records (every `Enable_*` false, every `Max_*` null) with 3 accurate Core/Growth/Enterprise records matching §3's matrix.
+- **New `PartnerSyncEntitlementService`** — resolves the org's edition (delegates to `TenantConfigService.getEdition()`, no duplicate mechanism) and exposes `isFeatureEntitled(String featureApiName)` against the `PartnerSync_License_Tier__mdt` catalog. This is resolution/catalog logic only — **nothing calls it yet**. Wiring it into actual feature gates (e.g., should `TenantConfigService.isMdfEnabled()` also require entitlement, and what happens when an org's own `Enable_MDF__c=true` toggle contradicts its edition's entitlement) is a real design question the doc itself splits into a separate `PartnerSyncFeatureAccessService` layer — deferred to Phase 3, not decided unilaterally here.
+- **`AI_Usage_Limit__mdt`** — deleted (object, 3 seed records, its static-resource export dump). Confirmed zero references before deletion.
+- Full test coverage for `PartnerSyncEntitlementService` (`PartnerSyncEntitlementServiceTest`): Core doesn't entitle MDF, Growth entitles MDF/Leads but not AI, Enterprise entitles AI, an unconfigured edition fails cleanly with a typed exception.
 
-**Recommendation: (B).** It's already the live pattern (`AI_Daily_Request_Limit` is exactly this — a flat value someone set for this org, not a live join against a shared catalog), it fits this app's actual deployment shape (one subscriber org per install, no true multi-tenancy inside a single org, so there's no "current tenant" to resolve at request time beyond "this org"), and it trivially supports per-customer overrides/negotiated deals without special-casing. `PartnerSync_License_Tier__mdt` becomes a **reference catalog for the provisioning process** (what Starter/Professional/Enterprise are supposed to set), not something Apex queries live.
+**Explicitly not done in Phase 1**: no enforcement wiring (nothing calls `PartnerSyncEntitlementService` from a real feature gate yet), no `AI_Usage_Policy__mdt`/`AIUsageService` rewire, no `PartnerSyncFeatureAccessService`/`PartnerSyncUsageService`/`PartnerSyncLicenseSyncService` (the doc's fuller service architecture — `LicenseSyncService` specifically requires a real external vendor subscription/entitlement backend this app doesn't have; building it now would be inventing infrastructure with nothing on the other end), no new caps enforcement (`Max_Partners__c` etc. are seeded but nothing counts against them yet), no `PACKAGE_LICENSE_INACTIVE`-style package/LMA license-status check (the package hasn't even been released/promoted yet — see [[project_2gp_package_release_state]]).
 
-### Consolidation this implies
+## 6. Reusable patterns already proven in this codebase
 
-- Retire `PartnerSync_Config__mdt` (pure duplicate of `Tenant_Config__mdt`) — independent of tier work, per [[feedback_unused_fields]].
-- Retire `Feature_Flag__mdt` — its `Enable_*` role is already covered by `Tenant_Config__mdt`, and its `License_Tier__c` dimension is superseded by design (B): tier maps to whether a `Tenant_Config__mdt.Enable_*` flag was set true at provisioning, not to a separate flag catalog.
-- Retire `AI_Usage_Limit__mdt` — same reasoning; `AI_Daily_Request_Limit` already is the resolved value. If a _monthly_ cap is added later, add `Tenant_Config__mdt.AI_Monthly_Request_Limit` following the same pattern rather than reviving this object.
-- Finish `PartnerSync_License_Tier__mdt` as documentation/reference data only (fix the null/false seed data so it's accurate as a catalog), or move its content into this doc / a provisioning runbook and delete the object entirely if nothing needs it to exist as queryable metadata.
+Two patterns already work in production and are extended, not replaced:
 
-## 6. Enforcement surface area
+1. **Named-record + cached static getter** (`TenantConfigService` reading `Tenant_Config__mdt.Default`, now mirrored by `PartnerSyncEntitlementService` reading `PartnerSync_License_Tier__mdt` keyed by edition).
+2. **Row-locked reservation ledger** (`AIUsageService` + `AI_Usage_Day__c`, `FOR UPDATE`, unique day key) — the pattern any future per-edition AI/usage cap should reuse rather than inventing a third mechanism.
 
-What would actually need a cap, and what hook it would use under design (B):
+## 7. Phased rollout plan
 
-| Capability                                 | Hook                                                                                            | Gap today                                                                                                                                                                                                                             |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AI requests/day                            | `AIUsageService` (exists)                                                                       | Already tier-independent-but-working; just needs the _value_ set per plan at provisioning.                                                                                                                                            |
-| Partners per org (`Max_Partners__c`)       | None                                                                                            | Needs a count-and-check at partner-account creation (e.g. `PartnerApplicationService` or wherever an Account gets provisioned as a partner). No reservation ledger needed — a `COUNT()` query against Account is cheap at this scale. |
-| Deals per month (`Max_Deals_Per_Month__c`) | None                                                                                            | Would need an `AIUsageService`-style monthly reservation ledger, or a simpler month-bucketed `COUNT()` against `Deal_Registration__c.CreatedDate`, in `DealRegistrationService`.                                                      |
-| MDF requests (`Max_MDF_Requests__c`)       | None                                                                                            | Same shape as deals, in `MDFService`.                                                                                                                                                                                                 |
-| Webhooks enabled/disabled                  | `Tenant_Config__mdt.Enable_Webhooks__c`-style flag (doesn't exist yet, `Enable_*` pattern does) | Straightforward: add the field, follow the existing `TenantConfigService` pattern.                                                                                                                                                    |
-| Portal / Experience Cloud access           | N/A — decoupled by design                                                                       | Per the packaging discussion (2026-09-09), the portal is a separate Lightning Bolt Solution / AppExchange SKU, gated by purchase, not by in-app tier logic. Keep it that way — don't fold it into `Tenant_Config__mdt`.               |
+**Phase 0 — readiness gate.** ~~Do not start until the owner explicitly decides core product validation is sufficient.~~ **Cleared 2026-09-25.**
 
-## 7. Phased rollout plan (for whenever this is picked back up)
+**Phase 1 — schema + entitlement resolution.** **Done, see §5.**
 
-**Phase 0 — readiness gate.** Do not start until the owner explicitly decides core product validation is sufficient. This phase has no engineering content; it's a go/no-go checkpoint.
+**Phase 2 — provisioning wiring.** Define how a subscriber's purchased plan turns into `Tenant_Config__mdt.Edition__c` at install/upgrade time (manual admin-set value initially is fine — no automation required on day one, since `Edition__c` is already a plain admin-editable CMDT field).
 
-**Phase 1 — schema consolidation.** Retire the dead/duplicate objects listed in §5, fix or delete `PartnerSync_License_Tier__mdt` seed data, add any new `Tenant_Config__mdt` fields needed for caps that don't have one yet (`Max_Partners__c`, `Max_Deals_Per_Month__c`, `Max_MDF_Requests__c`, `Enable_Webhooks__c`).
+**Phase 3 — enforcement wiring.** This now covers what the original Phase 1 and Phase 3 both partially described:
 
-**Phase 2 — provisioning wiring.** Define how a subscriber's purchased plan turns into `Tenant_Config__mdt` field values at install/upgrade time (manual admin-set values initially is fine — this doesn't require automation on day one).
+- Decide and implement how `PartnerSyncEntitlementService.isFeatureEntitled()` combines with `TenantConfigService`'s existing `Enable_*` toggles (edition sets the ceiling; the admin toggle can't exceed it) — this is the doc's `PartnerSyncFeatureAccessService` layer.
+- Build `AI_Usage_Policy__mdt` and rewire `AIUsageService` off the flat `Tenant_Config__mdt.AI_Daily_Request_Limit` key-value record onto a per-edition policy, per §4.
+- Implement the partner-count, deals/month, and MDF-request checks against the now-seeded `Max_Partners__c`/`Max_Deals_Per_Month__c`/`Max_MDF_Requests__c` caps, following the existing `AIUsageService` reservation-ledger pattern for anything period-based.
 
-**Phase 3 — new caps enforcement.** Implement the partner-count, deals/month, and MDF-request checks per §6, following the existing `AIUsageService` reservation-ledger pattern for anything period-based.
+**Phase 4 — portal SKU.** Convert `org-config`'s Experience Cloud assets into a Lightning Bolt Solution, listed/sold separately. Independent of Phases 1-3; can happen in parallel or not at all without blocking license-tier work.
 
-**Phase 4 — portal SKU.** Convert `org-config`'s Experience Cloud assets into a Lightning Bolt Solution, listed/sold separately (see the packaging discussion referenced above). Independent of Phases 1-3; can happen in parallel or not at all without blocking license-tier work.
-
-**Phase 5 — lifecycle policy.** Decide and implement overage and downgrade behavior (§8) once the caps from Phase 3 exist.
+**Phase 5 — lifecycle policy.** Decide and implement overage/downgrade/trial-expiry behavior (§8) once Phase 3's caps exist.
 
 ## 8. Open decisions (need product/business input, not just engineering)
 
-- **Overage behavior:** hard block vs. soft warning vs. metered overage billing, per capability. These can differ (e.g. AI requests already hard-block; deals/month might warn instead).
-- **Downgrade handling:** what happens to data that's already over a new, lower cap (e.g. an org with 50 partner accounts downgrades to a 25-partner plan) — freeze new creation only, or something more aggressive? Recommend freeze-only (never delete/deactivate customer data as a side effect of a plan change).
-- **Trial expiry:** does a Trial tier expire automatically, and what happens to the org's data and access when it does?
-- **Portal SKU pricing:** whether the Lightning Bolt Solution is bundled into Professional/Enterprise or sold as a standalone add-on to any tier — a listing/pricing decision, not blocked on anything in this doc.
+- **`PartnerSync_Config__mdt`'s fate** — carried forward from §4: still a verified zero-reference duplicate of the live `Tenant_Config__mdt`, despite the doc listing it as retained metadata. Recommend retiring it in a future pass once confirmed with the owner, rather than acting on it unilaterally here (this plan was itself just corrected once this session for moving on a stale reading of the doc — treating this specific item conservatively).
+- **Overage behavior**: hard block vs. soft warning vs. metered overage billing, per capability. These can differ (e.g. AI requests already hard-block; deals/month might warn instead).
+- **Downgrade handling**: what happens to data already over a new, lower cap. Recommend freeze-only (never delete/deactivate customer data as a side effect of a plan change).
+- **Trial expiry**: does a Trial status expire automatically, and what happens to the org's data/access when it does? (Trial is a subscription status per the doc's correction, not an edition — `Edition__c` alone can't represent it; a separate status field would be needed if this is pursued.)
+- **Portal SKU pricing**: bundled into Growth/Enterprise or sold as a standalone add-on to any tier.
+- **Exact numeric caps** (`Max_Partners__c` = 25/100/unlimited, etc., seeded in §5) — placeholders reflecting the doc's relative ordering, not a priced commercial decision.
 
 ## 9. Non-goals for this phase
 
-- No live tier-lookup branching in Apex (see §5 — resolved-value design is preferred).
+- No live external subscription/LMA sync (`PartnerSyncLicenseSyncService`) — no vendor-managed entitlement backend exists to sync against yet.
 - No changes to `Account.Partner_Tier__c` or the channel-tier objects (§2) — different concept, not in scope.
 - No automated billing/metering integration — caps are enforced in-app; charging for overage (if that's ever the policy) is a separate, later integration.
+- No `PartnerSync_Feature__mdt`/`PartnerSync_Feature_Entitlement__mdt` build-out — those are Sprint 43 (AI/Agentforce) constructs the doc itself only recommends, not requires, and nothing in this app needs per-feature entitlement granularity finer than the edition checkbox set yet.
 
 ## 10. References
 
-- [[project_license_tier_dead_config]] — origin of this inventory, and the reasoning for deferring this work.
-- [ai-request-quota.md](ai-request-quota.md) — the one real, working metering example this plan builds on.
-- [appexchange-and-experience-cloud-installation.md](appexchange-and-experience-cloud-installation.md) — portal packaging/SKU context (§6, §7 Phase 4).
+- [[project_license_tier_dead_config]] — origin of this inventory.
+- [ai-request-quota.md](ai-request-quota.md) — the one real, working metering example the Phase 3 AI usage policy work builds on.
+- [appexchange-and-experience-cloud-installation.md](appexchange-and-experience-cloud-installation.md) — portal packaging/SKU context (§7 Phase 4).
+- `architecture-design-and-enhancement.md`, ADR-043-LIC-001 (near end of document) — the canonical licensing correction this revision reconciles against.

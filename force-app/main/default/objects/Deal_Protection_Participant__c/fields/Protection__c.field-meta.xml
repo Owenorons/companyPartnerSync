@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Protection__c</fullName>
+    <description
+  >Points at the current Deal_Protection_Grant__c (Current__c=true) rather
+  than a versioned Deal_Protection__c chain - Sprint 37 deferred immutable
+  protection versioning, so shared-protection composition changes are
+  recorded via Version_Number__c/Exclusivity_Type__c bumps on the same
+  grant rather than a new grant row. See docs/deal-protection-lifecycle-review.md
+  and the Sprint 38 plan's Known Adaptation #1.</description>
+    <label>Protection</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Protection_Grant__c</referenceTo>
+    <relationshipLabel>Protection Participants</relationshipLabel>
+    <relationshipName>Protection_Participants</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>true</required>
+</CustomField>

@@ -84,6 +84,50 @@ private class PartnerShareServiceTest {
   }
 
   @IsTest
+  static void grantAndRevokeParticipantAccessBypassTheInteractivePermissionGate() {
+    User manager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSetGroup(
+      manager.Id,
+      'PSG_Internal_Administrator'
+    );
+    Group partnerGroup = new Group(
+      Name = 'Participant Share Test Group',
+      DeveloperName = 'Participant_Share_Test_Group',
+      Type = 'Regular'
+    );
+    insert partnerGroup;
+
+    System.runAs(manager) {
+      SharingFixture fixture = createFixture(partnerGroup.Id);
+      PartnerShareDTO dealRequest = request(
+        fixture.deal.Id,
+        'Deal Registration',
+        fixture.partner.Id,
+        'Edit'
+      );
+
+      // No PartnerPermissionService.assertCanManageRecordShares() gate -
+      // this is the entry point DealParticipantSharingService calls on
+      // behalf of an external co-sell partner acting on their own
+      // accepted participation, who would fail that interactive check.
+      Id registryId = PartnerShareService.grantParticipantAccess(dealRequest);
+      Assert.isTrue(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, fixture.partner.Id)
+      );
+      Assert.areEqual(
+        'Co-Sell',
+        PartnerShareSelector.selectActiveSharesForRecord(fixture.deal.Id)[0]
+          .Share_Reason__c
+      );
+
+      PartnerShareService.revokeParticipantAccess(registryId);
+      Assert.isFalse(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, fixture.partner.Id)
+      );
+    }
+  }
+
+  @IsTest
   static void rejectsMissingRegistryAndGroupMapping() {
     User manager = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSetGroup(

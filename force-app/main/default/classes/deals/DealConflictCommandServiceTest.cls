@@ -165,6 +165,40 @@ private class DealConflictCommandServiceTest {
     }
   }
 
+  @IsTest
+  static void controllerExposesWorkbenchQueueAndDetail() {
+    Deal_Conflict__c conflict = createConflict('High', 'Open');
+    authorize();
+
+    List<DealConflictWorkbenchListDTO> queue = DealConflictCommandController.getPendingConflicts();
+    Assert.areEqual(1, queue.size());
+    Assert.areEqual(conflict.Id, queue[0].conflictId);
+
+    DealConflictWorkbenchDetailDTO detail = DealConflictCommandController.getConflictDetail(
+      conflict.Id
+    );
+    Assert.areEqual(conflict.Id, detail.conflictId);
+
+    DealLifecyclePermissionService.clearTestPermissions();
+  }
+
+  @IsTest
+  static void controllerTranslatesWorkbenchQueryFailures() {
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Resolve_Deal_Conflict',
+      false
+    );
+
+    try {
+      DealConflictCommandController.getPendingConflicts();
+      Assert.fail('Expected a non-holder to be blocked.');
+    } catch (AuraHandledException expected) {
+      Assert.isNotNull(expected.getMessage());
+    }
+
+    DealLifecyclePermissionService.clearTestPermissions();
+  }
+
   private static Deal_Conflict__c createConflict(
     String severity,
     String status

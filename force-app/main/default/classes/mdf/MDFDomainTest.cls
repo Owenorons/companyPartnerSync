@@ -38,6 +38,9 @@ private class MDFDomainTest {
     System.assertEquals(contact.Id, record.Submitted_By__c);
     System.assertEquals('Webinar', record.Campaign_Type__c);
     System.assertEquals('Submitted', record.Status__c);
+    // Shipped MDF_Calculation_Rule.Default (blank Industry__c/Campaign_Type__c,
+    // Rate__c = 0.5, no Cap__c) applies to every tenant with no configuration.
+    System.assertEquals(500, record.Eligible_Amount__c);
   }
 
   @IsTest
@@ -102,6 +105,7 @@ private class MDFDomainTest {
     Assert.areEqual('Partner', dto.partnerName);
     Assert.areEqual('Campaign', dto.campaignName);
     Assert.areEqual(750, dto.approvedAmount);
+    Assert.areEqual(500, dto.eligibleAmount);
     Assert.areEqual(40, record.Expected_Leads__c);
 
     MDFListDTO noPartner = MDFDomain.toListDTO(new MDF_Request__c());

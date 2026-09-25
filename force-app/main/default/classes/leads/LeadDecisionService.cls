@@ -4,6 +4,13 @@
  * LeadConversionService (turning an accepted lead into deal records) —
  * this class only ever moves a lead's status, it never creates Opportunity
  * or Deal Registration data.
+ *
+ * A thin, backward-compatible facade: processDecision() keeps its original
+ * Lead-Id-keyed signature (so psPartnerLeads and any other existing caller
+ * are unaffected), but resolves the lead's current active
+ * Partner_Lead_Assignment__c and delegates the actual decision to
+ * LeadAssignmentCommandService - the durable, versioned aggregate is now
+ * the source of truth, not just Lead fields.
  */
 public with sharing class LeadDecisionService {
   /**
@@ -21,55 +28,27 @@ public with sharing class LeadDecisionService {
 
     PartnerRecordAccessService.assertPartnerAccessToLead(request.leadId);
 
-    Lead lead = LeadDistributionSelector.selectInternalLead(request.leadId);
+    Partner_Lead_Assignment__c assignment = PartnerLeadAssignmentSelector.selectActiveForLead(
+      request.leadId
+    );
 
-    if (lead.Lead_Distribution_Status__c != 'Assigned') {
+    if (assignment == null) {
       throw new PartnerSyncHandledException(
         'Only assigned leads can be accepted or rejected.'
       );
     }
 
-    if (request.decision == 'Accepted') {
-      lead.Lead_Distribution_Status__c = 'Accepted';
-      lead.Accepted_Date__c = System.now();
-    }
+    LeadAssignmentCommand command = new LeadAssignmentCommand();
+    command.assignmentId = assignment.Id;
+    command.action = request.decision;
+    command.expectedVersion = Integer.valueOf(assignment.Version_Number__c);
+    command.reason = request.notes;
 
-    if (request.decision == 'Rejected') {
-      lead.Lead_Distribution_Status__c = 'Rejected';
-      lead.Rejected_Date__c = System.now();
-    }
-
-    // Partners intentionally have read-only Lead CRUD. This command can only
-    // mutate the two decision timestamps/status after record-scope access and
-    // transition validation have both succeeded.
-    Database.update(lead, AccessLevel.SYSTEM_MODE);
-
-    LeadDistributionLogService.logAction(
-      lead.Id,
-      lead.Partner_Account__c,
-      lead.Partner_Contact__c,
-      request.decision,
-      lead.Lead_Distribution_Status__c,
-      request.notes
-    );
-
-    // Only acceptance publishes a platform event — a rejection has no
-    // downstream listeners (nothing else in the system reacts to it), so
-    // firing an event for it would just be noise.
-    if (request.decision == 'Accepted') {
-      PlatformEventPublisherService.publish(
-        'LeadAccepted',
-        lead.Id,
-        'Lead',
-        lead.Partner_Account__c,
-        'Partner accepted an assigned lead.',
-        'Info'
-      );
-    }
+    LeadAssignmentCommandService.execute(command);
 
     LoggingService.info(
       'LeadDecisionService',
-      'Lead decision processed. LeadId=' + lead.Id
+      'Lead decision processed. LeadId=' + request.leadId
     );
   }
 }

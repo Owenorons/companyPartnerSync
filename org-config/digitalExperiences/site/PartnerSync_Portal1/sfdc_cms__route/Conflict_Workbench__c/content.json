@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Conflict Workbench",
+  "contentBody" : {
+    "activeViewId" : "Conflict_Workbench",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-conflict-workbench",
+    "urlPrefix" : "conflict-workbench"
+  },
+  "urlName" : "conflict-workbench"
+}

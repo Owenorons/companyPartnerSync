@@ -82,6 +82,8 @@ public with sharing class LeadDistributionSelector {
         Company,
         Email,
         Phone,
+        Country,
+        Industry,
         Partner_Account__c,
         Partner_Contact__c,
         Customer_Account__c,

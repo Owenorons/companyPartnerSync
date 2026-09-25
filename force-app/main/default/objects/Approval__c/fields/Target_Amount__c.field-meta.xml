@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Target_Amount__c</fullName><description>Amount the target record was
+  evaluated against at generation time, snapshotted so a later edit to the
+  underlying record can't retroactively change what a pending decision is
+  being measured against. Used by authority-limit checks in place of a live
+  join.</description><label>Target Amount</label><precision>16</precision><scale
+  >2</scale><type>Currency</type></CustomField>

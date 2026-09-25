@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Target_Label__c</fullName><description>Denormalized display label for
+  the target record, copied from the parent Plan__c at generation time so
+  the pending-steps queue can render without an extra join.</description><label
+  >Target Label</label><length>255</length><required>false</required><type
+  >Text</type></CustomField>

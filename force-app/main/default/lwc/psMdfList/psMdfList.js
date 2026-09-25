@@ -1,10 +1,13 @@
 import { LightningElement, api } from "lwc";
 import getMyRequests from "@salesforce/apex/MDFController.getMyRequests";
+import resubmitRequest from "@salesforce/apex/MDFController.resubmitRequest";
 
 export default class PsMdfList extends LightningElement {
   requests = [];
   error;
   loading = true;
+  resubmittingId;
+  resubmitError;
 
   _refreshToken;
   _connected = false;
@@ -38,7 +41,9 @@ export default class PsMdfList extends LightningElement {
         ...request,
         requestedLabel: this.formatCurrency(request.requestedAmount),
         approvedLabel: this.formatCurrency(request.approvedAmount),
-        badgeVariant: this.getBadgeVariant(request.status)
+        badgeVariant: this.getBadgeVariant(request.status),
+        needsInformation: request.status === "Needs Information",
+        isResubmitting: request.requestId === this.resubmittingId
       }));
       this.error = undefined;
     } catch (error) {
@@ -51,6 +56,36 @@ export default class PsMdfList extends LightningElement {
 
   get hasRequests() {
     return this.requests.length > 0;
+  }
+
+  async handleResubmit(event) {
+    const requestId = event.currentTarget.dataset.id;
+
+    if (!requestId || this.resubmittingId) {
+      return;
+    }
+
+    this.resubmittingId = requestId;
+    this.resubmitError = undefined;
+    this.markResubmitting(requestId);
+
+    try {
+      await resubmitRequest({ requestId });
+      await this.loadRequests();
+    } catch (error) {
+      this.resubmitError =
+        error.body?.message || "Unable to resubmit MDF request.";
+      this.markResubmitting(undefined);
+    } finally {
+      this.resubmittingId = undefined;
+    }
+  }
+
+  markResubmitting(requestId) {
+    this.requests = this.requests.map((request) => ({
+      ...request,
+      isResubmitting: request.requestId === requestId
+    }));
   }
 
   formatCurrency(value) {
@@ -74,7 +109,11 @@ export default class PsMdfList extends LightningElement {
       return "danger";
     }
 
-    if (status === "Submitted" || status === "Under Review") {
+    if (
+      status === "Submitted" ||
+      status === "Under Review" ||
+      status === "Needs Information"
+    ) {
       return "warning";
     }
 

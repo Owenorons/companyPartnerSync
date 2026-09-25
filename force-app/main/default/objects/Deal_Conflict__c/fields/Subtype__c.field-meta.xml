@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
-  >Subtype__c</fullName><label>Subtype</label><type>Text</type><length
-  >80</length><required>false</required></CustomField>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Subtype__c</fullName>
+    <label>Subtype</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Same Customer Account</fullName>
+                <default>false</default>
+                <label>Same Customer Account</label>
+            </value>
+            <value>
+                <fullName>Identity Fingerprint</fullName>
+                <default>false</default>
+                <label>Identity Fingerprint</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

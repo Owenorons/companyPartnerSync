@@ -41,7 +41,17 @@ public with sharing class MDFService {
       contact.Id
     );
 
-    insert SecurityUtil.stripForCreate(new List<SObject>{ record });
+    // Security.stripInaccessible() (SecurityUtil.stripForCreate) returns new
+    // SObject instances, not the same references passed in - inserting its
+    // return value directly without capturing it would leave the original
+    // record.Id null for everything below.
+    List<SObject> sanitized = SecurityUtil.stripForCreate(
+      new List<SObject>{ record }
+    );
+
+    insert sanitized;
+
+    MDF_Request__c insertedRecord = (MDF_Request__c) sanitized[0];
 
     UsageMetricService.log(
       partnerAccountId,
@@ -50,7 +60,7 @@ public with sharing class MDFService {
 
     AuditLogRequestDTO audit = AuditFactory.createSuccess(
       'MDF_Request__c',
-      record.Id,
+      insertedRecord.Id,
       'Submit'
     );
 
@@ -61,10 +71,95 @@ public with sharing class MDFService {
 
     PlatformEventPublisherService.publish(
       'MDFSubmitted',
-      record.Id,
+      insertedRecord.Id,
       'MDF_Request__c',
       partnerAccountId,
       'MDF request submitted for review.',
+      'Info'
+    );
+
+    String targetLabel =
+      insertedRecord.Name +
+      (String.isBlank(insertedRecord.Campaign_Name__c)
+        ? ''
+        : ' — ' + insertedRecord.Campaign_Name__c);
+    ApprovalPlanService.generate(
+      'MDF_Request__c',
+      new Set<Id>{ insertedRecord.Id },
+      new Map<Id, Decimal>{
+        insertedRecord.Id => insertedRecord.Requested_Amount__c
+      },
+      new Map<Id, String>{ insertedRecord.Id => targetLabel },
+      new Map<Id, Integer>{ insertedRecord.Id => 0 }
+    );
+
+    notifyInternalReviewers(insertedRecord);
+  }
+
+  /**
+   * Resubmits an MDF request that a pre-approval chain step returned for correction: regenerates
+   * the approval plan and flips the request back to Submitted. The request must belong to the
+   * running partner and currently be in Needs Information - set by
+   * ApprovalReturnConsumerService when a chain step's decision is Returned.
+   *
+   * @param requestId Id of the MDF request to resubmit.
+   */
+  public static void resubmitRequest(Id requestId) {
+    if (!TenantConfigService.isMdfEnabled()) {
+      throw new PartnerSyncHandledException('MDF is disabled.');
+    }
+
+    if (!PartnerAccessService.canSubmitMDF()) {
+      throw new PartnerSyncHandledException(
+        'You do not have permission to submit MDF requests.'
+      );
+    }
+
+    Id partnerAccountId = PartnerAccessService.getCurrentPartnerAccountId();
+    MDF_Request__c record = MDFSelector.selectForPartner(
+      requestId,
+      partnerAccountId
+    );
+
+    if (record.Status__c != 'Needs Information') {
+      throw new PartnerSyncHandledException(
+        'Only requests marked Needs Information can be resubmitted.'
+      );
+    }
+
+    record.Status__c = 'Submitted';
+    record.Return_Reason__c = null;
+    Database.update(record, AccessLevel.SYSTEM_MODE);
+
+    AuditLogRequestDTO audit = AuditFactory.createSuccess(
+      'MDF_Request__c',
+      record.Id,
+      'Resubmit'
+    );
+
+    audit.partnerAccountId = partnerAccountId;
+
+    AuditService.log(audit);
+
+    String targetLabel =
+      record.Name +
+      (String.isBlank(record.Campaign_Name__c)
+        ? ''
+        : ' — ' + record.Campaign_Name__c);
+    ApprovalPlanService.generate(
+      'MDF_Request__c',
+      new Set<Id>{ record.Id },
+      new Map<Id, Decimal>{ record.Id => record.Requested_Amount__c },
+      new Map<Id, String>{ record.Id => targetLabel },
+      new Map<Id, Integer>{ record.Id => 0 }
+    );
+
+    PlatformEventPublisherService.publish(
+      'MDFSubmitted',
+      record.Id,
+      'MDF_Request__c',
+      partnerAccountId,
+      'MDF request resubmitted for review.',
       'Info'
     );
 

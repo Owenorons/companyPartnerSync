@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Protection_Role__c</fullName>
+    <label>Protection Role</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Primary Protected Partner</fullName><default
+        >false</default><label>Primary Protected Partner</label></value>
+            <value><fullName>Shared Protected Partner</fullName><default
+        >false</default><label>Shared Protected Partner</label></value>
+            <value><fullName>Co-Sell Protected Partner</fullName><default
+        >false</default><label>Co-Sell Protected Partner</label></value>
+            <value><fullName>Referral Participant</fullName><default
+        >false</default><label>Referral Participant</label></value>
+            <value><fullName>Implementation Participant</fullName><default
+        >false</default><label>Implementation Participant</label></value>
+            <value><fullName>Non-Protected Participant</fullName><default
+        >false</default><label>Non-Protected Participant</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -17,7 +17,7 @@ public without sharing class MDFSelector {
     PartnerPermissionService.assertCanViewAllMdf();
     SecurityUtil.assertReadable(MDF_Request__c.SObjectType);
     List<MDF_Request__c> rows = [
-      SELECT Id, Partner_Account__c, Status__c
+      SELECT Id, Partner_Account__c, Status__c, Eligible_Amount__c
       FROM MDF_Request__c
       WHERE Id = :requestId
       WITH SYSTEM_MODE
@@ -73,7 +73,9 @@ public without sharing class MDFSelector {
         Campaign_Type__c,
         Requested_Amount__c,
         Approved_Amount__c,
+        Eligible_Amount__c,
         Status__c,
+        Return_Reason__c,
         Activity_Start_Date__c,
         Activity_End_Date__c
       FROM MDF_Request__c
@@ -104,6 +106,7 @@ public without sharing class MDFSelector {
         Campaign_Type__c,
         Requested_Amount__c,
         Approved_Amount__c,
+        Eligible_Amount__c,
         Status__c,
         Activity_Start_Date__c,
         Activity_End_Date__c

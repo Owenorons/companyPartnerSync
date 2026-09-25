@@ -12,19 +12,23 @@
     </values>
     <values>
         <field>Enable_AI__c</field>
-        <value xsi:type="xsd:boolean">false</value>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>Enable_Analytics__c</field>
-        <value xsi:type="xsd:boolean">false</value>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Enable_Leads__c</field>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>Enable_MDF__c</field>
-        <value xsi:type="xsd:boolean">false</value>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>Enable_Webhooks__c</field>
-        <value xsi:type="xsd:boolean">false</value>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>Max_AI_Requests__c</field>

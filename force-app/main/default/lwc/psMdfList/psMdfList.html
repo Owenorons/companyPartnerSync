@@ -13,6 +13,10 @@
       <c-ps-error-panel message={error}></c-ps-error-panel>
     </template>
 
+    <template if:true={resubmitError}>
+      <c-ps-error-panel message={resubmitError}></c-ps-error-panel>
+    </template>
+
     <template if:true={hasRequests}>
       <ul class="request-items">
         <template for:each={requests} for:item="request">
@@ -42,6 +46,19 @@
                 <strong>{request.requestType}</strong>
               </div>
             </div>
+
+            <template if:true={request.needsInformation}>
+              <div class="return-notice">
+                <p class="return-reason">{request.returnReason}</p>
+                <lightning-button
+                  label="Resubmit"
+                  variant="brand"
+                  data-id={request.requestId}
+                  disabled={request.isResubmitting}
+                  onclick={handleResubmit}
+                ></lightning-button>
+              </div>
+            </template>
           </li>
         </template>
       </ul>

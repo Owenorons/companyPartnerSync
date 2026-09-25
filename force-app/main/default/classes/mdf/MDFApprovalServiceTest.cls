@@ -19,7 +19,50 @@ private class MDFApprovalServiceTest {
     );
     insert request;
 
+    // createSubmittedMdfRequest() builds the record directly (not via
+    // MDFService.submitRequest()), so no approval plan exists yet - approve()
+    // now requires one. Completing it here means every existing test that
+    // goes on to approve doesn't need to know about the chain.
+    completeApprovalChain(request.Id, request.Requested_Amount__c);
+
     return request;
+  }
+
+  // Generates the MDF approval plan/step and completes it as a
+  // PartnerSync_MDF_Reviewer holder - mirrors
+  // DealReviewServiceTest.completeApprovalPlan()'s pattern for Deal.
+  private static void completeApprovalChain(Id requestId, Decimal amount) {
+    ApprovalPlanService.generate(
+      'MDF_Request__c',
+      new Set<Id>{ requestId },
+      new Map<Id, Decimal>{ requestId => amount },
+      new Map<Id, String>{ requestId => 'Test MDF Request' },
+      new Map<Id, Integer>{ requestId => 0 }
+    );
+
+    Approval__c step = [
+      SELECT Id, Version_Number__c
+      FROM Approval__c
+      WHERE
+        Object_Name__c = 'MDF_Request__c'
+        AND Target_Record_Id__c = :requestId
+        AND Plan__r.Current__c = TRUE
+      LIMIT 1
+    ];
+
+    ApprovalCommand command = new ApprovalCommand();
+    command.approvalId = step.Id;
+    command.expectedVersion = Integer.valueOf(step.Version_Number__c);
+    command.decision = 'Approved';
+
+    User chainCompleter = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      chainCompleter.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+    System.runAs(chainCompleter) {
+      ApprovalCommandService.complete(command);
+    }
   }
 
   @IsTest
@@ -127,6 +170,107 @@ private class MDFApprovalServiceTest {
   }
 
   @IsTest
+  static void mdfReviewerBlockedWhenExceedingEligibleAmountWithoutOverride() {
+    MDF_Request__c mdfRequest = createSubmittedMdfRequest();
+    update new MDF_Request__c(Id = mdfRequest.Id, Eligible_Amount__c = 500);
+
+    User mdfReviewer = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      mdfReviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+
+    // Within the account's annual budget (2500 used + 1000 <= 10000), so
+    // only the eligible-amount check should be able to block this.
+    MDFDecisionDTO request = approval(mdfRequest.Id, 1000);
+
+    System.runAs(mdfReviewer) {
+      assertDecisionBlocked(request, 'eligible amount');
+    }
+  }
+
+  @IsTest
+  static void mdfReviewerWithOverrideCanExceedEligibleAmount() {
+    MDF_Request__c mdfRequest = createSubmittedMdfRequest();
+    update new MDF_Request__c(Id = mdfRequest.Id, Eligible_Amount__c = 500);
+
+    User mdfReviewerWithOverride = TestUserFactory.createInternalUser();
+
+    TestUserFactory.assignPermissionSet(
+      mdfReviewerWithOverride.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+    TestUserFactory.assignPermissionSet(
+      mdfReviewerWithOverride.Id,
+      'PartnerSync_Approval_Override'
+    );
+
+    MDFDecisionDTO request = approval(mdfRequest.Id, 1000);
+
+    System.runAs(mdfReviewerWithOverride) {
+      MDFApprovalService.processDecision(request);
+    }
+
+    Assert.areEqual(
+      'Approved',
+      [SELECT Status__c FROM MDF_Request__c WHERE Id = :mdfRequest.Id].Status__c
+    );
+  }
+
+  @IsTest
+  static void approvalBlockedWhilePreApprovalChainStepIsStillPending() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    insert partner;
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    insert contact;
+    MDF_Request__c mdfRequest = PartnerSyncTestDataFactory.mdfRequest(
+      partner.Id,
+      contact.Id
+    );
+    insert mdfRequest;
+    // Generate the chain but deliberately leave its step Pending - unlike
+    // createSubmittedMdfRequest(), which completes it.
+    ApprovalPlanService.generate(
+      'MDF_Request__c',
+      new Set<Id>{ mdfRequest.Id },
+      new Map<Id, Decimal>{ mdfRequest.Id => mdfRequest.Requested_Amount__c },
+      new Map<Id, String>{ mdfRequest.Id => 'Test MDF Request' },
+      new Map<Id, Integer>{ mdfRequest.Id => 0 }
+    );
+
+    User mdfReviewer = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      mdfReviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+
+    System.runAs(mdfReviewer) {
+      assertDecisionBlocked(approval(mdfRequest.Id, 500), 'not final');
+    }
+  }
+
+  @IsTest
+  static void approvalSucceedsOncePreApprovalChainStepIsCompleted() {
+    MDF_Request__c mdfRequest = createSubmittedMdfRequest();
+
+    User mdfReviewer = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      mdfReviewer.Id,
+      'PartnerSync_MDF_Reviewer'
+    );
+
+    System.runAs(mdfReviewer) {
+      MDFApprovalService.processDecision(approval(mdfRequest.Id, 500));
+    }
+
+    Assert.areEqual(
+      'Approved',
+      [SELECT Status__c FROM MDF_Request__c WHERE Id = :mdfRequest.Id].Status__c
+    );
+  }
+
+  @IsTest
   static void channelManagerWithoutMdfReviewerCannotApprove() {
     MDF_Request__c mdfRequest = createSubmittedMdfRequest();
 
@@ -223,6 +367,7 @@ private class MDFApprovalServiceTest {
       first.Submitted_By__c
     );
     insert second;
+    completeApprovalChain(second.Id, second.Requested_Amount__c);
     User reviewer = TestUserFactory.createInternalUser();
     TestUserFactory.assignPermissionSet(
       reviewer.Id,

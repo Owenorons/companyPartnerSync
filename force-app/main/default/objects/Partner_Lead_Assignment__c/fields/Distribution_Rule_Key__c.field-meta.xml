@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Distribution_Rule_Key__c</fullName>
+    <description>DeveloperName of the Lead_Distribution_Rule__mdt record
+  that produced this assignment. Blank for a Manual assignment.</description>
+    <label>Distribution Rule Key</label>
+    <length>100</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

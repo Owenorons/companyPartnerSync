@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assignment_Strategy__c</fullName>
+    <description>How this assignment's partner was selected. Manual is a
+  human-picked assignment (LeadDistributionService.assignLeadToPartner);
+  Round Robin is resolved by LeadDistributionService.distributeLead from an
+  active Lead_Distribution_Rule__mdt. Non-restricted so future strategies
+  (mirroring Lead_Distribution_Rule__mdt.Distribution_Method__c's other
+  values - Territory, Product Specialization, Partner Tier, AI
+  Recommendation) can be added without a metadata deploy once they're
+  actually built.</description>
+    <label>Assignment Strategy</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Manual</fullName>
+                <default>false</default>
+                <label>Manual</label>
+            </value>
+            <value>
+                <fullName>Round Robin</fullName>
+                <default>false</default>
+                <label>Round Robin</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

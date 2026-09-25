@@ -1,9 +1,9 @@
 /**
- * Scheduled/batch job that expires Deal_Registration__c records past their
- * Protection_End_Date__c. Deliberately calls DealReviewService.expireProtection
- * rather than routing through processDecision() — the latter requires the
- * interactive reviewer permission set, which the user/context that scheduled
- * this job may not hold; expiry itself is this job's authorization.
+ * Scheduled/batch job that expires active Deal_Protection_Grant__c records
+ * past their End_Date__c, via DealProtectionCommandService rather than
+ * DealReviewService.processDecision() — the latter requires the interactive
+ * reviewer permission set, which the user/context that scheduled this job
+ * may not hold; expiry itself is this job's authorization.
  * Per-record failures are caught and logged so one bad row doesn't block the
  * rest of the batch.
  */

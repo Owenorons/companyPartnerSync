@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Deal_Participant__c</fullName>
+    <label>Deal Participant</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Participant__c</referenceTo>
+    <relationshipLabel>Protection Participation</relationshipLabel>
+    <relationshipName>Protection_Participation</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>true</required>
+</CustomField>

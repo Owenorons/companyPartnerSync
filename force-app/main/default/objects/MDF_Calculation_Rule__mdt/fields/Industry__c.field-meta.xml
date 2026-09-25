@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Industry__c</fullName>
+    <description>Industry this rule applies to. Blank matches any
+  industry - a universal fallback rule, so a vendor doesn't need a row per
+  industry to have MDF calculation work at all.</description>
+    <label>Industry</label>
+    <referenceTo>Industry__mdt</referenceTo>
+    <relationshipLabel>MDF Calculation Rules</relationshipLabel>
+    <relationshipName>MDF_Calculation_Rules</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

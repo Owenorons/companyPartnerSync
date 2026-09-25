@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Participant_Key__c</fullName>
+    <description
+  >DealId|ParticipantType|coalesce(AccountId,ContactId,UserId)|Role.
+  Set while a participant occupies an active slot (Invited through
+  Suspended), cleared to null on Declined/Removed/Superseded/Expired.
+  Not cleared on Suspended - a suspended slot is still "the" active slot
+  for Resume to return to, and a second concurrent invite for the same
+  slot must still be rejected as a duplicate. Unique so concurrent
+  invitations cannot create two active participants for the same deal/
+  type/actor/role - mirrors Partner_Lead_Assignment__c.Active_Assignment_Key__c.</description>
+    <externalId>true</externalId>
+    <label>Active Participant Key</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

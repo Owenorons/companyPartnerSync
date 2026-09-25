@@ -20,7 +20,7 @@
     </values>
     <values>
         <field>Edition__c</field>
-        <value xsi:type="xsd:string">Bronze</value>
+        <value xsi:type="xsd:string">Core</value>
     </values>
     <values>
         <field>Enable_AI__c</field>
@@ -53,6 +53,10 @@
     <values>
         <field>Enable_Webhooks__c</field>
         <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Industry__c</field>
+        <value xsi:type="xsd:string">General</value>
     </values>
     <values>
         <field>Lead_SLA_Hours__c</field>

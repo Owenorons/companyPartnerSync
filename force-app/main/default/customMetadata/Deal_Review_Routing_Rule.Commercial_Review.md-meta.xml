@@ -21,9 +21,12 @@
     >Channel_Review</value></values><values><field
     >Assignment_Type__c</field><value
       xsi:type="xsd:string"
-    >Current User</value></values><values><field>SLA_Hours__c</field><value
-      xsi:type="xsd:double"
-    >24</value></values><values><field>Minimum_Deal_Value__c</field><value
+    >Permission Set</value></values><values><field
+    >Approver_Permission_Set__c</field><value
+      xsi:type="xsd:string"
+    >PartnerSync_Deal_Reviewer</value></values><values><field
+    >SLA_Hours__c</field><value xsi:type="xsd:double">24</value></values><values
+  ><field>Minimum_Deal_Value__c</field><value
       xsi:type="xsd:double"
     >50000</value></values><values><field>Reuse_On_Regeneration__c</field><value
       xsi:type="xsd:boolean"

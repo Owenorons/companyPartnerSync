@@ -15,6 +15,10 @@
     >PartnerSync_Replay_Deal_Event</name></customPermissions>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_View_Internal_Deal_Events</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Resolve_Deal_Conflict</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Waive_Critical_Conflict</name></customPermissions>
     <fieldPermissions><editable>false</editable><field
     >Deal_Registration__c.Lifecycle_Phase__c</field><readable
     >true</readable></fieldPermissions>
@@ -120,18 +124,17 @@
     <objectPermissions><allowCreate>true</allowCreate><allowDelete
     >true</allowDelete><allowEdit>true</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
-    >Deal_Approval_Plan__c</object><viewAllFields
-    >true</viewAllFields><viewAllRecords
+    >Approval_Plan__c</object><viewAllFields>true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>true</allowCreate><allowDelete
     >true</allowDelete><allowEdit>true</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
-    >Deal_Approval__c</object><viewAllFields>true</viewAllFields><viewAllRecords
+    >Approval__c</object><viewAllFields>true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>true</allowCreate><allowDelete
     >true</allowDelete><allowEdit>true</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
-    >Deal_Approval_Condition__c</object><viewAllFields
+    >Approval_Condition__c</object><viewAllFields
     >true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>true</allowCreate><allowDelete
@@ -151,5 +154,10 @@
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
     >Deal_Protection_Action__c</object><viewAllFields
     >true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >true</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>true</modifyAllRecords><object
+    >Deal_Conflict__c</object><viewAllFields>true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
 </PermissionSet>

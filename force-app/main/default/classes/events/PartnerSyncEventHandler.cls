@@ -1,8 +1,8 @@
 /**
  * Trigger handler for PartnerSyncEventTrigger (after insert on
  * PartnerSync_Event__e), fanning each event out to the audit,
- * notification, and webhook-dispatch consumers. This is the entry point
- * for the whole events/ package.
+ * notification, webhook-dispatch, and approval-return consumers. This is
+ * the entry point for the whole events/ package.
  */
 public with sharing class PartnerSyncEventHandler {
   /**
@@ -50,6 +50,7 @@ public with sharing class PartnerSyncEventHandler {
       recipientsByAccount.get(partnerAccountId)
     );
     WebhookDispatchConsumerService.dispatchBusinessEvent(eventRecord);
+    ApprovalReturnConsumerService.handleReturnedPlan(eventRecord);
   }
 
   private static Id idOrNull(String value) {

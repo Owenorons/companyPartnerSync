@@ -269,6 +269,133 @@ on expiry.
   `Badge_Rule_Config__mdt`'s existing generic `Metric_Name__c`/`Threshold__c`
   mechanism — reuses `Partner_Badge__c` gamification with no new schema.
 
+## Phase 9a (enterprise-standard follow-up) — Generalize the Approval Engine
+
+**Superseded Phase 8a's object/class names.** Everything Phase 8a shipped
+under `Deal_Approval_Plan__c`/`Deal_Approval__c`/`Deal_Approval_Condition__c`/
+`Deal_Approval_Step_Rule__mdt` and the `DealApproval*` Apex/LWC family was
+renamed and genericized to `Approval_Plan__c`/`Approval__c`/
+`Approval_Condition__c`/`Approval_Step_Rule__mdt` and `Approval*`
+(`force-app/main/default/classes/approvals/`), so MDF (Phase 9c) and any
+future approval-needing object can plug into the same engine instead of
+Deal getting a second parallel copy. Deal's own approval behavior is
+unchanged end-to-end — this was a pure refactor. Key mechanics: a typed
+`Deal__c` lookup became `Object_Name__c` (Text) + `Target_Record_Id__c`
+(Text 18); a new `Target_Amount__c`/`Target_Label__c` pair, populated by the
+calling object's own command handler at generation time, replaces what used
+to be a live relationship join for amount/display purposes. Deal-specific
+finalisation preconditions (blocking `Deal_Review__c`/
+`Deal_Information_Request__c`) moved out of the shared
+`ApprovalFinalisationGuard` into `RegistrationLifecycleCommandHandler`
+directly, since they don't apply to other objects.
+
+Pre-existing design docs (`docs/deal-process-enhancement-v2.md`,
+`docs/pdlm-permission-reconciliation.md`) still reference the old
+`Deal_Approval_*` names in places — left as historical record of the
+original design intent, not updated as part of this refactor.
+
+## Phase 9b (enterprise-standard follow-up) — MDF Calculation Engine
+
+CMDT-driven eligible-funding calculation for MDF requests, keyed on a new
+`Tenant_Config__mdt.Industry__c` (Metadata Relationship to a new `Industry__mdt`
+catalog, so the tenant's industry selection and the calculation rules can't
+drift out of sync the way two independent picklists could). New
+`MDF_Calculation_Rule__mdt` (`Industry__c`, `Campaign_Type__c`,
+`Calculation_Model__c`, `Rate__c`, `Cap__c`, `Minimum_Amount__c`/
+`Maximum_Amount__c`) drives `MDFCalculationEngine`, which collapses every
+"model" to one formula (`requested × rate, clamped to cap`) rather than three
+separate code paths. Writes `MDF_Request__c.Eligible_Amount__c` at submission
+(informational only); `MDFApprovalService.approve()` soft-blocks a decision
+that exceeds it, reusing the existing `PartnerSync_Approval_Override`
+authority rather than a new permission. No active rule matching = no ceiling
+= today's behavior, so tenants with nothing configured see no change.
+
+**Flagged then, still true:** this repo's first-ever use of the
+`MetadataRelationship` field type, with no prior precedent to verify the XML
+shape against — check in Setup on first deploy that `Tenant_Config.Default`'s
+`Industry__c` actually resolves to `Industry__mdt.General`.
+
+## Phase 9c (enterprise-standard follow-up) — Wire MDF into the Approval Engine
+
+The payoff of Phase 9a's generalization: MDF requests now get a real
+multi-tier pre-approval chain by calling the same engine Deal uses, just with
+`Object_Name__c = 'MDF_Request__c'` — no new generic Apex, no new UI (MDF
+steps show up in the existing `psApprovalWorkspace` queue alongside Deal
+steps). `MDFService.submitRequest()` generates the plan after insert;
+`MDFApprovalService.approve()` gates the _final_ decision on the chain being
+complete (reject is ungated, same reasoning as Deal). Ships one default rule,
+`Approval_Step_Rule.MDF_Reviewer` (routed to `PartnerSync_MDF_Reviewer`, the
+same set that already does final approval), so out-of-the-box behavior is
+unchanged — one step, same reviewer — while vendors can add tiers via CMDT
+alone. MDF has no resubmission cycle or version field, so both `generate()`
+and `assertReady()` use a constant `0` rather than building version-tracking
+infrastructure with nothing to guard.
+
+**Found and fixed a real pre-existing bug along the way:**
+`MDFService.submitRequest()` discarded the return value of
+`SecurityUtil.stripForCreate()` (`Security.stripInaccessible()`, which
+returns new SObject instances, not the same references) and then used the
+original `record.Id`/fields afterward — meaning the `MDFSubmitted` platform
+event, the audit log entry, and the internal-reviewer log line had likely
+been firing with a null record Id since this code was written. Fixed by
+capturing and using the actually-inserted record, matching the safe pattern
+`DealRegistrationService.cls` already uses.
+
+## Phase 9d (enterprise-standard follow-up) — Approval Chain Return/Recovery Path
+
+Phase 9c's "no resubmission cycle" note undersold a real defect: once a
+mid-chain `Approval__c` step is decided `'Returned'`, the parent
+`Approval_Plan__c` sticks in `Returned` status forever — `Approval-
+FinalisationGuard.assertReady()` fails permanently, and the record it gates
+has no path back to a working state. This isn't MDF-specific; it's a gap in
+the shared engine from Phase 9a. Deal only _appears_ unaffected because its
+`Needs Information → Resubmit` cycle is driven by unrelated
+`DealValidationEngine` findings at submission and just happens to
+regenerate the plan as a side effect — a chain-level Return with no
+independent validation findings driving that cycle would strand a Deal
+exactly the same way.
+
+**Engine fix (generic, benefits both objects):** `ApprovalCommandService
+.coordinate()` now publishes a `PartnerSync_Event__e`
+(`'ApprovalPlanReturned'`) whenever a plan's decision is `'Returned'`
+(`Rejected` stays terminal — a human decision, no recovery path needed).
+The engine only publishes; it doesn't know or care what, if anything,
+reacts.
+
+**Reaction (MDF only, this phase):** new `ApprovalReturnConsumerService`,
+dispatched from `PartnerSyncEventHandler` alongside the other three
+consumers. For `Object_Name__c = 'MDF_Request__c'`, it flips the record to
+a new `'Needs Information'` status and records the return reason on a new
+`MDF_Request__c.Return_Reason__c` field (SYSTEM_MODE, direct update — safe
+because `MDFService`/`MDFApprovalService` are flat services with no
+permission-gated state machine to route through). New
+`MDFService.resubmitRequest()` (+ `MDFController` entry point) lets the
+owning partner regenerate the plan and flip back to `Submitted`. The
+partner-facing `psMdfList` surfaces the return reason and a "Resubmit"
+action when a request needs information.
+
+**Deliberately deferred, not silently dropped:** `Deal_Registration__c` has
+the identical latent gap. Fixing it means safely driving
+`DealCommandService`'s permission-gated state machine
+(`Deal_State_Transition__mdt`, authority checks tied to the _interactively
+deciding user_) from an automated event consumer — a materially harder,
+separate problem that deserves its own research pass rather than a rushed
+bolt-on here. `ApprovalReturnConsumerService` explicitly no-ops for any
+object name other than `MDF_Request__c`, with a comment pointing back at
+this section.
+
+**Follow-up hardening:** `Approval_Plan__c.Status__c`, `Approval__c.Status__c`,
+and `Approval_Condition__c.Status__c` were plain Text fields — every value
+written to them (`'Pending'`, `'Approved'`, `'Approved with Conditions'`,
+`'Rejected'`, `'Returned'`, `'Superseded'` / `'Completed'`, `'Routing
+Failed'` / `'Open'`) came from a fixed, small set in Apex, so the freeform
+Text left them one typo away from a value nothing recognized. Converted all
+three to non-restricted Picklists (same convention as `MDF_Request__c
+.Status__c`/`Deal_Registration__c.Status__c`) — Setup now shows the real
+value list, and since Apex treats picklist fields as `String` regardless,
+no Apex changed. Safe as a pure schema change since no package version has
+ever been released or promoted for this app.
+
 ## Deferred (low priority, revisit later)
 
 - Public partner locator/directory (Account already has tier/type/region to
@@ -276,3 +403,10 @@ on expiry.
 - Broader incentive/rebate/SPIFF management beyond MDF.
 - Co-sell/account-mapping (Crossbeam-style) — even market leaders usually
   treat this as a separate bolt-on, not native PRM.
+- **`Deal_Registration__c`'s approval-chain Return/Recovery gap** (see Phase
+  9d) — a `'Returned'` chain-level decision strands the Deal's approval plan
+  with no way back, same root cause MDF had before Phase 9d. Deal isn't
+  actively broken today only because its unrelated `Needs Information →
+Resubmit` cycle happens to regenerate the plan as a side effect. Needs a
+  dedicated pass to safely drive `DealCommandService`'s permission-gated
+  state machine from an automated event consumer.

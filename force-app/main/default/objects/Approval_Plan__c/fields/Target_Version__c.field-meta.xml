@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Target_Version__c</fullName><description>Version of the target record
+  this plan was generated against, for staleness detection at
+  finalisation.</description><label>Target Version</label><precision
+  >12</precision><scale>0</scale><required>true</required><type
+  >Number</type></CustomField>

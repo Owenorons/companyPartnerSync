@@ -84,6 +84,14 @@ public without sharing class DealCommandService {
         DealLifecycleMutationContext.endControlledMutation();
       }
 
+      if (
+        context.command.commandType ==
+        DealRegistrationLifecycleConstants.FINALISE_APPROVAL
+      ) {
+        activateProtection(deal.Id, context.newState);
+        createOriginatingParticipant(deal.Id, context.newState);
+      }
+
       DealEventService.EventCreationResult eventResult = DealEventService.createEvent(
         context
       );
@@ -101,6 +109,90 @@ public without sharing class DealCommandService {
       throw ex;
     } finally {
       Database.releaseSavepoint(sp);
+    }
+  }
+
+  // Runs after the deal's Status__c update above has committed within this
+  // transaction, so DealProtectionCommandService's own fresh FOR UPDATE
+  // re-query of the deal sees the just-approved status rather than the
+  // pre-approval one. A blocking Protection-Blocking condition or missing
+  // policy is a legitimate, expected outcome (Sprint 37's "Pending
+  // Conditions" state) rather than a finalisation failure, so it's logged
+  // and swallowed here instead of failing the whole approval transaction.
+  private static void activateProtection(Id dealId, String newState) {
+    if (newState != 'Approved' && newState != 'Approved with Conditions') {
+      return;
+    }
+    try {
+      DealProtectionCommand command = new DealProtectionCommand();
+      command.dealId = dealId;
+      command.action = 'Activate Protection';
+      command.commandKey = 'auto-activate-' + dealId;
+      DealProtectionCommandService.execute(command);
+    } catch (DealProtectionCommandService.ProtectionCommandException ex) {
+      LoggingService.warn(
+        'DealCommandService',
+        'Protection activation deferred for deal ' +
+          dealId +
+          ': ' +
+          ex.getMessage()
+      );
+    }
+  }
+
+  // Backfills the originating partner as a Deal_Participant__c (Sprint 38
+  // §38.9) alongside protection activation - same graceful-defer shape,
+  // since a missing/duplicate backfill should defer rather than block
+  // finalisation. Deal_Registration__c.Partner_Account__c remains the
+  // backward-compatible projection; this is purely additive.
+  private static void createOriginatingParticipant(Id dealId, String newState) {
+    if (newState != 'Approved' && newState != 'Approved with Conditions') {
+      return;
+    }
+    try {
+      List<Deal_Registration__c> deals = [
+        SELECT Id, Partner_Account__c
+        FROM Deal_Registration__c
+        WHERE Id = :dealId
+        WITH SYSTEM_MODE
+      ];
+      if (deals.isEmpty() || deals[0].Partner_Account__c == null) {
+        return;
+      }
+
+      Integer existingOriginatingParticipants = [
+        SELECT COUNT()
+        FROM Deal_Participant__c
+        WHERE Deal__c = :dealId AND Participant_Type__c = 'Originating Partner'
+        WITH SYSTEM_MODE
+      ];
+      if (existingOriginatingParticipants > 0) {
+        return;
+      }
+
+      Datetime now = System.now();
+      Database.insert(
+        new Deal_Participant__c(
+          Deal__c = dealId,
+          Partner_Account__c = deals[0].Partner_Account__c,
+          Participant_Type__c = 'Originating Partner',
+          Participant_Role__c = 'Deal Owner',
+          Status__c = 'Active',
+          Access_Level__c = 'Full Partner',
+          Effective_From__c = now,
+          Last_Activity_On__c = now,
+          Version_Number__c = 0
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+    } catch (Exception ex) {
+      LoggingService.warn(
+        'DealCommandService',
+        'Originating participant backfill deferred for deal ' +
+          dealId +
+          ': ' +
+          ex.getMessage()
+      );
     }
   }
 

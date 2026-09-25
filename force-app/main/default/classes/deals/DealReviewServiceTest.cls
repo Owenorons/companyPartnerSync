@@ -7,50 +7,6 @@
  */
 @IsTest
 private class DealReviewServiceTest {
-  @IsTest
-  static void expireProtectionUpdatesOnlyPastApprovedDeals() {
-    Account partner = PartnerSyncTestDataFactory.partnerAccount(
-      'Expiry Partner'
-    );
-    insert partner;
-    Account customer = PartnerSyncTestDataFactory.customerAccount(
-      'Expiry Customer'
-    );
-    insert customer;
-    Deal_Registration__c expired = PartnerSyncTestDataFactory.deal(
-      customer.Id,
-      partner.Id,
-      null,
-      null
-    );
-    expired.Status__c = 'Approved';
-    expired.Protection_End_Date__c = Date.today().addDays(-1);
-    insert expired;
-
-    DealReviewService.expireProtection(expired.Id);
-    Assert.areEqual(
-      'Expired',
-      [SELECT Status__c FROM Deal_Registration__c WHERE Id = :expired.Id]
-      .Status__c
-    );
-
-    Deal_Registration__c active = PartnerSyncTestDataFactory.deal(
-      customer.Id,
-      partner.Id,
-      null,
-      null
-    );
-    active.Status__c = 'Approved';
-    active.Protection_End_Date__c = Date.today().addDays(5);
-    insert active;
-    try {
-      DealReviewService.expireProtection(active.Id);
-      Assert.fail('Expected active protection to be retained.');
-    } catch (PartnerSyncHandledException expected) {
-      Assert.isTrue(expected.getMessage().contains('not past'));
-    }
-  }
-
   private static Deal_Registration__c createSubmittedDeal() {
     Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
     insert partner;
@@ -146,8 +102,92 @@ private class DealReviewServiceTest {
     ];
 
     System.assertEquals('Approved', updated.Status__c);
-    System.assertEquals(null, updated.Protection_Start_Date__c);
-    System.assertEquals(null, updated.Protection_End_Date__c);
+    System.assertNotEquals(
+      null,
+      updated.Protection_Start_Date__c,
+      'Final approval should activate protection via DealProtectionCommandService.'
+    );
+    System.assertEquals(
+      updated.Protection_Start_Date__c.addDays(30),
+      updated.Protection_End_Date__c
+    );
+  }
+
+  @IsTest
+  static void protectionExtendedRoutesThroughTheGrantNotADirectDateWrite() {
+    Deal_Registration__c deal = createSubmittedDeal();
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealReviewDecisionDTO approveRequest = new DealReviewDecisionDTO();
+      approveRequest.dealId = deal.Id;
+      approveRequest.decision = 'Approved';
+      approveRequest.approvalNotes = 'Approved by channel manager.';
+
+      completeApprovalPlan(deal.Id);
+      DealReviewService.processDecision(approveRequest);
+
+      DealReviewDecisionDTO extendRequest = new DealReviewDecisionDTO();
+      extendRequest.dealId = deal.Id;
+      extendRequest.decision = 'Protection Extended';
+      extendRequest.protectionExtensionDays = 15;
+
+      DealReviewService.processDecision(extendRequest);
+    }
+
+    Deal_Protection_Grant__c grant = [
+      SELECT End_Date__c, Extension_Count__c, Version_Number__c
+      FROM Deal_Protection_Grant__c
+      WHERE Deal__c = :deal.Id AND Current__c = TRUE
+    ];
+    Deal_Registration__c updated = [
+      SELECT Protection_End_Date__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+
+    System.assertEquals(
+      1,
+      grant.Extension_Count__c,
+      'The grant, not a direct field write, should record the extension.'
+    );
+    System.assertEquals(
+      grant.End_Date__c,
+      updated.Protection_End_Date__c,
+      'The deal projection should match the grant after extension.'
+    );
+  }
+
+  @IsTest
+  static void protectionExtendedFailsCleanlyWithNoActiveGrant() {
+    Deal_Registration__c deal = createSubmittedDeal();
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+
+    System.runAs(channelManager) {
+      DealReviewDecisionDTO extendRequest = new DealReviewDecisionDTO();
+      extendRequest.dealId = deal.Id;
+      extendRequest.decision = 'Protection Extended';
+      extendRequest.protectionExtensionDays = 15;
+
+      try {
+        DealReviewService.processDecision(extendRequest);
+        Assert.fail('Expected a deal with no active grant to be rejected.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(
+          expected.getMessage().contains('no active protection grant')
+        );
+      }
+    }
   }
 
   @IsTest
@@ -383,17 +423,31 @@ private class DealReviewServiceTest {
   }
 
   private static void completeApprovalPlan(Id dealId) {
-    DealApprovalPlanService.generate(new Set<Id>{ dealId });
-    Deal_Approval__c approval = [
+    Deal_Registration__c deal = [
+      SELECT Estimated_Revenue__c
+      FROM Deal_Registration__c
+      WHERE Id = :dealId
+    ];
+    ApprovalPlanService.generate(
+      'Deal_Registration__c',
+      new Set<Id>{ dealId },
+      new Map<Id, Decimal>{ dealId => deal.Estimated_Revenue__c },
+      new Map<Id, String>{ dealId => 'Test Deal' },
+      new Map<Id, Integer>{ dealId => 0 }
+    );
+    Approval__c approval = [
       SELECT Id, Version_Number__c
-      FROM Deal_Approval__c
-      WHERE Deal__c = :dealId AND Plan__r.Current__c = TRUE
+      FROM Approval__c
+      WHERE
+        Object_Name__c = 'Deal_Registration__c'
+        AND Target_Record_Id__c = :dealId
+        AND Plan__r.Current__c = TRUE
       LIMIT 1
     ];
-    DealApprovalCommand command = new DealApprovalCommand();
+    ApprovalCommand command = new ApprovalCommand();
     command.approvalId = approval.Id;
     command.expectedVersion = Integer.valueOf(approval.Version_Number__c);
     command.decision = 'Approved';
-    DealApprovalCommandService.complete(command);
+    ApprovalCommandService.complete(command);
   }
 }

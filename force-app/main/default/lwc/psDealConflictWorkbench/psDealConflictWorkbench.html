@@ -1,0 +1,331 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Governance</p>
+        <h1>Conflict Workbench</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No open conflicts"
+            message="There are no unresolved deal conflict findings."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasConflicts}>
+          <template for:each={conflicts} for:item="item">
+            <button
+              key={item.conflictId}
+              class={item.rowClass}
+              data-id={item.conflictId}
+              onclick={handleSelectConflict}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="object-name">{item.type}</span>
+                <span class="ps-badge ps-badge-warning">{item.severity}</span>
+              </div>
+
+              <h3>{item.dealLabel}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>{item.status}</span>
+                <strong>{item.detectedLabel}</strong>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedConflict}>
+        <template if:true={detailError}>
+          <c-ps-error-panel message={detailError}></c-ps-error-panel>
+        </template>
+
+        <template if:true={loadingDetail}>
+          <c-ps-loading-state
+            message="Loading conflict detail"
+          ></c-ps-loading-state>
+        </template>
+
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">{selectedConflict.type}</p>
+            <h2>{selectedConflict.dealLabel}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span>Status: {selectedConflict.status}</span>
+              <span>Severity: {selectedConflict.severity}</span>
+              <a
+                href={selectedConflict.recordUrl}
+                target="_blank"
+                rel="noopener"
+                >View Deal</a
+              >
+              <template if:true={selectedConflict.matchedRecordUrl}>
+                <a
+                  href={selectedConflict.matchedRecordUrl}
+                  target="_blank"
+                  rel="noopener"
+                  >View Matched Deal</a
+                >
+              </template>
+            </div>
+          </div>
+
+          <template if:true={hasAvailableActions}>
+            <div class="slds-grid hero-actions">
+              <template for:each={availableActions} for:item="item">
+                <button
+                  key={item.action}
+                  class="action-button"
+                  data-action={item.action}
+                  onclick={handleActionClick}
+                >
+                  {item.label}
+                </button>
+              </template>
+            </div>
+          </template>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Classification</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Subtype</span>
+              <strong>{selectedConflict.subtype}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Confidence</span>
+              <strong>{selectedConflict.confidence}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Match Score</span>
+              <strong>{selectedConflict.matchScore}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Blocking</span>
+              <strong>{selectedConflict.blocking}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Detected</span>
+              <strong>{selectedConflict.detectedLabel}</strong>
+            </div>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Investigation</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Investigation Started</span>
+              <strong>{selectedConflict.investigationStartedLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Escalated</span>
+              <strong>{selectedConflict.escalatedLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>SLA Due</span>
+              <strong>{selectedConflict.slaDueLabel}</strong>
+            </div>
+          </article>
+
+          <template if:true={selectedConflict.evidenceSummary}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Evidence Summary</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedConflict.evidenceSummary}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedConflict.reviewedEvidence}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Reviewed Evidence</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedConflict.reviewedEvidence}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedConflict.resolutionReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Resolution</h3>
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Resolution</span>
+                <strong>{selectedConflict.resolution}</strong>
+              </div>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedConflict.resolutionReason}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedConflict.waiverReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Waiver</h3>
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Expires</span>
+                <strong>{selectedConflict.waiverExpiresLabel}</strong>
+              </div>
+              <div class="slds-grid slds-grid_align-spread status-row">
+                <span>Conditions</span>
+                <strong>{selectedConflict.waiverConditions}</strong>
+              </div>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedConflict.waiverReason}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedConflict.partnerMessage}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Partner-Visible Message</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedConflict.partnerMessage}
+              </div>
+            </article>
+          </template>
+        </section>
+      </template>
+
+      <template if:false={selectedConflict}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:warning" size="large">
+          </lightning-icon>
+
+          <h2>Select a conflict</h2>
+
+          <p>Choose a finding from the queue to begin.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+
+  <template if:true={showActionDialog}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="action-dialog-heading"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="action-dialog-heading" class="slds-modal__title">
+            {dialogTitle}
+          </h2>
+        </header>
+
+        <div class="slds-modal__content slds-var-p-around_medium">
+          <template if:true={isDialogReasonOnly}>
+            <lightning-textarea
+              label="Reason"
+              value={actionReason}
+              required
+              onchange={handleReasonChange}
+            >
+            </lightning-textarea>
+          </template>
+
+          <template if:true={isDialogAssign}>
+            <lightning-record-picker
+              label="Assignee"
+              placeholder="Search users..."
+              object-api-name={userObjectApiName}
+              onchange={handleAssigneeChange}
+            >
+            </lightning-record-picker>
+          </template>
+
+          <template if:true={isDialogSubmitEvidence}>
+            <lightning-textarea
+              label="Reviewed Evidence"
+              value={actionReviewedEvidence}
+              required
+              onchange={handleReviewedEvidenceChange}
+            >
+            </lightning-textarea>
+          </template>
+
+          <template if:true={isDialogWaive}>
+            <lightning-textarea
+              label="Waiver Reason"
+              value={actionReason}
+              required
+              onchange={handleReasonChange}
+            >
+            </lightning-textarea>
+
+            <lightning-textarea
+              class="slds-var-m-top_small"
+              label="Reviewed Evidence"
+              value={actionReviewedEvidence}
+              required
+              onchange={handleReviewedEvidenceChange}
+            >
+            </lightning-textarea>
+
+            <lightning-textarea
+              class="slds-var-m-top_small"
+              label="Waiver Conditions"
+              value={actionWaiverConditions}
+              required
+              onchange={handleWaiverConditionsChange}
+            >
+            </lightning-textarea>
+
+            <lightning-input
+              class="slds-var-m-top_small"
+              type="datetime-local"
+              label="Waiver Expires On"
+              required
+              onchange={handleWaiverExpiresOnChange}
+            >
+            </lightning-input>
+          </template>
+        </div>
+
+        <footer class="slds-modal__footer">
+          <lightning-button
+            variant="neutral"
+            label="Cancel"
+            onclick={handleCancelDialog}
+          >
+          </lightning-button>
+
+          <lightning-button
+            class="slds-var-m-left_small"
+            variant="brand"
+            label="Confirm"
+            disabled={isConfirmDisabled}
+            onclick={handleConfirmDialog}
+          >
+          </lightning-button>
+        </footer>
+      </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>

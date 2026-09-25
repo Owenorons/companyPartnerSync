@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Participant_Role__c</fullName>
+    <label>Participant Role</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Deal Owner</fullName><default>false</default><label
+        >Deal Owner</label></value>
+            <value><fullName>Deal Originator</fullName><default
+        >false</default><label>Deal Originator</label></value>
+            <value><fullName>Co-Sell Lead</fullName><default
+        >false</default><label>Co-Sell Lead</label></value>
+            <value><fullName>Co-Sell Contributor</fullName><default
+        >false</default><label>Co-Sell Contributor</label></value>
+            <value><fullName>Referral Source</fullName><default
+        >false</default><label>Referral Source</label></value>
+            <value><fullName>Sales Lead</fullName><default>false</default><label
+        >Sales Lead</label></value>
+            <value><fullName>Technical Lead</fullName><default
+        >false</default><label>Technical Lead</label></value>
+            <value><fullName>Commercial Lead</fullName><default
+        >false</default><label>Commercial Lead</label></value>
+            <value><fullName>Implementation Lead</fullName><default
+        >false</default><label>Implementation Lead</label></value>
+            <value><fullName>Renewal Lead</fullName><default
+        >false</default><label>Renewal Lead</label></value>
+            <value><fullName>Executive Sponsor</fullName><default
+        >false</default><label>Executive Sponsor</label></value>
+            <value><fullName>Observer</fullName><default>false</default><label
+        >Observer</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

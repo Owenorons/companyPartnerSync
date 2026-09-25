@@ -103,6 +103,11 @@ public with sharing class MDFDomain {
     record.Activity_Start_Date__c = request.startDate;
     record.Activity_End_Date__c = request.endDate;
 
+    record.Eligible_Amount__c = MDFCalculationEngine.computeEligibleAmount(
+      record.Requested_Amount__c,
+      record.Campaign_Type__c
+    );
+
     // roiTarget is the DTO's generic name for the partner's committed
     // outcome; the only ROI metric this object tracks today is lead
     // volume, hence the mapping to Expected_Leads__c.
@@ -134,7 +139,9 @@ public with sharing class MDFDomain {
     dto.requestType = record.Campaign_Type__c;
     dto.requestedAmount = record.Requested_Amount__c;
     dto.approvedAmount = record.Approved_Amount__c;
+    dto.eligibleAmount = record.Eligible_Amount__c;
     dto.status = record.Status__c;
+    dto.returnReason = record.Return_Reason__c;
     dto.startDate = record.Activity_Start_Date__c;
     dto.endDate = record.Activity_End_Date__c;
 

@@ -60,7 +60,8 @@ describe("c-ps-internal-dashboard", () => {
       "Review Deals",
       "Review MDF",
       "Notifications",
-      "Manage Content"
+      "Manage Content",
+      "Conflict Workbench"
     ]);
     expect(buttons.every((button) => button.type === "button")).toBe(true);
   });

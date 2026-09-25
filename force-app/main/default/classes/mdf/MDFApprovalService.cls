@@ -108,6 +108,21 @@ public with sharing class MDFApprovalService {
   }
 
   private static void approve(MDF_Request__c record, MDFDecisionDTO request) {
+    // The pre-approval chain (Approval_Step_Rule__mdt scoped to
+    // MDF_Request__c) must be complete before the final decision - mirrors
+    // RegistrationLifecycleCommandHandler's FINALISE_APPROVAL gating for
+    // Deal. MDF_Request__c has no version field, so 0 is used as a constant
+    // rather than building version-tracking infrastructure. This stays safe
+    // even with MDFService.resubmitRequest()'s Needs Information -> Submitted
+    // cycle (see ApprovalReturnConsumerService): every generate() call for
+    // this object always passes the same constant 0, so there's nothing for
+    // a real staleness check to catch either way.
+    try {
+      ApprovalFinalisationGuard.assertReady('MDF_Request__c', record.Id, 0);
+    } catch (ApprovalFinalisationGuard.ApprovalPlanNotReadyException ex) {
+      throw new PartnerSyncHandledException(ex.getMessage());
+    }
+
     Account partner = MDFSelector.selectPartnerBudgetForApproval(
       record.Partner_Account__c
     );
@@ -123,6 +138,20 @@ public with sharing class MDFApprovalService {
     // cases, rather than requiring a budget increase first.
     if (newUsed > budget && !PartnerPermissionService.canOverrideMdfBudget()) {
       throw new PartnerSyncHandledException('Partner MDF budget exceeded.');
+    }
+
+    // Same soft-block, same override authority, for the industry-scoped
+    // eligible ceiling computed at submission by MDFCalculationEngine. Null
+    // Eligible_Amount__c means no calculation rule matched, so there's
+    // nothing to enforce beyond the account-level budget above.
+    if (
+      record.Eligible_Amount__c != null &&
+      request.approvedAmount > record.Eligible_Amount__c &&
+      !PartnerPermissionService.canOverrideMdfBudget()
+    ) {
+      throw new PartnerSyncHandledException(
+        'Approved amount exceeds the eligible amount for this industry/campaign.'
+      );
     }
 
     SecurityUtil.assertUpdateable(Account.SObjectType);

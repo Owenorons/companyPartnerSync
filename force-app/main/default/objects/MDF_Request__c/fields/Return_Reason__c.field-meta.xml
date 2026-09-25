@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Return_Reason__c</fullName>
+    <description>Reason the pre-approval chain sent this request back for
+  correction, set by ApprovalReturnConsumerService when the approval plan is
+  Returned. Distinct from Approval_Comments__c, which is the final
+  reviewer's decision notes.</description>
+    <label>Return Reason</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

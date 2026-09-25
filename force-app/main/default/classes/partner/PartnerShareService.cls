@@ -20,6 +20,28 @@ public with sharing class PartnerShareService {
   public static Id grantAccess(PartnerShareDTO request) {
     PartnerPermissionService.assertCanManageRecordShares();
 
+    return grantAccessInternal(request);
+  }
+
+  /**
+   * Entry point for automated access materialization when a
+   * Deal_Participant__c becomes Active. grantAccess() gates on
+   * assertCanManageRecordShares(), an interactive-admin permission set the
+   * accepting external co-sell partner user does not and should not hold.
+   * Authorization here instead comes from the caller (DealParticipantSharingService)
+   * already having validated the Deal_Participant__c's own state (Active,
+   * correct partner, version-checked) - mirrors revokeExpiredAccess()'s
+   * reasoning for why interactive gating is wrong for a system-authorized
+   * transition.
+   *
+   * @param request The grant details (target record, partner account, access level).
+   * @return The Id of the newly created Partner_Record_Share__c registry row.
+   */
+  public static Id grantParticipantAccess(PartnerShareDTO request) {
+    return grantAccessInternal(request);
+  }
+
+  private static Id grantAccessInternal(PartnerShareDTO request) {
     PartnerShareDomain.validateGrant(request);
 
     SecurityUtil.assertCreateable(Partner_Record_Share__c.SObjectType);
@@ -129,6 +151,18 @@ public with sharing class PartnerShareService {
     }
 
     revokeAccessInternal(registry);
+  }
+
+  /**
+   * Entry point for automated access removal when a Deal_Participant__c's
+   * access no longer warrants a share (suspended, removed, or downgraded
+   * to Internal Only) - the non-interactive counterpart to revokeAccess(),
+   * same reasoning as grantParticipantAccess().
+   *
+   * @param partnerRecordShareId Id of the Partner_Record_Share__c registry row to revoke.
+   */
+  public static void revokeParticipantAccess(Id partnerRecordShareId) {
+    revokeAccessInternal(PartnerShareSelector.selectById(partnerRecordShareId));
   }
 
   private static void revokeAccessInternal(Partner_Record_Share__c registry) {

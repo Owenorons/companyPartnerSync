@@ -131,6 +131,7 @@ public without sharing class DealReviewService {
       resolveConflict(record, request);
     } else if (request.decision == 'Protection Extended') {
       extendProtection(record, request);
+      commandHandled = true;
     }
 
     if (!commandHandled) {
@@ -236,68 +237,58 @@ public without sharing class DealReviewService {
     record.Decision_On__c = System.now();
   }
 
-  /**
-   * Entry point for unattended expiry enforcement (e.g. DealExpiryBatch).
-   * processDecision()'s decisions all gate on assertCanDecide(), a
-   * permission-set check meant for an interactive reviewer action. A
-   * scheduled/batch job runs as whoever scheduled it, who may not hold that
-   * permission set, so gating this path the same way would silently break
-   * expiry cleanup. Authorization here instead comes from the record
-   * actually being Approved and past its Protection_End_Date__c.
-   *
-   * @param dealId Id of the deal registration to expire.
-   */
-  public static void expireProtection(Id dealId) {
-    Deal_Registration__c record = DealReviewSelector.selectForInternalReview(
-      dealId
-    );
-
-    if (
-      record.Status__c != 'Approved' ||
-      record.Protection_End_Date__c == null ||
-      record.Protection_End_Date__c >= Date.today()
-    ) {
-      throw new PartnerSyncHandledException(
-        'Deal registration is not past its protection window: ' + dealId
-      );
-    }
-
-    record.Status__c = 'Expired';
-
-    Database.update(record, AccessLevel.SYSTEM_MODE);
-
-    PlatformEventPublisherService.publish(
-      'DealExpired',
-      record.Id,
-      'Deal_Registration__c',
-      record.Partner_Account__c,
-      'Deal registration protection window expired.',
-      'Info'
-    );
-
-    LoggingService.info(
-      'DealReviewService',
-      'Deal registration expired. DealId=' + record.Id
-    );
-  }
-
+  // Extension is routed through DealProtectionCommandService rather than
+  // mutating Protection_End_Date__c directly, because Deal_Protection_Grant__c
+  // (not Deal_Registration__c) is the authoritative protection record as of
+  // Sprint 37 - the deal's own Protection_Start/End_Date__c fields are a
+  // system-managed projection that only DealProtectionCommandService's
+  // syncSummary() should write. Writing them here too would let this path
+  // silently diverge from the grant it's supposed to be extending.
   private static void extendProtection(
     Deal_Registration__c record,
     DealReviewDecisionDTO request
   ) {
-    // Extends from the existing end date (not from today) when one is
-    // already set, so a second extension stacks on top of the first
-    // instead of resetting the protection window's clock.
-    Date baseDate = record.Protection_End_Date__c == null
-      ? Date.today()
-      : record.Protection_End_Date__c;
+    List<Deal_Protection_Grant__c> grants = [
+      SELECT Version_Number__c
+      FROM Deal_Protection_Grant__c
+      WHERE Deal__c = :record.Id AND Current__c = TRUE
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    if (grants.isEmpty()) {
+      throw new PartnerSyncHandledException(
+        'This deal has no active protection grant to extend.'
+      );
+    }
 
-    record.Protection_End_Date__c = baseDate.addDays(
-      request.protectionExtensionDays
+    DealProtectionCommand command = new DealProtectionCommand();
+    command.dealId = record.Id;
+    command.action = 'Extend Protection';
+    command.commandKey =
+      'legacy-review-extend-' +
+      record.Id +
+      '-' +
+      System.now().getTime();
+    command.expectedVersion = Integer.valueOf(grants[0].Version_Number__c);
+    command.extensionDays = request.protectionExtensionDays;
+    command.reason = String.isBlank(request.approvalNotes)
+      ? 'Extended via deal review decision.'
+      : request.approvalNotes;
+
+    try {
+      DealProtectionCommandService.execute(command);
+    } catch (DealProtectionCommandService.ProtectionCommandException ex) {
+      throw new PartnerSyncHandledException(ex.getMessage());
+    }
+
+    Database.update(
+      new Deal_Registration__c(
+        Id = record.Id,
+        Approval_Notes__c = request.approvalNotes,
+        Decision_By__c = UserInfo.getUserId(),
+        Decision_On__c = System.now()
+      ),
+      AccessLevel.SYSTEM_MODE
     );
-
-    record.Approval_Notes__c = request.approvalNotes;
-    record.Decision_By__c = UserInfo.getUserId();
-    record.Decision_On__c = System.now();
   }
 }

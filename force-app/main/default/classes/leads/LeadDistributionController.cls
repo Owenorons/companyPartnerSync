@@ -25,6 +25,26 @@ public with sharing class LeadDistributionController {
   }
 
   /**
+   * Automatically distributes a Lead to a partner using the active, matching, implemented
+   * Lead_Distribution_Rule__mdt strategy.
+   *
+   * @param leadId Id of the lead to distribute.
+   */
+  @AuraEnabled
+  public static void distributeLead(Id leadId) {
+    try {
+      LeadDistributionService.distributeLead(leadId);
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'LeadDistributionController',
+        'Unable to distribute lead.',
+        'Unable to distribute lead.',
+        ex
+      );
+    }
+  }
+
+  /**
    * Loads the leads currently visible to the signed-in partner user.
    *
    * @return The signed-in partner's leads.

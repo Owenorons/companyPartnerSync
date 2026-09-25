@@ -20,6 +20,11 @@
                 <label>Submitted</label>
             </value>
             <value>
+                <fullName>Needs Information</fullName>
+                <default>false</default>
+                <label>Needs Information</label>
+            </value>
+            <value>
                 <fullName>Under Review</fullName>
                 <default>false</default>
                 <label>Under Review</label>

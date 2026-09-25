@@ -21,7 +21,11 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>DealApprovalController</apexClass>
+        <apexClass>DealReviewStepController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ApprovalController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -30,27 +34,47 @@
     </classAccesses>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Deal_Approval__c.Status__c</field>
+        <field>Approval__c.Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Deal_Approval__c.Decision__c</field>
+        <field>Approval__c.Decision__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Deal_Approval__c.Decision_Reason__c</field>
+        <field>Approval__c.Decision_Reason__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Deal_Approval__c.Version_Number__c</field>
+        <field>Approval__c.Version_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Deal_Approval__c.Approver_Permission_Set__c</field>
+        <field>Approval__c.Approver_Permission_Set__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Approval__c.Object_Name__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Approval__c.Target_Record_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Approval__c.Target_Amount__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Approval__c.Target_Label__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -224,6 +248,11 @@
     <objectPermissions><allowCreate>false</allowCreate><allowDelete
     >false</allowDelete><allowEdit>false</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Conflict__c</object><viewAllFields>true</viewAllFields><viewAllRecords
+    >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>false</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>false</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
     >Deal_Review_Plan__c</object><viewAllFields
     >true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
@@ -241,18 +270,17 @@
     <objectPermissions><allowCreate>false</allowCreate><allowDelete
     >false</allowDelete><allowEdit>false</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
-    >Deal_Approval_Plan__c</object><viewAllFields
-    >true</viewAllFields><viewAllRecords
+    >Approval_Plan__c</object><viewAllFields>true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>false</allowCreate><allowDelete
     >false</allowDelete><allowEdit>true</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
-    >Deal_Approval__c</object><viewAllFields>true</viewAllFields><viewAllRecords
+    >Approval__c</object><viewAllFields>true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>false</allowCreate><allowDelete
     >false</allowDelete><allowEdit>false</allowEdit><allowRead
     >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
-    >Deal_Approval_Condition__c</object><viewAllFields
+    >Approval_Condition__c</object><viewAllFields
     >true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
     <objectPermissions><allowCreate>false</allowCreate><allowDelete

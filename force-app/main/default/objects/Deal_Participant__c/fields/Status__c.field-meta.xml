@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description
+  >Command-managed lifecycle status. Trimmed from the architecture doc's 12-value
+  list to the 8 values DealParticipantCommandService's commands actually
+  produce: Invited/Accepted/Active/Declined/Suspended/Removed/Superseded/Expired.
+  Proposed and Pending Acceptance collapse into Invited (no command
+  distinguishes them); Completed and Withdrawn are unreachable until a
+  future phase adds the commands that would produce them.</description>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Invited</fullName><default>false</default><label
+        >Invited</label></value>
+            <value><fullName>Accepted</fullName><default>false</default><label
+        >Accepted</label></value>
+            <value><fullName>Active</fullName><default>false</default><label
+        >Active</label></value>
+            <value><fullName>Declined</fullName><default>false</default><label
+        >Declined</label></value>
+            <value><fullName>Suspended</fullName><default>false</default><label
+        >Suspended</label></value>
+            <value><fullName>Removed</fullName><default>false</default><label
+        >Removed</label></value>
+            <value><fullName>Superseded</fullName><default>false</default><label
+        >Superseded</label></value>
+            <value><fullName>Expired</fullName><default>false</default><label
+        >Expired</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

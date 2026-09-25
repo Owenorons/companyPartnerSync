@@ -89,3 +89,19 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+.return-notice {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--ps-color-warning);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-color-warning-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.return-reason {
+  color: var(--ps-color-text);
+  font-size: var(--ps-font-sm);
+}

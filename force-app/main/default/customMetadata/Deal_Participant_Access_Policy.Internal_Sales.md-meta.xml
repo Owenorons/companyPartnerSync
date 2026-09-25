@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Internal Sales</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Access_Level__c</field>
+        <value xsi:type="xsd:string">Internal Only</value>
+    </values>
+    <values>
+        <field>Can_Collaborate__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_Edit_Deal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_Request_Extension__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_Upload_Evidence__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_View_Commercials__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_View_Customer__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_View_Opportunity__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Can_View_Protection__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Participant_Role__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Participant_Type__c</field>
+        <value xsi:type="xsd:string">Internal Sales</value>
+    </values>
+    <values>
+        <field>Policy_Key__c</field>
+        <value xsi:type="xsd:string">InternalSales_Default</value>
+    </values>
+</CustomMetadata>

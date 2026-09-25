@@ -46,11 +46,25 @@ public with sharing class MDFListDTO {
   public Decimal approvedAmount { get; set; }
 
   /**
+   * Eligible funding ceiling computed from the tenant's industry-scoped MDF
+   * calculation rules. Null if no rule matched - informational only.
+   */
+  @AuraEnabled
+  public Decimal eligibleAmount { get; set; }
+
+  /**
    * Current status of the MDF request (e.g. Submitted, Under Review,
    * Approved, Rejected).
    */
   @AuraEnabled
   public String status { get; set; }
+
+  /**
+   * Reason a pre-approval chain step sent this request back for correction. Only set while
+   * status is Needs Information.
+   */
+  @AuraEnabled
+  public String returnReason { get; set; }
 
   /**
    * Planned start date of the funded activity.

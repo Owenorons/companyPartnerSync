@@ -26,6 +26,7 @@ public without sharing class DealReviewPlanService {
         Depends_On_Key__c,
         Assignment_Type__c,
         Assignment_Key__c,
+        Approver_Permission_Set__c,
         Fallback_Queue_Key__c,
         SLA_Hours__c,
         Minimum_Deal_Value__c
@@ -95,6 +96,12 @@ public without sharing class DealReviewPlanService {
         Id assignee = rule.Assignment_Type__c == 'Current User'
           ? UserInfo.getUserId()
           : null;
+        String approverPermissionSet = rule.Assignment_Type__c ==
+          'Permission Set'
+          ? rule.Approver_Permission_Set__c
+          : null;
+        Boolean routed =
+          assignee != null || String.isNotBlank(approverPermissionSet);
         reviews.add(
           new Deal_Review__c(
             Plan__c = planByDeal.get(deal.Id).Id,
@@ -106,10 +113,13 @@ public without sharing class DealReviewPlanService {
             Parallel_Group__c = rule.Parallel_Group__c,
             Depends_On_Key__c = rule.Depends_On_Key__c,
             Assigned_To__c = assignee,
-            Assignment_Source__c = assignee == null
+            Approver_Permission_Set__c = approverPermissionSet,
+            Assignment_Source__c = !routed
               ? 'Routing Failed'
-              : 'Rule: Current User',
-            Status__c = assignee == null
+              : (assignee != null
+                  ? 'Rule: Current User'
+                  : 'Rule: Permission Set'),
+            Status__c = !routed
               ? 'Routing Failed'
               : (String.isBlank(rule.Depends_On_Key__c) ? 'Ready' : 'Blocked'),
             Due_On__c = System.now()

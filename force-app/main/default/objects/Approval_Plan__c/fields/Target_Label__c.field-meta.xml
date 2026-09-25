@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Target_Label__c</fullName><description>Denormalized display label for
+  the target record, set by the caller at generation time (e.g. "DR-00123 -
+  Acme Corp"). Avoids the generic engine needing per-object field
+  knowledge.</description><label>Target Label</label><length
+  >255</length><required>false</required><type>Text</type></CustomField>

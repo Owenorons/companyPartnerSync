@@ -195,8 +195,22 @@ public with sharing class PartnerAccessService {
     }
 
     Deal_Registration__c deal = DealRegistrationSelector.selectById(dealId);
+    Id currentPartnerAccountId = getCurrentPartnerAccountId();
 
-    return deal.Partner_Account__c == getCurrentPartnerAccountId();
+    if (deal.Partner_Account__c == currentPartnerAccountId) {
+      return true;
+    }
+
+    // A co-sell participant (Deal_Participant__c) isn't the deal's own
+    // Partner_Account__c, but Sprint 38 grants them a working
+    // Deal_Registration__Share via DealParticipantSharingService once
+    // Active - this business-logic gate must also recognise them, or
+    // every partner-facing deal endpoint rejects them before the query
+    // (and its Salesforce share) is ever consulted.
+    return DealParticipantSelector.hasActiveParticipant(
+      dealId,
+      currentPartnerAccountId
+    );
   }
 
   /**

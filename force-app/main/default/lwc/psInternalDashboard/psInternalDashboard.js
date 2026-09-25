@@ -105,6 +105,7 @@ export default class PsInternalDashboard extends NavigationMixin(
   @api notificationsTabName = "Notification_Center__c";
   @api contentAdminTabName = "Content_Admin__c";
   @api partner360TabName = "Partner_360__c";
+  @api conflictWorkbenchTabName = "Conflict_Workbench__c";
 
   dashboard;
   error;
@@ -348,6 +349,10 @@ export default class PsInternalDashboard extends NavigationMixin(
 
   handleContentAdmin() {
     this.handleNavigation(this.contentAdminTabName);
+  }
+
+  handleConflictWorkbench() {
+    this.handleNavigation(this.conflictWorkbenchTabName);
   }
 
   handlePartner360() {

@@ -49,16 +49,19 @@ private class RegistrationLifecycleCommandHandlerTest {
       'PartnerSync_Approve_Deal',
       true
     );
-    // No manual DealApprovalPlanService.generate() call here - RESUBMIT above
+    // No manual ApprovalPlanService.generate() call here - RESUBMIT above
     // already auto-generated the current plan via routeSubmission(), which is
     // exactly the production code path this test is proving works end to end.
-    Deal_Approval__c approval = [
+    Approval__c approval = [
       SELECT Id, Version_Number__c
-      FROM Deal_Approval__c
-      WHERE Deal__c = :deal.Id AND Plan__r.Current__c = TRUE
+      FROM Approval__c
+      WHERE
+        Object_Name__c = 'Deal_Registration__c'
+        AND Target_Record_Id__c = :deal.Id
+        AND Plan__r.Current__c = TRUE
       LIMIT 1
     ];
-    DealApprovalCommand approvalCommand = new DealApprovalCommand();
+    ApprovalCommand approvalCommand = new ApprovalCommand();
     approvalCommand.approvalId = approval.Id;
     approvalCommand.expectedVersion = Integer.valueOf(
       approval.Version_Number__c
@@ -71,7 +74,41 @@ private class RegistrationLifecycleCommandHandlerTest {
       'PartnerSync_Channel_Manager'
     );
     System.runAs(channelManager) {
-      DealApprovalCommandService.complete(approvalCommand);
+      ApprovalCommandService.complete(approvalCommand);
+    }
+
+    // FINALISE_APPROVAL also requires the deal's blocking review checklist
+    // to be complete (RegistrationLifecycleCommandHandler
+    // .assertNoBlockingReviews) - a real gate now that
+    // DealReviewPlanService.generate() actually runs on submission. This
+    // deal's $10,000 value is below Commercial_Review's $50,000 minimum, so
+    // only the Channel_Review step (routed to the same
+    // PartnerSync_Channel_Manager permission set) needs completing.
+    Deal_Review__c channelReview = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Review__c
+      WHERE
+        Deal__c = :deal.Id
+        AND Review_Key__c = 'Channel_Review'
+        AND Plan__r.Current__c = TRUE
+      LIMIT 1
+    ];
+    System.runAs(channelManager) {
+      DealReviewCommandService.execute(
+        new List<DealReviewCommand>{ reviewCommand(channelReview, 'Start') }
+      );
+    }
+    channelReview = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Review__c
+      WHERE Id = :channelReview.Id
+    ];
+    DealReviewCommand completeReview = reviewCommand(channelReview, 'Complete');
+    completeReview.outcome = 'Approved';
+    System.runAs(channelManager) {
+      DealReviewCommandService.execute(
+        new List<DealReviewCommand>{ completeReview }
+      );
     }
 
     DealCommand command = command(
@@ -95,10 +132,106 @@ private class RegistrationLifecycleCommandHandlerTest {
     ];
     Assert.areEqual('Approved', approved.Status__c);
     Assert.areEqual(4, approved.Version_Number__c);
-    Assert.isNull(approved.Protection_Start_Date__c);
-    Assert.isNull(approved.Protection_End_Date__c);
+    Assert.isNotNull(
+      approved.Protection_Start_Date__c,
+      'Final approval should activate protection via DealProtectionCommandService.'
+    );
+    Assert.areEqual(
+      approved.Protection_Start_Date__c.addDays(30),
+      approved.Protection_End_Date__c
+    );
     Assert.areEqual('Approved by test reviewer.', approved.Approval_Notes__c);
+    Assert.areEqual(
+      1,
+      [
+        SELECT COUNT()
+        FROM Deal_Protection_Grant__c
+        WHERE Deal__c = :deal.Id AND Current__c = TRUE
+      ]
+    );
+    Deal_Participant__c originatingParticipant = [
+      SELECT Participant_Type__c, Participant_Role__c, Status__c
+      FROM Deal_Participant__c
+      WHERE Deal__c = :deal.Id AND Participant_Type__c = 'Originating Partner'
+    ];
+    Assert.areEqual('Deal Owner', originatingParticipant.Participant_Role__c);
+    Assert.areEqual('Active', originatingParticipant.Status__c);
     DealLifecyclePermissionService.clearTestPermissions();
+  }
+
+  // A blocking Protection-Blocking condition should not fail final
+  // approval itself - the deal still finalises to Approved with Conditions,
+  // and DealCommandService.activateProtection() simply defers activation
+  // (catching DealProtectionCommandService.ProtectionCommandException),
+  // matching Sprint 37's "Pending Conditions" outcome rather than treating
+  // it as a finalisation error.
+  @IsTest
+  static void deferProtectionActivationWhenABlockingConditionIsOpen() {
+    Account customer = new Account(Name = 'Deferred Protection Customer');
+    insert customer;
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Status__c = 'Under Review',
+      Conflict_Status__c = 'None',
+      Customer_Account__c = customer.Id,
+      Customer_Name__c = 'Deferred Protection Customer',
+      Estimated_Revenue__c = 10000,
+      Version_Number__c = 0
+    );
+    insert deal;
+    Approval_Plan__c plan = new Approval_Plan__c(
+      Object_Name__c = 'Deal_Registration__c',
+      Target_Record_Id__c = deal.Id,
+      Current__c = true,
+      Current_Plan_Key__c = 'Deal_Registration__c:' + deal.Id,
+      Version_Number__c = 1,
+      Target_Version__c = 0,
+      Status__c = 'Approved with Conditions',
+      Approval_Model__c = 'Sequential'
+    );
+    insert plan;
+    insert new Approval__c(
+      Object_Name__c = 'Deal_Registration__c',
+      Target_Record_Id__c = deal.Id,
+      Plan__c = plan.Id,
+      Status__c = 'Completed',
+      Authority_Snapshot__c = 'Test Reviewer',
+      Sequence__c = 1,
+      Version_Number__c = 0
+    );
+    insert new Approval_Condition__c(
+      Object_Name__c = 'Deal_Registration__c',
+      Target_Record_Id__c = deal.Id,
+      Plan__c = plan.Id,
+      Condition_Type__c = 'Protection Blocking',
+      Description__c = 'Signed customer confirmation required',
+      Status__c = 'Open'
+    );
+
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Approve_Deal',
+      true
+    );
+    execute(
+      deal.Id,
+      DealRegistrationLifecycleConstants.FINALISE_APPROVAL,
+      0,
+      '37-deferred-protection',
+      null
+    );
+    DealLifecyclePermissionService.clearTestPermissions();
+
+    Deal_Registration__c finalised = [
+      SELECT Status__c, Protection_Start_Date__c, Protection_End_Date__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+    Assert.areEqual('Approved with Conditions', finalised.Status__c);
+    Assert.isNull(finalised.Protection_Start_Date__c);
+    Assert.isNull(finalised.Protection_End_Date__c);
+    Assert.areEqual(
+      0,
+      [SELECT COUNT() FROM Deal_Protection_Grant__c WHERE Deal__c = :deal.Id]
+    );
   }
 
   @IsTest
@@ -323,6 +456,17 @@ private class RegistrationLifecycleCommandHandlerTest {
     command.reason = reason;
     command.source = 'Apex Test';
     return command;
+  }
+
+  private static DealReviewCommand reviewCommand(
+    Deal_Review__c review,
+    String action
+  ) {
+    DealReviewCommand result = new DealReviewCommand();
+    result.reviewId = review.Id;
+    result.action = action;
+    result.expectedVersion = Integer.valueOf(review.Version_Number__c);
+    return result;
   }
 
   private static void assertState(Id dealId, String status, Integer version) {

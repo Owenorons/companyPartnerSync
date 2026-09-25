@@ -71,6 +71,19 @@ public with sharing class TenantConfigService {
   }
 
   /**
+   * Returns the tenant's configured industry, used by
+   * MDF_Calculation_Rule__mdt to select industry-specific MDF eligibility
+   * rules.
+   *
+   * @return The tenant's industry developer name, or null if unset.
+   */
+  public static String getIndustry() {
+    return getConfig().Industry__r == null
+      ? null
+      : getConfig().Industry__r.DeveloperName;
+  }
+
+  /**
    * Indicates whether the content feature module is enabled for the
    * tenant.
    *

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Industry__c</fullName>
+    <description>The tenant's configured industry, used by
+  MDF_Calculation_Rule__mdt to select industry-specific MDF eligibility
+  rules. Optional - a tenant that hasn't set one only matches rules with a
+  blank Industry__c (the universal fallback).</description>
+    <label>Industry</label>
+    <referenceTo>Industry__mdt</referenceTo>
+    <relationshipLabel>Tenant Configs</relationshipLabel>
+    <relationshipName>Tenant_Configs</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

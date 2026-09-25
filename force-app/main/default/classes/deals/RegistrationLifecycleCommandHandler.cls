@@ -28,15 +28,55 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     }
     if (action == DealRegistrationLifecycleConstants.FINALISE_APPROVAL) {
       DealConflictApprovalGuard.assertNoBlockingConflicts(context.deal.Id);
-      Deal_Approval_Plan__c approvalPlan = DealApprovalFinalisationGuard.assertReady(
-        context.deal.Id,
-        context.previousVersion
-      );
+      assertNoBlockingReviews(context.deal.Id);
+      Approval_Plan__c approvalPlan;
+      try {
+        approvalPlan = ApprovalFinalisationGuard.assertReady(
+          'Deal_Registration__c',
+          context.deal.Id,
+          context.previousVersion
+        );
+      } catch (ApprovalFinalisationGuard.ApprovalPlanNotReadyException ex) {
+        throw new DealLifecycleException(ex.getMessage());
+      }
       if (approvalPlan.Status__c == 'Approved with Conditions') {
         context.newState = 'Approved with Conditions';
         context.eventType = 'DealApprovedWithConditions';
       }
     }
+  }
+
+  // Deal-specific finalisation preconditions - unlike plan/step completeness
+  // (ApprovalFinalisationGuard, object-agnostic), blocking reviews/
+  // information requests are a Deal Registration concept with no equivalent
+  // on other approval-routed objects, so they're asserted here rather than
+  // inside the shared guard.
+  private static void assertNoBlockingReviews(Id dealId) {
+    Integer incompleteReviews = [
+      SELECT COUNT()
+      FROM Deal_Review__c
+      WHERE
+        Deal__c = :dealId
+        AND Plan__r.Current__c = TRUE
+        AND Blocking__c = TRUE
+        AND Status__c NOT IN ('Completed', 'Waived')
+    ];
+    if (incompleteReviews > 0)
+      throw new DealLifecycleException(
+        'Blocking reviews must complete before final approval.'
+      );
+    Integer openRequests = [
+      SELECT COUNT()
+      FROM Deal_Information_Request__c
+      WHERE
+        Deal__c = :dealId
+        AND Review__r.Blocking__c = TRUE
+        AND Status__c NOT IN ('Accepted', 'Closed', 'Cancelled')
+    ];
+    if (openRequests > 0)
+      throw new DealLifecycleException(
+        'Blocking information requests remain open.'
+      );
   }
 
   /**
@@ -130,12 +170,23 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     );
     // Generate against the version the deal is about to become (context.newVersion), not the
     // stale Version_Number__c still on the locked row - that increment hasn't persisted yet, and
-    // DealApprovalFinalisationGuard later compares the plan's snapshot against the deal's
+    // ApprovalFinalisationGuard later compares the plan's snapshot against the deal's
     // then-current (post-submit) version.
-    DealApprovalPlanService.generate(
+    String targetLabel =
+      submissionDeal.Name +
+      (String.isBlank(submissionDeal.Customer_Name__c)
+        ? ''
+        : ' — ' + submissionDeal.Customer_Name__c);
+    ApprovalPlanService.generate(
+      'Deal_Registration__c',
       new Set<Id>{ context.deal.Id },
+      new Map<Id, Decimal>{
+        context.deal.Id => submissionDeal.Estimated_Revenue__c
+      },
+      new Map<Id, String>{ context.deal.Id => targetLabel },
       new Map<Id, Integer>{ context.deal.Id => context.newVersion }
     );
+    DealReviewPlanService.generate(new Set<Id>{ context.deal.Id });
   }
 
   private static Deal_Registration__c selectSubmissionDeal(Id dealId) {
@@ -145,6 +196,7 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
       return [
         SELECT
           Id,
+          Name,
           Customer_Account__c,
           Customer_Name__c,
           Estimated_Revenue__c,
@@ -157,6 +209,7 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     return [
       SELECT
         Id,
+        Name,
         Customer_Account__c,
         Customer_Name__c,
         Estimated_Revenue__c,

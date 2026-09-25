@@ -25,6 +25,25 @@ public with sharing class MDFController {
   }
 
   /**
+   * Resubmits an MDF request a pre-approval chain step returned for correction.
+   *
+   * @param requestId Id of the MDF request to resubmit.
+   */
+  @AuraEnabled
+  public static void resubmitRequest(Id requestId) {
+    try {
+      MDFService.resubmitRequest(requestId);
+    } catch (Exception ex) {
+      throw ControllerExceptionMapper.toAura(
+        'MDFController',
+        'Unable to resubmit MDF request.',
+        'Unable to resubmit MDF request.',
+        ex
+      );
+    }
+  }
+
+  /**
    * Returns the running partner user's own MDF requests.
    *
    * @return List of the caller's MDF requests as list-row DTOs.

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calculation_Model__c</fullName>
+    <description>Admin-facing label for what this rule configures - the
+  engine always applies the same formula (requested amount x Rate__c,
+  clamped to Cap__c). "Flat Cap" implies Rate__c left blank (defaults to
+  100%) with Cap__c set; "Percentage Match" implies Rate__c set with no
+  Cap__c; "Tiered Match" implies multiple rule rows with different
+  Minimum_Amount__c/Maximum_Amount__c brackets.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Calculation Model</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Percentage Match</fullName>
+                <default>true</default>
+                <label>Percentage Match</label>
+            </value>
+            <value>
+                <fullName>Flat Cap</fullName>
+                <default>false</default>
+                <label>Flat Cap</label>
+            </value>
+            <value>
+                <fullName>Tiered Match</fullName>
+                <default>false</default>
+                <label>Tiered Match</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

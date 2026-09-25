@@ -125,10 +125,13 @@ public without sharing class DealProtectionCommandService {
       throw new ProtectionCommandException(
         'The deal already has a current protection grant.'
       );
-    List<Deal_Approval_Plan__c> plans = [
+    List<Approval_Plan__c> plans = [
       SELECT Id, Status__c
-      FROM Deal_Approval_Plan__c
-      WHERE Deal__c = :deal.Id AND Current__c = TRUE
+      FROM Approval_Plan__c
+      WHERE
+        Object_Name__c = 'Deal_Registration__c'
+        AND Target_Record_Id__c = :deal.Id
+        AND Current__c = TRUE
       LIMIT 1
     ];
     if (
@@ -142,9 +145,10 @@ public without sharing class DealProtectionCommandService {
     if (
       [
         SELECT COUNT()
-        FROM Deal_Approval_Condition__c
+        FROM Approval_Condition__c
         WHERE
-          Deal__c = :deal.Id
+          Object_Name__c = 'Deal_Registration__c'
+          AND Target_Record_Id__c = :deal.Id
           AND Plan__c = :plans[0].Id
           AND Status__c = 'Open'
           AND Condition_Type__c = 'Protection Blocking'

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Allows_MDF_Collaboration__c</fullName>
+    <defaultValue>false</defaultValue>
+    <label>Allows MDF Collaboration</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,290 @@
+<template>
+  <div class="workspace-shell">
+    <aside class="slds-grid_vertical slds-grid sidebar">
+      <div class="slds-var-p-around_large sidebar-header">
+        <p class="slds-text-body_small eyebrow">Operations</p>
+        <h1>My Deal Review Steps</h1>
+      </div>
+
+      <div class="slds-var-p-around_medium queue-list">
+        <template if:true={error}>
+          <c-ps-error-panel message={error}></c-ps-error-panel>
+        </template>
+
+        <template if:true={showEmptyQueue}>
+          <c-ps-empty-state
+            title="No pending steps"
+            message="You have no deal review steps waiting on you."
+          >
+          </c-ps-empty-state>
+        </template>
+
+        <template if:true={hasSteps}>
+          <template for:each={steps} for:item="step">
+            <button
+              key={step.reviewId}
+              class={step.rowClass}
+              data-id={step.reviewId}
+              onclick={handleSelectStep}
+            >
+              <div
+                class="slds-media_center slds-grid_align-spread slds-grid queue-top"
+              >
+                <span class="object-name">{step.reviewType}</span>
+                <template if:true={step.needsReassignment}>
+                  <span class="ps-badge ps-badge-danger"
+                    >Needs Reassignment</span
+                  >
+                </template>
+                <template if:false={step.needsReassignment}>
+                  <span class="ps-badge ps-badge-warning">{step.status}</span>
+                </template>
+              </div>
+
+              <h3>{step.dealLabel}</h3>
+
+              <div class="slds-grid_align-spread slds-grid queue-meta">
+                <span>{step.reviewKey}</span>
+                <strong>Due {step.dueLabel}</strong>
+              </div>
+            </button>
+          </template>
+        </template>
+      </div>
+    </aside>
+
+    <main class="slds-var-p-around_large review-panel">
+      <template if:true={selectedStep}>
+        <template if:true={detailError}>
+          <c-ps-error-panel message={detailError}></c-ps-error-panel>
+        </template>
+
+        <template if:true={loadingDetail}>
+          <c-ps-loading-state
+            message="Loading deal review step detail"
+          ></c-ps-loading-state>
+        </template>
+
+        <section
+          class="slds-media_center slds-grid_align-spread slds-grid hero-card"
+        >
+          <div>
+            <p class="slds-text-body_small eyebrow">{selectedStep.reviewKey}</p>
+            <h2>{selectedStep.dealLabel}</h2>
+
+            <div class="slds-var-m-top_medium slds-grid hero-meta">
+              <span>{selectedStep.reviewType}</span>
+              <span>Status: {selectedStep.status}</span>
+              <a href={selectedStep.recordUrl} target="_blank" rel="noopener"
+                >View Deal</a
+              >
+            </div>
+          </div>
+
+          <template if:true={hasAvailableActions}>
+            <div class="slds-grid hero-actions">
+              <template for:each={availableActions} for:item="item">
+                <button
+                  key={item.action}
+                  class="action-button"
+                  data-action={item.action}
+                  onclick={handleActionClick}
+                >
+                  {item.label}
+                </button>
+              </template>
+            </div>
+          </template>
+
+          <template if:true={showNoActionsAvailable}>
+            <div class="decision-state">
+              You do not have permission to act on this review step.
+            </div>
+          </template>
+        </section>
+
+        <section class="slds-var-m-top_large detail-grid">
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">Step Status</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Status</span>
+              <strong>{selectedStep.status}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Blocking</span>
+              <strong>{selectedStep.blocking}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Depends On</span>
+              <strong>{selectedStep.dependsOnKey}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Due</span>
+              <strong>{selectedStep.dueLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Generated</span>
+              <strong>{selectedStep.generatedLabel}</strong>
+            </div>
+          </article>
+
+          <article class="panel-card">
+            <h3 class="slds-var-m-bottom_medium">History</h3>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Started</span>
+              <strong>{selectedStep.startedLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Completed</span>
+              <strong>{selectedStep.completedLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Escalated</span>
+              <strong>{selectedStep.escalatedLabel}</strong>
+            </div>
+
+            <div class="slds-grid slds-grid_align-spread status-row">
+              <span>Outcome</span>
+              <strong>{selectedStep.outcome}</strong>
+            </div>
+          </article>
+
+          <template if:true={selectedStep.recusalReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Recusal Reason</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedStep.recusalReason}
+              </div>
+            </article>
+          </template>
+
+          <template if:true={selectedStep.waiverReason}>
+            <article class="panel-card full-width decision-detail">
+              <h3 class="slds-var-m-bottom_medium">Waiver Reason</h3>
+              <div class="slds-var-p-around_medium notes-body">
+                {selectedStep.waiverReason}
+              </div>
+            </article>
+          </template>
+        </section>
+      </template>
+
+      <template if:false={selectedStep}>
+        <div class="slds-text-align_center empty-state">
+          <lightning-icon icon-name="utility:preview" size="large">
+          </lightning-icon>
+
+          <h2>Select a step</h2>
+
+          <p>Choose a deal review step from the queue to begin.</p>
+        </div>
+      </template>
+    </main>
+  </div>
+
+  <template if:true={showActionDialog}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="action-dialog-heading"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="action-dialog-heading" class="slds-modal__title">
+            {dialogTitle}
+          </h2>
+        </header>
+
+        <div class="slds-modal__content slds-var-p-around_medium">
+          <template if:true={isDialogReason}>
+            <lightning-textarea
+              label="Reason"
+              value={actionReason}
+              required
+              onchange={handleReasonChange}
+            >
+            </lightning-textarea>
+          </template>
+
+          <template if:true={isDialogComplete}>
+            <lightning-input
+              type="text"
+              label="Outcome"
+              value={actionOutcome}
+              required
+              onchange={handleOutcomeChange}
+            >
+            </lightning-input>
+          </template>
+
+          <template if:true={isDialogRequestInfo}>
+            <lightning-textarea
+              label="Question"
+              value={actionQuestion}
+              required
+              onchange={handleQuestionChange}
+            >
+            </lightning-textarea>
+
+            <lightning-input
+              class="slds-var-m-top_small"
+              type="text"
+              label="Audience"
+              value={actionAudience}
+              onchange={handleAudienceChange}
+            >
+            </lightning-input>
+
+            <lightning-textarea
+              class="slds-var-m-top_small"
+              label="Evidence Required"
+              value={actionEvidenceRequirement}
+              onchange={handleEvidenceRequirementChange}
+            >
+            </lightning-textarea>
+          </template>
+
+          <template if:true={isDialogReassign}>
+            <lightning-record-picker
+              label="New Assignee"
+              placeholder="Search users..."
+              object-api-name={userObjectApiName}
+              onchange={handleAssigneeChange}
+            >
+            </lightning-record-picker>
+          </template>
+        </div>
+
+        <footer class="slds-modal__footer">
+          <lightning-button
+            variant="neutral"
+            label="Cancel"
+            onclick={handleCancelDialog}
+          >
+          </lightning-button>
+
+          <lightning-button
+            class="slds-var-m-left_small"
+            variant="brand"
+            label="Confirm"
+            disabled={isConfirmDisabled}
+            onclick={handleConfirmDialog}
+          >
+          </lightning-button>
+        </footer>
+      </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>
