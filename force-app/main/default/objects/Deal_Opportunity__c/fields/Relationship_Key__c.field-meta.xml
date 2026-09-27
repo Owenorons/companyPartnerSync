@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Relationship_Key__c</fullName>
+    <description
+  >DealId|OpportunityId. Unique so the same Opportunity can never be
+  linked twice to the same Deal, regardless of Relationship_Type__c.</description>
+    <externalId>true</externalId>
+    <label>Relationship Key</label>
+    <length>60</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

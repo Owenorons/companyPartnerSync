@@ -1,0 +1,142 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Sales Execution Workbench</h1>
+        <p>Opportunity linkage, reapproval, and closed-deal oversight.</p>
+      </div>
+    </section>
+
+    <nav class="slds-var-m-bottom_large tab-bar">
+      <template for:each={tabs} for:item="tab">
+        <button
+          key={tab.name}
+          class={tab.className}
+          data-tab={tab.name}
+          onclick={handleSelectTab}
+        >
+          {tab.label}
+        </button>
+      </template>
+    </nav>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading sales execution data..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <!-- Opportunity Pending Link -->
+    <template if:true={isPendingLinkTab}>
+      <template if:true={hasPendingLink}>
+        <div class="queue-grid">
+          <template for:each={pendingLink} for:item="row">
+            <article key={row.dealId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.status}
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPendingLink}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No deals pending an opportunity link"
+            message="Approved deals with no current opportunity relationship will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Reapproval Required -->
+    <template if:true={isReapprovalTab}>
+      <template if:true={hasReapproval}>
+        <div class="queue-grid">
+          <template for:each={reapproval} for:item="row">
+            <article key={row.dealId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.status}
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasReapproval}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No deals require reapproval"
+            message="Deals sent back to Under Review by a material change will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Orphaned Relationships -->
+    <template if:true={isOrphanedTab}>
+      <template if:true={hasOrphaned}>
+        <div class="queue-grid">
+          <template for:each={orphaned} for:item="row">
+            <article key={row.dealId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label="Blocked"
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasOrphaned}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No orphaned opportunity relationships"
+            message="Deals whose primary opportunity is no longer accessible will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Recently Closed -->
+    <template if:true={isRecentlyClosedTab}>
+      <template if:true={hasRecentlyClosed}>
+        <div class="queue-grid">
+          <template for:each={recentlyClosed} for:item="row">
+            <article key={row.dealId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.stage}
+                variant="success"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasRecentlyClosed}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No recently closed deals"
+            message="Deals whose primary opportunity closed won or lost will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

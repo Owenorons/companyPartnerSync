@@ -9,6 +9,10 @@
 public with sharing class DealAttributionEngine {
   public static final String PARTNER_SOURCED = 'Partner-Sourced';
   public static final String CO_SELL = 'Co-Sell';
+  // Set later, from the participant roster (DealCoSellStatusProjectionService),
+  // not by classify() itself - Opportunity age has no bearing on whether a
+  // deal was referral-driven.
+  public static final String REFERRAL = 'Referral';
 
   @TestVisible
   private static Deal_Attribution_Rule__mdt testPolicy;

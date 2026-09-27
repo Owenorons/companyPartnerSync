@@ -89,6 +89,48 @@ private class AuditServiceTest {
   }
 
   @IsTest
+  static void logBulkWritesAllEntriesInOneInsert() {
+    User internalUser = TestUserFactory.createInternalUser();
+
+    List<AuditLogRequestDTO> requests = new List<AuditLogRequestDTO>();
+    for (Integer i = 0; i < 5; i++) {
+      requests.add(
+        AuditFactory.createSuccess('Partner_Record_Share__c', null, 'Grant')
+      );
+    }
+
+    System.runAs(internalUser) {
+      Test.startTest();
+      AuditService.logBulk(requests);
+      Test.stopTest();
+    }
+
+    Assert.areEqual(
+      5,
+      [
+        SELECT COUNT()
+        FROM Audit_Log__c
+        WHERE Object_Name__c = 'Partner_Record_Share__c'
+      ]
+    );
+  }
+
+  @IsTest
+  static void logBulkSwallowsNullAndEmptyWithoutError() {
+    Boolean threw = false;
+
+    try {
+      AuditService.logBulk(null);
+      AuditService.logBulk(new List<AuditLogRequestDTO>());
+    } catch (Exception ex) {
+      threw = true;
+    }
+
+    Assert.isFalse(threw);
+    Assert.areEqual(0, [SELECT COUNT() FROM Audit_Log__c]);
+  }
+
+  @IsTest
   static void logSwallowsNullRequestWithoutError() {
     Boolean threw = false;
 

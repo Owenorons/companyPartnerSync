@@ -130,9 +130,16 @@ private class DealCommandServiceTest {
       Command_Type__c = 'Initialize Lifecycle',
       Status__c = 'Processing',
       Expected_Version__c = 0,
-      Requested_On__c = System.now()
+      Requested_On__c = System.now(),
+      Request_Payload__c = JSON.serialize(
+        buildCommand(deal.Id, 'processing-command', 0)
+      )
     );
 
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Administer_PDLM',
+      true
+    );
     DealCommandResult result = DealCommandService.execute(
       buildCommand(deal.Id, 'processing-command', 0)
     );
@@ -271,6 +278,73 @@ private class DealCommandServiceTest {
       ],
       'The lifecycle event should have rolled back with the failed completion.'
     );
+  }
+
+  @IsTest
+  static void replayRejectsChangedRequestAndRevokedPermission() {
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Version_Number__c = 0
+    );
+    insert deal;
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Administer_PDLM',
+      true
+    );
+    DealCommand command = buildCommand(deal.Id, 'secure-replay', 0);
+    DealCommandService.execute(command);
+    command.reason = 'Different business input';
+    assertLifecycleFailure(command, 'cannot be reused');
+    command.reason = null;
+    command.parameters.put('changed', true);
+    assertLifecycleFailure(command, 'cannot be reused');
+    command.parameters.clear();
+    command.correlationId = 'retry-trace';
+    Assert.isTrue(DealCommandService.execute(command).duplicateCommand);
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Administer_PDLM',
+      false
+    );
+    assertLifecycleFailure(command, 'not authorised');
+    DealLifecyclePermissionService.clearTestPermissions();
+  }
+
+  @IsTest
+  static void replayRejectsDifferentRequesterAndAggregate() {
+    User otherUser = TestUserFactory.createInternalUser();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      Deal_Registration__c deal = new Deal_Registration__c(
+        Status__c = 'Draft',
+        Version_Number__c = 0
+      );
+      Deal_Registration__c otherDeal = new Deal_Registration__c(
+        Status__c = 'Draft',
+        Version_Number__c = 0
+      );
+      insert new List<Deal_Registration__c>{ deal, otherDeal };
+      DealLifecyclePermissionService.setTestPermission(
+        'PartnerSync_Administer_PDLM',
+        true
+      );
+      DealCommand command = buildCommand(deal.Id, 'requester-replay', 0);
+      DealCommandService.execute(command);
+      assertLifecycleFailure(
+        buildCommand(otherDeal.Id, command.commandKey, 0),
+        'cannot be reused'
+      );
+      System.runAs(otherUser) {
+        assertLifecycleFailure(command, 'cannot be reused');
+      }
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM Deal_Event__c
+          WHERE Command_Key__c = 'requester-replay'
+        ]
+      );
+      DealLifecyclePermissionService.clearTestPermissions();
+    }
   }
 
   private static void assertLifecycleFailure(

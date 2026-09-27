@@ -101,6 +101,32 @@ public without sharing class PartnerShareSelector {
   }
 
   /**
+   * Bulk counterpart to selectById(): loads many share grants by Id in one
+   * query, for callers revoking several at once.
+   *
+   * @param partnerRecordShareIds Ids of the Partner_Record_Share__c rows to retrieve.
+   * @return The matching Partner_Record_Share__c records (may be fewer than requested).
+   */
+  public static List<Partner_Record_Share__c> selectByIds(
+    List<Id> partnerRecordShareIds
+  ) {
+    return [
+      SELECT
+        Id,
+        Target_Record_Id__c,
+        Target_Object__c,
+        Partner_Account__c,
+        Active__c,
+        Expiry_Date__c,
+        Partner_Group_Id__c,
+        Salesforce_Share_Id__c
+      FROM Partner_Record_Share__c
+      WHERE Id IN :partnerRecordShareIds
+      WITH SYSTEM_MODE
+    ];
+  }
+
+  /**
    * Checks whether an active share grant already exists for the given
    * target record and partner account.
    *
@@ -118,5 +144,37 @@ public without sharing class PartnerShareSelector {
           AND Active__c = TRUE
         WITH SYSTEM_MODE
       ] > 0;
+  }
+
+  /**
+   * Bulk counterpart to hasActiveGrant(): one query instead of one per
+   * (record, partner) pair, for callers reconciling many grants at once.
+   *
+   * @param targetRecordIds Ids of the target records to check.
+   * @param partnerAccountIds Ids of the partner accounts to check.
+   * @return A set of "targetRecordId|partnerAccountId" keys with an active grant.
+   */
+  public static Set<String> selectActiveGrantKeys(
+    Set<Id> targetRecordIds,
+    Set<Id> partnerAccountIds
+  ) {
+    Set<String> targetRecordIdStrings = new Set<String>();
+    for (Id recordId : targetRecordIds) {
+      targetRecordIdStrings.add(String.valueOf(recordId));
+    }
+
+    Set<String> keys = new Set<String>();
+    for (Partner_Record_Share__c share : [
+      SELECT Target_Record_Id__c, Partner_Account__c
+      FROM Partner_Record_Share__c
+      WHERE
+        Target_Record_Id__c IN :targetRecordIdStrings
+        AND Partner_Account__c IN :partnerAccountIds
+        AND Active__c = TRUE
+      WITH SYSTEM_MODE
+    ]) {
+      keys.add(share.Target_Record_Id__c + '|' + share.Partner_Account__c);
+    }
+    return keys;
   }
 }

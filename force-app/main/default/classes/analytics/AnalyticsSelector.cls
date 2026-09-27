@@ -167,6 +167,9 @@ public with sharing class AnalyticsSelector {
       ) {
         rowTotals.partnerSourcedRevenue = amount;
         rowTotals.partnerSourcedWonDeals = count;
+      } else if (row.get('attributionType') == DealAttributionEngine.REFERRAL) {
+        rowTotals.referralRevenue = amount;
+        rowTotals.referralWonDeals = count;
       }
     }
     return totals;

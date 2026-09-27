@@ -61,6 +61,7 @@ public without sharing class DealParticipantSharingService {
     }
 
     Set<Id> desiredPartnerIds = new Set<Id>();
+    List<PartnerShareDTO> grantsNeeded = new List<PartnerShareDTO>();
     for (
       Deal_Participant__c participant : DealParticipantSelector.selectActiveParticipantsForDeal(
         dealId
@@ -93,16 +94,27 @@ public without sharing class DealParticipantSharingService {
         request.partnerAccountId = participant.Partner_Account__c;
         request.accessLevel = targetAccessLevel;
         request.shareReason = SHARE_REASON;
-        PartnerShareService.grantParticipantAccess(request);
+        grantsNeeded.add(request);
       }
     }
 
+    // Bulk grant/revoke instead of one call per participant - governor-safe
+    // at scale (see DealParticipantSharingServiceTest's bulk coverage and
+    // docs/deal-participant-management-review.md's now-closed bulk gap).
+    if (!grantsNeeded.isEmpty()) {
+      PartnerShareService.grantParticipantAccessBulk(grantsNeeded);
+    }
+
+    List<Id> revokesNeeded = new List<Id>();
     for (Id partnerAccountId : existingCoSellSharesByPartner.keySet()) {
       if (!desiredPartnerIds.contains(partnerAccountId)) {
-        PartnerShareService.revokeParticipantAccess(
+        revokesNeeded.add(
           existingCoSellSharesByPartner.get(partnerAccountId).Id
         );
       }
+    }
+    if (!revokesNeeded.isEmpty()) {
+      PartnerShareService.revokeParticipantAccessBulk(revokesNeeded);
     }
   }
 

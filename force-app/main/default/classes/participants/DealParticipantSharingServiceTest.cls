@@ -144,6 +144,139 @@ private class DealParticipantSharingServiceTest {
     );
   }
 
+  // Proves the doc's full 200-record bulk requirement (§38.50): reconciling
+  // 200 brand-new grants for one deal in a single transaction, via
+  // PartnerShareService.grantParticipantAccessBulk's batched SOQL/DML
+  // rather than the one-query-and-one-DML-per-grant shape the interactive
+  // grantAccess()/grantParticipantAccess() entry points use.
+  @IsTest
+  static void reconciliationHandles200NewGrantsWithinGovernorLimits() {
+    Fixture fixture = createFixture();
+    Group partnerGroup = [
+      SELECT Id
+      FROM Group
+      WHERE DeveloperName = 'Deal_Participant_Sharing_Test_Group'
+      LIMIT 1
+    ];
+
+    List<Account> coSellPartners = new List<Account>();
+    for (Integer i = 0; i < 200; i++) {
+      coSellPartners.add(
+        PartnerSyncTestDataFactory.partnerAccount('Bulk Co-Sell Partner ' + i)
+      );
+    }
+    insert coSellPartners;
+
+    List<Partner_Access_Group__c> groupMappings = new List<Partner_Access_Group__c>();
+    List<Deal_Participant__c> participants = new List<Deal_Participant__c>();
+    for (Account partner : coSellPartners) {
+      groupMappings.add(
+        new Partner_Access_Group__c(
+          Partner_Account__c = partner.Id,
+          Group_Id__c = String.valueOf(partnerGroup.Id),
+          Active__c = true
+        )
+      );
+      participants.add(
+        activeParticipant(fixture.deal.Id, partner.Id, 'Collaborator')
+      );
+    }
+    insert groupMappings;
+    insert participants;
+
+    System.runAs(fixture.manager) {
+      Test.startTest();
+      DealParticipantSharingService.reconcileForDeal(fixture.deal.Id);
+      Test.stopTest();
+    }
+
+    Assert.areEqual(
+      200,
+      [
+        SELECT COUNT()
+        FROM Partner_Record_Share__c
+        WHERE
+          Target_Record_Id__c = :String.valueOf(fixture.deal.Id)
+          AND Active__c = TRUE
+      ]
+    );
+  }
+
+  // Proves the revoke side is equally bulk-safe: 200 previously-granted
+  // shares all losing access (e.g. every co-sell participant suspended at
+  // once) in a single reconcileForDeal() call.
+  @IsTest
+  static void reconciliationHandles200RevocationsWithinGovernorLimits() {
+    Fixture fixture = createFixture();
+    Group partnerGroup = [
+      SELECT Id
+      FROM Group
+      WHERE DeveloperName = 'Deal_Participant_Sharing_Test_Group'
+      LIMIT 1
+    ];
+
+    List<Account> coSellPartners = new List<Account>();
+    for (Integer i = 0; i < 200; i++) {
+      coSellPartners.add(
+        PartnerSyncTestDataFactory.partnerAccount('Revoke Co-Sell Partner ' + i)
+      );
+    }
+    insert coSellPartners;
+
+    List<Partner_Access_Group__c> groupMappings = new List<Partner_Access_Group__c>();
+    List<Deal_Participant__c> participants = new List<Deal_Participant__c>();
+    for (Account partner : coSellPartners) {
+      groupMappings.add(
+        new Partner_Access_Group__c(
+          Partner_Account__c = partner.Id,
+          Group_Id__c = String.valueOf(partnerGroup.Id),
+          Active__c = true
+        )
+      );
+      participants.add(
+        activeParticipant(fixture.deal.Id, partner.Id, 'Collaborator')
+      );
+    }
+    insert groupMappings;
+    insert participants;
+
+    System.runAs(fixture.manager) {
+      DealParticipantSharingService.reconcileForDeal(fixture.deal.Id);
+    }
+    Assert.areEqual(
+      200,
+      [
+        SELECT COUNT()
+        FROM Partner_Record_Share__c
+        WHERE
+          Target_Record_Id__c = :String.valueOf(fixture.deal.Id)
+          AND Active__c = TRUE
+      ]
+    );
+
+    for (Deal_Participant__c participant : participants) {
+      participant.Status__c = 'Suspended';
+    }
+    update participants;
+
+    System.runAs(fixture.manager) {
+      Test.startTest();
+      DealParticipantSharingService.reconcileForDeal(fixture.deal.Id);
+      Test.stopTest();
+    }
+
+    Assert.areEqual(
+      0,
+      [
+        SELECT COUNT()
+        FROM Partner_Record_Share__c
+        WHERE
+          Target_Record_Id__c = :String.valueOf(fixture.deal.Id)
+          AND Active__c = TRUE
+      ]
+    );
+  }
+
   private static Fixture createFixture() {
     Fixture fixture = new Fixture();
     fixture.manager = TestUserFactory.createInternalUser();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Approved_Customer_Account__c</fullName>
+    <description>The primary Opportunity's AccountId snapshotted once at
+  FINALISE_APPROVAL, for Material Change Policy drift detection. See
+  Approved_Revenue__c.</description>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Approved Customer Account</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipName>Approved_Deal_Registrations</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

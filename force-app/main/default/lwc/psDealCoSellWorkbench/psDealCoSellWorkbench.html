@@ -1,0 +1,311 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Co-Sell Workbench</h1>
+        <p>Co-sell participation, protection and territory oversight.</p>
+      </div>
+    </section>
+
+    <nav class="slds-var-m-bottom_large tab-bar">
+      <template for:each={tabs} for:item="tab">
+        <button
+          key={tab.name}
+          class={tab.className}
+          data-tab={tab.name}
+          onclick={handleSelectTab}
+        >
+          {tab.label}
+        </button>
+      </template>
+    </nav>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading pending invitations..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <!-- Pending Invitations -->
+    <template if:true={isInvitationsTab}>
+      <template if:true={hasInvitations}>
+        <div class="invitation-grid">
+          <template for:each={invitations} for:item="invitation">
+            <article key={invitation.participantId} class="invitation-card">
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {invitation.participantType}
+                  </p>
+                  <h2>{invitation.organisationName}</h2>
+                  <p class="slds-var-m-top_xx-small invitation-role">
+                    Role: {invitation.participantRole}
+                  </p>
+                </div>
+
+                <c-ps-status-badge
+                  label={invitation.status}
+                  variant="warning"
+                ></c-ps-status-badge>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Respond By</span>
+                  <strong>{invitation.respondByLabel}</strong>
+                </div>
+              </div>
+
+              <div class="slds-grid slds-var-m-top_medium invitation-actions">
+                <button
+                  class="remove"
+                  data-id={invitation.participantId}
+                  onclick={handleRemove}
+                >
+                  Remove
+                </button>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasInvitations}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No pending invitations"
+            message="Co-sell invitations awaiting a partner response will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Active Co-Sell Deals -->
+    <template if:true={isCoSellDealsTab}>
+      <template if:true={hasCoSellDeals}>
+        <div class="invitation-grid">
+          <template for:each={coSellDeals} for:item="deal">
+            <article key={deal.dealId} class="invitation-card">
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {deal.originatingPartnerName}
+                  </p>
+                  <h2>{deal.customerName}</h2>
+                </div>
+
+                <c-ps-status-badge
+                  label={deal.coSellStatus}
+                  variant="success"
+                ></c-ps-status-badge>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Active Participants</span>
+                  <strong>{deal.activeParticipantCount}</strong>
+                </div>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasCoSellDeals}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No active co-sell deals"
+            message="Deals with active co-sell participation will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Participant Changes -->
+    <template if:true={isChangesTab}>
+      <template if:true={hasChanges}>
+        <div class="invitation-grid">
+          <template for:each={changes} for:item="change">
+            <article key={change.changeKey} class="invitation-card">
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {change.performedByName}
+                  </p>
+                  <h2>{change.action}</h2>
+                </div>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Performed On</span>
+                  <strong>{change.performedOnLabel}</strong>
+                </div>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasChanges}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No participant changes"
+            message="Recent participant lifecycle changes will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Shared Protection Requests -->
+    <template if:true={isProtectionRequestsTab}>
+      <template if:true={hasProtectionRequests}>
+        <div class="invitation-grid">
+          <template for:each={protectionRequests} for:item="request">
+            <article
+              key={request.protectionParticipantId}
+              class="invitation-card"
+            >
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {request.protectionRole}
+                  </p>
+                  <h2>{request.participantOrganisationName}</h2>
+                </div>
+
+                <c-ps-status-badge
+                  label="Proposed"
+                  variant="warning"
+                ></c-ps-status-badge>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Share %</span>
+                  <strong>{request.sharePercentage}</strong>
+                </div>
+                <div>
+                  <span class="slds-text-body_small">Requested On</span>
+                  <strong>{request.requestedOnLabel}</strong>
+                </div>
+              </div>
+
+              <div class="slds-grid slds-var-m-top_medium invitation-actions">
+                <button
+                  class="approve"
+                  data-id={request.protectionParticipantId}
+                  onclick={handleApprove}
+                >
+                  Approve
+                </button>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasProtectionRequests}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No pending shared protection requests"
+            message="Shared protection requests awaiting approval will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Relationship Exceptions -->
+    <template if:true={isExceptionsTab}>
+      <template if:true={hasExceptions}>
+        <div class="invitation-grid">
+          <template for:each={exceptions} for:item="exception">
+            <article key={exception.relationshipId} class="invitation-card">
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {exception.sourceAccountName}
+                  </p>
+                  <h2>{exception.targetAccountName}</h2>
+                </div>
+
+                <c-ps-status-badge
+                  label={exception.status}
+                  variant="danger"
+                ></c-ps-status-badge>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Effective To</span>
+                  <strong>{exception.effectiveToLabel}</strong>
+                </div>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasExceptions}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No relationship exceptions"
+            message="Suspended or expired partner relationships will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Participant SLA Breaches -->
+    <template if:true={isSlaBreachesTab}>
+      <template if:true={hasSlaBreaches}>
+        <div class="invitation-grid">
+          <template for:each={slaBreaches} for:item="breach">
+            <article key={breach.participantId} class="invitation-card">
+              <div class="slds-grid_align-spread slds-grid invitation-top">
+                <div>
+                  <p class="slds-text-body_small invitation-label">
+                    {breach.participantType}
+                  </p>
+                  <h2>{breach.organisationName}</h2>
+                </div>
+
+                <c-ps-status-badge
+                  label={breach.status}
+                  variant="danger"
+                ></c-ps-status-badge>
+              </div>
+
+              <div class="slds-var-m-top_medium invitation-details">
+                <div>
+                  <span class="slds-text-body_small">Respond By</span>
+                  <strong>{breach.respondByLabel}</strong>
+                </div>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+
+      <template if:false={hasSlaBreaches}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No SLA breaches"
+            message="At-risk and expired participant invitations will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

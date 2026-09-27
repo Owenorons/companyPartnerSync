@@ -55,4 +55,30 @@ public without sharing class DealProtectionParticipantSelector {
 
     return rows[0];
   }
+
+  /**
+   * Queries Proposed (not yet approved) shared-protection requests, for
+   * the internal Co-Sell Workbench's "Shared Protection Requests" view.
+   *
+   * @return Up to 200 Proposed Deal_Protection_Participant__c rows, oldest first.
+   */
+  public static List<Deal_Protection_Participant__c> selectPendingRequests() {
+    return [
+      SELECT
+        Id,
+        Protection__c,
+        Protection__r.Deal__c,
+        Protection__r.Version_Number__c,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Protection_Role__c,
+        Share_Percentage__c,
+        CreatedDate
+      FROM Deal_Protection_Participant__c
+      WHERE Status__c = 'Proposed'
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate ASC
+      LIMIT 200
+    ];
+  }
 }

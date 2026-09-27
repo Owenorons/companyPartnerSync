@@ -170,6 +170,84 @@ private class PartnerShareServiceTest {
     }
   }
 
+  @IsTest
+  static void bulkGrantSkipsExistingGrantsAndUnmappedPartnersThenBulkRevokes() {
+    User manager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSetGroup(
+      manager.Id,
+      'PSG_Internal_Administrator'
+    );
+    Group partnerGroup = new Group(
+      Name = 'Bulk Share Test Group',
+      DeveloperName = 'Bulk_Share_Test_Group',
+      Type = 'Regular'
+    );
+    insert partnerGroup;
+
+    System.runAs(manager) {
+      SharingFixture fixture = createFixture(partnerGroup.Id);
+
+      Account alreadyGranted = PartnerSyncTestDataFactory.partnerAccount(
+        'Already Granted Partner'
+      );
+      Account unmapped = PartnerSyncTestDataFactory.partnerAccount(
+        'Unmapped Bulk Partner'
+      );
+      insert new List<Account>{ alreadyGranted, unmapped };
+      insert new Partner_Access_Group__c(
+        Partner_Account__c = alreadyGranted.Id,
+        Group_Id__c = String.valueOf(partnerGroup.Id),
+        Active__c = true
+      );
+      // No Partner_Access_Group__c for `unmapped`, deliberately.
+
+      Id preExistingRegistryId = PartnerShareService.grantAccess(
+        request(fixture.deal.Id, 'Deal Registration', alreadyGranted.Id, 'Read')
+      );
+
+      List<PartnerShareDTO> bulkRequests = new List<PartnerShareDTO>{
+        request(
+          fixture.deal.Id,
+          'Deal Registration',
+          fixture.partner.Id,
+          'Edit'
+        ),
+        request(
+          fixture.deal.Id,
+          'Deal Registration',
+          alreadyGranted.Id,
+          'Edit'
+        ),
+        request(fixture.deal.Id, 'Deal Registration', unmapped.Id, 'Read')
+      };
+
+      List<Id> created = PartnerShareService.grantParticipantAccessBulk(
+        bulkRequests
+      );
+
+      // Only fixture.partner's grant is new - alreadyGranted is skipped as a
+      // duplicate, unmapped is skipped for having no access group.
+      Assert.areEqual(1, created.size());
+      Assert.isTrue(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, fixture.partner.Id)
+      );
+      Assert.isFalse(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, unmapped.Id)
+      );
+
+      PartnerShareService.revokeParticipantAccessBulk(
+        new List<Id>{ created[0], preExistingRegistryId }
+      );
+
+      Assert.isFalse(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, fixture.partner.Id)
+      );
+      Assert.isFalse(
+        PartnerShareSelector.hasActiveGrant(fixture.deal.Id, alreadyGranted.Id)
+      );
+    }
+  }
+
   private static SharingFixture createFixture(Id groupId) {
     SharingFixture fixture = new SharingFixture();
     fixture.partner = PartnerSyncTestDataFactory.partnerAccount(

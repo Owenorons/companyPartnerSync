@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>At_Risk_Notified__c</fullName>
+    <description>Set by DealParticipantExpiryBatch the first time an
+  Invited/Accepted invitation crosses its SLA warning threshold, so the
+  DealParticipantInvitationAtRisk notification fires only once per
+  invitation rather than every batch run.</description>
+    <defaultValue>false</defaultValue>
+    <label>At Risk Notified</label>
+    <type>Checkbox</type>
+</CustomField>

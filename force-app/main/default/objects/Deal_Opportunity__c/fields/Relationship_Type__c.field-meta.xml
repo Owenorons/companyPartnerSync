@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Relationship_Type__c</fullName>
+    <label>Relationship Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Primary</fullName><default>false</default><label
+        >Primary</label></value>
+            <value><fullName>Secondary</fullName><default>false</default><label
+        >Secondary</label></value>
+            <value><fullName>Expansion</fullName><default>false</default><label
+        >Expansion</label></value>
+            <value><fullName>Renewal</fullName><default>false</default><label
+        >Renewal</label></value>
+            <value><fullName>Regional</fullName><default>false</default><label
+        >Regional</label></value>
+            <value><fullName>Product</fullName><default>false</default><label
+        >Product</label></value>
+            <value><fullName>Services</fullName><default>false</default><label
+        >Services</label></value>
+            <value><fullName>Co-Sell</fullName><default>false</default><label
+        >Co-Sell</label></value>
+            <value><fullName>Replacement</fullName><default
+        >false</default><label>Replacement</label></value>
+            <value><fullName>Historical</fullName><default>false</default><label
+        >Historical</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

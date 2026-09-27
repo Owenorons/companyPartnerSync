@@ -57,6 +57,11 @@ public with sharing class PartnerLeaderboardRowDTO {
   @AuraEnabled
   public Decimal coSellRevenue { get; set; }
   /**
+   * Won revenue from deals classified Referral.
+   */
+  @AuraEnabled
+  public Decimal referralRevenue { get; set; }
+  /**
    * The partner's lead-to-deal conversion rate.
    */
   @AuraEnabled

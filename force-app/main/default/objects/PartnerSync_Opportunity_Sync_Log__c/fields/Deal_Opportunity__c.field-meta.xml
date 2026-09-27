@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Deal_Opportunity__c</fullName><label>Deal Opportunity</label><type
+  >MasterDetail</type><referenceTo
+  >Deal_Opportunity__c</referenceTo><relationshipLabel
+  >Sync Log Entries</relationshipLabel><relationshipName
+  >Sync_Log_Entries</relationshipName><reparentableMasterDetail
+  >false</reparentableMasterDetail><writeRequiresMasterRead
+  >false</writeRequiresMasterRead></CustomField>

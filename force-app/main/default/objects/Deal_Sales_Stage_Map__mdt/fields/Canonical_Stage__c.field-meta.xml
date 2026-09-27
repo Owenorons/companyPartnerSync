@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Canonical_Stage__c</fullName>
+    <description
+  >One of Deal_Registration__c.Stage__c's values (Qualification/Discovery/
+  Proposal/Negotiation/Closed Won/Closed Lost). Free text, not a mirrored
+  picklist, matching this codebase's convention of CMDT policy rows
+  storing their target picklist value as text.</description>
+    <label>Canonical Stage</label>
+    <length>40</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>

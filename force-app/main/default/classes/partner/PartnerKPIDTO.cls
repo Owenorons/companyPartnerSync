@@ -69,6 +69,17 @@ public with sharing class PartnerKPIDTO {
    */
   @AuraEnabled
   public Integer coSellWonDeals { get; set; }
+  /**
+   * Won revenue from deals reclassified Referral (an active Referral
+   * Partner participant exists on the deal - Sprint 39 channel analytics).
+   */
+  @AuraEnabled
+  public Decimal referralRevenue { get; set; }
+  /**
+   * Count of won deals classified Referral.
+   */
+  @AuraEnabled
+  public Integer referralWonDeals { get; set; }
 
   /**
    * Rate of leads accepted out of total leads.

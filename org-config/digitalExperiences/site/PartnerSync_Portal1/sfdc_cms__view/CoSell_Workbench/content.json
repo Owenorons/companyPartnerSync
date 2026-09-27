@@ -1,0 +1,67 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Co-Sell Workbench",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"e7d94c6d-75c5-4f2e-a952-0250265a9fe6\",\"columns\":[{\"UUID\":\"117ae3e1-7c70-41f0-a1dc-93c05d245295\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":[]}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : { },
+              "definition" : "psync:psDealCoSellWorkbench",
+              "id" : "c587eda0-468f-4bf2-a7dc-0b5aa974b2e3",
+              "type" : "component"
+            } ],
+            "id" : "117ae3e1-7c70-41f0-a1dc-93c05d245295",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "e7d94c6d-75c5-4f2e-a952-0250265a9fe6",
+          "type" : "component"
+        } ],
+        "id" : "27e2740e-1bfe-4016-9265-faa4969ad44a",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "pageTitle" : "Co-Sell Workbench",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "643e80b5-2d41-441f-b472-2b0746f844d0",
+          "type" : "component"
+        } ],
+        "id" : "8ea86562-5604-480d-8d3d-d2fd06418246",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "3fa8a2f3-9c1e-4b0a-8d2e-6a7f9c0b1d2e",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "TwwSuK3LeGqBdTzvhKP4j8mlpW4Job",
+    "viewType" : "custom-cosell-workbench"
+  },
+  "urlName" : "cosell-workbench"
+}

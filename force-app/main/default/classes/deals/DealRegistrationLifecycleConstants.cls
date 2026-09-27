@@ -9,4 +9,5 @@ public class DealRegistrationLifecycleConstants {
   public static final String REJECT = 'Reject Registration';
   public static final String CANCEL = 'Cancel Registration';
   public static final String FINALISE_APPROVAL = 'Finalise Deal Approval';
+  public static final String REQUEST_REAPPROVAL = 'Request Reapproval';
 }

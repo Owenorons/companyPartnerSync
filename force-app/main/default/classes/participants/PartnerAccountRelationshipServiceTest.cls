@@ -85,4 +85,44 @@ private class PartnerAccountRelationshipServiceTest {
       Assert.isTrue(expected.getMessage().contains('does not permit co-sell'));
     }
   }
+
+  @IsTest
+  static void allowsTerritoryIsTrueWhenNoTerritoryIsSet() {
+    Partner_Account_Relationship__c unrestricted = new Partner_Account_Relationship__c();
+    Assert.isTrue(
+      PartnerAccountRelationshipService.allowsTerritory(
+        unrestricted,
+        'Australia'
+      )
+    );
+    Assert.isTrue(
+      PartnerAccountRelationshipService.allowsTerritory(unrestricted, null)
+    );
+  }
+
+  @IsTest
+  static void allowsTerritoryMatchesCaseInsensitively() {
+    Partner_Account_Relationship__c restricted = new Partner_Account_Relationship__c(
+      Territory__c = 'australia'
+    );
+    Assert.isTrue(
+      PartnerAccountRelationshipService.allowsTerritory(restricted, 'Australia')
+    );
+  }
+
+  @IsTest
+  static void allowsTerritoryFailsClosedOnMismatchOrMissingDealCountry() {
+    Partner_Account_Relationship__c restricted = new Partner_Account_Relationship__c(
+      Territory__c = 'Australia'
+    );
+    Assert.isFalse(
+      PartnerAccountRelationshipService.allowsTerritory(
+        restricted,
+        'New Zealand'
+      )
+    );
+    Assert.isFalse(
+      PartnerAccountRelationshipService.allowsTerritory(restricted, null)
+    );
+  }
 }

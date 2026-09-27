@@ -1,0 +1,78 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Co-Sell</p>
+        <h1>Deal Team</h1>
+        <p>Your organisation and any co-sell participants on this deal.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state message="Loading deal team..."></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasParticipants}>
+      <div class="team-grid">
+        <template for:each={participants} for:item="participant">
+          <article key={participant.participantId} class="team-card">
+            <div class="slds-grid_align-spread slds-grid team-top">
+              <div>
+                <p class="slds-text-body_small team-label">
+                  <template if:true={participant.isOwnOrganisation}>
+                    Your organisation
+                  </template>
+                  <template if:false={participant.isOwnOrganisation}>
+                    Co-Sell Participant
+                  </template>
+                </p>
+                <h2>{participant.organisationName}</h2>
+                <p class="slds-var-m-top_xx-small team-role">
+                  Role: {participant.participantRole}
+                </p>
+              </div>
+
+              <c-ps-status-badge
+                label={participant.status}
+                variant={participant.badgeVariant}
+              ></c-ps-status-badge>
+            </div>
+
+            <template if:true={participant.canAccept}>
+              <div class="slds-grid slds-var-m-top_medium team-actions">
+                <button
+                  class="accept"
+                  data-id={participant.participantId}
+                  onclick={handleAccept}
+                >
+                  Accept
+                </button>
+                <button
+                  class="decline"
+                  data-id={participant.participantId}
+                  onclick={handleDecline}
+                >
+                  Decline
+                </button>
+              </div>
+            </template>
+          </article>
+        </template>
+      </div>
+    </template>
+
+    <template if:false={hasParticipants}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="No co-sell participants yet"
+          message="When co-sell participants are invited to this deal, they will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

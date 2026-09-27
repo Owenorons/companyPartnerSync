@@ -26,7 +26,8 @@
                 "mdfReviewTabName" : "MDF_Review__c",
                 "notificationsTabName" : "Notification_Center__c",
                 "partner360TabName" : "Partner_360__c",
-                "conflictWorkbenchTabName" : "Conflict_Workbench__c"
+                "conflictWorkbenchTabName" : "Conflict_Workbench__c",
+                "coSellWorkbenchTabName" : "CoSell_Workbench__c"
               },
               "definition" : "psync:psInternalDashboard",
               "id" : "3d47e13e-a68b-49f4-bef5-5b7cbb49e7bc",

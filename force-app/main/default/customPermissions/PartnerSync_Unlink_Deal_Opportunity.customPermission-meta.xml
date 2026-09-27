@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Unlink Deal Opportunity</label>
+    <description
+  >Allows unlinking an opportunity relationship from a deal registration, or marking one historical.</description>
+</CustomPermission>

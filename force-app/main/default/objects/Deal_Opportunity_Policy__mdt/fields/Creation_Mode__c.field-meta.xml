@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Creation_Mode__c</fullName>
+    <description>Create New, Link Existing, Create or Link, External Managed, or
+  Disabled. This org's actual registration flow (partner picks from an
+  existing Opportunity; internal Lead conversion creates one moments
+  before registration) is Link Existing - see the Default record and
+  Sprint 39's Known Adaptation #1.</description>
+    <label>Creation Mode</label>
+    <length>40</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>

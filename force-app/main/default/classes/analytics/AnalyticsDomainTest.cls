@@ -93,6 +93,8 @@ private class AnalyticsDomainTest {
     kpi.partnerSourcedWonDeals = 1;
     kpi.coSellRevenue = 6000;
     kpi.coSellWonDeals = 2;
+    kpi.referralRevenue = 1000;
+    kpi.referralWonDeals = 1;
     kpi.healthScore = 50;
 
     PartnerLeaderboardRowDTO row = AnalyticsDomain.buildLeaderboardRow(
@@ -102,6 +104,7 @@ private class AnalyticsDomainTest {
 
     Assert.areEqual(4000, row.partnerSourcedRevenue);
     Assert.areEqual(6000, row.coSellRevenue);
+    Assert.areEqual(1000, row.referralRevenue);
   }
 
   @IsTest
@@ -111,6 +114,8 @@ private class AnalyticsDomainTest {
     totals.partnerSourcedWonDeals = 2;
     totals.coSellRevenue = 2500;
     totals.coSellWonDeals = 3;
+    totals.referralRevenue = 500;
+    totals.referralWonDeals = 1;
 
     PartnerKPIDTO dto = AnalyticsDomain.calculatePartnerKPI(
       totals,
@@ -121,6 +126,8 @@ private class AnalyticsDomainTest {
     Assert.areEqual(2, dto.partnerSourcedWonDeals);
     Assert.areEqual(2500, dto.coSellRevenue);
     Assert.areEqual(3, dto.coSellWonDeals);
+    Assert.areEqual(500, dto.referralRevenue);
+    Assert.areEqual(1, dto.referralWonDeals);
   }
 
   @IsTest

@@ -160,6 +160,26 @@ public with sharing class DealRegistrationService {
 
     Deal_Registration__c insertedRecord = (Deal_Registration__c) sanitized[0];
 
+    // Deal_Opportunity__c is the authoritative Deal <-> Opportunity
+    // relationship going forward (Sprint 39 §39.2); Opportunity__c above
+    // remains a backward-compatible projection. This org's registration
+    // flow always has a resolved Opportunity before the deal exists, so
+    // "Link Existing" materializes as a real primary relationship from the
+    // moment of registration, not a later pipeline stage.
+    Database.insert(
+      new Deal_Opportunity__c(
+        Deal__c = insertedRecord.Id,
+        Opportunity__c = opportunity.Id,
+        Partner_Account__c = insertedRecord.Partner_Account__c,
+        Relationship_Type__c = 'Primary',
+        Primary__c = true,
+        Current__c = true,
+        Relationship_Key__c = insertedRecord.Id + '|' + opportunity.Id,
+        Version_Number__c = 0
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
+
     UsageMetricService.log(
       insertedRecord.Partner_Account__c,
       UsageMetricService.METRIC_TYPE_DEAL_SUBMITTED

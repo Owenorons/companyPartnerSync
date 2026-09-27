@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Previous_Relationship__c</fullName>
+    <description>Points at the Deal_Opportunity__c row this one replaces, when
+  Relationship_Type__c = 'Replacement' - lineage only, not a version
+  chain (each row is otherwise independent).</description>
+    <label>Previous Relationship</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Opportunity__c</referenceTo>
+    <relationshipLabel>Superseding Relationships</relationshipLabel>
+    <relationshipName>Superseding_Relationships</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

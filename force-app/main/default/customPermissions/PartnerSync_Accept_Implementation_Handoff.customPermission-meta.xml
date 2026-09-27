@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Accept Implementation Handoff</label>
+  <description
+  >Allows an internal delivery owner to accept or return a sales-to-delivery handoff.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

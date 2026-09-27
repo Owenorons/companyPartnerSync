@@ -185,7 +185,15 @@ private class AnalyticsServiceTest {
         CloseDate = Date.today(),
         Amount = 7000
       );
-      insert new List<Opportunity>{ sourcedOpp, coSellOpp };
+      Opportunity referralOpp = new Opportunity(
+        Name = 'Referral Won',
+        AccountId = customer.Id,
+        Partner_Account__c = partner.Id,
+        StageName = 'Closed Won',
+        CloseDate = Date.today(),
+        Amount = 1000
+      );
+      insert new List<Opportunity>{ sourcedOpp, coSellOpp, referralOpp };
 
       insert new List<Deal_Registration__c>{
         new Deal_Registration__c(
@@ -199,6 +207,12 @@ private class AnalyticsServiceTest {
           Status__c = 'Approved',
           Opportunity__c = coSellOpp.Id,
           Attribution_Type__c = DealAttributionEngine.CO_SELL
+        ),
+        new Deal_Registration__c(
+          Partner_Account__c = partner.Id,
+          Status__c = 'Approved',
+          Opportunity__c = referralOpp.Id,
+          Attribution_Type__c = DealAttributionEngine.REFERRAL
         )
       };
 
@@ -211,6 +225,8 @@ private class AnalyticsServiceTest {
       Assert.areEqual(1, kpi.partnerSourcedWonDeals);
       Assert.areEqual(7000, kpi.coSellRevenue);
       Assert.areEqual(1, kpi.coSellWonDeals);
+      Assert.areEqual(1000, kpi.referralRevenue);
+      Assert.areEqual(1, kpi.referralWonDeals);
 
       List<PartnerLeaderboardRowDTO> leaderboard = AnalyticsService.getPartnerLeaderboard();
       PartnerLeaderboardRowDTO partnerRow;
@@ -222,6 +238,7 @@ private class AnalyticsServiceTest {
       Assert.isNotNull(partnerRow);
       Assert.areEqual(3000, partnerRow.partnerSourcedRevenue);
       Assert.areEqual(7000, partnerRow.coSellRevenue);
+      Assert.areEqual(1000, partnerRow.referralRevenue);
     }
   }
 

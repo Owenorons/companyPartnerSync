@@ -159,6 +159,129 @@ private class RegistrationLifecycleCommandHandlerTest {
     DealLifecyclePermissionService.clearTestPermissions();
   }
 
+  @IsTest
+  static void finalApprovalCapturesTheApprovalSnapshotFromThePrimaryOpportunity() {
+    Account customer = new Account(Name = 'Snapshot Customer');
+    insert customer;
+    Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+      customer.Id,
+      null,
+      null
+    );
+    opportunity.CloseDate = Date.today().addDays(45);
+    insert opportunity;
+
+    Deal_Registration__c deal = new Deal_Registration__c(
+      Status__c = 'Draft',
+      Conflict_Status__c = 'None',
+      Customer_Account__c = customer.Id,
+      Customer_Name__c = 'Snapshot Customer',
+      Estimated_Revenue__c = 10000,
+      Lifecycle_Phase__c = 'Registration',
+      Version_Number__c = 0
+    );
+    insert deal;
+    insert new Deal_Opportunity__c(
+      Deal__c = deal.Id,
+      Opportunity__c = opportunity.Id,
+      Relationship_Type__c = 'Primary',
+      Primary__c = true,
+      Current__c = true,
+      Relationship_Key__c = deal.Id + '|' + opportunity.Id,
+      Version_Number__c = 0
+    );
+
+    execute(
+      deal.Id,
+      DealRegistrationLifecycleConstants.SUBMIT,
+      0,
+      '39-snapshot-submit',
+      null
+    );
+    assertState(deal.Id, 'Submitted', 1);
+
+    DealLifecyclePermissionService.setTestPermission(
+      'PartnerSync_Approve_Deal',
+      true
+    );
+    Approval__c approval = [
+      SELECT Id, Version_Number__c
+      FROM Approval__c
+      WHERE
+        Object_Name__c = 'Deal_Registration__c'
+        AND Target_Record_Id__c = :deal.Id
+        AND Plan__r.Current__c = TRUE
+      LIMIT 1
+    ];
+    ApprovalCommand approvalCommand = new ApprovalCommand();
+    approvalCommand.approvalId = approval.Id;
+    approvalCommand.expectedVersion = Integer.valueOf(
+      approval.Version_Number__c
+    );
+    approvalCommand.decision = 'Approved';
+
+    User channelManager = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      channelManager.Id,
+      'PartnerSync_Channel_Manager'
+    );
+    System.runAs(channelManager) {
+      ApprovalCommandService.complete(approvalCommand);
+    }
+
+    Deal_Review__c channelReview = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Review__c
+      WHERE
+        Deal__c = :deal.Id
+        AND Review_Key__c = 'Channel_Review'
+        AND Plan__r.Current__c = TRUE
+      LIMIT 1
+    ];
+    System.runAs(channelManager) {
+      DealReviewCommandService.execute(
+        new List<DealReviewCommand>{ reviewCommand(channelReview, 'Start') }
+      );
+    }
+    channelReview = [
+      SELECT Id, Version_Number__c
+      FROM Deal_Review__c
+      WHERE Id = :channelReview.Id
+    ];
+    DealReviewCommand completeReview = reviewCommand(channelReview, 'Complete');
+    completeReview.outcome = 'Approved';
+    System.runAs(channelManager) {
+      DealReviewCommandService.execute(
+        new List<DealReviewCommand>{ completeReview }
+      );
+    }
+
+    DealCommandService.execute(
+      command(
+        deal.Id,
+        DealRegistrationLifecycleConstants.FINALISE_APPROVAL,
+        1,
+        '39-snapshot-approve',
+        null
+      )
+    );
+    DealLifecyclePermissionService.clearTestPermissions();
+
+    Deal_Registration__c snapshotted = [
+      SELECT
+        Approved_Revenue__c,
+        Approved_Customer_Account__c,
+        Approved_Close_Date__c,
+        Approved_Opportunity__c
+      FROM Deal_Registration__c
+      WHERE Id = :deal.Id
+    ];
+    Assert.areEqual(10000, snapshotted.Approved_Revenue__c);
+    Assert.areEqual(customer.Id, snapshotted.Approved_Customer_Account__c);
+    Assert.areEqual(opportunity.CloseDate, snapshotted.Approved_Close_Date__c);
+    Assert.areEqual(opportunity.Id, snapshotted.Approved_Opportunity__c);
+  }
+
   // A blocking Protection-Blocking condition should not fail final
   // approval itself - the deal still finalises to Approved with Conditions,
   // and DealCommandService.activateProtection() simply defers activation

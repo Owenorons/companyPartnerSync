@@ -1,0 +1,170 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Implementation</p>
+        <h1>Delivery Workspace</h1>
+        <p>Status, milestones, evidence, issues, and customer acceptance.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading implementation..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:true={hasImplementation}>
+      <section class="slds-var-m-bottom_large status-card">
+        <p class="slds-text-body_small team-label">
+          {summary.implementationType}
+        </p>
+        <h2>{summary.customerName}</h2>
+        <div class="slds-grid slds-var-m-top_x-small status-badges">
+          <c-ps-status-badge
+            label={summary.status}
+            variant="info"
+          ></c-ps-status-badge>
+          <c-ps-status-badge
+            label={summary.health}
+            variant="success"
+          ></c-ps-status-badge>
+        </div>
+      </section>
+
+      <section class="slds-var-m-bottom_large">
+        <h3>Milestones</h3>
+        <template if:true={hasMilestones}>
+          <div class="queue-grid">
+            <template for:each={milestones} for:item="milestone">
+              <article key={milestone.milestoneId} class="queue-card">
+                <div class="slds-grid_align-spread slds-grid">
+                  <div>
+                    <h2>{milestone.name}</h2>
+                    <p class="slds-var-m-top_xx-small team-role">
+                      Due: {milestone.dueOn}
+                    </p>
+                  </div>
+                  <c-ps-status-badge
+                    label={milestone.status}
+                    variant="info"
+                  ></c-ps-status-badge>
+                </div>
+                <template if:true={milestone.canComplete}>
+                  <div class="slds-var-m-top_medium team-actions">
+                    <button
+                      class="accept"
+                      data-id={milestone.milestoneId}
+                      onclick={handleCompleteMilestone}
+                    >
+                      Mark Complete
+                    </button>
+                  </div>
+                </template>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasMilestones}>
+          <c-ps-empty-state
+            title="No milestones yet"
+            message="Delivery milestones will appear here once generated."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+
+      <section class="slds-var-m-bottom_large">
+        <h3>Evidence</h3>
+        <template if:true={hasEvidenceItems}>
+          <div class="queue-grid">
+            <template for:each={evidenceItems} for:item="evidence">
+              <article key={evidence.evidenceId} class="queue-card">
+                <div class="slds-grid_align-spread slds-grid">
+                  <h2>{evidence.evidenceType}</h2>
+                  <c-ps-status-badge
+                    label={evidence.status}
+                    variant="info"
+                  ></c-ps-status-badge>
+                </div>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasEvidenceItems}>
+          <c-ps-empty-state
+            title="No evidence submitted"
+            message="Delivery evidence submitted for review will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+
+      <section class="slds-var-m-bottom_large">
+        <h3>Issues</h3>
+        <template if:true={hasIssues}>
+          <div class="queue-grid">
+            <template for:each={issues} for:item="issue">
+              <article key={issue.issueId} class="queue-card">
+                <div class="slds-grid_align-spread slds-grid">
+                  <h2>{issue.title}</h2>
+                  <c-ps-status-badge
+                    label={issue.status}
+                    variant="warning"
+                  ></c-ps-status-badge>
+                </div>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasIssues}>
+          <c-ps-empty-state
+            title="No delivery issues"
+            message="Delivery issues raised on this implementation will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+
+      <section>
+        <h3>Customer Acceptance</h3>
+        <template if:true={hasAcceptances}>
+          <div class="queue-grid">
+            <template for:each={acceptances} for:item="acceptance">
+              <article key={acceptance.acceptanceId} class="queue-card">
+                <div class="slds-grid_align-spread slds-grid">
+                  <h2>{acceptance.acceptanceType}</h2>
+                  <c-ps-status-badge
+                    label={acceptance.status}
+                    variant="success"
+                  ></c-ps-status-badge>
+                </div>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasAcceptances}>
+          <c-ps-empty-state
+            title="No acceptance requests yet"
+            message="Customer acceptance requests will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+    </template>
+
+    <template if:false={hasImplementation}>
+      <template if:false={loading}>
+        <c-ps-empty-state
+          title="No implementation yet"
+          message="Once this deal closes won, its implementation will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

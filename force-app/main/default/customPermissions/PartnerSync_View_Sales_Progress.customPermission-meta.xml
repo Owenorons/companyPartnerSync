@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync View Sales Progress</label>
+    <description
+  >Allows viewing the sanitized partner-facing sales progress summary for a deal's linked opportunity.</description>
+</CustomPermission>

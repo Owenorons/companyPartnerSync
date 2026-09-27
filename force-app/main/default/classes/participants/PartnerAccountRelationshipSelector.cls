@@ -22,6 +22,8 @@ public without sharing class PartnerAccountRelationshipSelector {
         Relationship_Type__c,
         Status__c,
         Allows_CoSell__c,
+        Territory__c,
+        Product_Family__c,
         Effective_From__c,
         Effective_To__c
       FROM Partner_Account_Relationship__c
@@ -36,5 +38,30 @@ public without sharing class PartnerAccountRelationshipSelector {
     ];
 
     return rows.isEmpty() ? null : rows[0];
+  }
+
+  /**
+   * Queries Suspended or Expired relationships, for the internal Co-Sell
+   * Workbench's "Relationship Exceptions" view - relationships that may
+   * need administrative attention.
+   *
+   * @return Up to 200 Suspended/Expired relationships, most recently changed first.
+   */
+  public static List<Partner_Account_Relationship__c> selectExceptions() {
+    return [
+      SELECT
+        Id,
+        Source_Account__c,
+        Source_Account__r.Name,
+        Target_Account__c,
+        Target_Account__r.Name,
+        Status__c,
+        Effective_To__c
+      FROM Partner_Account_Relationship__c
+      WHERE Status__c IN ('Suspended', 'Expired')
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
   }
 }

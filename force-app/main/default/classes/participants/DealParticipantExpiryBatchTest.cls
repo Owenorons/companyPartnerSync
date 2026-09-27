@@ -93,6 +93,53 @@ private class DealParticipantExpiryBatchTest {
   }
 
   @IsTest
+  static void flagsAndNotifiesAnInvitationOnceItCrossesTheWarningThreshold() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+    insert partner;
+    Account customer = PartnerSyncTestDataFactory.customerAccount('Customer');
+    insert customer;
+    Deal_Registration__c deal = PartnerSyncTestDataFactory.deal(
+      customer.Id,
+      partner.Id,
+      null,
+      null
+    );
+    deal.Status__c = 'Approved';
+    insert deal;
+
+    // 72h window, 75% default warning threshold -> at risk from hour 54.
+    // Invited 60 hours ago still leaves it short of the 72h deadline, so
+    // the batch should flag it as at risk rather than expire it.
+    Deal_Participant__c atRisk = new Deal_Participant__c(
+      Deal__c = deal.Id,
+      Partner_Account__c = partner.Id,
+      Participant_Type__c = 'Co-Sell Partner',
+      Participant_Role__c = 'Co-Sell Contributor',
+      Status__c = 'Invited',
+      Invited_On__c = System.now().addHours(-60),
+      Respond_By__c = System.now().addHours(12),
+      Active_Participant_Key__c = deal.Id +
+        '|Co-Sell Partner|' +
+        partner.Id +
+        '|Co-Sell Contributor',
+      Version_Number__c = 0
+    );
+    insert atRisk;
+
+    Test.startTest();
+    Database.executeBatch(new DealParticipantExpiryBatch(), 100);
+    Test.stopTest();
+
+    Deal_Participant__c updated = [
+      SELECT Status__c, At_Risk_Notified__c
+      FROM Deal_Participant__c
+      WHERE Id = :atRisk.Id
+    ];
+    Assert.areEqual('Invited', updated.Status__c);
+    Assert.isTrue(updated.At_Risk_Notified__c);
+  }
+
+  @IsTest
   static void canBeScheduled() {
     Test.startTest();
     String jobId = System.schedule(

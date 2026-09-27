@@ -45,6 +45,27 @@
         label="Partner 360 page API name"
         description="Internal LWR page API name the Partner 360 quick action navigates to"
       />
+            <property
+        name="conflictWorkbenchTabName"
+        type="String"
+        default="Conflict_Workbench__c"
+        label="Conflict Workbench page API name"
+        description="Internal LWR page API name the Conflict Workbench quick action navigates to"
+      />
+            <property
+        name="coSellWorkbenchTabName"
+        type="String"
+        default="CoSell_Workbench__c"
+        label="Co-Sell Workbench page API name"
+        description="Internal LWR page API name the Co-Sell Workbench quick action navigates to"
+      />
+            <property
+        name="salesExecutionWorkbenchTabName"
+        type="String"
+        default="Sales_Execution_Workbench__c"
+        label="Sales Execution Workbench page API name"
+        description="Internal LWR page API name the Sales Execution Workbench quick action navigates to"
+      />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

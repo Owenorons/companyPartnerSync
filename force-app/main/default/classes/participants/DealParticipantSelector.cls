@@ -102,6 +102,70 @@ public without sharing class DealParticipantSelector {
   }
 
   /**
+   * Queries every non-terminal participant for a deal (Invited through
+   * Suspended), for display in the deal-team UI - a broader set than
+   * selectActiveParticipantsForDeal, which excludes still-pending
+   * invitations.
+   *
+   * @param dealId Id of the deal.
+   * @return The deal's currently-visible participants.
+   */
+  public static List<Deal_Participant__c> selectVisibleParticipantsForDeal(
+    Id dealId
+  ) {
+    return [
+      SELECT
+        Id,
+        Deal__c,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Participant_Type__c,
+        Participant_Role__c,
+        Status__c,
+        Access_Level__c,
+        Invited_On__c,
+        Respond_By__c,
+        Effective_From__c,
+        Version_Number__c
+      FROM Deal_Participant__c
+      WHERE
+        Deal__c = :dealId
+        AND Status__c IN ('Invited', 'Accepted', 'Active', 'Suspended')
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate ASC
+    ];
+  }
+
+  /**
+   * Queries Invited participants across deals, for the internal co-sell
+   * workbench's pending-invitations queue.
+   *
+   * @return Up to 200 Invited participants, oldest first.
+   */
+  public static List<Deal_Participant__c> selectPendingInvitations() {
+    return [
+      SELECT
+        Id,
+        Deal__c,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Participant_Type__c,
+        Participant_Role__c,
+        Status__c,
+        Access_Level__c,
+        Invited_On__c,
+        Respond_By__c,
+        Effective_From__c,
+        Version_Number__c
+      FROM Deal_Participant__c
+      WHERE Status__c = 'Invited'
+      WITH SYSTEM_MODE
+      ORDER BY Invited_On__c ASC
+      LIMIT 200
+    ];
+  }
+
+  /**
    * Bulk-loads active participants for a set of deals, for reconciliation
    * and dashboard-style callers that need every deal's roster at once.
    *
@@ -144,5 +208,71 @@ public without sharing class DealParticipantSelector {
           AND Status__c = 'Active'
         WITH SYSTEM_MODE
       ] > 0;
+  }
+
+  /**
+   * Queries participants with an SLA concern, for the internal Co-Sell
+   * Workbench's "Participant SLA Breaches" view: invitations already
+   * flagged at risk (still open) and ones that expired outright.
+   *
+   * @return Up to 200 at-risk or expired participants, most recently flagged/expired first.
+   */
+  public static List<Deal_Participant__c> selectSlaBreaches() {
+    return [
+      SELECT
+        Id,
+        Deal__c,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        Participant_Type__c,
+        Participant_Role__c,
+        Status__c,
+        Access_Level__c,
+        Invited_On__c,
+        Respond_By__c,
+        Effective_From__c,
+        Version_Number__c
+      FROM Deal_Participant__c
+      WHERE
+        (Status__c IN ('Invited', 'Accepted')
+        AND At_Risk_Notified__c = TRUE)
+        OR Status__c = 'Expired'
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Queries recent participant-related audit entries, for the internal
+   * Co-Sell Workbench's "Participant Changes" view. Sourced from
+   * Audit_Log__c, written by AuditEventConsumerService for the participant
+   * lifecycle event types it maps.
+   *
+   * @return Up to 100 participant-related Audit_Log__c rows, most recent first.
+   */
+  public static List<Audit_Log__c> selectRecentParticipantChanges() {
+    return [
+      SELECT Record_Id__c, Action__c, Performed_By_Name__c, Audit_Timestamp__c
+      FROM Audit_Log__c
+      WHERE
+        Object_Name__c = 'Deal_Registration__c'
+        AND Action__c IN (
+          'Invite Participant',
+          'Accept Participation',
+          'Decline Participation',
+          'Activate Participant',
+          'Suspend Participant',
+          'Resume Participant',
+          'Remove Participant',
+          'Change Participant Role',
+          'Request Shared Protection',
+          'Grant Shared Protection',
+          'Transfer Deal Ownership'
+        )
+      WITH SYSTEM_MODE
+      ORDER BY Audit_Timestamp__c DESC
+      LIMIT 100
+    ];
   }
 }

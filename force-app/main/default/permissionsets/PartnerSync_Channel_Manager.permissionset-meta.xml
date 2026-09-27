@@ -10,6 +10,22 @@
     </customPermissions>
     <customPermissions>
         <enabled>true</enabled>
+        <name>PartnerSync_Accept_Implementation_Handoff</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Manage_Implementation</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Review_Implementation_Evidence</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Escalate_Implementation</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
         <name>PartnerSync_Reject_Deal</name>
     </customPermissions>
     <customPermissions>
@@ -38,12 +54,22 @@
     </customPermissions>
     <customPermissions><enabled>true</enabled><name
     >PartnerSync_Review_Onboarding_Documents</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Create_Deal_Opportunity</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Link_Deal_Opportunity</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >PartnerSync_Unlink_Deal_Opportunity</name></customPermissions>
     <classAccesses>
         <apexClass>AnalyticsController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>DealRegistrationController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>DealOpportunityController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -1711,6 +1737,82 @@
     >Partner_Training_Assignment__c</object><viewAllFields
     >true</viewAllFields><viewAllRecords
     >true</viewAllRecords></objectPermissions>
+    <objectPermissions><allowCreate>true</allowCreate><allowDelete
+    >false</allowDelete><allowEdit>true</allowEdit><allowRead
+    >true</allowRead><modifyAllRecords>false</modifyAllRecords><object
+    >Deal_Opportunity__c</object><viewAllFields
+    >false</viewAllFields><viewAllRecords
+    >false</viewAllRecords></objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Deal_Implementation__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Deal_Implementation_Handoff__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Implementation_Participant__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Implementation_Milestone__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Implementation_Evidence__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Implementation_Issue__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Implementation_Acceptance__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
     <tabSettings>
         <tab>Partner_360</tab>
         <visibility>Visible</visibility>

@@ -67,6 +67,23 @@ private class AuditNotificationCoverageTest {
         1,
         [SELECT COUNT() FROM Audit_Log__c WHERE Action__c = 'Submit']
       );
+
+      AuditEventConsumerService.logBusinessEvent(
+        new PartnerSync_Event__e(
+          Event_Type__c = 'DealParticipantInvited',
+          Object_Name__c = 'Deal_Registration__c',
+          Record_Id__c = null,
+          Partner_Account_Id__c = null
+        )
+      );
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM Audit_Log__c
+          WHERE Action__c = 'Invite Participant'
+        ]
+      );
     }
   }
 
@@ -111,6 +128,35 @@ private class AuditNotificationCoverageTest {
       Assert.areEqual('Deal', notification.Notification_Type__c);
       Assert.areEqual('Deal Approved', notification.Title__c);
       Assert.areEqual(adminUser.Id, notification.Recipient_User__c);
+    }
+  }
+
+  @IsTest
+  static void notificationConsumerMapsSprint38CoSellEventTypes() {
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      Account partner = PartnerSyncTestDataFactory.partnerAccount('Partner');
+      insert partner;
+      NotificationEventConsumerService.notifyBusinessEvent(
+        new PartnerSync_Event__e(
+          Event_Type__c = 'DealParticipantInvited',
+          Object_Name__c = 'Deal_Registration__c',
+          Record_Id__c = String.valueOf(partner.Id),
+          Partner_Account_Id__c = String.valueOf(partner.Id)
+        ),
+        new List<User>{ adminUser }
+      );
+      Partner_Notification__c notification = [
+        SELECT Notification_Type__c, Title__c, Message__c
+        FROM Partner_Notification__c
+        LIMIT 1
+      ];
+      Assert.areEqual('Deal', notification.Notification_Type__c);
+      Assert.areEqual('Co-Sell Invitation', notification.Title__c);
     }
   }
 }

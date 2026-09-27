@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>View Implementation</label>
+  <description
+  >Allows a partner user to view their assigned implementations and delivery detail.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

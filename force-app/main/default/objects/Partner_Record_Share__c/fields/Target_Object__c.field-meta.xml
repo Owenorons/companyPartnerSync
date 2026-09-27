@@ -20,6 +20,11 @@
                 <label>MDF Request</label>
             </value>
             <value>
+                <fullName>Deal Implementation</fullName>
+                <default>false</default>
+                <label>Deal Implementation</label>
+            </value>
+            <value>
                 <fullName>Opportunity</fullName>
                 <default>false</default>
                 <label>Opportunity</label>

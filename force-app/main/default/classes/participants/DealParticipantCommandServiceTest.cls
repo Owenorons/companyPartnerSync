@@ -118,6 +118,75 @@ private class DealParticipantCommandServiceTest {
   }
 
   @IsTest
+  static void territoryRestrictedRelationshipBlocksAnOutOfTerritoryInvite() {
+    Account originatingPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Originating Partner'
+    );
+    Account coSellPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Co-Sell Partner'
+    );
+    insert new List<Account>{ originatingPartner, coSellPartner };
+    Deal_Registration__c deal = approvedDeal(originatingPartner.Id);
+    deal.Identity_Country__c = 'New Zealand';
+    update deal;
+    insert new Partner_Account_Relationship__c(
+      Source_Account__c = originatingPartner.Id,
+      Target_Account__c = coSellPartner.Id,
+      Relationship_Type__c = 'Co-Sell',
+      Status__c = 'Active',
+      Allows_CoSell__c = true,
+      Territory__c = 'Australia',
+      Version_Number__c = 0
+    );
+
+    User channelManager = internalUser();
+
+    System.runAs(channelManager) {
+      try {
+        DealParticipantCommandService.execute(
+          inviteCommand(deal.Id, coSellPartner.Id)
+        );
+        Assert.fail('Expected the territory mismatch to block the invite.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('territory'));
+      }
+    }
+  }
+
+  @IsTest
+  static void territoryRestrictedRelationshipAllowsAMatchingTerritoryInvite() {
+    Account originatingPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Originating Partner'
+    );
+    Account coSellPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Co-Sell Partner'
+    );
+    insert new List<Account>{ originatingPartner, coSellPartner };
+    Deal_Registration__c deal = approvedDeal(originatingPartner.Id);
+    deal.Identity_Country__c = 'Australia';
+    update deal;
+    insert new Partner_Account_Relationship__c(
+      Source_Account__c = originatingPartner.Id,
+      Target_Account__c = coSellPartner.Id,
+      Relationship_Type__c = 'Co-Sell',
+      Status__c = 'Active',
+      Allows_CoSell__c = true,
+      Territory__c = 'Australia',
+      Version_Number__c = 0
+    );
+
+    User channelManager = internalUser();
+    Deal_Participant__c participant;
+    System.runAs(channelManager) {
+      participant = DealParticipantCommandService.execute(
+        inviteCommand(deal.Id, coSellPartner.Id)
+      );
+    }
+
+    Assert.areEqual('Invited', participant.Status__c);
+  }
+
+  @IsTest
   static void invitedPartnerCanAcceptAndInactiveDealNoLongerBlocks() {
     Account originatingPartner = PartnerSyncTestDataFactory.partnerAccount(
       'Originating Partner'
@@ -235,6 +304,57 @@ private class DealParticipantCommandServiceTest {
 
     Assert.areEqual('Declined', participant.Status__c);
     Assert.isNull(participant.Active_Participant_Key__c);
+  }
+
+  @IsTest
+  static void acceptAfterConcurrentRemovalFailsOnStaleVersion() {
+    Account originatingPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Originating Partner'
+    );
+    Account coSellPartner = PartnerSyncTestDataFactory.partnerAccount(
+      'Co-Sell Partner'
+    );
+    insert new List<Account>{ originatingPartner, coSellPartner };
+    Contact coSellContact = PartnerSyncTestDataFactory.partnerContact(
+      coSellPartner.Id
+    );
+    insert coSellContact;
+    Deal_Registration__c deal = approvedDeal(originatingPartner.Id);
+    activeRelationship(originatingPartner.Id, coSellPartner.Id);
+
+    User channelManager = internalUser();
+    Deal_Participant__c participant;
+    System.runAs(channelManager) {
+      participant = DealParticipantCommandService.execute(
+        inviteCommand(deal.Id, coSellPartner.Id)
+      );
+
+      // Simulates a channel manager removing the invitation concurrently
+      // with the partner's own accept attempt below.
+      DealParticipantCommand remove = new DealParticipantCommand();
+      remove.participantId = participant.Id;
+      remove.action = 'Remove';
+      remove.expectedVersion = 0;
+      remove.reason = 'No longer pursuing this collaboration.';
+      DealParticipantCommandService.execute(remove);
+    }
+
+    User coSellUser = TestUserFactory.createExternalUser(coSellContact.Id);
+    DealParticipantCommand accept = new DealParticipantCommand();
+    accept.participantId = participant.Id;
+    accept.action = 'Accept';
+    accept.expectedVersion = 0;
+
+    System.runAs(coSellUser) {
+      try {
+        DealParticipantCommandService.execute(accept);
+        Assert.fail(
+          'Expected the accept to be rejected after the concurrent removal.'
+        );
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('changed'));
+      }
+    }
   }
 
   @IsTest

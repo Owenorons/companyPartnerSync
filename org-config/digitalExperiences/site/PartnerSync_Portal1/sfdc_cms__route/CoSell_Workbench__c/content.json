@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__route",
+  "title" : "Co-Sell Workbench",
+  "contentBody" : {
+    "activeViewId" : "CoSell_Workbench",
+    "configurationTags" : [ ],
+    "pageAccess" : "UseParent",
+    "routeType" : "custom-cosell-workbench",
+    "urlPrefix" : "cosell-workbench"
+  },
+  "urlName" : "cosell-workbench"
+}

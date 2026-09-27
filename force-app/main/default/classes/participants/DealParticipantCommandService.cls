@@ -46,6 +46,7 @@ public without sharing class DealParticipantCommandService {
       if (outcome.outcome != DealParticipantOutcome.INVITED) {
         throw new PartnerSyncHandledException(outcome.message);
       }
+      DealCoSellStatusProjectionService.recompute(outcome.participant.Deal__c);
       return outcome.participant;
     }
 
@@ -101,8 +102,22 @@ public without sharing class DealParticipantCommandService {
       DealParticipantSharingService.reconcileForParticipant(participant.Id);
     }
 
+    if (RECOMPUTES_COSELL_STATUS.contains(command.action)) {
+      DealCoSellStatusProjectionService.recompute(participant.Deal__c);
+    }
+
     return participant;
   }
+
+  private static final Set<String> RECOMPUTES_COSELL_STATUS = new Set<String>{
+    'Accept',
+    'Decline',
+    'Activate',
+    'Suspend',
+    'Resume',
+    'Remove',
+    'Expire'
+  };
 
   private static final Set<String> RECONCILES_SHARING = new Set<String>{
     'Activate',
@@ -138,23 +153,36 @@ public without sharing class DealParticipantCommandService {
         );
       }
 
-      if (
-        !PartnerAccountRelationshipService.allowsCoSell(
-          deal.Partner_Account__c,
-          command.partnerAccountId
-        )
-      ) {
+      Partner_Account_Relationship__c relationship = PartnerAccountRelationshipSelector.selectActive(
+        deal.Partner_Account__c,
+        command.partnerAccountId
+      );
+      if (relationship == null || relationship.Allows_CoSell__c != true) {
         return new DealParticipantOutcome(
           DealParticipantOutcome.RELATIONSHIP_REQUIRED,
           null,
           'No active partner relationship permits this collaboration.'
         );
       }
-    }
 
-    // Territory/product eligibility (doc §38.12 step 7) and conflict
-    // restrictions (step 9, real in a later phase) are deliberate no-ops
-    // here - see the Sprint 38 plan's Known Adaptations.
+      // Territory eligibility (doc §38.12 step 7) - checked against
+      // Identity_Country__c, the closest field this org has to a deal
+      // territory (see PartnerAccountRelationshipService.allowsTerritory).
+      // Product eligibility remains a no-op - Deal_Registration__c has no
+      // product-family-equivalent field to check against at all.
+      if (
+        !PartnerAccountRelationshipService.allowsTerritory(
+          relationship,
+          deal.Identity_Country__c
+        )
+      ) {
+        return new DealParticipantOutcome(
+          DealParticipantOutcome.PARTNER_INELIGIBLE,
+          null,
+          'The partner relationship does not cover this deal\'s territory.'
+        );
+      }
+    }
 
     Id actorId = DealParticipantDomain.resolveActorId(command);
     String activeKey = DealParticipantDomain.buildActiveKey(
@@ -544,7 +572,7 @@ public without sharing class DealParticipantCommandService {
 
   private static Deal_Registration__c selectDeal(Id dealId) {
     List<Deal_Registration__c> rows = [
-      SELECT Id, Status__c, Partner_Account__c
+      SELECT Id, Status__c, Partner_Account__c, Identity_Country__c
       FROM Deal_Registration__c
       WHERE Id = :dealId
       WITH SYSTEM_MODE

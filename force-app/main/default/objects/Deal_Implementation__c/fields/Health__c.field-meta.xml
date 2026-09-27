@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Health__c</fullName>
+    <description
+  >Same value shape as Deal_Registration__c.Lifecycle_Health__c for UI
+  consistency. Computed by ImplementationHealthService.</description>
+    <label>Health</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Healthy</fullName><default>true</default><label
+        >Healthy</label></value>
+            <value><fullName>At Risk</fullName><default>false</default><label
+        >At Risk</label></value>
+            <value><fullName>Blocked</fullName><default>false</default><label
+        >Blocked</label></value>
+            <value><fullName>Overdue</fullName><default>false</default><label
+        >Overdue</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

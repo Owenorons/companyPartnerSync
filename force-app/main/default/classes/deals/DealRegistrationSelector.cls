@@ -60,6 +60,19 @@ public with sharing class DealRegistrationSelector {
       registeredOpportunityIds.add(registration.Opportunity__c);
     }
 
+    // Deal_Opportunity__c is the authoritative claim, not just
+    // Deal_Registration__c.Opportunity__c - an opportunity already linked
+    // to any deal as a secondary/expansion/etc. relationship must not be
+    // offered again either (Sprint 39 §39.2).
+    for (Deal_Opportunity__c relationship : [
+      SELECT Opportunity__c
+      FROM Deal_Opportunity__c
+      WHERE Partner_Account__c = :partnerAccountId AND Current__c = TRUE
+      WITH USER_MODE
+    ]) {
+      registeredOpportunityIds.add(relationship.Opportunity__c);
+    }
+
     return [
       SELECT Id, Name, StageName, Amount, CloseDate
       FROM Opportunity
@@ -89,7 +102,19 @@ public with sharing class DealRegistrationSelector {
       LIMIT 1
     ];
 
-    return !existing.isEmpty();
+    if (!existing.isEmpty()) {
+      return true;
+    }
+
+    // Deal_Opportunity__c is the authoritative claim going forward (Sprint
+    // 39 §39.2) - an opportunity already linked to a different deal as any
+    // relationship type must still block a brand new registration from
+    // independently claiming it, even before that deal's own
+    // Deal_Registration__c.Opportunity__c projection would have shown it.
+    SecurityUtil.assertReadable(Deal_Opportunity__c.SObjectType);
+    return DealOpportunitySelector.selectActiveLinkForOpportunity(
+        opportunityId
+      ) != null;
   }
 
   /**
@@ -247,6 +272,116 @@ public with sharing class DealRegistrationSelector {
         AND Id != :currentDealId
       WITH USER_MODE
       LIMIT 20
+    ];
+  }
+
+  /**
+   * Queries deals whose co-sell participation is currently Active, for the
+   * internal Co-Sell Workbench's "Active Co-Sell Deals" view.
+   *
+   * @return Up to 200 deals with CoSell_Status__c = 'Active'.
+   */
+  public static List<Deal_Registration__c> selectActiveCoSellDeals() {
+    return [
+      SELECT
+        Id,
+        Customer_Name__c,
+        Partner_Account__c,
+        Partner_Account__r.Name,
+        CoSell_Status__c
+      FROM Deal_Registration__c
+      WHERE CoSell_Status__c = 'Active'
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Queries approved deals with no current Deal_Opportunity__c relationship
+   * at all, for the internal Sales Execution Workbench's "Opportunity
+   * Pending Link" view. This org's registration flow backfills a primary
+   * relationship unconditionally at registration time, so this should be
+   * rare in practice - a genuine invariant-violation catch, not the common
+   * case the doc's Creation_Mode-driven "pending" state assumes.
+   *
+   * @return Up to 200 approved deals with no current opportunity relationship.
+   */
+  public static List<Deal_Registration__c> selectApprovedDealsWithoutOpportunityLink() {
+    Set<Id> dealIdsWithRelationships = new Set<Id>();
+    for (Deal_Opportunity__c relationship : [
+      SELECT Deal__c
+      FROM Deal_Opportunity__c
+      WHERE Current__c = TRUE
+      WITH SYSTEM_MODE
+    ]) {
+      dealIdsWithRelationships.add(relationship.Deal__c);
+    }
+
+    return [
+      SELECT Id, Customer_Name__c, Partner_Account__r.Name, Status__c, Stage__c
+      FROM Deal_Registration__c
+      WHERE
+        Status__c IN ('Approved', 'Approved with Conditions')
+        AND Id NOT IN :dealIdsWithRelationships
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Queries deals currently back in Under Review because a material change
+   * triggered reapproval (DealMaterialChangeService), for the internal
+   * Sales Execution Workbench's "Reapproval Required" view.
+   *
+   * @return Up to 200 deals under review due to a material change.
+   */
+  public static List<Deal_Registration__c> selectReapprovalRequiredDeals() {
+    return [
+      SELECT Id, Customer_Name__c, Partner_Account__r.Name, Status__c, Stage__c
+      FROM Deal_Registration__c
+      WHERE
+        Status__c = 'Under Review'
+        AND Last_Lifecycle_Event__c = 'DealReapprovalRequested'
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Queries deals whose primary opportunity relationship is orphaned
+   * (DealOpportunityReconciliationBatch), for the internal Sales Execution
+   * Workbench's "Orphaned Relationships" view.
+   *
+   * @return Up to 200 deals with Lifecycle_Health__c = 'Blocked'.
+   */
+  public static List<Deal_Registration__c> selectOrphanedOpportunityDeals() {
+    return [
+      SELECT Id, Customer_Name__c, Partner_Account__r.Name, Status__c, Stage__c
+      FROM Deal_Registration__c
+      WHERE Lifecycle_Health__c = 'Blocked'
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
+    ];
+  }
+
+  /**
+   * Queries deals whose canonical Stage__c is Closed Won/Lost, for the
+   * internal Sales Execution Workbench's "Recently Closed" view.
+   *
+   * @return Up to 200 recently closed deals.
+   */
+  public static List<Deal_Registration__c> selectRecentlyClosedDeals() {
+    return [
+      SELECT Id, Customer_Name__c, Partner_Account__r.Name, Status__c, Stage__c
+      FROM Deal_Registration__c
+      WHERE Stage__c IN ('Closed Won', 'Closed Lost')
+      WITH SYSTEM_MODE
+      ORDER BY LastModifiedDate DESC
+      LIMIT 200
     ];
   }
 }

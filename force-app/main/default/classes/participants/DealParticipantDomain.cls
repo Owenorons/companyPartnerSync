@@ -45,4 +45,43 @@ public with sharing class DealParticipantDomain {
     }
     return command.partnerAccountId;
   }
+
+  /**
+   * Maps a Deal_Participant__c row to the partner-safe summary DTO (doc
+   * §38.24) - no internal conflict/review/approval fields, ever.
+   *
+   * @param participant The participant record to map.
+   * @param partnerAccountName The related Partner_Account__c's Name (queried separately - not on the base object).
+   * @param currentPartnerAccountId The current user's own partner account Id, or null for an internal user.
+   * @return The partner-safe summary DTO.
+   */
+  public static DealParticipantSummaryDTO toSummaryDTO(
+    Deal_Participant__c participant,
+    String partnerAccountName,
+    Id currentPartnerAccountId
+  ) {
+    DealParticipantSummaryDTO dto = new DealParticipantSummaryDTO();
+    dto.participantId = participant.Id;
+    dto.dealId = participant.Deal__c;
+    dto.organisationName = partnerAccountName;
+    dto.participantType = participant.Participant_Type__c;
+    dto.participantRole = participant.Participant_Role__c;
+    dto.status = participant.Status__c;
+    dto.accessLevel = participant.Access_Level__c;
+    dto.invitedOn = participant.Invited_On__c;
+    dto.respondBy = participant.Respond_By__c;
+    dto.effectiveFrom = participant.Effective_From__c;
+    dto.versionNumber = participant.Version_Number__c == null
+      ? 0
+      : Integer.valueOf(participant.Version_Number__c);
+
+    Boolean isOwnRow =
+      currentPartnerAccountId != null &&
+      participant.Partner_Account__c == currentPartnerAccountId;
+    dto.isOwnOrganisation = isOwnRow;
+    dto.canAccept = isOwnRow && participant.Status__c == 'Invited';
+    dto.canDecline = isOwnRow && participant.Status__c == 'Invited';
+
+    return dto;
+  }
 }

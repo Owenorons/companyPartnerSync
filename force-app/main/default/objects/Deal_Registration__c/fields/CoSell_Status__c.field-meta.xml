@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CoSell_Status__c</fullName>
+    <description
+  >Projection from the deal's Deal_Participant__c roster, maintained
+  by DealCoSellStatusProjectionService - not directly editable. Trimmed to
+  the 3 values reachable today (Not Applicable/Inviting/Active); Completed
+  and Cancelled need a deal-closure/cancellation hook that doesn't exist
+  until Sprint 39, so they aren't shipped as unreachable picklist values.
+  See docs/deal-participant-management-review.md.</description>
+    <label>Co-Sell Status</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Not Applicable</fullName>
+                <default>true</default>
+                <label>Not Applicable</label>
+            </value>
+            <value>
+                <fullName>Inviting</fullName>
+                <default>false</default>
+                <label>Inviting</label>
+            </value>
+            <value>
+                <fullName>Active</fullName>
+                <default>false</default>
+                <label>Active</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

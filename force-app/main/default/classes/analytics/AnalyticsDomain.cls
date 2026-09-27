@@ -27,6 +27,8 @@ public with sharing class AnalyticsDomain {
     public Integer partnerSourcedWonDeals = 0;
     public Decimal coSellRevenue = 0;
     public Integer coSellWonDeals = 0;
+    public Decimal referralRevenue = 0;
+    public Integer referralWonDeals = 0;
   }
 
   /**
@@ -119,6 +121,8 @@ public with sharing class AnalyticsDomain {
     dto.partnerSourcedWonDeals = totals.partnerSourcedWonDeals;
     dto.coSellRevenue = totals.coSellRevenue;
     dto.coSellWonDeals = totals.coSellWonDeals;
+    dto.referralRevenue = totals.referralRevenue;
+    dto.referralWonDeals = totals.referralWonDeals;
 
     dto.leadAcceptanceRate = totals.totalLeads == 0
       ? 0
@@ -176,6 +180,7 @@ public with sharing class AnalyticsDomain {
 
     dto.partnerSourcedRevenue = kpi.partnerSourcedRevenue;
     dto.coSellRevenue = kpi.coSellRevenue;
+    dto.referralRevenue = kpi.referralRevenue;
 
     // Use the same explainable 0-100 score shown to the partner so internal
     // rankings and partner-facing performance guidance cannot drift apart.

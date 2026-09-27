@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Implementation_Status__c</fullName>
+    <description>Projected from the deal's Deal_Implementation__c rows by
+  ImplementationStatusProjectionService (Sprint 40 §40.35 precedence: any
+  critical active implementation -&gt; At Risk; any In Progress -&gt; In
+  Progress; all required completed -&gt; Completed; only planned -&gt;
+  Planned; no implementation exists -&gt; Not Required). This field did
+  not exist before Sprint 40 despite the architecture doc calling it
+  "existing/previously planned" - built fresh, not reprojected.</description>
+    <label>Implementation Status</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Not Required</fullName><default
+        >true</default><label>Not Required</label></value>
+            <value><fullName>Planned</fullName><default>false</default><label
+        >Planned</label></value>
+            <value><fullName>In Progress</fullName><default
+        >false</default><label>In Progress</label></value>
+            <value><fullName>At Risk</fullName><default>false</default><label
+        >At Risk</label></value>
+            <value><fullName>Completed</fullName><default>false</default><label
+        >Completed</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

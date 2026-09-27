@@ -15,6 +15,10 @@
         <value xsi:type="xsd:double">72</value>
     </values>
     <values>
+        <field>Warning_Percentage__c</field>
+        <value xsi:type="xsd:double">75</value>
+    </values>
+    <values>
         <field>Participant_Type__c</field>
         <value xsi:nil="true" />
     </values>

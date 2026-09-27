@@ -51,6 +51,39 @@ private class TransferDealOwnershipServiceTest {
   }
 
   @IsTest
+  static void secondConcurrentTransferAttemptFailsOnStaleVersion() {
+    Fixture fixture = createFixture();
+
+    User pdlmAdmin = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(pdlmAdmin.Id, 'PartnerSync_PDLM_Admin');
+
+    TransferDealOwnershipCommand firstTransfer = new TransferDealOwnershipCommand();
+    firstTransfer.dealId = fixture.deal.Id;
+    firstTransfer.newPartnerAccountId = fixture.newPartner.Id;
+    firstTransfer.expectedDealVersion = 0;
+
+    System.runAs(pdlmAdmin) {
+      TransferDealOwnershipService.execute(firstTransfer);
+
+      // Simulates a second, concurrent transfer request built against the
+      // pre-transfer deal state (still expecting version 0) - the deal is
+      // now on version 1, so this must fail deterministically rather than
+      // silently re-transferring or racing the first.
+      TransferDealOwnershipCommand secondTransfer = new TransferDealOwnershipCommand();
+      secondTransfer.dealId = fixture.deal.Id;
+      secondTransfer.newPartnerAccountId = fixture.newPartner.Id;
+      secondTransfer.expectedDealVersion = 0;
+
+      try {
+        TransferDealOwnershipService.execute(secondTransfer);
+        Assert.fail('Expected the second concurrent transfer to be rejected.');
+      } catch (PartnerSyncHandledException expected) {
+        Assert.isTrue(expected.getMessage().contains('changed'));
+      }
+    }
+  }
+
+  @IsTest
   static void transferRequiresThePermission() {
     Fixture fixture = createFixture();
 

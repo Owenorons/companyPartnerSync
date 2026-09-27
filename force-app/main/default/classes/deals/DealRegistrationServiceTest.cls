@@ -82,6 +82,74 @@ private class DealRegistrationServiceTest {
   }
 
   @IsTest
+  static void createDealRegistrationBackfillsThePrimaryDealOpportunityRelationship() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Backfill Partner'
+    );
+    insert partner;
+
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Backfill Customer'
+    );
+    insert customer;
+
+    Contact contact = PartnerSyncTestDataFactory.partnerContact(partner.Id);
+    contact.Can_Submit_Deals__c = true;
+    insert contact;
+
+    Opportunity opportunity = PartnerSyncTestDataFactory.opportunity(
+      customer.Id,
+      partner.Id,
+      contact.Id
+    );
+    insert opportunity;
+
+    User partnerUser = TestUserFactory.createExternalUser(contact.Id);
+    TestUserFactory.assignPermissionSet(
+      partnerUser.Id,
+      'PartnerSync_Partner_User'
+    );
+    if (
+      !PartnerAccessService.testPartnerAccountIdsByUser.containsKey(
+        partnerUser.Id
+      )
+    ) {
+      insert new OpportunityShare(
+        OpportunityId = opportunity.Id,
+        UserOrGroupId = partnerUser.Id,
+        OpportunityAccessLevel = 'Read',
+        RowCause = Schema.OpportunityShare.RowCause.Manual
+      );
+    }
+
+    Tenant_Config__mdt config = new Tenant_Config__mdt(
+      Enable_Deals__c = true,
+      Max_Open_Deals_Per_Partner__c = 5
+    );
+
+    DealRegistrationResultDTO result;
+    Test.startTest();
+    System.runAs(partnerUser) {
+      TenantConfigService.setConfigForTest(config);
+      result = DealRegistrationService.createDealRegistration(
+        buildRequest(opportunity.Id)
+      );
+    }
+    Test.stopTest();
+
+    List<Deal_Opportunity__c> relationships = [
+      SELECT Opportunity__c, Relationship_Type__c, Primary__c, Current__c
+      FROM Deal_Opportunity__c
+      WHERE Deal__c = :result.dealRegistrationId
+    ];
+    System.assertEquals(1, relationships.size());
+    System.assertEquals(opportunity.Id, relationships[0].Opportunity__c);
+    System.assertEquals('Primary', relationships[0].Relationship_Type__c);
+    System.assertEquals(true, relationships[0].Primary__c);
+    System.assertEquals(true, relationships[0].Current__c);
+  }
+
+  @IsTest
   static void getDealDetailReturnsDealForOwningPartner() {
     Account partner = PartnerSyncTestDataFactory.partnerAccount(
       'Detail Partner'

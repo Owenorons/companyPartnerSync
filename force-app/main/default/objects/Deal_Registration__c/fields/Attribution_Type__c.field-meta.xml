@@ -3,12 +3,19 @@
     <fullName>Attribution_Type__c</fullName>
     <description>Computed at submission from the active
   Deal_Attribution_Rule__mdt policy (Opportunity age vs. the registration's
-  Submitted_On__c); reviewers may override it during deal review.</description>
+  Submitted_On__c); reviewers may override it during deal review.
+  Referral is reclassified later, from the participant roster, by
+  DealCoSellStatusProjectionService whenever an active Referral Partner
+  participant exists - Influenced is not built (Sprint 39 Known
+  Adaptation: no unambiguous signal exists for it without inventing new
+  tracking).</description>
     <label>Attribution Type</label>
     <type>Picklist</type>
     <valueSet><restricted>true</restricted><valueSetDefinition><sorted
       >false</sorted><value><fullName>Partner-Sourced</fullName><default
         >false</default><label>Partner-Sourced</label></value><value><fullName
         >Co-Sell</fullName><default>false</default><label
-        >Co-Sell</label></value></valueSetDefinition></valueSet>
+        >Co-Sell</label></value><value><fullName>Referral</fullName><default
+        >false</default><label
+        >Referral</label></value></valueSetDefinition></valueSet>
 </CustomField>

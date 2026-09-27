@@ -16,7 +16,13 @@ public without sharing class DealCommandRepository {
     // The ledger is an internal idempotency boundary. Callers are authorised by
     // DealCommandService and must not require direct object access. NOPMD
     List<Deal_Command_Execution__c> rows = [
-      SELECT Id, Command_Key__c, Status__c, Result_Payload__c
+      SELECT
+        Id,
+        CreatedById,
+        Command_Key__c,
+        Status__c,
+        Request_Payload__c,
+        Result_Payload__c
       FROM Deal_Command_Execution__c
       WHERE Command_Key__c = :commandKey
       LIMIT 1
@@ -47,6 +53,45 @@ public without sharing class DealCommandRepository {
     );
     result.duplicateCommand = true;
     return result;
+  }
+
+  /** Validates replay identity before exposing either completed or pending state. */
+  public static DealCommandResult replayResult(DealCommand command) {
+    Deal_Command_Execution__c row = findByKey(command.commandKey);
+    if (row == null) {
+      return null;
+    }
+    if (
+      row.CreatedById != UserInfo.getUserId() ||
+      String.isBlank(row.Request_Payload__c) ||
+      semanticRequest(row.Request_Payload__c) !=
+      semanticRequest(JSON.serialize(command))
+    ) {
+      throw new DealLifecycleException(
+        'The command key cannot be reused for this request.'
+      );
+    }
+    if (row.Status__c != 'Completed' || String.isBlank(row.Result_Payload__c)) {
+      return DealCommandResult.inProgress(command);
+    }
+    DealCommandResult result = (DealCommandResult) JSON.deserialize(
+      row.Result_Payload__c,
+      DealCommandResult.class
+    );
+    result.duplicateCommand = true;
+    return result;
+  }
+
+  // Transport tracing may change on retry; business inputs may not. Untyped
+  // comparison preserves nested values without depending on JSON key order.
+  private static Map<String, Object> semanticRequest(String payload) {
+    Map<String, Object> request = (Map<String, Object>) JSON.deserializeUntyped(
+      payload
+    );
+    request.remove('correlationId');
+    request.remove('causationId');
+    request.remove('source');
+    return request;
   }
 
   /**

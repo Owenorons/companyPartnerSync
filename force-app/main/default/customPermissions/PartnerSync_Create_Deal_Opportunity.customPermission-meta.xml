@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Create Deal Opportunity</label>
+    <description
+  >Allows creating a new Opportunity for a deal registration, when the org's Deal Opportunity Policy allows PartnerSync to create opportunities directly.</description>
+</CustomPermission>

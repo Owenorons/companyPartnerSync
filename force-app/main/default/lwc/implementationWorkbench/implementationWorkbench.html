@@ -1,0 +1,223 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Implementation Workbench</h1>
+        <p>Delivery, handoff, and customer acceptance oversight.</p>
+      </div>
+    </section>
+
+    <nav class="slds-var-m-bottom_large tab-bar">
+      <template for:each={tabs} for:item="tab">
+        <button
+          key={tab.name}
+          class={tab.className}
+          data-tab={tab.name}
+          onclick={handleSelectTab}
+        >
+          {tab.label}
+        </button>
+      </template>
+    </nav>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading implementation data..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <!-- Pending Handoff -->
+    <template if:true={isPendingHandoffTab}>
+      <template if:true={hasPendingHandoff}>
+        <div class="queue-grid">
+          <template for:each={pendingHandoff} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label="Handoff Pending"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPendingHandoff}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No implementations pending handoff"
+            message="Handoffs awaiting an internal accept/return decision will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Ready to Start -->
+    <template if:true={isReadyToStartTab}>
+      <template if:true={hasReadyToStart}>
+        <div class="queue-grid">
+          <template for:each={readyToStart} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.status}
+                variant="info"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasReadyToStart}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No implementations ready to start"
+            message="Implementations with an accepted handoff will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- In Progress -->
+    <template if:true={isInProgressTab}>
+      <template if:true={hasInProgress}>
+        <div class="queue-grid">
+          <template for:each={inProgress} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.health}
+                variant="success"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasInProgress}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No implementations in progress"
+            message="Implementations currently being delivered will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- At Risk / Blocked -->
+    <template if:true={isAtRiskBlockedTab}>
+      <template if:true={hasAtRiskBlocked}>
+        <div class="queue-grid">
+          <template for:each={atRiskBlocked} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label={row.health}
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasAtRiskBlocked}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No at-risk or blocked implementations"
+            message="Implementations flagged At Risk or Blocked will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Awaiting Acceptance -->
+    <template if:true={isAwaitingAcceptanceTab}>
+      <template if:true={hasAwaitingAcceptance}>
+        <div class="queue-grid">
+          <template for:each={awaitingAcceptance} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label="Pending Customer Acceptance"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasAwaitingAcceptance}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No implementations awaiting acceptance"
+            message="Implementations pending a customer acceptance decision will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Overdue -->
+    <template if:true={isOverdueTab}>
+      <template if:true={hasOverdue}>
+        <div class="queue-grid">
+          <template for:each={overdue} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label="Overdue"
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasOverdue}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No overdue implementations"
+            message="Implementations flagged Overdue will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Completed -->
+    <template if:true={isCompletedTab}>
+      <template if:true={hasCompleted}>
+        <div class="queue-grid">
+          <template for:each={completed} for:item="row">
+            <article key={row.implementationId} class="queue-card">
+              <p class="slds-text-body_small queue-label">{row.partnerName}</p>
+              <h2>{row.customerName}</h2>
+              <c-ps-status-badge
+                label="Completed"
+                variant="success"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasCompleted}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No completed implementations"
+            message="Implementations that have completed delivery will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

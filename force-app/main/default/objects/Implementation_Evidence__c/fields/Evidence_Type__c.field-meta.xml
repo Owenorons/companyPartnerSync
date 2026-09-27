@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Evidence_Type__c</fullName>
+    <label>Evidence Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Project Plan</fullName><default
+        >true</default><label>Project Plan</label></value>
+            <value><fullName>Configuration Document</fullName><default
+        >false</default><label>Configuration Document</label></value>
+            <value><fullName>Data Migration Report</fullName><default
+        >false</default><label>Data Migration Report</label></value>
+            <value><fullName>Test Results</fullName><default
+        >false</default><label>Test Results</label></value>
+            <value><fullName>Training Record</fullName><default
+        >false</default><label>Training Record</label></value>
+            <value><fullName>Go-Live Checklist</fullName><default
+        >false</default><label>Go-Live Checklist</label></value>
+            <value><fullName>Customer Sign-Off</fullName><default
+        >false</default><label>Customer Sign-Off</label></value>
+            <value><fullName>Screenshot</fullName><default>false</default><label
+        >Screenshot</label></value>
+            <value><fullName>Meeting Notes</fullName><default
+        >false</default><label>Meeting Notes</label></value>
+            <value><fullName>Runbook</fullName><default>false</default><label
+        >Runbook</label></value>
+            <value><fullName>Other</fullName><default>false</default><label
+        >Other</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

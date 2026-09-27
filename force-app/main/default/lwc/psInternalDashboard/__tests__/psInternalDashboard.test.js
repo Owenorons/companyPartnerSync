@@ -61,7 +61,10 @@ describe("c-ps-internal-dashboard", () => {
       "Review MDF",
       "Notifications",
       "Manage Content",
-      "Conflict Workbench"
+      "Conflict Workbench",
+      "Co-Sell Workbench",
+      "Sales Execution Workbench",
+      "Implementation Workbench"
     ]);
     expect(buttons.every((button) => button.type === "button")).toBe(true);
   });

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Creation_Timing__c</fullName>
+    <description
+  >When DealOpportunityCommandService.createOpportunityForDeal is allowed
+  to run: On Deal Submission, After Conflict Clearance, After Deal
+  Approval, After Protection Activation, Manual, or External System
+  (never created by PartnerSync).</description>
+    <label>Creation Timing</label>
+    <length>40</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>

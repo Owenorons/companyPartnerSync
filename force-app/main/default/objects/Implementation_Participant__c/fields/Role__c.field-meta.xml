@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Role__c</fullName>
+    <description
+  >The delivery-execution role on this implementation - distinct from
+  Deal_Participant__c.Participant_Role__c (the deal-level role). Both
+  fields happen to share the value "Implementation Lead" for two
+  different purposes; keep them visually distinct in UI labeling
+  ("Deal Role" vs "Delivery Role").</description>
+    <label>Role</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Implementation Lead</fullName><default
+        >true</default><label>Implementation Lead</label></value>
+            <value><fullName>Project Manager</fullName><default
+        >false</default><label>Project Manager</label></value>
+            <value><fullName>Technical Lead</fullName><default
+        >false</default><label>Technical Lead</label></value>
+            <value><fullName>Solution Architect</fullName><default
+        >false</default><label>Solution Architect</label></value>
+            <value><fullName>Integration Lead</fullName><default
+        >false</default><label>Integration Lead</label></value>
+            <value><fullName>Migration Lead</fullName><default
+        >false</default><label>Migration Lead</label></value>
+            <value><fullName>Training Lead</fullName><default
+        >false</default><label>Training Lead</label></value>
+            <value><fullName>Customer Success Lead</fullName><default
+        >false</default><label>Customer Success Lead</label></value>
+            <value><fullName>Customer Sponsor</fullName><default
+        >false</default><label>Customer Sponsor</label></value>
+            <value><fullName>Customer Project Lead</fullName><default
+        >false</default><label>Customer Project Lead</label></value>
+            <value><fullName>Support Lead</fullName><default
+        >false</default><label>Support Lead</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description>Trimmed from the architecture doc's 9 values to the 6
+  ImplementationIssueCommandService's commands actually produce.</description>
+    <label>Status</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Open</fullName><default>true</default><label
+        >Open</label></value>
+            <value><fullName>Investigating</fullName><default
+        >false</default><label>Investigating</label></value>
+            <value><fullName>Escalated</fullName><default>false</default><label
+        >Escalated</label></value>
+            <value><fullName>Resolved</fullName><default>false</default><label
+        >Resolved</label></value>
+            <value><fullName>Accepted Risk</fullName><default
+        >false</default><label>Accepted Risk</label></value>
+            <value><fullName>Closed</fullName><default>false</default><label
+        >Closed</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

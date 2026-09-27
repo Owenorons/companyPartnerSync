@@ -1,0 +1,37 @@
+<template>
+  <template if:true={loading}>
+    <c-ps-loading-state
+      message="Loading sales progress..."
+    ></c-ps-loading-state>
+  </template>
+
+  <template if:true={error}>
+    <c-ps-error-panel message={error}></c-ps-error-panel>
+  </template>
+
+  <template if:true={hasProgress}>
+    <section class="slds-var-m-top_large sales-progress-card">
+      <div class="slds-grid_align-spread slds-grid card-top">
+        <div>
+          <p class="slds-text-body_small eyebrow">Sales Progress</p>
+          <h2>{stageLabel}</h2>
+        </div>
+        <c-ps-status-badge
+          label={stageLabel}
+          variant={statusBadgeVariant}
+        ></c-ps-status-badge>
+      </div>
+
+      <div class="slds-var-m-top_medium progress-details">
+        <div>
+          <span class="slds-text-body_small">Amount</span>
+          <strong>{amountLabel}</strong>
+        </div>
+        <div>
+          <span class="slds-text-body_small">Close Date</span>
+          <strong>{closeDateLabel}</strong>
+        </div>
+      </div>
+    </section>
+  </template>
+</template>

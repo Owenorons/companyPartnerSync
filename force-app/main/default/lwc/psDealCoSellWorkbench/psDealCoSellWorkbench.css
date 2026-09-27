@@ -1,0 +1,154 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--ps-color-border);
+  padding-bottom: 0.75rem;
+}
+
+.tab-button {
+  border: 1px solid var(--ps-color-border);
+  background: transparent;
+  color: var(--ps-color-text-muted);
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-button-active {
+  color: var(--ps-color-text);
+  border-color: var(--ps-color-text);
+  background: var(--ps-color-card);
+}
+
+.invitation-grid {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ps-color-border);
+}
+
+.invitation-card {
+  background: var(--ps-color-card);
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--ps-color-border);
+}
+
+.invitation-card:last-child {
+  border-bottom: none;
+}
+
+.invitation-top {
+  gap: 1rem;
+}
+
+.invitation-label {
+  font-family: var(--ps-font-mono);
+  color: var(--ps-color-text-muted);
+  font-weight: 600;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+h2 {
+  font-family: var(--ps-font-display);
+  font-size: 1.1rem;
+  color: var(--ps-color-text);
+  font-weight: 400;
+  margin-top: 0.2rem;
+}
+
+.invitation-role {
+  color: var(--ps-color-text-muted);
+  font-size: 0.85rem;
+}
+
+.invitation-details {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  margin-top: 0.9rem !important;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ps-color-border);
+}
+
+.invitation-details div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.invitation-details span {
+  font-family: var(--ps-font-mono);
+  color: var(--ps-color-text-muted);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.invitation-details strong {
+  color: var(--ps-color-text);
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.invitation-actions {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid var(--ps-color-text);
+  background: transparent;
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remove {
+  color: var(--ps-color-danger);
+  border-color: var(--ps-color-danger);
+}
+
+.approve {
+  color: var(--ps-color-success, var(--ps-color-text));
+  border-color: var(--ps-color-success, var(--ps-color-text));
+}

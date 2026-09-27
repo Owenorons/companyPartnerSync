@@ -23,10 +23,16 @@ public without sharing class DealCommandService {
     command.validate();
     assertSupportedAggregate(command);
 
-    DealCommandResult prior = DealCommandRepository.completedResult(
-      command.commandKey
-    );
+    // Check current record access before consulting the privileged ledger.
+    Deal_Registration__c deal = selectDealForUpdate(command.dealId);
+    if (command.aggregateId != deal.Id) {
+      throw new DealLifecycleException(
+        'The aggregate does not belong to the requested deal.'
+      );
+    }
+    DealCommandResult prior = DealCommandRepository.replayResult(command);
     if (prior != null) {
+      assertReplayAuthority(deal, command, prior);
       return prior;
     }
 
@@ -47,15 +53,14 @@ public without sharing class DealCommandService {
         command
       );
       if (execution == null) {
-        prior = DealCommandRepository.completedResult(command.commandKey);
-        return prior == null ? DealCommandResult.inProgress(command) : prior;
-      }
-
-      Deal_Registration__c deal = selectDealForUpdate(command.dealId);
-      if (command.aggregateId != deal.Id) {
-        throw new DealLifecycleException(
-          'The aggregate does not belong to the requested deal.'
-        );
+        prior = DealCommandRepository.replayResult(command);
+        if (prior == null) {
+          throw new DealLifecycleException(
+            'The command reservation could not be verified. Retry the request.'
+          );
+        }
+        assertReplayAuthority(deal, command, prior);
+        return prior;
       }
 
       DealCommandContext context = DealStateEngine.evaluate(deal, command);
@@ -90,6 +95,7 @@ public without sharing class DealCommandService {
       ) {
         activateProtection(deal.Id, context.newState);
         createOriginatingParticipant(deal.Id, context.newState);
+        captureApprovalSnapshot(deal.Id, context.newState);
       }
 
       DealEventService.EventCreationResult eventResult = DealEventService.createEvent(
@@ -110,6 +116,26 @@ public without sharing class DealCommandService {
     } finally {
       Database.releaseSavepoint(sp);
     }
+  }
+
+  private static void assertReplayAuthority(
+    Deal_Registration__c deal,
+    DealCommand command,
+    DealCommandResult result
+  ) {
+    // Re-authorize the original action under current policy without requiring
+    // its already-consumed version or previous state to still be current.
+    Deal_Registration__c authorizationState = deal.clone(
+      true,
+      false,
+      false,
+      false
+    );
+    if (result.completed == true) {
+      authorizationState.Status__c = result.previousState;
+      authorizationState.Version_Number__c = command.expectedVersion;
+    }
+    DealStateEngine.evaluate(authorizationState, command);
   }
 
   // Runs after the deal's Status__c update above has committed within this
@@ -189,6 +215,65 @@ public without sharing class DealCommandService {
       LoggingService.warn(
         'DealCommandService',
         'Originating participant backfill deferred for deal ' +
+          dealId +
+          ': ' +
+          ex.getMessage()
+      );
+    }
+  }
+
+  // Snapshots the fields Material Change Policy (Sprint 39 §39.31-39.33)
+  // needs to compare later drift against, once at approval finalisation -
+  // same graceful-defer shape as the two hooks above, since a deal with no
+  // primary opportunity relationship yet is a legitimate (if unusual) state
+  // to finalise into, not a finalisation failure.
+  private static void captureApprovalSnapshot(Id dealId, String newState) {
+    if (newState != 'Approved' && newState != 'Approved with Conditions') {
+      return;
+    }
+    try {
+      List<Deal_Registration__c> deals = [
+        SELECT Id, Estimated_Revenue__c
+        FROM Deal_Registration__c
+        WHERE Id = :dealId
+        WITH SYSTEM_MODE
+      ];
+      if (deals.isEmpty()) {
+        return;
+      }
+
+      Deal_Opportunity__c primary = DealOpportunitySelector.selectCurrentPrimary(
+        dealId
+      );
+      if (primary == null) {
+        return;
+      }
+
+      List<Opportunity> opportunities = [
+        SELECT Id, AccountId, CloseDate, OwnerId
+        FROM Opportunity
+        WHERE Id = :primary.Opportunity__c
+        WITH SYSTEM_MODE
+      ];
+      if (opportunities.isEmpty()) {
+        return;
+      }
+
+      Database.update(
+        new Deal_Registration__c(
+          Id = dealId,
+          Approved_Revenue__c = deals[0].Estimated_Revenue__c,
+          Approved_Customer_Account__c = opportunities[0].AccountId,
+          Approved_Close_Date__c = opportunities[0].CloseDate,
+          Approved_Opportunity__c = opportunities[0].Id,
+          Approved_Owner__c = opportunities[0].OwnerId
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+    } catch (Exception ex) {
+      LoggingService.warn(
+        'DealCommandService',
+        'Approval snapshot capture deferred for deal ' +
           dealId +
           ': ' +
           ex.getMessage()

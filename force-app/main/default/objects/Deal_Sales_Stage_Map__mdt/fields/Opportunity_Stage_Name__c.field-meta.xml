@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Opportunity_Stage_Name__c</fullName>
+    <description
+  >The org's actual configured Opportunity.StageName value to match -
+  never assumed to be a standard label (Sprint 39 §39.16-39.18). Null on
+  the one Default record, used as the unmapped-stage fallback.</description>
+    <label>Opportunity Stage Name</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

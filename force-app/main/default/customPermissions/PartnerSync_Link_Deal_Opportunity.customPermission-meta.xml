@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Link Deal Opportunity</label>
+    <description
+  >Allows linking an existing Opportunity to a deal registration, and setting a deal's primary opportunity relationship.</description>
+</CustomPermission>

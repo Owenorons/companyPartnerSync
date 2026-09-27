@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Implementation_Type__c</fullName>
+    <label>Implementation Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Initial Implementation</fullName><default
+        >true</default><label>Initial Implementation</label></value>
+            <value><fullName>Expansion</fullName><default>false</default><label
+        >Expansion</label></value>
+            <value><fullName>Upgrade</fullName><default>false</default><label
+        >Upgrade</label></value>
+            <value><fullName>Migration</fullName><default>false</default><label
+        >Migration</label></value>
+            <value><fullName>Integration</fullName><default
+        >false</default><label>Integration</label></value>
+            <value><fullName>Professional Services</fullName><default
+        >false</default><label>Professional Services</label></value>
+            <value><fullName>Proof of Value</fullName><default
+        >false</default><label>Proof of Value</label></value>
+            <value><fullName>Pilot</fullName><default>false</default><label
+        >Pilot</label></value>
+            <value><fullName>Regional Rollout</fullName><default
+        >false</default><label>Regional Rollout</label></value>
+            <value><fullName>Remediation</fullName><default
+        >false</default><label>Remediation</label></value>
+            <value><fullName>Other</fullName><default>false</default><label
+        >Other</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

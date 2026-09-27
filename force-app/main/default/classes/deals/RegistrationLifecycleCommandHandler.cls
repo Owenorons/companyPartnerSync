@@ -98,7 +98,7 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
     ) {
       context.deal.Current_Action_Required__c = 'Provide Information';
       context.deal.Current_Action_Owner__c = UserInfo.getUserId();
-      context.deal.Lifecycle_Health__c = 'Attention Required';
+      context.deal.Lifecycle_Health__c = 'At Risk';
     } else if (action == DealRegistrationLifecycleConstants.REJECT) {
       context.deal.Rejection_Reason__c = context.command.reason;
       context.deal.Approval_Notes__c = stringParameter(
@@ -118,6 +118,16 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
       context.deal.Rejection_Reason__c = null;
       stampDecision(context.deal);
       clearAction(context.deal);
+    } else if (
+      action == DealRegistrationLifecycleConstants.REQUEST_REAPPROVAL
+    ) {
+      // Sprint 39 §39.31-39.33: DealMaterialChangeService already
+      // regenerated the current approval plan before issuing this command -
+      // this just moves the deal's own lifecycle fields back into the
+      // in-review state so the existing Under Review -> Finalise path can
+      // bring it back to Approved once reapproved.
+      context.deal.Current_Action_Required__c = 'Reapprove Material Change';
+      context.deal.Lifecycle_Health__c = 'At Risk';
     }
   }
 
@@ -145,7 +155,7 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
       context.eventType = 'DealSubmissionNeedsInformation';
       context.deal.Current_Action_Required__c = 'Correct Validation Findings';
       context.deal.Current_Action_Owner__c = UserInfo.getUserId();
-      context.deal.Lifecycle_Health__c = 'Attention Required';
+      context.deal.Lifecycle_Health__c = 'At Risk';
       return;
     }
     DealConflictDTO conflict = DealConflictAnalysisService.analyze(
@@ -155,7 +165,7 @@ public with sharing class RegistrationLifecycleCommandHandler implements DealCom
       context.newState = 'Under Review';
       context.deal.Conflict_Status__c = 'Potential Conflict';
       context.deal.Current_Action_Required__c = 'Resolve Conflict';
-      context.deal.Lifecycle_Health__c = 'Attention Required';
+      context.deal.Lifecycle_Health__c = 'At Risk';
     } else {
       context.newState = 'Submitted';
       context.deal.Conflict_Status__c = 'None';

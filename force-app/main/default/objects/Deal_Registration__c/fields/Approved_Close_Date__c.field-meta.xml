@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Approved_Close_Date__c</fullName>
+    <description>The primary Opportunity's CloseDate snapshotted once at
+  FINALISE_APPROVAL, for Material Change Policy drift detection. See
+  Approved_Revenue__c.</description>
+    <label>Approved Close Date</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>
