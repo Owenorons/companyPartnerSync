@@ -1,0 +1,124 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Operations Console</h1>
+        <p>Dead-letter event recovery and AI governance health.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading operations health..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <template if:true={hasHealth}>
+        <section class="metrics-grid">
+          <c-ps-dashboard-metric-card
+            label="New Dead Letters"
+            value={health.newDeadLetterCount}
+            icon-name="utility:warning"
+            icon-alternative-text="New dead letters"
+          >
+          </c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Failed Retries"
+            value={health.failedDeadLetterCount}
+            icon-name="utility:error"
+            icon-alternative-text="Failed retries"
+          >
+          </c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Retried"
+            value={health.retriedDeadLetterCount}
+            icon-name="utility:refresh"
+            icon-alternative-text="Retried"
+          >
+          </c-ps-dashboard-metric-card>
+        </section>
+
+        <section class="metrics-grid ai-metrics">
+          <c-ps-dashboard-metric-card
+            label="AI Failed Interactions"
+            value={health.aiFailedInteractionCount}
+            icon-name="utility:einstein"
+            icon-alternative-text="AI failed interactions"
+          >
+          </c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="AI Blocked Interactions"
+            value={health.aiBlockedInteractionCount}
+            icon-name="utility:blocked"
+            icon-alternative-text="AI blocked interactions"
+          >
+          </c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Proposed Recommendations"
+            value={health.aiProposedRecommendationCount}
+            icon-name="utility:einstein"
+            icon-alternative-text="Proposed AI recommendations"
+          >
+          </c-ps-dashboard-metric-card>
+          <c-ps-dashboard-metric-card
+            label="Failed Recommendations"
+            value={health.aiFailedRecommendationCount}
+            icon-name="utility:error"
+            icon-alternative-text="Failed AI recommendations"
+          >
+          </c-ps-dashboard-metric-card>
+        </section>
+
+        <section class="slds-var-m-top_large">
+          <h2 class="section-title">Dead Letter Queue</h2>
+          <template if:true={hasDeadLetters}>
+            <div class="queue-grid">
+              <template for:each={deadLetterRows} for:item="row">
+                <article key={row.dlqId} class="queue-card">
+                  <p class="slds-text-body_small queue-label">
+                    {row.eventType} &middot; {row.status}
+                  </p>
+                  <h2>{row.errorMessage}</h2>
+                  <p class="retry-count">Retry count: {row.retryCount}</p>
+                  <div class="action-row">
+                    <button
+                      type="button"
+                      class="action-button action-button-retry"
+                      data-id={row.dlqId}
+                      disabled={row.isBusy}
+                      onclick={handleRetry}
+                    >
+                      Retry
+                    </button>
+                    <button
+                      type="button"
+                      class="action-button action-button-acknowledge"
+                      data-id={row.dlqId}
+                      disabled={row.isBusy}
+                      onclick={handleAcknowledge}
+                    >
+                      Acknowledge
+                    </button>
+                  </div>
+                </article>
+              </template>
+            </div>
+          </template>
+          <template if:false={hasDeadLetters}>
+            <c-ps-empty-state
+              title="Queue clear"
+              message="No dead-lettered events need attention."
+            >
+            </c-ps-empty-state>
+          </template>
+        </section>
+      </template>
+    </template>
+  </div>
+</template>

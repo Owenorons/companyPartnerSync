@@ -64,7 +64,13 @@ describe("c-ps-internal-dashboard", () => {
       "Conflict Workbench",
       "Co-Sell Workbench",
       "Sales Execution Workbench",
-      "Implementation Workbench"
+      "Implementation Workbench",
+      "Finance Workbench",
+      "Customer Success Workbench",
+      "Portfolio Intelligence",
+      "Executive Command Center",
+      "Partner Operations Command Center",
+      "Operations Console"
     ]);
     expect(buttons.every((button) => button.type === "button")).toBe(true);
   });

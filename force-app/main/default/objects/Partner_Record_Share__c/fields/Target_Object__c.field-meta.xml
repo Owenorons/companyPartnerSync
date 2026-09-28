@@ -39,6 +39,11 @@
                 <default>false</default>
                 <label>Partner Performance Snapshot</label>
             </value>
+            <value>
+                <fullName>Customer Success Engagement</fullName>
+                <default>false</default>
+                <label>Customer Success Engagement</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

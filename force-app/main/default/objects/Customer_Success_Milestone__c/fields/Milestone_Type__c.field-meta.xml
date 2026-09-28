@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Milestone_Type__c</fullName>
+    <label>Milestone Type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Onboarding Kickoff</fullName>
+                <default>true</default>
+                <label>Onboarding Kickoff</label>
+            </value>
+            <value>
+                <fullName>First Value Realized</fullName>
+                <default>false</default>
+                <label>First Value Realized</label>
+            </value>
+            <value>
+                <fullName>Adoption Target Met</fullName>
+                <default>false</default>
+                <label>Adoption Target Met</label>
+            </value>
+            <value>
+                <fullName>Executive Business Review</fullName>
+                <default>false</default>
+                <label>Executive Business Review</label>
+            </value>
+            <value>
+                <fullName>Health Check</fullName>
+                <default>false</default>
+                <label>Health Check</label>
+            </value>
+            <value>
+                <fullName>Renewal Readiness Review</fullName>
+                <default>false</default>
+                <label>Renewal Readiness Review</label>
+            </value>
+            <value>
+                <fullName>Expansion Readiness Review</fullName>
+                <default>false</default>
+                <label>Expansion Readiness Review</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

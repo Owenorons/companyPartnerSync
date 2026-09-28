@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Health_Snapshot__c</fullName>
+    <description
+  >JSON snapshot of the metric inputs and computed result at the time health was last calculated, kept explainable even if policy metadata later changes - mirrors Deal_Revenue_Attribution__c.Calculation_Snapshot__c's precedent.</description>
+    <label>Health Snapshot</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+    <required>false</required>
+</CustomField>

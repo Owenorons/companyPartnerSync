@@ -7,7 +7,9 @@
 public with sharing class PartnerShareDomain {
   private static final Set<String> SUPPORTED_TARGETS = new Set<String>{
     'Deal Registration',
-    'MDF Request'
+    'MDF Request',
+    'Deal Implementation',
+    'Customer Success Engagement'
   };
   private static final Set<String> ACCESS_LEVELS = new Set<String>{
     'Read',
@@ -22,7 +24,9 @@ public with sharing class PartnerShareDomain {
     'Escalation',
     'Deal Conflict Review',
     'MDF Review',
-    'Multi-Account Access'
+    'Multi-Account Access',
+    'Implementation',
+    'Customer Success'
   };
 
   /**
@@ -64,13 +68,11 @@ public with sharing class PartnerShareDomain {
     }
 
     // Guards against a caller declaring one target object (e.g. "MDF
-    // Request") while actually passing the Id of the other kind of record —
-    // without this, the mismatch would only surface later as a confusing
-    // failure inside PartnerShareService's object-specific share creation.
-    Schema.SObjectType expectedType = request.targetObject ==
-      'Deal Registration'
-      ? Deal_Registration__c.SObjectType
-      : MDF_Request__c.SObjectType;
+    // Request") while actually passing the Id of a different kind of
+    // record — without this, the mismatch would only surface later as a
+    // confusing failure inside PartnerShareService's object-specific share
+    // creation.
+    Schema.SObjectType expectedType = expectedSObjectType(request.targetObject);
     if (request.targetRecordId.getSObjectType() != expectedType) {
       throw new PartnerSyncHandledException(
         'Target record does not match target object: ' + request.targetObject
@@ -90,6 +92,19 @@ public with sharing class PartnerShareDomain {
         'Expiry date must be later than today.'
       );
     }
+  }
+
+  private static Schema.SObjectType expectedSObjectType(String targetObject) {
+    if (targetObject == 'Deal Registration') {
+      return Deal_Registration__c.SObjectType;
+    } else if (targetObject == 'MDF Request') {
+      return MDF_Request__c.SObjectType;
+    } else if (targetObject == 'Deal Implementation') {
+      return Deal_Implementation__c.SObjectType;
+    } else if (targetObject == 'Customer Success Engagement') {
+      return Customer_Success_Engagement__c.SObjectType;
+    }
+    return null;
   }
 
   /**

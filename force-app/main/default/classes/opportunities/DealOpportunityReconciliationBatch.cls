@@ -40,7 +40,17 @@
  * closedWon15OpportunitiesCreatesImplementationsWithinGovernorLimits in
  * this class's own test), not a false 200 claim - 200 deals closing won in
  * the exact same batch chunk is not realistic, and would exceed both the
- * SOQL and DML statement limits at that per-row cost.
+ * SOQL and DML statement limits at that per-row cost. The closed-lost
+ * release path costs the same 3 SOQL + 3 DML per row via
+ * DealProtectionCommandService, proven safe at the same honestly-scoped 15
+ * (see closedLost15ReleasesProtectionWithinGovernorLimits) - a pre-beta
+ * bulk-safety audit found this class's own doc comment had asserted this
+ * path was "bounded" without ever actually proving it with a bulk test.
+ * That same audit also found resolveClosedLostBehaviour() was re-querying
+ * Deal_Protection_Policy__mdt on every closed-lost row instead of once per
+ * job run - fixed by caching it on the batch instance (Salesforce reuses
+ * one Batchable instance across every chunk in a run, so this now costs
+ * exactly one query total, not one per chunk or per row).
  *
  * Per-record failures are caught, logged to PartnerSync_Opportunity_Sync_Log__c,
  * and the batch continues - a bad row never fails the whole chunk, and
@@ -53,6 +63,15 @@ public without sharing class DealOpportunityReconciliationBatch implements Datab
   // DealLifecyclePermissionService.testOverrides.
   @TestVisible
   private static String testClosedLostBehaviourOverride;
+
+  // Instance fields persist across execute() calls within the same batch
+  // job run (Salesforce reuses one Batchable instance for every chunk),
+  // so resolving this once here instead of per row - previously a real
+  // SOQL query inside the per-row loop, found during a pre-beta
+  // bulk-safety audit - costs one query for the whole job, not one per
+  // closed-lost row.
+  private String cachedClosedLostBehaviour;
+  private Boolean closedLostBehaviourCached = false;
 
   /**
    * Builds the query locator over every deal's current primary
@@ -304,6 +323,9 @@ public without sharing class DealOpportunityReconciliationBatch implements Datab
     if (Test.isRunningTest() && testClosedLostBehaviourOverride != null) {
       return testClosedLostBehaviourOverride;
     }
+    if (closedLostBehaviourCached) {
+      return cachedClosedLostBehaviour;
+    }
     List<Deal_Protection_Policy__mdt> policies = [
       SELECT Closed_Lost_Behaviour__c
       FROM Deal_Protection_Policy__mdt
@@ -311,7 +333,11 @@ public without sharing class DealOpportunityReconciliationBatch implements Datab
       WITH SYSTEM_MODE
       LIMIT 1
     ];
-    return policies.isEmpty() ? null : policies[0].Closed_Lost_Behaviour__c;
+    cachedClosedLostBehaviour = policies.isEmpty()
+      ? null
+      : policies[0].Closed_Lost_Behaviour__c;
+    closedLostBehaviourCached = true;
+    return cachedClosedLostBehaviour;
   }
 
   private void handleOpen(

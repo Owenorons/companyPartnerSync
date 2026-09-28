@@ -1,0 +1,238 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Customer Success Workbench</h1>
+        <p>
+          Handoffs, health, renewals, expansion, reassignment, and churn
+          oversight.
+        </p>
+      </div>
+    </section>
+
+    <nav class="slds-var-m-bottom_large tab-bar">
+      <template for:each={tabs} for:item="tab">
+        <button
+          key={tab.name}
+          class={tab.className}
+          data-tab={tab.name}
+          onclick={handleSelectTab}
+        >
+          {tab.label}
+        </button>
+      </template>
+    </nav>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading customer success data..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <!-- Pending Handoff -->
+    <template if:true={isPendingHandoffsTab}>
+      <template if:true={hasPendingHandoffs}>
+        <div class="queue-grid">
+          <template for:each={pendingHandoffs} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">Engagement</p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label="Pending Handoff"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPendingHandoffs}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No pending handoffs"
+            message="Completed implementations awaiting Customer Success acceptance will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- At Risk / Critical -->
+    <template if:true={isAtRiskTab}>
+      <template if:true={hasAtRisk}>
+        <div class="queue-grid">
+          <template for:each={atRisk} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                Score {row.Health_Score__c}
+              </p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label={row.Health_Status__c}
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasAtRisk}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No at-risk customers"
+            message="Engagements at At Risk or Critical health will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Renewals Due -->
+    <template if:true={isRenewalsDueTab}>
+      <template if:true={hasRenewalsDue}>
+        <div class="queue-grid">
+          <template for:each={renewalsDue} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                Decision by {row.Target_Decision_On__c}
+              </p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="info"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasRenewalsDue}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No renewals due"
+            message="Renewals awaiting internal qualification, review, or approval will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Partner Confirmation Required -->
+    <template if:true={isPartnerConfirmationTab}>
+      <template if:true={hasPartnerConfirmation}>
+        <div class="queue-grid">
+          <template for:each={partnerConfirmation} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                Decision by {row.Target_Decision_On__c}
+              </p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label="Awaiting Partner"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPartnerConfirmation}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No renewals awaiting partner confirmation"
+            message="Renewals waiting on a partner response will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Expansion Opportunities -->
+    <template if:true={isExpansionOpportunitiesTab}>
+      <template if:true={hasExpansionOpportunities}>
+        <div class="queue-grid">
+          <template for:each={expansionOpportunities} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Expansion_Type__c}
+              </p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="info"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasExpansionOpportunities}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No open expansion opportunities"
+            message="Identified partner expansion opportunities will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Partner Reassignment -->
+    <template if:true={isPartnerReassignmentTab}>
+      <template if:true={hasPartnerReassignment}>
+        <div class="queue-grid">
+          <template for:each={partnerReassignment} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Target_Object__c}
+              </p>
+              <h2>{row.Reason__c}</h2>
+              <c-ps-status-badge
+                label="Requested"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPartnerReassignment}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No pending reassignments"
+            message="Partner reassignment requests awaiting approval will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Churn -->
+    <template if:true={isChurnTab}>
+      <template if:true={hasChurn}>
+        <div class="queue-grid">
+          <template for:each={churn} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Churn_Category__c}
+              </p>
+              <h2>{row.Id}</h2>
+              <c-ps-status-badge
+                label="Churned"
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasChurn}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No churned customers"
+            message="Customers recorded as churned will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

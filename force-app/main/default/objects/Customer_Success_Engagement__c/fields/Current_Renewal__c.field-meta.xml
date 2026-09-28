@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Renewal__c</fullName>
+    <label>Current Renewal</label>
+    <type>Lookup</type>
+    <referenceTo>Partner_Renewal__c</referenceTo>
+    <relationshipLabel
+  >Customer Success Engagements (Current Renewal)</relationshipLabel>
+    <relationshipName>Customer_Success_Engagements_Current</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

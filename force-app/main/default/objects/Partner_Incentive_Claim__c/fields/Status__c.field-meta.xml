@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description
+  >No separate Draft value - a claim is always inserted directly as Submitted, matching Sprint 40's Deal_Implementation_Handoff__c.Status__c lesson.</description>
+    <label>Status</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Submitted</fullName>
+                <default>true</default>
+                <label>Submitted</label>
+            </value>
+            <value>
+                <fullName>Under Review</fullName>
+                <default>false</default>
+                <label>Under Review</label>
+            </value>
+            <value>
+                <fullName>Information Required</fullName>
+                <default>false</default>
+                <label>Information Required</label>
+            </value>
+            <value>
+                <fullName>Approved</fullName>
+                <default>false</default>
+                <label>Approved</label>
+            </value>
+            <value>
+                <fullName>Rejected</fullName>
+                <default>false</default>
+                <label>Rejected</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calculation_Snapshot__c</fullName>
+    <description
+  >JSON snapshot of the revenue/attribution/policy inputs used at calculation time (doc section 41.35).</description>
+    <label>Calculation Snapshot</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+    <required>false</required>
+</CustomField>

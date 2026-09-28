@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Customer Success Administrator</label>
+    <description
+  >Restricted authorities for the Customer Success / Renewal / Expansion domain - kept separate from ordinary Customer Success operations (PartnerSync_Channel_Manager) per this sprint's own precedent (Finance Admin, PDLM Admin), matching the doc's grouping of "Internal Customer Success / Channel Operations" as one persona tier with a narrower restricted-authority slice on top.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>PartnerSync_Approve_Partner_Reassignment</name>
+    </customPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>true</modifyAllRecords>
+        <object>Partner_Reassignment__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+</PermissionSet>

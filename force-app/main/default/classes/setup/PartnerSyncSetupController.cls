@@ -9,6 +9,10 @@ public with sharing class PartnerSyncSetupController {
   private static Integer liveSiteCountOverride;
   @TestVisible
   private static Integer activeAiProviderCountOverride;
+  @TestVisible
+  private static Integer deadLetterBacklogCountOverride;
+  @TestVisible
+  private static Integer aiInteractionFailureCountOverride;
 
   private static final String ADMIN_PERMISSION_SET = 'PartnerSync_Internal_Admin';
   private static final Map<String, String> OPERATIONAL_SCHEDULES = new Map<String, String>{
@@ -48,7 +52,10 @@ public with sharing class PartnerSyncSetupController {
       onboardingPolicyCheck(),
       scheduledAutomationCheck(),
       experienceCloudCheck(),
-      aiConfigurationCheck()
+      aiConfigurationCheck(),
+      deadLetterBacklogCheck(),
+      aiUsageHealthCheck(),
+      analyticsSnapshotFreshnessCheck()
     };
 
     Integer readyCount = 0;
@@ -310,6 +317,100 @@ public with sharing class PartnerSyncSetupController {
           'WARNING',
           'No active AI provider is configured. AI features remain optional.',
           'Activate and test a provider only when the subscriber intends to use AI features.'
+        );
+  }
+
+  private static ReadinessCheck deadLetterBacklogCheck() {
+    Integer backlogCount = deadLetterBacklogCountOverride == null
+      ? [SELECT COUNT() FROM Event_DLQ__c WHERE Status__c = 'New']
+      : deadLetterBacklogCountOverride;
+    return backlogCount < DEAD_LETTER_BACKLOG_WARNING_THRESHOLD
+      ? check(
+          'dead-letter-backlog',
+          'Event recovery',
+          'READY',
+          'No unresolved dead-lettered events are waiting for attention.',
+          'No action required.'
+        )
+      : check(
+          'dead-letter-backlog',
+          'Event recovery',
+          'WARNING',
+          String.valueOf(backlogCount) +
+          ' dead-lettered event(s) are waiting for attention.',
+          'Review and retry or acknowledge them from the Operations Console.'
+        );
+  }
+
+  private static ReadinessCheck aiUsageHealthCheck() {
+    Integer activeProviders = activeAiProviderCountOverride == null
+      ? [SELECT COUNT() FROM AI_Provider_Config__mdt WHERE Active__c = TRUE]
+      : activeAiProviderCountOverride;
+    if (activeProviders == 0) {
+      return check(
+        'ai-usage-health',
+        'AI usage health',
+        'READY',
+        'No active AI provider is configured, so there is no recent AI usage to review.',
+        'No action required.'
+      );
+    }
+
+    Integer failureCount = aiInteractionFailureCountOverride == null
+      ? [SELECT COUNT() FROM AI_Interaction__c WHERE Status__c = 'Failed']
+      : aiInteractionFailureCountOverride;
+    return failureCount == 0
+      ? check(
+          'ai-usage-health',
+          'AI usage health',
+          'READY',
+          'No failed AI interactions have been recorded.',
+          'No action required.'
+        )
+      : check(
+          'ai-usage-health',
+          'AI usage health',
+          'WARNING',
+          String.valueOf(failureCount) + ' AI interaction(s) have failed.',
+          'Review AI interaction failures from the Operations Console; check provider credentials and quota.'
+        );
+  }
+
+  private static ReadinessCheck analyticsSnapshotFreshnessCheck() {
+    List<Executive_Snapshot__c> rows = [
+      SELECT Computed_On__c
+      FROM Executive_Snapshot__c
+      ORDER BY Snapshot_Date__c DESC
+      LIMIT 1
+    ];
+    if (rows.isEmpty()) {
+      return check(
+        'analytics-freshness',
+        'Analytics freshness',
+        'WARNING',
+        'No executive snapshot has been computed yet.',
+        'Schedule ExecutiveSnapshotBatch to run after PartnerPortfolioSnapshotBatch each day.'
+      );
+    }
+
+    Datetime computedOn = rows[0].Computed_On__c;
+    Boolean isFresh =
+      computedOn != null &&
+      computedOn >= System.now().addDays(-1);
+    return isFresh
+      ? check(
+          'analytics-freshness',
+          'Analytics freshness',
+          'READY',
+          'The latest executive snapshot was computed within the last day.',
+          'No action required.'
+        )
+      : check(
+          'analytics-freshness',
+          'Analytics freshness',
+          'WARNING',
+          'The latest executive snapshot is more than a day old.',
+          'Confirm ExecutiveSnapshotBatch is scheduled and running.'
         );
   }
 

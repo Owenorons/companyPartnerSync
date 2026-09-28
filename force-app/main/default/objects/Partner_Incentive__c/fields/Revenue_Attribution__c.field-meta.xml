@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Revenue_Attribution__c</fullName>
+    <label>Revenue Attribution</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Revenue_Attribution__c</referenceTo>
+    <relationshipLabel>Partner Incentives</relationshipLabel>
+    <relationshipName>Partner_Incentives3</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

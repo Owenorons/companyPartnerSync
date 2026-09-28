@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Submit Incentive Claim</label>
+  <description
+  >Allows a partner user to submit a claim for an incentive that requires one.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

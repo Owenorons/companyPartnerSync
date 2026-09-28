@@ -49,6 +49,11 @@
                 <default>false</default>
                 <label>Implementation</label>
             </value>
+            <value>
+                <fullName>Customer Success</fullName>
+                <default>false</default>
+                <label>Customer Success</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

@@ -123,12 +123,19 @@ public with sharing class DealParticipantExpiryBatch implements Database.Batchab
   }
 
   /**
-   * Scheduled entry point: launches this class as a batch job with a chunk
-   * size of 100.
+   * Scheduled entry point: launches this class as a batch job.
+   *
+   * Chunk size 25, not 100: an overdue participant costs 1 SOQL + 1 DML
+   * via DealParticipantCommandService.execute('Expire'), plus 2 more SOQL
+   * + up to 1 DML from DealCoSellStatusProjectionService.recompute() (Expire
+   * is in RECOMPUTES_COSELL_STATUS) - 3 SOQL + up to 2 DML per row. At a
+   * 100-row chunk of all-overdue participants that's 300 SOQL, over the
+   * per-transaction limit, found during a pre-beta bulk-safety audit. 25
+   * keeps real headroom under both limits.
    *
    * @param context Scheduled execution context (unused).
    */
   public void execute(SchedulableContext context) {
-    Database.executeBatch(new DealParticipantExpiryBatch(), 100);
+    Database.executeBatch(new DealParticipantExpiryBatch(), 25);
   }
 }

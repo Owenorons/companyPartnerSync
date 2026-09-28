@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Total Revenue (12mo)</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value
+      xsi:type="xsd:boolean"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >true</value>
+    </values>
+    <values>
+        <field>Metric_Key__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Total_Revenue_Trailing_12mo__c</value>
+    </values>
+    <values>
+        <field>Display_Label__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Total Revenue (12mo)</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Revenue</value>
+    </values>
+    <values>
+        <field>Format__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Currency</value>
+    </values>
+    <values>
+        <field>Display_Order__c</field>
+        <value
+      xsi:type="xsd:double"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >110</value>
+    </values>
+</CustomMetadata>

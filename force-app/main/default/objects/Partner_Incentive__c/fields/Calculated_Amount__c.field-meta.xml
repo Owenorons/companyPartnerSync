@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calculated_Amount__c</fullName>
+    <description
+  >Set once by IncentiveCommandService.calculate() and never overwritten by an approval override - see Approved_Amount__c.</description>
+    <label>Calculated Amount</label>
+    <precision>18</precision>
+    <scale>2</scale>
+    <type>Currency</type>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

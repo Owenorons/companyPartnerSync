@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Metric__c</fullName>
+    <description
+  >One CMDT row per metric under a shared Policy_Key__c - e.g. 'Adoption', 'Support Volume', 'Renewal Proximity'. CustomerSuccessHealthService.recompute() groups rows by Policy_Key__c and folds each metric's Weight__c into the overall score.</description>
+    <label>Metric</label>
+    <length>80</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

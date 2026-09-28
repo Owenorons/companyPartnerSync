@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source_Revenue__c</fullName>
+    <description
+  >The original revenue record this adjustment/correction relates to, if any.</description>
+    <label>Source Revenue</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Revenue__c</referenceTo>
+    <relationshipLabel>Corrections</relationshipLabel>
+    <relationshipName>Corrections</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

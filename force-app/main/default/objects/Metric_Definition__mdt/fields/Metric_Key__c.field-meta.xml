@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Metric_Key__c</fullName>
+    <description
+  >Matches an Executive_Snapshot__c field API name. Display/documentation metadata only - never dynamically invoked to build SOQL; ExecutiveCommandCenterController.getLatestSnapshot() returns the real, compiled field values and the LWC pairs them with this row's label/format by Metric_Key__c.</description>
+    <label>Metric Key</label>
+    <length>80</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

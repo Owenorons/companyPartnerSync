@@ -1,0 +1,58 @@
+# Revenue, Attribution & Partner Incentive Management — Sprint 41
+
+## 1. What shipped (2026-09-28)
+
+All 10 phases of the approved plan (`architecture-design-and-enhancement.md` §41, lines ~15695-17402) were built in this pass. Sprint 41 was genuinely greenfield — zero existing objects/classes for any Sprint 41-named entity — and introduces PartnerSync's financial governance layer, sitting below the Salesforce Opportunity and above the customer's own ERP/finance system. Summary by phase:
+
+1. **Schema** — 7 new objects: `Deal_Revenue__c` (durable revenue events, not a mutable total), `Deal_Revenue_Attribution__c` (multi-dimensional partner attribution, deliberately separate from `Deal_Registration__c.Attribution_Type__c` — a different, Sprint 39 concept), `Partner_Incentive__c` (with `Calculated_Amount__c`/`Approved_Amount__c`/`Paid_Amount__c` kept as three genuinely independent fields, never overwritten into each other), `Partner_Incentive_Claim__c`, `Partner_Incentive_Payment__c`, `Revenue_Reconciliation__c`, `Partner_Revenue_Dispute__c`. Plus 3 CMDTs (`Revenue_Attribution_Policy__mdt`, `Partner_Incentive_Policy__mdt`, `Partner_Incentive_Tier__mdt`) with seeded Default policies and a 3-tier example matching the doc's own worked example (§41.33).
+2. **Revenue core** — `RevenueSourceAdapter` interface with two real implementations: `ManualRevenueAdapter` (an internal user logs revenue directly) and `OpportunityRevenueAdapter` (books a `'Booking'`-type event at Closed Won, **never** `'Recognised Revenue'` — the doc's headline invariant, §41.13). `RevenueCommandService.importRevenue()` resolves idempotency via `External_Revenue_Key__c`, resolves the Deal via the `Deal_Opportunity__c` relationship, and routes anything ambiguous to `Revenue_Reconciliation__c` instead of guessing.
+3. **Reconciliation** — `RevenueReconciliationCommandService.resolve()` links an unmatched revenue record to a chosen candidate deal.
+4. **Attribution** — `DealRevenueAttributionService` calculates `Deal_Revenue_Attribution__c` rows from the deal's `Deal_Participant_Contribution__c` roster, using each contribution's own `Effective_From__c`/`Effective_To__c` against the revenue's `Revenue_Date__c` rather than today's participant status (doc §41.23's key invariant — a participant removed after the revenue's effective date still gets historical attribution). Percentage caps enforced within one attribution dimension, not across dimensions (§41.19).
+5. **Incentive core** — `PartnerIncentiveEligibilityService` (pure evaluation chain) + `IncentiveCommandService` (percentage/fixed/tiered calculation, with a maximum-incentive cap).
+6. **Claims & payment** — `IncentiveClaimCommandService` (submit/approve/reject, approved amount kept separate from calculated), `PartnerIncentivePaymentAdapter` (interface-only, no implementation — no payment system exists) + `IncentivePaymentCommandService` (manual record/reverse, reversal via a compensating record).
+7. **Disputes** — `RevenueDisputeCommandService` (open/resolve) deliberately never mutates the referenced revenue/attribution/incentive itself (§41.43) — resolution just records the outcome.
+8. **Sharing, permissions, events** — **no `PartnerShareService` extension** for this domain, per the doc's own explicit instruction (§41.54) to prefer controller authorization + sanitized DTOs over broad record sharing for financial data. 13 new custom permissions, a new `PartnerSync_Finance_Admin` permission set (kept separate from `PartnerSync_PDLM_Admin` per the doc's instruction), and 19 new event types across both event-consumer maps.
+9. **UI** — `RevenueController` (partner-safe DTOs + 5 internal queue methods + submitClaim/openDispute commands), `financeWorkbench` (internal, 5-tab shape mirroring `implementationWorkbench`), `partnerRevenueWorkspace` (Experience Cloud, combining revenue summary and incentive workspace into one component per the plan's proportionate-scope call).
+10. **Bulk & concurrency hardening** — see §2; three real gaps were found and fixed during this phase alone, plus the doc's applicable concurrency pairs were proven with the same-test-method two-step technique used throughout this codebase.
+
+**Verification**: every phase was checked for Apex brace/paren balance and XML well-formedness; `prettier --check`, `eslint`, and a full `sfdx-lwc-jest` run were clean at the end, at **62/62 suites, 223/223 tests** (up from 60/212 at the start of this build). No `sf deploy`/`sf validate` — user pushes to the org manually.
+
+## 2. Real gaps found and fixed along the way (not in the original doc)
+
+- **`Deal_Revenue__c.Deal__c` was marked required**, which would have broken the entire reconciliation flow — an unmatched revenue event is deliberately inserted with no `Deal__c` and routed to `Revenue_Reconciliation__c` instead of guessing (§41.15). Caught by the first reconciliation test, fixed by making the field nullable.
+- **An unsafe `List<Partner_Incentive_Tier__mdt>.sort()` call** would not have sorted tiers by `Sequence__c` at all — `sort()` has no defined behavior for sObject lists without a `Comparator`, and the tiered-incentive calculation genuinely depends on processing tiers in ascending order to allocate marginal amounts correctly. Replaced with an explicit selection sort before this could ever reach the org.
+- **The doc's own §41.42 revenue-reversal orchestration** ("Revenue reversed → find dependent attribution → create attribution reversal → find dependent incentive → not paid? recalculate/cancel") was promised in the approved plan but never actually wired during Phase 2/5 implementation — a real gap between plan and code, caught only while writing Phase 10's concurrency tests. Fixed by adding `RevenueCommandService.cascadeReversal()`, called from `reverseRevenue()`, which reverses dependent attribution and cancels any dependent incentive that hasn't been paid yet (a paid incentive is left for a deliberate, reviewed `IncentivePaymentCommandService.reverse()` call instead of an automatic cascade, since picking which payment to recover isn't safe to automate).
+- **Three genuinely decorative custom permissions**, created in Phase 8 but never actually checked anywhere: `PartnerSync_Reverse_Revenue` (now gates `RevenueCommandService.reverseRevenue()`), `PartnerSync_Reverse_Incentive` (now gates `IncentivePaymentCommandService.reverse()`), and `PartnerSync_Approve_Incentive_Override` (now gates `IncentiveClaimCommandService.approve()` specifically when the claimed amount differs from the calculated amount — an override, not an ordinary approval). Found by re-applying this codebase's own "no decorative permissions" discipline to freshly-written Sprint 41 code, the same class of issue a whole-app audit had already flagged elsewhere in the codebase before this sprint began.
+- **A missing test file**: `RevenueAttributionCommandService` (override/reverse) had zero test coverage — only the calculation service (`DealRevenueAttributionService`) was tested. Written from scratch in Phase 10, which is also where the concurrency pair (override vs. concurrent override) and the permission-gate tests live.
+- **The recurring SOQL-style doubled-quote escape bug** (`'...account''s revenue.'` instead of `'...account\'s revenue.'` — invalid Apex, not a SQL string) resurfaced once in `RevenueControllerTest.cls`, the same mistake caught and fixed once already in Sprint 40's `ImplementationParticipantCommandService`. Caught by the same discipline before it reached the org.
+
+## 3. Known Adaptations (deliberate, labeled, not silently dropped)
+
+1. Multi-currency fields (`CurrencyIsoCode`, `Original_Amount__c`/`Original_Currency__c`) are schema-only — no live FX conversion service, since the org isn't multi-currency enabled.
+2. `RevenueSourceAdapter` ships two real implementations (`ManualRevenueAdapter`, `OpportunityRevenueAdapter`, Booking-only) — no ERP/Revenue Cloud adapter exists.
+3. `PartnerIncentivePaymentAdapter` is interface-only, zero real implementations — no payment system exists in this org.
+4. `CommercialEntitlementAdapter` is **not built** — that's `Customer_Commercial_Entitlement__c`, explicitly Sprint 42 scope.
+5. `Partner_Performance__c` stays unwired — events publish, no batch consumes them, matching Sprint 40's identical decision on the identical object.
+6. `Deal_Revenue_Attribution__c.Attribution_Type__c` is a new, separate field from `Deal_Registration__c.Attribution_Type__c` — not reused, not renamed.
+7. `Require_Protection__c` checks for any active `Deal_Protection_Grant__c` (`Status__c = 'Active'`), not a protection _type_ — no such field exists yet on that object.
+8. No `PartnerShareService` extension — financial objects stay OWD Private, access mediated entirely through controller authorization + sanitized DTOs, per the doc's own explicit instruction for this domain.
+9. `RevenueReconciliationBatch`/`IncentivePaymentReconciliationBatch` (§41.61) are **not built** — no real external system exists yet to reconcile against. Named follow-up.
+10. `Partner_Revenue_Dispute__c` ships with open/resolve commands only — no dispute-type-specific workflow automation beyond status transitions.
+11. Tax fields (`Tax_Amount__c`/`Tax_Inclusive__c`) are schema-only on `Deal_Revenue__c` — no tax calculation logic.
+12. AI features (§41.60) are not built — matches every prior sprint's treatment of the doc's optional AI sections.
+13. **Bulk minimums are honestly scoped, not a false 200 claim** (a new, explicit adaptation this sprint): `RevenueCommandService.importRevenue()` proven safe at 40/transaction (~2 SOQL + 1 DML/call), `DealRevenueAttributionService.calculateAttribution()` at 30 (~3 SOQL/call), `IncentiveCommandService.evaluate()` at 15 (~6 SOQL/call) — no batch class in this codebase calls any of these three in a loop today, so each ceiling reflects the command's own real cost, not a claimed-but-unproven 200.
+
+## 4. What a future phase would need to complete
+
+- `RevenueReconciliationBatch`/`IncentivePaymentReconciliationBatch` once a real external finance/payment system exists to reconcile against (Adaptation #9).
+- A real ERP/Revenue Cloud `RevenueSourceAdapter` implementation and a real `PartnerIncentivePaymentAdapter` implementation, once such systems are chosen (Adaptations #2/#3).
+- `Customer_Commercial_Entitlement__c`/`CommercialEntitlementAdapter` — explicitly Sprint 42's job (Adaptation #4).
+- `Partner_Performance__c` population from governed revenue/attribution records, per §41.57 (Adaptation #5) — the events exist; nothing consumes them yet.
+- Live multi-currency conversion, if this org ever enables multi-currency (Adaptation #1).
+- A genuine bulk rewrite of `RevenueCommandService.importRevenue()`/`DealRevenueAttributionService.calculateAttribution()`/`IncentiveCommandService.evaluate()` if any of them is ever called from a real batch process at 200-record scale (Adaptation #13) — currently accepted-risk, matching this codebase's established tolerance for this category of single-record command service cost.
+
+## 5. References
+
+- `architecture-design-and-enhancement.md`, Sprint 41 — the canonical spec this build implements.
+- The approved plan at the time of this build (10-phase breakdown, Known Adaptations #1-12 as originally scoped — delivered with 1 additional adaptation and 6 real gap-fixes discovered during implementation, §2/§3 above).
+- `docs/deal-implementation-delivery-review.md` — the prior sprint's review doc this one follows the same format as, including its own "recurring test-authoring quirk" and "decorative permission" lessons, both of which recurred in this sprint's own fresh code and were caught the same way.

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Origin_Type__c</fullName>
+    <description
+  >Sprint 42 addition - distinguishes a deal created by ExpansionCommandService.createExpansionDeal() from an ordinary partner-submitted registration, so downstream logic (DealOpportunityReconciliationBatch's Closed Won revenue booking) can tell them apart without inferring it. Defaults to Registration so every pre-existing deal is classified correctly with no data fix-up needed.</description>
+    <label>Origin Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Registration</fullName>
+                <default>true</default>
+                <label>Registration</label>
+            </value>
+            <value>
+                <fullName>Expansion</fullName>
+                <default>false</default>
+                <label>Expansion</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

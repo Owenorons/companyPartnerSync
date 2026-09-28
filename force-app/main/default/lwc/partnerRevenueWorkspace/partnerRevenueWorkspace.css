@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.ps-page {
+  background: var(--ps-color-bg);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: var(--ps-color-text);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ps-color-border-strong, var(--ps-color-text));
+}
+
+.eyebrow {
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ps-color-text-muted);
+}
+
+h1 {
+  font-family: var(--ps-font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+h3 {
+  font-family: var(--ps-font-display);
+  font-size: 1.2rem;
+  color: var(--ps-color-text);
+  font-weight: 400;
+  margin-bottom: 0.6rem;
+}
+
+.queue-grid {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ps-color-border);
+}
+
+.queue-card {
+  background: var(--ps-color-card);
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--ps-color-border);
+  display: grid;
+  gap: 0.4rem;
+}
+
+.queue-card:last-child {
+  border-bottom: none;
+}
+
+.team-label {
+  font-family: var(--ps-font-mono);
+  color: var(--ps-color-text-muted);
+  font-weight: 600;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+h2 {
+  font-family: var(--ps-font-display);
+  font-size: 1.1rem;
+  color: var(--ps-color-text);
+  font-weight: 400;
+  margin-top: 0.2rem;
+}
+
+.team-actions {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid var(--ps-color-text);
+  background: transparent;
+  font-family: var(--ps-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accept {
+  color: var(--ps-color-success);
+  border-color: var(--ps-color-success);
+}
+
+.dispute {
+  color: var(--ps-color-danger);
+  border-color: var(--ps-color-danger);
+}

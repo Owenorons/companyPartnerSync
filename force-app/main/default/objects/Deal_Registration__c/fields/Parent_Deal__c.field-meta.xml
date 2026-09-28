@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Deal__c</fullName>
+    <description
+  >Sprint 42 addition - for an Expansion-origin deal, the deal it expanded from. Null for an ordinary registration.</description>
+    <label>Parent Deal</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Registration__c</referenceTo>
+    <relationshipLabel>Expansion Deals</relationshipLabel>
+    <relationshipName>Expansion_Deals</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

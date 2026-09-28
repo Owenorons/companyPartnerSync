@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Renewal Risk Advisor - Request Renewal Review</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value
+      xsi:type="xsd:boolean"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >true</value>
+    </values>
+    <values>
+        <field>Use_Case_Key__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >RenewalRiskAdvisor</value>
+    </values>
+    <values>
+        <field>Action_Key__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >RequestRenewalReview</value>
+    </values>
+    <values>
+        <field>Target_Command_Service__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >RenewalCommandService.requestReview</value>
+    </values>
+    <values>
+        <field>Requires_Permission__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >PartnerSync_Manage_Renewal</value>
+    </values>
+</CustomMetadata>

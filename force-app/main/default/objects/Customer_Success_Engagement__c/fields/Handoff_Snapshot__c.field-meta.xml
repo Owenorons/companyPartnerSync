@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Handoff_Snapshot__c</fullName>
+    <description
+  >JSON snapshot of the completed Deal_Implementation__c's key facts captured at handoff time (doc Sprint 42 section 42.7), so Customer Success has the implementation context without a live join back to a record it may not have access to.</description>
+    <label>Handoff Snapshot</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+    <required>false</required>
+</CustomField>

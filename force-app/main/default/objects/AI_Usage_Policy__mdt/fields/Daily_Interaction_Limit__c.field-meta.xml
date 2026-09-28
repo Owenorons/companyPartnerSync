@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Daily_Interaction_Limit__c</fullName>
+    <description
+  >Per-use-case daily ceiling, layered on top of AIUsageService's existing tenant-wide AI_Daily_Request_Limit - both are checked; either can block a call.</description>
+    <label>Daily Interaction Limit</label>
+    <precision>6</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <required>false</required>
+</CustomField>

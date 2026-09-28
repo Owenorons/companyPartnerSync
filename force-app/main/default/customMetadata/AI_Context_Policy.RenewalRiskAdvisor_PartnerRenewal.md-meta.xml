@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Renewal Risk Advisor - Partner Renewal</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value
+      xsi:type="xsd:boolean"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >true</value>
+    </values>
+    <values>
+        <field>Use_Case_Key__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >RenewalRiskAdvisor</value>
+    </values>
+    <values>
+        <field>Allowed_Object__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Partner_Renewal__c</value>
+    </values>
+    <values>
+        <field>Allowed_Fields__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Status__c,Renewal_Health__c,Target_Decision_On__c</value>
+    </values>
+</CustomMetadata>

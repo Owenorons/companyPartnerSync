@@ -26536,7 +26536,7 @@ Terms such as Core Intelligence, Intelligence, or Advanced Intelligence can desc
 
 This is the model I would now freeze for implementation. It also fits cleanly with PartnerAccessService: licensing/entitlement establishes what the organisation can use; permission sets/custom permissions establish what the user can do; sharing establishes which records they can access; and domain rules establish whether the operation is valid.
 
-he correction to Sprint 43. The existing licensing architecture remains canonical; Sprint 43 will integrate with it.
+the correction to Sprint 43. The existing licensing architecture remains canonical; Sprint 43 will integrate with it.
 
 ADR-043-LIC-001 — PartnerSync Licensing Integration
 
@@ -26682,7 +26682,9 @@ Refresh signed subscription entitlements.
 Maintain last-successful-verification details.
 Apply a configured grace period.
 Publish operational alerts for expired or invalid state.
-Never store provider or licensing secrets in CMDT. 6. Permission-set alignment
+Never store provider or licensing secrets in CMDT.
+
+6. Permission-set alignment
 
 The current permission sets remain authoritative. No Core, Growth or Enterprise permission sets will be created.
 
@@ -26738,3 +26740,2031 @@ Expired subscription state produces a typed, user-safe response.
 Server-side enforcement still blocks direct Apex/API invocation when the LWC hides the feature.
 
 This resolves the Sprint 43 conflict while preserving the established PartnerSync licensing, permission-set and packaging architecture.
+
+The next logical phase is Sprint 44 — Hybrid Packaging, Licensing and Customer Provisioning.
+This is necessary because the business-tier design is now settled, but two implementation concerns remain:
+
+- ExperienceBundle-managed packaging is unsupported, and Salesforce also documents enhanced LWR sites as unsupported in the relevant 2GP packaging path. Salesforce Developers
+- PartnerSync needs a production-grade way to provision Core, Growth, Enterprise and add-on entitlements.
+  Sprint 44 scope
+
+1. Hybrid distribution architecture
+   Split PartnerSync into two deliverables:
+   Deliverable Contents Deployment
+   PartnerSync Core 2GP Apex, LWCs, objects, fields, CMDT, permissions, events and flows AppExchange managed package
+   PartnerSync LWR Site Kit ExperienceBundle, routes, pages, branding, navigation and site configuration Metadata API/CLI customer deployment
+
+The site kit depends on the managed package, but it is not part of the managed package.
+Recommended repository structure:
+packages/
+partnersync-core/
+
+site-kit/
+force-app/main/default/
+experiences/
+networks/
+sites/
+
+scripts/
+install-core.sh
+deploy-site.sh
+configure-site.sh
+validate-installation.sh
+
+config/
+core-scratch-def.json
+growth-scratch-def.json
+enterprise-scratch-def.json
+
+docs/
+Installation_Guide.md
+Upgrade_Guide.md
+Licensing_Guide.md
+
+2. Native licensing control plane
+   Enhance the existing architecture by using Salesforce:
+
+- LMA for package licence status, seats, trial and expiry.
+- FMA feature parameters for edition, add-ons and commercial limits.
+- Local PartnerSync records for high-volume usage metering.
+  Salesforce explicitly supports LMO-to-subscriber feature parameters as permissions and limits for 2GP packages, accessible through System.FeatureManagement. Apex Reference Guide
+  This means the previously proposed custom signed entitlement service is unnecessary for the normal AppExchange deployment.
+
+3. Feature parameters
+   Parameter Type Purpose
+   License_Tier Integer 10=Core, 20=Growth, 30=Enterprise
+   AI_Enabled Boolean AI Copilot entitlement
+   Agentforce_Actions_Enabled Boolean Bounded Agentforce actions
+   Enhanced_Analytics_Enabled Boolean Analytics add-on
+   CoSell_Enabled Boolean Co-sell add-on
+   Integration_Pack_Enabled Boolean Advanced connector entitlement
+   Maximum_Partner_Users Integer Contracted user capacity
+   Monthly_AI_Request_Limit Integer AI quota
+   Monthly_Deal_Limit Integer Deal-registration quota
+   Monthly_MDF_Request_Limit Integer MDF quota
+   AddOn_Expiry_Date Date Time-bound add-on access
+
+FMA should carry commercial entitlement values—not every usage event. Salesforce supports up to 200 feature parameters, but they are unsuitable as a transactional metering store. developer.salesforce.com 4. Apex implementation pack
+The next code pack should contain:
+PartnerSyncEntitlementService
+PartnerSyncFeatureAccessService
+PartnerSyncUsageService
+PartnerSyncLicenseDTO
+FeatureAccessDecision
+PartnerSyncFeatureKey
+PartnerSyncEntitlementException
+
+Example access sequence:
+FeatureAccessDecision decision =
+PartnerSyncFeatureAccessService.evaluate(
+PartnerSyncFeatureKey.AI_DEAL_SUMMARY,
+UserInfo.getUserId(),
+dealId
+);
+
+if (!decision.allowed) {
+throw new PartnerSyncEntitlementException(
+decision.reasonCode,
+decision.userMessage
+);
+}
+
+Every controller, invocable, REST endpoint, queueable and event subscriber must use the same service. LWC feature hiding alone is insufficient. 5. Installation experience
+The installer must:
+
+1. Install the PartnerSync Core 2GP package.
+2. Validate Experience Cloud and external-user licensing.
+3. Confirm required Salesforce features.
+4. Deploy the LWR Site Kit.
+5. create or identify the partner site.
+6. Assign existing persona permission-set groups.
+7. configure domain and login settings.
+8. Publish the site.
+9. Run entitlement and security diagnostics.
+10. Produce an installation report.
+    The post-install handler must not attempt to create the LWR site or modify subscriber OWD.
+11. Acceptance environments
+    Certification should cover:
+    Environment Purpose
+    Core without AI Minimum supported installation
+    Growth with MDF and analytics Mid-tier feature validation
+    Growth with AI add-on Add-on entitlement validation
+    Enterprise with Agentforce Full capability validation
+    Expired trial Licence failure behaviour
+    Package installed without site kit Core package remains valid
+    Site kit upgrade Existing customer branding remains intact
+    Non-private customer OWD No package-driven OWD modification
+
+Recommended execution order
+
+1. Create the 2GP/LWR distribution ADR.
+2. Implement FMA feature parameters.
+3. Build the three entitlement services.
+4. Add server-side gates to each module.
+5. Build the LWR Site Kit installer.
+6. Add tier and add-on test matrices.
+7. Produce the installation, licensing and upgrade guides.
+8. Run an AppExchange-style security review.
+   The immediate next deliverable should therefore be the Sprint 44 implementation pack, starting with the FMA metadata, entitlement Apex classes and hybrid repository/package structure.
+
+It retains Core, Growth, Enterprise and add-ons, reuses existing persona permission sets, and separates the managed package from the LWR site deployment.
+This is the licensing foundation. Integration with your existing business services requires their actual source, particularly account-scope policies, asynchronous execution context and existing usage metadata.
+
+1. Repository structure
+   Use these locations within your existing repository. Retain your current namespace, package identity and package aliases.
+   packages/partnersync-core/force-app/main/default/
+   classes/
+   customMetadata/
+   customPermissions/
+   featureParameters/
+   objects/
+
+site-kit/
+sfdx-project.json
+force-app/
+
+scripts/
+partner_sync.py
+prepare-usage.apex
+
+The core package contains Apex, metadata and permissions. The site kit contains the separately retrieved Experience Cloud configuration. 2. FMA entitlement metadata
+Use LMO-to-subscriber parameters for commercial grants. Subscriber-editable configuration can disable an entitled feature, but must not grant a paid entitlement.
+Salesforce supports Boolean, Integer and Date feature parameters in 2GP packages. developer.salesforce.com
+Create the following files under:
+packages/partnersync-core/force-app/main/default/featureParameters/
+
+API name Type Default Meaning
+License_Tier Integer 0 10=Core, 20=Growth, 30=Enterprise
+AI_Enabled Boolean false AI activation/entitlement
+AI_Expiry Date 2000-01-01 AI entitlement expiry
+Agentforce_Actions_Enabled Boolean false Bounded agent actions
+Agentforce_Actions_Expiry Date 2000-01-01 Agent-action expiry
+Enhanced_Analytics_Enabled Boolean false Enhanced analytics add-on
+Enhanced_Analytics_Expiry Date 2000-01-01 Analytics add-on expiry
+CoSell_Enabled Boolean false Co-sell add-on
+CoSell_Expiry Date 2000-01-01 Co-sell add-on expiry
+Integration_Pack_Enabled Boolean false Integration add-on
+Integration_Pack_Expiry Date 2000-01-01 Integration add-on expiry
+Monthly_AI_Request_Limit Integer 0 Shared monthly AI request quota
+Monthly_Deal_Limit Integer 0 Monthly deal-creation quota
+Monthly_MDF_Request_Limit Integer 0 Monthly MDF request quota
+Maximum_Partner_Users Integer 0 Contracted partner-user capacity
+
+The defaults deliberately deny access until the customer is provisioned. Zero means zero allowance. Negative values are invalid.
+Each add-on has its own expiry; one add-on expiring must not disable an unrelated purchase.
+License_Tier.featureParameterInteger-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<FeatureParameterInteger xmlns="http://soap.sforce.com/2006/04/metadata">
+    <dataflowDirection>LmoToSubscriber</dataflowDirection>
+    <masterLabel>License Tier</masterLabel>
+    <value>0</value>
+</FeatureParameterInteger>
+
+AI_Enabled.featureParameterBoolean-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<FeatureParameterBoolean xmlns="http://soap.sforce.com/2006/04/metadata">
+    <dataflowDirection>LmoToSubscriber</dataflowDirection>
+    <masterLabel>AI Enabled</masterLabel>
+    <value>false</value>
+</FeatureParameterBoolean>
+
+AI_Expiry.featureParameterDate-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<FeatureParameterDate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <dataflowDirection>LmoToSubscriber</dataflowDirection>
+    <masterLabel>AI Expiry</masterLabel>
+    <value>2000-01-01</value>
+</FeatureParameterDate>
+
+Use these same templates for the remaining rows, substituting the filename, label and default.
+Maximum_Partner_Users is an entitlement input. Enforcement during user activation/provisioning still needs integration with the existing onboarding service. 3. Protected feature catalogue
+The code below uses PartnerSync_Feature_Policy**mdt.
+This is a proposed implementation schema, because the existing Feature_Flag**mdt field definitions were not supplied. If that existing type already provides the same protected commercial catalogue, adapt the selector to use it. Maintain one commercial decision authority.
+Keep Partner_Tier_Config**mdt for partner-programme benefits.
+PartnerSync_Feature_Policy**mdt.object-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Feature Policy</label>
+    <pluralLabel>PartnerSync Feature Policies</pluralLabel>
+    <visibility>Protected</visibility>
+</CustomObject>
+
+Create these fields:
+Field Type Configuration
+Minimum_Edition**c Number(2,0) Developer controlled
+Add_On_Parameter**c Text(100) Developer controlled
+Add_On_Expiry**c Text(100) Developer controlled
+Permission**c Text(100) Developer controlled
+Quota_Parameter**c Text(100) Developer controlled
+Requires_AI**c Checkbox Default false; developer controlled
+Requires_Agentforce\_\_c Checkbox Default false; developer controlled
+
+Example text field:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Add_On_Parameter__c</fullName>
+    <label>Add On Parameter</label>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <length>100</length>
+    <type>Text</type>
+</CustomField>
+
+Number field:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minimum_Edition__c</fullName>
+    <label>Minimum Edition</label>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <precision>2</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>
+
+Checkbox field:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requires_AI__c</fullName>
+    <label>Requires AI</label>
+    <defaultValue>false</defaultValue>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <type>Checkbox</type>
+</CustomField>
+
+Create these protected records. Blank entries mean the field is omitted.
+DeveloperName Minimum edition Add-on prefix Custom permission Quota parameter Requires AI Requires Agentforce
+PARTNER_WORKSPACE 10 — — — No No
+DEAL_CREATE 10 — PS_Use_Deals Monthly_Deal_Limit No No
+CONTENT_READ 10 — PS_Use_Content — No No
+LEAD_DISTRIBUTE 20 — PS_Use_Leads — No No
+MDF_CREATE 20 — PS_Use_MDF Monthly_MDF_Request_Limit No No
+ANALYTICS_READ 20 — PS_Use_Analytics — No No
+ENHANCED_ANALYTICS 30 Enhanced_Analytics PS_Use_Analytics — No No
+COSELL 30 CoSell PS_Use_CoSell — No No
+INTEGRATION 30 Integration_Pack PS_Use_Integrations — No No
+AI_DEAL_SUMMARY 30 AI PS_Use_AI Monthly_AI_Request_Limit Yes No
+AI_PORTFOLIO_NARRATIVE 30 AI PS_Use_AI Monthly_AI_Request_Limit Yes No
+AGENT_ACTION 30 — PS_Use_Agent_Actions Monthly_AI_Request_Limit Yes Yes
+
+For an add-on prefix such as CoSell:
+Add_On_Parameter**c = CoSell_Enabled
+Add_On_Expiry**c = CoSell_Expiry
+
+The implementation permits these optional add-ons from Growth upward. Enterprise includes the relevant capabilities, while AI and agent actions also require explicit activation.
+Example PartnerSync_Feature_Policy.AI_DEAL_SUMMARY.md-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<CustomMetadata
+    xmlns="http://soap.sforce.com/2006/04/metadata"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <label>AI Deal Summary</label>
+    <protected>true</protected>
+
+    <values>
+        <field>Minimum_Edition__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Add_On_Parameter__c</field>
+        <value xsi:type="xsd:string">AI_Enabled</value>
+    </values>
+    <values>
+        <field>Add_On_Expiry__c</field>
+        <value xsi:type="xsd:string">AI_Expiry</value>
+    </values>
+    <values>
+        <field>Permission__c</field>
+        <value xsi:type="xsd:string">PS_Use_AI</value>
+    </values>
+    <values>
+        <field>Quota_Parameter__c</field>
+        <value xsi:type="xsd:string">Monthly_AI_Request_Limit</value>
+    </values>
+    <values>
+        <field>Requires_AI__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Requires_Agentforce__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+
+</CustomMetadata>
+
+4. Apex entitlement services
+   For every class below, add a matching .cls-meta.xml:
+   <?xml version="1.0" encoding="UTF-8"?>
+   <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
+       <apiVersion>65.0</apiVersion>
+       <status>Active</status>
+   </ApexClass>
+
+Reconcile API 65.0 with the version used by your existing package.
+PartnerSyncEntitlementException.cls:
+public class PartnerSyncEntitlementException extends Exception {}
+
+FeatureAccessDecision.cls:
+public class FeatureAccessDecision {
+public Boolean allowed { get; private set; }
+public String reasonCode { get; private set; }
+public String featureKey { get; private set; }
+
+    public FeatureAccessDecision(
+        Boolean permitted,
+        String reason,
+        String feature
+    ) {
+        allowed = permitted;
+        reasonCode = reason;
+        featureKey = feature;
+    }
+
+    public static FeatureAccessDecision deny(
+        String code,
+        String feature
+    ) {
+        return new FeatureAccessDecision(false, code, feature);
+    }
+
+    public static FeatureAccessDecision permit(String feature) {
+        return new FeatureAccessDecision(true, 'ALLOWED', feature);
+    }
+
+}
+
+PartnerSyncFeatureKey.cls:
+public class PartnerSyncFeatureKey {
+public static final String DEAL_CREATE = 'DEAL_CREATE';
+public static final String MDF_CREATE = 'MDF_CREATE';
+
+    public static final String AI_DEAL_SUMMARY =
+        'AI_DEAL_SUMMARY';
+
+    public static final String AI_PORTFOLIO_NARRATIVE =
+        'AI_PORTFOLIO_NARRATIVE';
+
+    public static final String AGENT_ACTION = 'AGENT_ACTION';
+
+}
+
+PartnerSyncEntitlementSource.cls:
+public interface PartnerSyncEntitlementSource {
+Boolean currentUserLicensed();
+Integer integerValue(String key);
+Boolean booleanValue(String key);
+Date dateValue(String key);
+}
+
+PartnerSyncFmaSource.cls:
+public with sharing class PartnerSyncFmaSource
+implements PartnerSyncEntitlementSource {
+
+    private String namespaceName;
+
+    public PartnerSyncFmaSource() {
+        String typeName = PartnerSyncFmaSource.class.getName();
+
+        namespaceName = typeName.contains('.')
+            ? typeName.substringBefore('.')
+            : null;
+    }
+
+    private String qualified(String key) {
+        if (String.isBlank(namespaceName)) {
+            throw new PartnerSyncEntitlementException(
+                'MANAGED_NAMESPACE_REQUIRED'
+            );
+        }
+
+        return namespaceName + '__' + key;
+    }
+
+    public Boolean currentUserLicensed() {
+        return !String.isBlank(namespaceName)
+            && UserInfo.isCurrentUserLicensed(namespaceName);
+    }
+
+    public Integer integerValue(String key) {
+        return FeatureManagement.checkPackageIntegerValue(
+            qualified(key)
+        );
+    }
+
+    public Boolean booleanValue(String key) {
+        return FeatureManagement.checkPackageBooleanValue(
+            qualified(key)
+        );
+    }
+
+    public Date dateValue(String key) {
+        return FeatureManagement.checkPackageDateValue(
+            qualified(key)
+        );
+    }
+
+}
+
+The namespace comes from the compiled package class. It is never accepted from the browser.
+isCurrentUserLicensed checks the current user’s package licence; it does not distinguish an expired organisation subscription from every other licence failure. Salesforce documents this method for checking managed-package user licensing. developer.salesforce.com
+PartnerSyncEntitlementService.cls:
+public with sharing class PartnerSyncEntitlementService {
+private PartnerSyncEntitlementSource source;
+
+    public PartnerSyncEntitlementService() {
+        source = new PartnerSyncFmaSource();
+    }
+
+    @TestVisible
+    private PartnerSyncEntitlementService(
+        PartnerSyncEntitlementSource fake
+    ) {
+        source = fake;
+    }
+
+    public PartnerSync_Feature_Policy__mdt policy(String key) {
+        if (String.isBlank(key)) {
+            return null;
+        }
+
+        return PartnerSync_Feature_Policy__mdt.getInstance(key);
+    }
+
+    private Boolean activeAddOn(String flag, String expiry) {
+        if (String.isBlank(flag) || String.isBlank(expiry)) {
+            return false;
+        }
+
+        if (source.booleanValue(flag) != true) {
+            return false;
+        }
+
+        Date endDate = source.dateValue(expiry);
+
+        // Inclusive UTC expiry, independent of user timezone.
+        return endDate != null
+            && endDate >= System.now().dateGmt();
+    }
+
+    public FeatureAccessDecision evaluate(String key) {
+        PartnerSync_Feature_Policy__mdt p = policy(key);
+
+        if (p == null) {
+            return FeatureAccessDecision.deny(
+                'UNKNOWN_FEATURE',
+                key
+            );
+        }
+
+        try {
+            if (source.currentUserLicensed() != true) {
+                return FeatureAccessDecision.deny(
+                    'PACKAGE_USER_UNLICENSED',
+                    key
+                );
+            }
+
+            Integer tier = source.integerValue('License_Tier');
+
+            if (
+                tier == null
+                || !(new Set<Integer>{10, 20, 30}).contains(tier)
+            ) {
+                return FeatureAccessDecision.deny(
+                    'EDITION_UNPROVISIONED',
+                    key
+                );
+            }
+
+            Boolean included = tier >= p.Minimum_Edition__c;
+
+            // Optional add-ons begin at Growth.
+            if (
+                !included
+                && !(
+                    tier >= 20
+                    && activeAddOn(
+                        p.Add_On_Parameter__c,
+                        p.Add_On_Expiry__c
+                    )
+                )
+            ) {
+                return FeatureAccessDecision.deny(
+                    'FEATURE_NOT_ENTITLED',
+                    key
+                );
+            }
+
+            // Explicit AI activation applies to Enterprise too.
+            if (
+                p.Requires_AI__c
+                && !activeAddOn('AI_Enabled', 'AI_Expiry')
+            ) {
+                return FeatureAccessDecision.deny(
+                    'AI_ENTITLEMENT_INACTIVE',
+                    key
+                );
+            }
+
+            if (
+                p.Requires_Agentforce__c
+                && !activeAddOn(
+                    'Agentforce_Actions_Enabled',
+                    'Agentforce_Actions_Expiry'
+                )
+            ) {
+                return FeatureAccessDecision.deny(
+                    'AGENT_ACTIONS_INACTIVE',
+                    key
+                );
+            }
+
+            return FeatureAccessDecision.permit(key);
+        } catch (Exception ex) {
+            return FeatureAccessDecision.deny(
+                'ENTITLEMENT_UNAVAILABLE',
+                key
+            );
+        }
+    }
+
+    public Integer quota(String key) {
+        PartnerSync_Feature_Policy__mdt p = policy(key);
+
+        if (p == null || String.isBlank(p.Quota_Parameter__c)) {
+            throw new PartnerSyncEntitlementException(
+                'FEATURE_NOT_METERED'
+            );
+        }
+
+        Integer value = source.integerValue(
+            p.Quota_Parameter__c
+        );
+
+        if (value == null || value < 0) {
+            throw new PartnerSyncEntitlementException(
+                'INVALID_QUOTA'
+            );
+        }
+
+        return value;
+    }
+
+}
+
+PartnerSyncFeatureAccessService.cls combines commercial entitlement with user permission and the module’s business/data-access policy:
+public with sharing class PartnerSyncFeatureAccessService {
+public interface ScopePolicy {
+FeatureAccessDecision evaluate(
+String feature,
+Id recordId
+);
+}
+
+    private PartnerSyncEntitlementService entitlements;
+    private ScopePolicy scope;
+
+    public PartnerSyncFeatureAccessService(
+        ScopePolicy modulePolicy
+    ) {
+        entitlements = new PartnerSyncEntitlementService();
+        scope = modulePolicy;
+    }
+
+    @TestVisible
+    private PartnerSyncFeatureAccessService(
+        PartnerSyncEntitlementService service,
+        ScopePolicy modulePolicy
+    ) {
+        entitlements = service;
+        scope = modulePolicy;
+    }
+
+    public FeatureAccessDecision evaluate(
+        String feature,
+        Id recordId
+    ) {
+        FeatureAccessDecision result =
+            entitlements.evaluate(feature);
+
+        if (!result.allowed) {
+            return result;
+        }
+
+        PartnerSync_Feature_Policy__mdt p =
+            entitlements.policy(feature);
+
+        if (
+            !String.isBlank(p.Permission__c)
+            && !FeatureManagement.checkPermission(
+                p.Permission__c
+            )
+        ) {
+            return FeatureAccessDecision.deny(
+                'USER_NOT_PERMITTED',
+                feature
+            );
+        }
+
+        if (scope == null) {
+            return FeatureAccessDecision.deny(
+                'SCOPE_POLICY_MISSING',
+                feature
+            );
+        }
+
+        FeatureAccessDecision scoped =
+            scope.evaluate(feature, recordId);
+
+        if (
+            scoped == null
+            || scoped.featureKey != feature
+        ) {
+            return FeatureAccessDecision.deny(
+                'INVALID_SCOPE_DECISION',
+                feature
+            );
+        }
+
+        return scoped;
+    }
+
+    public void requireAccess(String feature, Id recordId) {
+        FeatureAccessDecision decision =
+            evaluate(feature, recordId);
+
+        if (!decision.allowed) {
+            throw new PartnerSyncEntitlementException(
+                decision.reasonCode
+            );
+        }
+    }
+
+}
+
+Each module’s ScopePolicy must enforce:
+
+- Operational feature switches.
+- CRUD/FLS and record access.
+- Partner-account scope.
+- Partner-programme eligibility where applicable.
+- Business action/state restrictions.
+- Provider prerequisites and action policy for AI.
+  A missing policy denies access. Do not implement a production policy that simply returns permit() for every request.
+  PartnerSyncLicenseDTO.cls is optional diagnostic output:
+  public class PartnerSyncLicenseDTO {
+  public String edition;
+  public String statusCode;
+  public Map<String, FeatureAccessDecision> features;
+
+      public PartnerSyncLicenseDTO() {
+          features = new Map<String, FeatureAccessDecision>();
+      }
+
+  }
+
+This DTO must never be deserialized from a client request and treated as trusted authorization. 5. Quota reservation metadata
+Retain existing Usage_Metric**c and AI_Usage**c.
+The following two objects provide the transactional counter and reservation ledger. If your existing objects already implement equivalent unique keys, locking and settlement, adapt the service to them.
+Object Purpose
+PartnerSync_Usage_Bucket**c One counter per quota metric and month
+PartnerSync_Usage_Reservation**c Idempotency and reservation settlement
+
+Both are internal operational objects. Portal users receive no direct CRUD access.
+Object definition template:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <label>PartnerSync Usage Bucket</label>
+    <nameField>
+        <displayFormat>PS-{00000000}</displayFormat>
+        <label>Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>PartnerSync Usage Buckets</pluralLabel>
+    <sharingModel>Private</sharingModel>
+    <externalSharingModel>Private</externalSharingModel>
+</CustomObject>
+
+For the reservation object, change the labels to PartnerSync Usage Reservation and PartnerSync Usage Reservations.
+Bucket fields:
+Field Definition
+Bucket_Key**c Text(100), required, unique, case-sensitive, external ID
+Metric**c Text(100), required
+Period_Start**c Date, required
+Used**c Number(18,0), required, default 0
+Reserved\_\_c Number(18,0), required, default 0
+
+Reservation fields:
+Field Definition
+Request_Key**c Text(100), required, unique, case-sensitive, external ID
+Fingerprint**c Text(64), required
+Actor**c Text(18), required
+Feature**c Text(80), required
+State**c Text(16), required
+Bucket**c Required lookup to PartnerSync_Usage_Bucket\_\_c; restrict deletion
+
+Unique-key field template:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bucket_Key__c</fullName>
+    <label>Bucket Key</label>
+    <caseSensitive>true</caseSensitive>
+    <externalId>true</externalId>
+    <length>100</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>
+
+Counter field template:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reserved__c</fullName>
+    <label>Reserved</label>
+    <defaultValue>0</defaultValue>
+    <precision>18</precision>
+    <scale>0</scale>
+    <required>true</required>
+    <type>Number</type>
+</CustomField>
+
+Lookup field:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bucket__c</fullName>
+    <label>Bucket</label>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <referenceTo>PartnerSync_Usage_Bucket__c</referenceTo>
+    <relationshipLabel>Reservations</relationshipLabel>
+    <relationshipName>Reservations</relationshipName>
+    <required>true</required>
+    <type>Lookup</type>
+</CustomField>
+
+The reservation lifecycle is:
+#chatgpt-mermaid-_r_16c_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_16c_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_16c_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_16c_ .error-icon{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_16c_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_16c_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_16c_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_16c_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_16c_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_16c_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_16c_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;}#chatgpt-mermaid-_r_16c_ p{margin:0;}#chatgpt-mermaid-_r_16c_ defs [id$="-barbEnd"]{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ g.stateGroup text{fill:rgb(83, 154, 248);stroke:none;font-size:10px;}#chatgpt-mermaid-_r_16c_ g.stateGroup text{fill:rgb(13, 13, 13);stroke:none;font-size:10px;}#chatgpt-mermaid-_r_16c_ g.stateGroup .state-title{font-weight:bolder;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ g.stateGroup rect{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_16c_ g.stateGroup line{stroke:rgb(143, 143, 143);stroke-width:1;}#chatgpt-mermaid-_r_16c_ .transition{stroke:rgb(143, 143, 143);stroke-width:1;fill:none;}#chatgpt-mermaid-_r_16c_ .stateGroup .composit{fill:transparent;border-bottom:1px;}#chatgpt-mermaid-_r_16c_ .stateGroup .alt-composit{fill:#e0e0e0;border-bottom:1px;}#chatgpt-mermaid-_r_16c_ .state-note{stroke:rgb(107, 198, 127);fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_16c_ .state-note text{fill:rgb(13, 13, 13);stroke:none;font-size:10px;}#chatgpt-mermaid-_r_16c_ .stateLabel .box{stroke:none;stroke-width:0;fill:rgb(222, 234, 251);opacity:0.5;}#chatgpt-mermaid-_r_16c_ .edgeLabel .label rect{fill:rgb(222, 234, 251);opacity:0.5;}#chatgpt-mermaid-_r_16c_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_16c_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_16c_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_16c_ .edgeLabel .label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .label div .edgeLabel{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .stateLabel text{fill:rgb(13, 13, 13);font-size:10px;font-weight:bold;}#chatgpt-mermaid-_r_16c_ .node circle.state-start{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ .node .fork-join{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ .node circle.state-end{fill:rgb(83, 154, 248);stroke:transparent;stroke-width:1.5;}#chatgpt-mermaid-_r_16c_ .end-state-inner{fill:transparent;stroke-width:1.5;}#chatgpt-mermaid-_r_16c_ .node rect{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_16c_ .node polygon{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_16c_ [id$="-barbEnd"]{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_16c_ .statediagram-cluster rect{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_16c_ .cluster-label,#chatgpt-mermaid-_r_16c_ .nodeLabel{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .statediagram-cluster rect.outer{rx:5px;ry:5px;}#chatgpt-mermaid-_r_16c_ .statediagram-state .divider{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_16c_ .statediagram-state .title-state{rx:5px;ry:5px;}#chatgpt-mermaid-_r_16c_ .statediagram-cluster.statediagram-cluster .inner{fill:transparent;}#chatgpt-mermaid-_r_16c_ .statediagram-cluster.statediagram-cluster-alt .inner{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_16c_ .statediagram-cluster .inner{rx:0;ry:0;}#chatgpt-mermaid-_r_16c_ .statediagram-state rect.basic{rx:5px;ry:5px;}#chatgpt-mermaid-_r_16c_ .statediagram-state rect.divider{stroke-dasharray:10,10;fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_16c_ .note-edge{stroke-dasharray:5;}#chatgpt-mermaid-_r_16c_ .statediagram-note rect{fill:rgb(255, 255, 255);stroke:rgb(107, 198, 127);stroke-width:1px;rx:0;ry:0;}#chatgpt-mermaid-_r_16c_ .statediagram-note rect{fill:rgb(255, 255, 255);stroke:rgb(107, 198, 127);stroke-width:1px;rx:0;ry:0;}#chatgpt-mermaid-_r_16c_ .statediagram-note text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .statediagram-note .nodeLabel{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ .statediagram .edgeLabel{color:red;}#chatgpt-mermaid-_r_16c_ [id$="-dependencyStart"],#chatgpt-mermaid-_r_16c_ [id$="-dependencyEnd"]{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);stroke-width:1;}#chatgpt-mermaid-_r_16c_ .statediagramTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_16c_ [data-look="neo"].statediagram-cluster rect{fill:rgb(222, 234, 251);stroke:url(#chatgpt-mermaid-_r_16c_-gradient);stroke-width:1;}#chatgpt-mermaid-_r_16c_ [data-look="neo"].statediagram-cluster rect.outer{rx:5px;ry:5px;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_16c_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_16c_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_16c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_16c_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_16c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_16c_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_16c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_16c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_16c_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";}RESERVEDCONSUMEDRELEASEDSuccessful consumptionConfirmednon-consumption
+/Users/owenmacpro/Downloads/mermaid-diagram (6).png
+CONSUMED<---"Successful consumption"----RESERVED----CONFIRMED----"Confirmed non-consumption"--->RELEASED
+|
+|
+
+Repeating the same settlement is harmless. Changing a terminal outcome is rejected. 6. Quota service: locking and idempotency
+PartnerSyncUsageService.cls:
+/\*\*
+
+- Internal org-wide ledger.
+-
+- Intentionally uses system context.
+- No AuraEnabled, REST, invocable or global entry points.
+-
+- Call only after module authorization.
+- Every counter mutation locks its bucket first.
+  \*/
+  public without sharing class PartnerSyncUsageService {
+  private PartnerSyncEntitlementService entitlements;
+
+      public PartnerSyncUsageService() {
+          entitlements = new PartnerSyncEntitlementService();
+      }
+
+      @TestVisible
+      private PartnerSyncUsageService(
+          PartnerSyncEntitlementService source
+      ) {
+          entitlements = source;
+      }
+
+      public class ReservationResult {
+          public Id reservationId;
+          public String state;
+          public Boolean created;
+
+          public ReservationResult(
+              PartnerSync_Usage_Reservation__c reservation,
+              Boolean isNew
+          ) {
+              reservationId = reservation.Id;
+              state = reservation.State__c;
+              created = isNew;
+          }
+      }
+
+      private static String hash(String input) {
+          return EncodingUtil.convertToHex(
+              Crypto.generateDigest(
+                  'SHA-256',
+                  Blob.valueOf(input)
+              )
+          );
+      }
+
+      private static Date monthStart() {
+          Date today = System.now().dateGmt();
+
+          return Date.newInstance(
+              today.year(),
+              today.month(),
+              1
+          );
+      }
+
+      public static String bucketKey(
+          String metric,
+          Date startDate
+      ) {
+          return metric + ':' + String.valueOf(startDate);
+      }
+
+      public ReservationResult reserve(
+          String feature,
+          String operationKey,
+          String fingerprint
+      ) {
+          if (
+              String.isBlank(operationKey)
+              || operationKey.length() > 200
+              || String.isBlank(fingerprint)
+              || !Pattern.matches(
+                  '[a-fA-F0-9]{64}',
+                  fingerprint
+              )
+          ) {
+              throw new PartnerSyncEntitlementException(
+                  'INVALID_IDEMPOTENCY_INPUT'
+              );
+          }
+
+          FeatureAccessDecision decision =
+              entitlements.evaluate(feature);
+
+          if (!decision.allowed) {
+              throw new PartnerSyncEntitlementException(
+                  decision.reasonCode
+              );
+          }
+
+          PartnerSync_Feature_Policy__mdt policy =
+              entitlements.policy(feature);
+
+          Integer ceiling = entitlements.quota(feature);
+
+          String requestKey = hash(
+              feature
+              + ':'
+              + UserInfo.getUserId()
+              + ':'
+              + operationKey
+          );
+
+          List<PartnerSync_Usage_Reservation__c> existing = [
+              SELECT Id, Bucket__c
+              FROM PartnerSync_Usage_Reservation__c
+              WHERE Request_Key__c = :requestKey
+              LIMIT 1
+          ];
+
+          String currentBucketKey = bucketKey(
+              policy.Quota_Parameter__c,
+              monthStart()
+          );
+
+          Id priorBucket = existing.isEmpty()
+              ? null
+              : existing[0].Bucket__c;
+
+          List<PartnerSync_Usage_Bucket__c> buckets;
+
+          if (priorBucket == null) {
+              buckets = [
+                  SELECT Id, Used__c, Reserved__c
+                  FROM PartnerSync_Usage_Bucket__c
+                  WHERE Bucket_Key__c = :currentBucketKey
+                  LIMIT 1
+                  FOR UPDATE
+              ];
+          } else {
+              buckets = [
+                  SELECT Id, Used__c, Reserved__c
+                  FROM PartnerSync_Usage_Bucket__c
+                  WHERE Id = :priorBucket
+                  LIMIT 1
+                  FOR UPDATE
+              ];
+          }
+
+          if (buckets.isEmpty()) {
+              throw new PartnerSyncEntitlementException(
+                  'USAGE_BUCKET_MISSING'
+              );
+          }
+
+          PartnerSync_Usage_Bucket__c bucket = buckets[0];
+
+          // Requery after acquiring the lock.
+          List<PartnerSync_Usage_Reservation__c> retries = [
+              SELECT
+                  Id,
+                  Bucket__c,
+                  State__c,
+                  Fingerprint__c
+              FROM PartnerSync_Usage_Reservation__c
+              WHERE Request_Key__c = :requestKey
+              LIMIT 1
+          ];
+
+          if (!retries.isEmpty()) {
+              if (
+                  retries[0].Fingerprint__c
+                  != fingerprint.toLowerCase()
+              ) {
+                  throw new PartnerSyncEntitlementException(
+                      'IDEMPOTENCY_CONFLICT'
+                  );
+              }
+
+              return new ReservationResult(
+                  retries[0],
+                  false
+              );
+          }
+
+          if (
+              bucket.Used__c
+              + bucket.Reserved__c
+              + 1
+              > ceiling
+          ) {
+              throw new PartnerSyncEntitlementException(
+                  'USAGE_LIMIT_REACHED'
+              );
+          }
+
+          Savepoint checkpoint = Database.setSavepoint();
+
+          try {
+              PartnerSync_Usage_Reservation__c reservation =
+                  new PartnerSync_Usage_Reservation__c(
+                      Request_Key__c = requestKey,
+                      Fingerprint__c = fingerprint.toLowerCase(),
+                      Actor__c = UserInfo.getUserId(),
+                      Feature__c = feature,
+                      Bucket__c = bucket.Id,
+                      State__c = 'RESERVED'
+                  );
+
+              insert reservation;
+
+              bucket.Reserved__c += 1;
+              update bucket;
+
+              return new ReservationResult(
+                  reservation,
+                  true
+              );
+          } catch (Exception ex) {
+              Database.rollback(checkpoint);
+              throw ex;
+          }
+      }
+
+      public static void consume(Id reservationId) {
+          settle(reservationId, 'CONSUMED');
+      }
+
+      public static void release(Id reservationId) {
+          settle(reservationId, 'RELEASED');
+      }
+
+      private static void settle(
+          Id reservationId,
+          String target
+      ) {
+          PartnerSync_Usage_Reservation__c initial = [
+              SELECT Bucket__c
+              FROM PartnerSync_Usage_Reservation__c
+              WHERE Id = :reservationId
+          ];
+
+          PartnerSync_Usage_Bucket__c bucket = [
+              SELECT Id, Used__c, Reserved__c
+              FROM PartnerSync_Usage_Bucket__c
+              WHERE Id = :initial.Bucket__c
+              FOR UPDATE
+          ];
+
+          PartnerSync_Usage_Reservation__c reservation = [
+              SELECT Id, State__c
+              FROM PartnerSync_Usage_Reservation__c
+              WHERE Id = :reservationId
+          ];
+
+          if (reservation.State__c == target) {
+              return;
+          }
+
+          if (reservation.State__c != 'RESERVED') {
+              throw new PartnerSyncEntitlementException(
+                  'RESERVATION_TERMINAL'
+              );
+          }
+
+          if (bucket.Reserved__c < 1) {
+              throw new PartnerSyncEntitlementException(
+                  'LEDGER_INCONSISTENT'
+              );
+          }
+
+          Savepoint checkpoint = Database.setSavepoint();
+
+          try {
+              bucket.Reserved__c -= 1;
+
+              if (target == 'CONSUMED') {
+                  bucket.Used__c += 1;
+              }
+
+              reservation.State__c = target;
+
+              update bucket;
+              update reservation;
+          } catch (Exception ex) {
+              Database.rollback(checkpoint);
+              throw ex;
+          }
+      }
+
+  }
+
+The service deliberately accepts neither a client-supplied quota nor a client-supplied actor.
+Its metering contract is:
+Condition Result
+New operation within quota Create one reservation
+Same operation and fingerprint Return existing reservation; created=false
+Same operation, different fingerprint IDEMPOTENCY_CONFLICT
+Used + reserved reaches limit USAGE_LIMIT_REACHED
+Missing monthly bucket USAGE_BUCKET_MISSING
+Same settlement repeated No additional counter change
+Consumed reservation released later RESERVATION_TERMINAL
+
+A returned reservation does not authorize executing the business operation again. If created=false, return or inspect the existing command/execution result.
+One reservation represents one request. Token, currency, storage and active-user metering require their own measured-unit contracts. 7. Monthly bucket provisioning
+PartnerSyncUsageProvisioner.cls:
+public without sharing class PartnerSyncUsageProvisioner {
+public static void prepareMonth(Date startDate) {
+if (startDate == null || startDate.day() != 1) {
+throw new PartnerSyncEntitlementException(
+'INVALID_PERIOD'
+);
+}
+
+        Set<String> metrics = new Set<String>();
+
+        for (
+            PartnerSync_Feature_Policy__mdt policy
+            : PartnerSync_Feature_Policy__mdt.getAll().values()
+        ) {
+            if (!String.isBlank(policy.Quota_Parameter__c)) {
+                metrics.add(policy.Quota_Parameter__c);
+            }
+        }
+
+        Set<String> keys = new Set<String>();
+
+        for (String metric : metrics) {
+            keys.add(
+                PartnerSyncUsageService.bucketKey(
+                    metric,
+                    startDate
+                )
+            );
+        }
+
+        Set<String> present = new Set<String>();
+
+        for (
+            PartnerSync_Usage_Bucket__c bucket
+            : [
+                SELECT Bucket_Key__c
+                FROM PartnerSync_Usage_Bucket__c
+                WHERE Bucket_Key__c IN :keys
+            ]
+        ) {
+            present.add(bucket.Bucket_Key__c);
+        }
+
+        List<PartnerSync_Usage_Bucket__c> missing =
+            new List<PartnerSync_Usage_Bucket__c>();
+
+        for (String metric : metrics) {
+            String key = PartnerSyncUsageService.bucketKey(
+                metric,
+                startDate
+            );
+
+            if (!present.contains(key)) {
+                missing.add(
+                    new PartnerSync_Usage_Bucket__c(
+                        Bucket_Key__c = key,
+                        Metric__c = metric,
+                        Period_Start__c = startDate,
+                        Used__c = 0,
+                        Reserved__c = 0
+                    )
+                );
+            }
+        }
+
+        // Never upsert zeros over existing counters.
+        if (!missing.isEmpty()) {
+            insert missing;
+        }
+    }
+
+}
+
+PartnerSyncUsageScheduler.cls:
+public without sharing class PartnerSyncUsageScheduler
+implements Schedulable {
+
+    public void execute(SchedulableContext context) {
+        Date today = System.now().dateGmt();
+
+        Date startDate = Date.newInstance(
+            today.year(),
+            today.month(),
+            1
+        );
+
+        PartnerSyncUsageProvisioner.prepareMonth(
+            startDate
+        );
+
+        PartnerSyncUsageProvisioner.prepareMonth(
+            startDate.addMonths(1)
+        );
+    }
+
+}
+
+Register this through your existing job-management framework. Prepare the current and next month during installation/configuration, and run the preparation regularly.
+The code uses UTC calendar months. If contracts use billing-anniversary periods, introduce a period resolver before release. 8. Apex tests
+The following tests use an injected entitlement source. They do not require live FMA provisioning to test decision logic.
+PartnerSyncEntitlementTest.cls:
+@IsTest
+private class PartnerSyncEntitlementTest {
+private class FakeSource
+implements PartnerSyncEntitlementSource {
+
+        Boolean licensed = true;
+        Boolean broken = false;
+
+        Map<String, Integer> nums =
+            new Map<String, Integer>{
+                'License_Tier' => 20,
+                'Monthly_AI_Request_Limit' => 2,
+                'Monthly_Deal_Limit' => 2
+            };
+
+        Map<String, Boolean> flags =
+            new Map<String, Boolean>();
+
+        Map<String, Date> dates =
+            new Map<String, Date>();
+
+        public Boolean currentUserLicensed() {
+            return licensed;
+        }
+
+        public Integer integerValue(String key) {
+            if (broken) {
+                throw new PartnerSyncEntitlementException(
+                    'FAKE_OUTAGE'
+                );
+            }
+
+            return nums.get(key);
+        }
+
+        public Boolean booleanValue(String key) {
+            return flags.get(key);
+        }
+
+        public Date dateValue(String key) {
+            return dates.get(key);
+        }
+
+        void enable(String prefix) {
+            flags.put(prefix + '_Enabled', true);
+
+            dates.put(
+                prefix + '_Expiry',
+                System.now().dateGmt().addDays(1)
+            );
+        }
+    }
+
+    private static void reason(
+        String expected,
+        FeatureAccessDecision actual
+    ) {
+        System.assertEquals(false, actual.allowed);
+        System.assertEquals(expected, actual.reasonCode);
+    }
+
+    @IsTest
+    static void editionsAndUnknownFailClosed() {
+        FakeSource fake = new FakeSource();
+
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(fake);
+
+        System.assert(
+            service.evaluate('MDF_CREATE').allowed
+        );
+
+        fake.nums.put('License_Tier', 10);
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('MDF_CREATE')
+        );
+
+        System.assert(
+            service.evaluate('DEAL_CREATE').allowed
+        );
+
+        fake.nums.put('License_Tier', 99);
+
+        reason(
+            'EDITION_UNPROVISIONED',
+            service.evaluate('DEAL_CREATE')
+        );
+
+        reason(
+            'UNKNOWN_FEATURE',
+            service.evaluate('invented')
+        );
+    }
+
+    @IsTest
+    static void growthAiRequiresPurchaseAndExpiry() {
+        FakeSource fake = new FakeSource();
+
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(fake);
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('AI_DEAL_SUMMARY')
+        );
+
+        fake.enable('AI');
+
+        System.assert(
+            service.evaluate('AI_DEAL_SUMMARY').allowed
+        );
+
+        fake.dates.put(
+            'AI_Expiry',
+            System.now().dateGmt()
+        );
+
+        System.assert(
+            service.evaluate('AI_DEAL_SUMMARY').allowed
+        );
+
+        fake.dates.put(
+            'AI_Expiry',
+            System.now().dateGmt().addDays(-1)
+        );
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('AI_DEAL_SUMMARY')
+        );
+
+        fake.enable('AI');
+        fake.nums.put('License_Tier', 10);
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('AI_DEAL_SUMMARY')
+        );
+    }
+
+    @IsTest
+    static void enterpriseAgentActionRequiresBothControls() {
+        FakeSource fake = new FakeSource();
+        fake.nums.put('License_Tier', 30);
+
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(fake);
+
+        reason(
+            'AI_ENTITLEMENT_INACTIVE',
+            service.evaluate('AI_DEAL_SUMMARY')
+        );
+
+        fake.enable('AI');
+
+        System.assert(
+            service.evaluate('AI_DEAL_SUMMARY').allowed
+        );
+
+        reason(
+            'AGENT_ACTIONS_INACTIVE',
+            service.evaluate('AGENT_ACTION')
+        );
+
+        fake.enable('Agentforce_Actions');
+
+        System.assert(
+            service.evaluate('AGENT_ACTION').allowed
+        );
+
+        fake.nums.put('License_Tier', 20);
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('AGENT_ACTION')
+        );
+    }
+
+    @IsTest
+    static void independentAddonExpiry() {
+        FakeSource fake = new FakeSource();
+
+        fake.enable('CoSell');
+        fake.enable('AI');
+
+        fake.dates.put(
+            'AI_Expiry',
+            System.now().dateGmt().addDays(-1)
+        );
+
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(fake);
+
+        System.assert(
+            service.evaluate('COSELL').allowed
+        );
+
+        reason(
+            'FEATURE_NOT_ENTITLED',
+            service.evaluate('AI_DEAL_SUMMARY')
+        );
+    }
+
+    @IsTest
+    static void licenceAndProviderFailuresDeny() {
+        FakeSource fake = new FakeSource();
+
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(fake);
+
+        fake.licensed = false;
+
+        reason(
+            'PACKAGE_USER_UNLICENSED',
+            service.evaluate('DEAL_CREATE')
+        );
+
+        fake.licensed = true;
+        fake.broken = true;
+
+        reason(
+            'ENTITLEMENT_UNAVAILABLE',
+            service.evaluate('DEAL_CREATE')
+        );
+    }
+
+    private class DenyScope
+        implements PartnerSyncFeatureAccessService.ScopePolicy {
+
+        public FeatureAccessDecision evaluate(
+            String feature,
+            Id recordId
+        ) {
+            return FeatureAccessDecision.deny(
+                'RECORD_SCOPE_DENIED',
+                feature
+            );
+        }
+    }
+
+    @IsTest
+    static void noScopeNeverPermits() {
+        PartnerSyncEntitlementService service =
+            new PartnerSyncEntitlementService(
+                new FakeSource()
+            );
+
+        PartnerSyncFeatureAccessService access =
+            new PartnerSyncFeatureAccessService(
+                service,
+                null
+            );
+
+        reason(
+            'SCOPE_POLICY_MISSING',
+            access.evaluate('PARTNER_WORKSPACE', null)
+        );
+
+        access = new PartnerSyncFeatureAccessService(
+            service,
+            new DenyScope()
+        );
+
+        reason(
+            'RECORD_SCOPE_DENIED',
+            access.evaluate('PARTNER_WORKSPACE', null)
+        );
+    }
+
+    @IsTest
+    static void permissionDoesNotFollowEdition() {
+        FakeSource fake = new FakeSource();
+        fake.enable('AI');
+
+        PartnerSyncFeatureAccessService access =
+            new PartnerSyncFeatureAccessService(
+                new PartnerSyncEntitlementService(fake),
+                new DenyScope()
+            );
+
+        reason(
+            'USER_NOT_PERMITTED',
+            access.evaluate('AI_DEAL_SUMMARY', null)
+        );
+    }
+
+    private static String fingerprint(String value) {
+        return EncodingUtil.convertToHex(
+            Crypto.generateDigest(
+                'SHA-256',
+                Blob.valueOf(value)
+            )
+        );
+    }
+
+    private static Date monthStart() {
+        Date today = System.now().dateGmt();
+
+        return Date.newInstance(
+            today.year(),
+            today.month(),
+            1
+        );
+    }
+
+    private static PartnerSyncUsageService meter() {
+        return new PartnerSyncUsageService(
+            new PartnerSyncEntitlementService(
+                new FakeSource()
+            )
+        );
+    }
+
+    @IsTest
+    static void reservationRetryAndConflict() {
+        PartnerSyncUsageProvisioner.prepareMonth(
+            monthStart()
+        );
+
+        PartnerSyncUsageService service = meter();
+        String fp = fingerprint('payload');
+
+        PartnerSyncUsageService.ReservationResult first =
+            service.reserve(
+                'DEAL_CREATE',
+                'operation-1',
+                fp
+            );
+
+        System.assertEquals(true, first.created);
+
+        PartnerSyncUsageService.ReservationResult retry =
+            service.reserve(
+                'DEAL_CREATE',
+                'operation-1',
+                fp
+            );
+
+        System.assertEquals(
+            first.reservationId,
+            retry.reservationId
+        );
+
+        System.assertEquals(false, retry.created);
+
+        try {
+            service.reserve(
+                'DEAL_CREATE',
+                'operation-1',
+                fingerprint('different')
+            );
+
+            System.assert(false);
+        } catch (PartnerSyncEntitlementException ex) {
+            System.assertEquals(
+                'IDEMPOTENCY_CONFLICT',
+                ex.getMessage()
+            );
+        }
+
+        PartnerSyncUsageService.consume(
+            first.reservationId
+        );
+
+        PartnerSyncUsageService.consume(
+            first.reservationId
+        );
+
+        PartnerSync_Usage_Bucket__c bucket = [
+            SELECT Used__c, Reserved__c
+            FROM PartnerSync_Usage_Bucket__c
+            WHERE Metric__c = 'Monthly_Deal_Limit'
+        ];
+
+        System.assertEquals(1, bucket.Used__c);
+        System.assertEquals(0, bucket.Reserved__c);
+    }
+
+    @IsTest
+    static void ceilingAndRelease() {
+        PartnerSyncUsageProvisioner.prepareMonth(
+            monthStart()
+        );
+
+        PartnerSyncUsageService service = meter();
+        String fp = fingerprint('same');
+
+        PartnerSyncUsageService.ReservationResult first =
+            service.reserve('DEAL_CREATE', 'a', fp);
+
+        service.reserve('DEAL_CREATE', 'b', fp);
+
+        try {
+            service.reserve('DEAL_CREATE', 'c', fp);
+            System.assert(false);
+        } catch (PartnerSyncEntitlementException ex) {
+            System.assertEquals(
+                'USAGE_LIMIT_REACHED',
+                ex.getMessage()
+            );
+        }
+
+        PartnerSyncUsageService.release(
+            first.reservationId
+        );
+
+        PartnerSyncUsageService.release(
+            first.reservationId
+        );
+
+        System.assertEquals(
+            'RELEASED',
+            service.reserve('DEAL_CREATE', 'a', fp).state
+        );
+
+        System.assert(
+            service.reserve('DEAL_CREATE', 'c', fp).created
+        );
+
+        try {
+            PartnerSyncUsageService.consume(
+                first.reservationId
+            );
+
+            System.assert(false);
+        } catch (PartnerSyncEntitlementException ex) {
+            System.assertEquals(
+                'RESERVATION_TERMINAL',
+                ex.getMessage()
+            );
+        }
+    }
+
+    @IsTest
+    static void missingBucketAndInvalidQuotaDeny() {
+        try {
+            meter().reserve(
+                'DEAL_CREATE',
+                'a',
+                fingerprint('x')
+            );
+
+            System.assert(false);
+        } catch (PartnerSyncEntitlementException ex) {
+            System.assertEquals(
+                'USAGE_BUCKET_MISSING',
+                ex.getMessage()
+            );
+        }
+
+        PartnerSyncUsageProvisioner.prepareMonth(
+            monthStart()
+        );
+
+        FakeSource fake = new FakeSource();
+        fake.nums.put('Monthly_Deal_Limit', 0);
+
+        PartnerSyncUsageService service =
+            new PartnerSyncUsageService(
+                new PartnerSyncEntitlementService(fake)
+            );
+
+        try {
+            service.reserve(
+                'DEAL_CREATE',
+                'a',
+                fingerprint('x')
+            );
+
+            System.assert(false);
+        } catch (PartnerSyncEntitlementException ex) {
+            System.assertEquals(
+                'USAGE_LIMIT_REACHED',
+                ex.getMessage()
+            );
+        }
+    }
+
+    @IsTest
+    static void monthRolloverDoesNotChargeRetry() {
+        Date previous = monthStart().addMonths(-1);
+
+        PartnerSyncUsageProvisioner.prepareMonth(previous);
+        PartnerSyncUsageProvisioner.prepareMonth(monthStart());
+
+        PartnerSync_Usage_Bucket__c oldBucket = [
+            SELECT Id, Reserved__c
+            FROM PartnerSync_Usage_Bucket__c
+            WHERE Metric__c = 'Monthly_Deal_Limit'
+            AND Period_Start__c = :previous
+        ];
+
+        String fp = fingerprint('x');
+
+        String key = fingerprint(
+            'DEAL_CREATE:'
+            + UserInfo.getUserId()
+            + ':old'
+        );
+
+        insert new PartnerSync_Usage_Reservation__c(
+            Request_Key__c = key,
+            Fingerprint__c = fp,
+            Actor__c = UserInfo.getUserId(),
+            Feature__c = 'DEAL_CREATE',
+            State__c = 'RESERVED',
+            Bucket__c = oldBucket.Id
+        );
+
+        oldBucket.Reserved__c = 1;
+        update oldBucket;
+
+        PartnerSyncUsageService.ReservationResult replay =
+            meter().reserve(
+                'DEAL_CREATE',
+                'old',
+                fp
+            );
+
+        System.assertEquals(false, replay.created);
+
+        PartnerSyncUsageService.consume(
+            replay.reservationId
+        );
+
+        PartnerSync_Usage_Bucket__c currentBucket = [
+            SELECT Used__c, Reserved__c
+            FROM PartnerSync_Usage_Bucket__c
+            WHERE Metric__c = 'Monthly_Deal_Limit'
+            AND Period_Start__c = :monthStart()
+        ];
+
+        System.assertEquals(0, currentBucket.Used__c);
+        System.assertEquals(0, currentBucket.Reserved__c);
+    }
+
+    @IsTest
+    static void provisioningDoesNotResetUsage() {
+        PartnerSyncUsageProvisioner.prepareMonth(
+            monthStart()
+        );
+
+        PartnerSyncUsageService service = meter();
+
+        PartnerSyncUsageService.consume(
+            service.reserve(
+                'DEAL_CREATE',
+                'a',
+                fingerprint('x')
+            ).reservationId
+        );
+
+        PartnerSyncUsageProvisioner.prepareMonth(
+            monthStart()
+        );
+
+        System.assertEquals(
+            1,
+            [
+                SELECT Used__c
+                FROM PartnerSync_Usage_Bucket__c
+                WHERE Metric__c = 'Monthly_Deal_Limit'
+            ].Used__c
+        );
+    }
+
+}
+
+These tests exercise logical retries, but true simultaneous transactions require an org-level concurrency test. Run parallel requests against the final remaining quota unit and verify that exactly one new reservation succeeds. 9. Existing permission-set merge instructions
+Create the custom permissions referenced by the feature catalogue.
+Example PS_Use_AI.customPermission-meta.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>PartnerSync Use AI</label>
+    <description>
+        Authorizes AI use after commercial entitlement
+        and business-scope checks succeed.
+    </description>
+</CustomPermission>
+
+Create equivalent definitions for:
+PS_Use_Deals
+PS_Use_Content
+PS_Use_Leads
+PS_Use_MDF
+PS_Use_Analytics
+PS_Use_CoSell
+PS_Use_Integrations
+PS_Use_AI
+PS_Use_Agent_Actions
+
+Merge these entries into the existing permission-set files:
+Existing capability permission set Custom permissions to merge
+PartnerSync_Deal_Registration_User PS_Use_Deals
+PartnerSync_MDF_User PS_Use_MDF
+PartnerSync_Content_Hub_User PS_Use_Content
+PartnerSync_Analytics_User PS_Use_Analytics
+PartnerSync_Internal_Channel_Manager Deals, MDF, Content, Analytics, Leads, Co-sell as permitted by that persona
+PartnerSync_Internal_Admin PS_Use_Integrations, where integration execution is part of its existing authority
+PartnerSync_AI_User PS_Use_AI
+PartnerSync_AI_Admin PS_Use_AI, plus existing AI configuration permissions
+
+For example, merge this child element into PartnerSync_Deal_Registration_User.permissionset-meta.xml:
+<customPermissions>
+<enabled>true</enabled>
+<name>PS_Use_Deals</name>
+</customPermissions>
+
+For AI:
+<customPermissions>
+<enabled>true</enabled>
+<name>PS_Use_AI</name>
+</customPermissions>
+
+Apply these rules:
+
+1. Preserve the existing permission set’s class, object and field permissions.
+2. Preserve existing permission-set groups and muting.
+3. Reuse Sprint 43 AI sets if already present.
+4. Create an AI capability set only if it is genuinely missing.
+5. Grant PS_Use_Agent_Actions only to explicitly authorized action operators.
+6. Keep ledger objects inaccessible to portal users.
+7. Do not create Core/Growth/Enterprise permission sets.
+   AI administration does not automatically grant deal approval, MDF approval or financial-action authority.
+8. Business-service integration
+   Use this sequence inside the existing application-service boundary:
+   Commercial entitlement
+   → Custom permission
+   → Module scope and business policy
+   → Quota reservation
+   → Business operation
+   → Reservation settlement
+
+The following is integration pseudocode: ExistingDealScopePolicy and the command/result names represent your existing module implementation.
+PartnerSyncFeatureAccessService access =
+new PartnerSyncFeatureAccessService(
+new ExistingDealScopePolicy()
+);
+
+access.requireAccess(
+PartnerSyncFeatureKey.DEAL_CREATE,
+customerAccountId
+);
+
+PartnerSyncUsageService.ReservationResult reservation =
+new PartnerSyncUsageService().reserve(
+PartnerSyncFeatureKey.DEAL_CREATE,
+serverOperationKey,
+canonicalPayloadSha256
+);
+
+if (!reservation.created) {
+// Return the original command/execution outcome.
+// Do not execute the business operation again.
+return existingCommandResult;
+}
+
+existingDealCommandService.execute(command);
+
+PartnerSyncUsageService.consume(
+reservation.reservationId
+);
+
+The canonical payload fingerprint must cover the operation, relevant inputs, record IDs and partner-account scope.
+Existing service Entitlement gate Module-specific checks
+DealRegistrationService DEAL_CREATE Partner/customer scope, CRUD/FLS, valid command/state
+MDFRequestService MDF_CREATE Partner scope, programme eligibility, budget
+LeadDistributionService LEAD_DISTRIBUTE Routing authority, recipient eligibility
+ContentHubService CONTENT_READ Content/category/region/partner access
+PartnerPerformanceService ANALYTICS_READ Portfolio and snapshot visibility
+AIOrchestrationService AI summary/narrative feature Authorized grounding, provider, budget, kill switch
+AI action gateway AGENT_ACTION Current action authority, bounded policy, required approval
+
+Synchronous transactions: reservation, business mutation and consumption should commit together. The caller owns rollback for technical failure.
+Expected business rejection: release the reservation and return the existing typed business outcome while preserving validation findings.
+Asynchronous AI:
+
+1. Authorize the initiating user.
+2. Reserve usage.
+3. Create the durable execution/outbox record and enqueue work.
+4. Commit.
+5. In the worker, deduplicate and reauthorize using a server-owned initiating-actor context.
+6. Make the provider callout before DML/locking in that worker transaction.
+7. Persist the provider outcome and settle the reservation.
+   Do not assume the worker’s UserInfo represents the original user. The asynchronous execution-context adapter requires integration with your existing framework.
+   A provider timeout with an unknown outcome must remain reserved until reconciled. Automatically releasing it could permit uncounted consumption.
+8. Separate LWR deployment tooling
+   Salesforce documents that ExperienceBundle does not support managed packaging; its 2GP component guidance also excludes enhanced LWR sites from the relevant DigitalExperienceBundle packaging use case. Deploy site metadata separately. developer.salesforce.com
+   site-kit/sfdx-project.json:
+   {
+   "packageDirectories": [
+   {
+   "path": "force-app",
+   "default": true
+   }
+   ],
+   "sourceApiVersion": "65.0"
+   }
+
+Keep the site kit outside the managed package’s source root.
+scripts/partner_sync.py:
+#!/usr/bin/env python3"""Explicit-target Salesforce CLI wrapper."""import argparseimport datetimeimport jsonimport pathlibimport subprocessimport sysROOT = pathlib.Path(**file**).resolve().parents[1]parser = argparse.ArgumentParser()parser.add_argument( "action", choices=[ "install", "validate-core", "test", "prepare-usage", "retrieve-site", "validate-site", "deploy-site", "publish-site", ],)parser.add_argument("--org", required=True)parser.add_argument("--package-id")parser.add_argument("--site-name")parser.add_argument( "--site-type", choices=["lwr", "enhanced-lwr"],)parser.add_argument(
+
+scripts/prepare-usage.apex:
+Date today = System.now().dateGmt();
+
+Date first = Date.newInstance(
+today.year(),
+today.month(),
+1
+);
+
+PartnerSyncUsageProvisioner.prepareMonth(first);
+
+PartnerSyncUsageProvisioner.prepareMonth(
+first.addMonths(1)
+);
+
+The setup script is for the package-development context. In a subscriber org, invoke these internal classes through the reviewed package installation/admin workflow. They are intentionally not global. 12. Installation guide
+Perform installation in this order:
+
+1. Merge the source into the existing namespaced PartnerSync project.
+2. Reconcile the proposed catalogue and ledger objects against existing metadata.
+3. Validate and run Apex tests in the development org.
+4. Build the managed-package version using the existing 2GP pipeline.
+5. Install in a subscriber test org.
+6. Provision LMA/FMA entitlements.
+7. Merge and assign capability permissions.
+8. Prepare usage buckets and register the existing scheduler integration.
+9. Deploy and publish the LWR site separately.
+10. Run subscriber-tier and cross-partner access tests.
+    Development validation:
+    python3 scripts/partner_sync.py validate-core \
+     --org PS_DEV
+
+python3 scripts/partner_sync.py test \
+ --org PS_DEV
+
+python3 scripts/partner_sync.py prepare-usage \
+ --org PS_DEV
+
+The validate-core action is a dry run; it does not install the source. Run the tests after deploying the source into the development org through your normal workflow.
+Package installation:
+python3 scripts/partner_sync.py install \
+ --org PS_CUSTOMER \
+ --package-id ACTUAL_04T_PACKAGE_VERSION_ID
+
+Replace the package argument with the actual ID beginning 04t.
+Retrieve a non-enhanced LWR site:
+python3 scripts/partner_sync.py retrieve-site \
+ --org PS_SITE_SOURCE \
+ --site-name ActualSiteApiName \
+ --site-type lwr
+
+For enhanced LWR:
+python3 scripts/partner_sync.py retrieve-site \
+ --org PS_SITE_SOURCE \
+ --site-name ActualSiteApiName \
+ --site-type enhanced-lwr
+
+The retrieval action fetches the primary bundle. Also retrieve the actual dependencies, including the applicable:
+
+- Network
+- CustomSite
+- DigitalExperienceConfig for enhanced LWR
+- Navigation and branding metadata
+- Other referenced components
+  Use their actual API names; they need not match the bundle name.
+  Create or identify the destination site through the supported provisioning flow, adapt organisation-specific references, then validate and deploy:
+  python3 scripts/partner_sync.py validate-site \
+   --org PS_CUSTOMER
+
+python3 scripts/partner_sync.py deploy-site \
+ --org PS_CUSTOMER
+
+Publish explicitly:
+python3 scripts/partner_sync.py publish-site \
+ --org PS_CUSTOMER \
+ --site-name ActualSiteName \
+ --confirmed-site-name ActualSiteName
+
+The tooling does not fabricate PartnerSync pages, configure customer authentication or automatically create the destination site. 13. Licensing operations guide
+Concern Operational rule
+Base licence Govern through supported LMA operations
+Edition Set License_Tier in FMA
+Add-ons Set each enabled flag and its own expiry
+Enterprise AI Activate AI only after governance/provider setup
+Quotas Provision explicit nonnegative limits
+Permissions Assign existing persona/capability sets
+Platform licences Verify separately from PartnerSync entitlements
+Provisioning completion Verify effective values in the subscriber org
+
+Important implementation rules:
+
+- FMA grants commercial rights; it is not the transactional usage ledger.
+- FMA propagation is not an instantaneous revocation mechanism.
+- A local operational switch can disable an entitled feature.
+- A local operational switch cannot grant a missing entitlement.
+- Do not promise a custom grace/read-only experience after native package suspension; Salesforce can block managed code before your own gate runs.
+- Keep settlement and reconciliation able to complete previously accepted work.
+- Local usage records provide operational enforcement. Independently verifiable billing may also require provider/vendor-side reconciliation.
+  For quota changes, a lowered ceiling below existing consumption blocks additional requests. It must not reset prior consumption.
+
+14. Integration guide
+    The remaining integration work is concrete:
+    Work Required change
+    Existing feature catalogue Reuse or migrate to one protected commercial catalogue
+    Existing business services Add access gate before protected operations
+    Module access policies Implement account scope, CRUD/FLS and business eligibility
+    Existing permission sets Merge custom permissions without replacing current rights
+    AI execution framework Persist initiating actor, provider request ID and reservation ID
+    Existing usage reporting Aggregate terminal reservations into current reporting objects
+    Active partner-user capacity Define counted users and enforce during activation/deactivation
+    Scheduler framework Register one bucket-preparation job
+    LWR source Retrieve actual pages and dependencies
+
+Preserve the existing rule that broad subscriber OWD must not expose another partner’s records. Commercial licensing never substitutes for data security.
+For production throughput, benchmark the shared monthly bucket lock. This initial service reserves one request at a time; large bulk workloads require a separately designed batch-reservation contract. 15. Upgrade guide
+Use the following sequence for existing customers:
+
+1. Inventory their current edition, add-ons, permission assignments and usage.
+2. Map any historical edition names explicitly to Core/Growth/Enterprise.
+3. Merge capability permissions into existing sets and preserve group membership.
+4. Install the candidate package in a subscriber test environment.
+5. Provision new FMA values intentionally.
+6. Reconcile current-period consumption before enabling the new ledger.
+7. Switch business services to the new enforcement boundary.
+8. Upgrade site metadata separately, preserving customer branding and configuration.
+9. Publish and run authenticated role/tier tests.
+10. Record the package version and site revision together.
+    Do not reset usage to zero during migration. Do not delete AI_Usage_Limit\_\_mdt or existing public APIs merely because a newer design supersedes them; migrate references and values after inspecting the repository.
+    Managed-package rollback generally requires a forward fix. Preserve the previous site revision for a separately reviewed site rollback.
+11. Validation status
+    The source prepared for this implementation passed:
+    Check Result
+    Local XML/JSON/Python integrity checks Passed
+    Metadata references and protected catalogue checks Passed
+    Apex grammar parsing: 12 classes plus setup script Passed
+    Deployment-script rejection of missing/invalid inputs Passed
+
+Salesforce compilation, Apex test execution, coverage, package creation, FMA propagation and subscriber installation still require an authenticated org.
+The remaining release tests must also cover real concurrent reservations, positive permission assignments, initiating-user authorization in asynchronous jobs, active partner-user capacity, and the actual LWR site installation/upgrade.

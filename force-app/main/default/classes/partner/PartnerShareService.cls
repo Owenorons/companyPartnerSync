@@ -403,6 +403,8 @@ public with sharing class PartnerShareService {
     List<Id> mdfShareRegistryIds = new List<Id>();
     List<Deal_Implementation__Share> implementationShares = new List<Deal_Implementation__Share>();
     List<Id> implementationShareRegistryIds = new List<Id>();
+    List<Customer_Success_Engagement__Share> customerSuccessShares = new List<Customer_Success_Engagement__Share>();
+    List<Id> customerSuccessShareRegistryIds = new List<Id>();
 
     for (Partner_Record_Share__c registry : registries) {
       if (registry.Target_Object__c == 'Deal Registration') {
@@ -435,6 +437,16 @@ public with sharing class PartnerShareService {
         share.RowCause = Schema.Deal_Implementation__Share.RowCause.Partner_Record_Share__c;
         implementationShares.add(share);
         implementationShareRegistryIds.add(registry.Id);
+      } else if (registry.Target_Object__c == 'Customer Success Engagement') {
+        Customer_Success_Engagement__Share share = new Customer_Success_Engagement__Share();
+        share.ParentId = (Id) registry.Target_Record_Id__c;
+        share.UserOrGroupId = (Id) registry.Partner_Group_Id__c;
+        share.AccessLevel = PartnerShareDomain.toSalesforceAccessLevel(
+          registry.Access_Level__c
+        );
+        share.RowCause = Schema.Customer_Success_Engagement__Share.RowCause.Partner_Record_Share__c;
+        customerSuccessShares.add(share);
+        customerSuccessShareRegistryIds.add(registry.Id);
       } else {
         throw new PartnerSyncHandledException(
           'Sharing is not yet supported for target object: ' +
@@ -490,6 +502,25 @@ public with sharing class PartnerShareService {
       }
     }
 
+    if (!customerSuccessShares.isEmpty()) {
+      List<Database.SaveResult> results = Database.insert(
+        customerSuccessShares,
+        false
+      );
+      for (Integer i = 0; i < results.size(); i++) {
+        if (results[i].isSuccess()) {
+          shareIdByRegistryId.put(
+            customerSuccessShareRegistryIds[i],
+            results[i].getId()
+          );
+        } else if (!isInvalidFieldError(results[i])) {
+          throw new PartnerSyncHandledException(
+            results[i].getErrors()[0].getMessage()
+          );
+        }
+      }
+    }
+
     return shareIdByRegistryId;
   }
 
@@ -516,6 +547,7 @@ public with sharing class PartnerShareService {
     List<Id> dealShareIds = new List<Id>();
     List<Id> mdfShareIds = new List<Id>();
     List<Id> implementationShareIds = new List<Id>();
+    List<Id> customerSuccessShareIds = new List<Id>();
 
     for (Partner_Record_Share__c registry : registries) {
       if (String.isBlank(registry.Salesforce_Share_Id__c)) {
@@ -533,6 +565,8 @@ public with sharing class PartnerShareService {
         mdfShareIds.add((Id) registry.Salesforce_Share_Id__c);
       } else if (registry.Target_Object__c == 'Deal Implementation') {
         implementationShareIds.add((Id) registry.Salesforce_Share_Id__c);
+      } else if (registry.Target_Object__c == 'Customer Success Engagement') {
+        customerSuccessShareIds.add((Id) registry.Salesforce_Share_Id__c);
       }
     }
 
@@ -544,6 +578,9 @@ public with sharing class PartnerShareService {
     }
     if (!implementationShareIds.isEmpty()) {
       Database.delete(implementationShareIds, false);
+    }
+    if (!customerSuccessShareIds.isEmpty()) {
+      Database.delete(customerSuccessShareIds, false);
     }
   }
 
@@ -561,6 +598,8 @@ public with sharing class PartnerShareService {
       return createMdfShare(registry);
     } else if (registry.Target_Object__c == 'Deal Implementation') {
       return createImplementationShare(registry);
+    } else if (registry.Target_Object__c == 'Customer Success Engagement') {
+      return createCustomerSuccessShare(registry);
     } else {
       throw new PartnerSyncHandledException(
         'Sharing is not yet supported for target object: ' +
@@ -632,6 +671,28 @@ public with sharing class PartnerShareService {
   }
 
   @SuppressWarnings('PMD.ApexCRUDViolation')
+  private static Id createCustomerSuccessShare(
+    Partner_Record_Share__c registry
+  ) {
+    Customer_Success_Engagement__Share share = new Customer_Success_Engagement__Share();
+    share.ParentId = (Id) registry.Target_Record_Id__c;
+    share.UserOrGroupId = (Id) registry.Partner_Group_Id__c;
+    share.AccessLevel = PartnerShareDomain.toSalesforceAccessLevel(
+      registry.Access_Level__c
+    );
+    share.RowCause = Schema.Customer_Success_Engagement__Share.RowCause.Partner_Record_Share__c;
+
+    try {
+      insert share;
+    } catch (DmlException ex) {
+      if (ex.getDmlStatusCode(0) == 'INVALID_FIELD_FOR_INSERT_UPDATE')
+        return null;
+      throw ex;
+    }
+    return share.Id;
+  }
+
+  @SuppressWarnings('PMD.ApexCRUDViolation')
   private static void deleteSalesforceShare(Partner_Record_Share__c registry) {
     // A record can be shared with more than one partner using the same Apex
     // sharing reason. Scope the delete to the group for this registry entry;
@@ -649,6 +710,11 @@ public with sharing class PartnerShareService {
         return;
       } else if (registry.Target_Object__c == 'Deal Implementation') {
         delete new Deal_Implementation__Share(
+          Id = (Id) registry.Salesforce_Share_Id__c
+        );
+        return;
+      } else if (registry.Target_Object__c == 'Customer Success Engagement') {
+        delete new Customer_Success_Engagement__Share(
           Id = (Id) registry.Salesforce_Share_Id__c
         );
         return;
@@ -687,6 +753,15 @@ public with sharing class PartnerShareService {
           ParentId = :((Id) registry.Target_Record_Id__c)
           AND UserOrGroupId = :partnerGroupId
           AND RowCause = :Schema.Deal_Implementation__Share.RowCause.Partner_Record_Share__c
+      ];
+    } else if (registry.Target_Object__c == 'Customer Success Engagement') {
+      delete [
+        SELECT Id
+        FROM Customer_Success_Engagement__Share
+        WHERE
+          ParentId = :((Id) registry.Target_Record_Id__c)
+          AND UserOrGroupId = :partnerGroupId
+          AND RowCause = :Schema.Customer_Success_Engagement__Share.RowCause.Partner_Record_Share__c
       ];
     } else {
       throw new PartnerSyncHandledException(

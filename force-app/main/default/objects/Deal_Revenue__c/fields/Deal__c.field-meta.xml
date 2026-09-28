@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Deal__c</fullName>
+    <description
+  >Nullable, not required - an imported revenue event that couldn't be automatically matched to a deal is inserted with no Deal__c and routed to Revenue_Reconciliation__c instead of guessing (doc Sprint 41 §41.15).</description>
+    <label>Deal</label>
+    <type>Lookup</type>
+    <referenceTo>Deal_Registration__c</referenceTo>
+    <relationshipLabel>Deal Revenues</relationshipLabel>
+    <relationshipName>Deal_Revenues</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

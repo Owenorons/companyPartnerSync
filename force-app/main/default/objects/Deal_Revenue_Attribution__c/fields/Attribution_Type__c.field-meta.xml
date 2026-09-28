@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Attribution_Type__c</fullName>
+    <description
+  >Known Adaptation #6 - a new field, separate from Deal_Registration__c.Attribution_Type__c (Sprint 39's different, deal-level concept).</description>
+    <label>Attribution Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sourced</fullName>
+                <default>true</default>
+                <label>Sourced</label>
+            </value>
+            <value>
+                <fullName>Influenced</fullName>
+                <default>false</default>
+                <label>Influenced</label>
+            </value>
+            <value>
+                <fullName>Co-Sell</fullName>
+                <default>false</default>
+                <label>Co-Sell</label>
+            </value>
+            <value>
+                <fullName>Referral</fullName>
+                <default>false</default>
+                <label>Referral</label>
+            </value>
+            <value>
+                <fullName>Implementation</fullName>
+                <default>false</default>
+                <label>Implementation</label>
+            </value>
+            <value>
+                <fullName>Renewal</fullName>
+                <default>false</default>
+                <label>Renewal</label>
+            </value>
+            <value>
+                <fullName>Expansion</fullName>
+                <default>false</default>
+                <label>Expansion</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Revenue_Type__c</fullName>
+    <label>Revenue Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Booking</fullName>
+                <default>true</default>
+                <label>Booking</label>
+            </value>
+            <value>
+                <fullName>Recognised Revenue</fullName>
+                <default>false</default>
+                <label>Recognised Revenue</label>
+            </value>
+            <value>
+                <fullName>Invoice</fullName>
+                <default>false</default>
+                <label>Invoice</label>
+            </value>
+            <value>
+                <fullName>Payment</fullName>
+                <default>false</default>
+                <label>Payment</label>
+            </value>
+            <value>
+                <fullName>Credit</fullName>
+                <default>false</default>
+                <label>Credit</label>
+            </value>
+            <value>
+                <fullName>Refund</fullName>
+                <default>false</default>
+                <label>Refund</label>
+            </value>
+            <value>
+                <fullName>Adjustment</fullName>
+                <default>false</default>
+                <label>Adjustment</label>
+            </value>
+            <value>
+                <fullName>Reversal</fullName>
+                <default>false</default>
+                <label>Reversal</label>
+            </value>
+            <value>
+                <fullName>Renewal</fullName>
+                <default>false</default>
+                <label>Renewal</label>
+            </value>
+            <value>
+                <fullName>Expansion</fullName>
+                <default>false</default>
+                <label>Expansion</label>
+            </value>
+            <value>
+                <fullName>Services Revenue</fullName>
+                <default>false</default>
+                <label>Services Revenue</label>
+            </value>
+            <value>
+                <fullName>Subscription Revenue</fullName>
+                <default>false</default>
+                <label>Subscription Revenue</label>
+            </value>
+            <value>
+                <fullName>Usage Revenue</fullName>
+                <default>false</default>
+                <label>Usage Revenue</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

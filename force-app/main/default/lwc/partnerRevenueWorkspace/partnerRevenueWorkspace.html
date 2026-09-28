@@ -1,0 +1,103 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Revenue</p>
+        <h1>Revenue & Incentives</h1>
+        <p>Confirmed revenue attributed to you and your incentive status.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state message="Loading revenue..."></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <section class="slds-var-m-bottom_large">
+      <h3>Revenue</h3>
+      <template if:true={hasRevenues}>
+        <div class="queue-grid">
+          <template for:each={revenues} for:item="revenue">
+            <article key={revenue.revenueId} class="queue-card">
+              <div class="slds-grid_align-spread slds-grid">
+                <div>
+                  <p class="slds-text-body_small team-label">
+                    {revenue.revenueType}
+                  </p>
+                  <h2>{revenue.netAmount} {revenue.currencyIsoCode}</h2>
+                </div>
+                <c-ps-status-badge
+                  label={revenue.status}
+                  variant="info"
+                ></c-ps-status-badge>
+              </div>
+              <div class="slds-var-m-top_medium team-actions">
+                <button
+                  class="dispute"
+                  data-id={revenue.revenueId}
+                  onclick={handleOpenDispute}
+                >
+                  Dispute
+                </button>
+              </div>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasRevenues}>
+        <c-ps-empty-state
+          title="No revenue yet"
+          message="Confirmed revenue attributed to your organisation will appear here."
+        >
+        </c-ps-empty-state>
+      </template>
+    </section>
+
+    <section>
+      <h3>Incentives</h3>
+      <template if:true={hasIncentives}>
+        <div class="queue-grid">
+          <template for:each={incentives} for:item="incentive">
+            <article key={incentive.incentiveId} class="queue-card">
+              <div class="slds-grid_align-spread slds-grid">
+                <div>
+                  <p class="slds-text-body_small team-label">
+                    {incentive.incentiveType}
+                  </p>
+                  <h2>
+                    {incentive.calculatedAmount} {incentive.currencyIsoCode}
+                  </h2>
+                </div>
+                <c-ps-status-badge
+                  label={incentive.status}
+                  variant="success"
+                ></c-ps-status-badge>
+              </div>
+              <template if:true={incentive.canSubmitClaim}>
+                <div class="slds-var-m-top_medium team-actions">
+                  <button
+                    class="accept"
+                    data-id={incentive.incentiveId}
+                    onclick={handleSubmitClaim}
+                  >
+                    Submit Claim
+                  </button>
+                </div>
+              </template>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasIncentives}>
+        <c-ps-empty-state
+          title="No incentives yet"
+          message="Incentive eligibility and status will appear here once revenue is attributed."
+        >
+        </c-ps-empty-state>
+      </template>
+    </section>
+  </div>
+</template>

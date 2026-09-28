@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Internal_Customer_Success_Owner__c</fullName>
+    <label>Internal Customer Success Owner</label>
+    <type>Lookup</type>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel
+  >Customer Success Engagements (CS Owner)</relationshipLabel>
+    <relationshipName>Owned_Customer_Success_Engagements</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

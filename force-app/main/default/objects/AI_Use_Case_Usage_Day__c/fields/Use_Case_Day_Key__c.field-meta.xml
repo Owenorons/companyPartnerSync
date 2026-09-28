@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Use_Case_Day_Key__c</fullName>
+    <description
+  >Composite unique key: Use_Case_Key__c + '|' + the UTC day key (e.g. 'PortfolioNarrative|2026-09-28'). Mirrors AI_Usage_Day__c.Day_Key__c's own unique-external-id-arbitrates-concurrent-first-request pattern, but scoped per use case instead of tenant-wide, since Day_Key__c alone is already unique on AI_Usage_Day__c and can't be reused for a second, per-use-case counter.</description>
+    <caseSensitive>false</caseSensitive>
+    <externalId>true</externalId>
+    <label>Use Case Day Key</label>
+    <length>120</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>View Portfolio Intelligence</label>
+  <description
+  >Allows an internal user to view partner portfolio snapshots and AI recommendations on the Customer Success Workbench's portfolio panel.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

@@ -1,0 +1,88 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Executive Command Center</h1>
+        <p>Org-wide partner program health, at a glance.</p>
+      </div>
+      <lightning-button
+        type="button"
+        class="action-button-export"
+        label="Export CSV"
+        variant="neutral"
+        disabled={exporting}
+        onclick={handleExport}
+      >
+      </lightning-button>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading the executive snapshot..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <template if:true={hasSnapshot}>
+        <template if:true={hasMetricTiles}>
+          <section class="metrics-grid">
+            <template for:each={metricTiles} for:item="tile">
+              <c-ps-dashboard-metric-card
+                key={tile.key}
+                label={tile.label}
+                value={tile.value}
+                icon-name="utility:metrics"
+                icon-alternative-text={tile.label}
+              >
+              </c-ps-dashboard-metric-card>
+            </template>
+          </section>
+        </template>
+
+        <template if:true={hasNarrative}>
+          <section class="slds-var-m-top_large narrative-section">
+            <h2 class="section-title">Narrative</h2>
+            <p class="narrative-text">{narrative}</p>
+          </section>
+        </template>
+
+        <section class="slds-var-m-top_large">
+          <h2 class="section-title">Trend</h2>
+          <template if:true={hasTrend}>
+            <div class="queue-grid">
+              <template for:each={trendRows} for:item="row">
+                <article key={row.key} class="queue-card">
+                  <p class="slds-text-body_small queue-label">
+                    {row.snapshotDate}
+                  </p>
+                  <h2>{row.activePartnerCount} active partners</h2>
+                  <p>Average health {row.averageHealthScoreLabel}</p>
+                </article>
+              </template>
+            </div>
+          </template>
+          <template if:false={hasTrend}>
+            <c-ps-empty-state
+              title="No trend yet"
+              message="Historical executive snapshots will appear here once computed."
+            >
+            </c-ps-empty-state>
+          </template>
+        </section>
+      </template>
+
+      <template if:false={hasSnapshot}>
+        <c-ps-empty-state
+          title="No snapshot yet"
+          message="An executive snapshot has not been computed yet."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

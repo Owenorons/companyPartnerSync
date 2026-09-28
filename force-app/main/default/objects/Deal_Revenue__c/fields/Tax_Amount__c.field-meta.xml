@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tax_Amount__c</fullName>
+    <description
+  >Schema-only (Known Adaptation #11) - no tax calculation logic. Populated only if the source system supplies it.</description>
+    <label>Tax Amount</label>
+    <precision>18</precision>
+    <scale>2</scale>
+    <type>Currency</type>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

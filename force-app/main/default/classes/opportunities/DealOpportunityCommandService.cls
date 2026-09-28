@@ -17,6 +17,14 @@ public without sharing class DealOpportunityCommandService {
   private static final String LINK_PERMISSION = 'PartnerSync_Link_Deal_Opportunity';
   private static final String UNLINK_PERMISSION = 'PartnerSync_Unlink_Deal_Opportunity';
 
+  // CMDT org-singleton - the shipped Default row is 'Link Existing', so a
+  // test exercising createOpportunityForDeal() (a real caller was added in
+  // Sprint 42's RenewalOpportunityCommandService) needs to override it per
+  // test case, the same @TestVisible hook pattern used throughout this
+  // codebase (e.g. IncentiveCommandService.testPolicyOverride).
+  @TestVisible
+  private static Deal_Opportunity_Policy__mdt testPolicyOverride;
+
   /**
    * Links an existing Opportunity to a deal as a new Deal_Opportunity__c
    * relationship, running the doc's linking eligibility checks first.
@@ -380,6 +388,9 @@ public without sharing class DealOpportunityCommandService {
   }
 
   private static Deal_Opportunity_Policy__mdt resolvePolicy() {
+    if (Test.isRunningTest() && testPolicyOverride != null) {
+      return testPolicyOverride;
+    }
     List<Deal_Opportunity_Policy__mdt> rows = [
       SELECT
         Creation_Timing__c,

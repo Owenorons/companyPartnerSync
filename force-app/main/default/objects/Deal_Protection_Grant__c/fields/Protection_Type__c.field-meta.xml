@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Protection_Type__c</fullName>
+    <description
+  >Sprint 42 addition - distinguishes an original registration-time protection grant from a renewal-time protection grant created by RenewalCommandService, so a renewal protection is a real, distinct, queryable row rather than an untyped duplicate. Defaults to Registration so every pre-existing grant is classified correctly with no data fix-up needed.</description>
+    <label>Protection Type</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Registration</fullName>
+                <default>true</default>
+                <label>Registration</label>
+            </value>
+            <value>
+                <fullName>Renewal</fullName>
+                <default>false</default>
+                <label>Renewal</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

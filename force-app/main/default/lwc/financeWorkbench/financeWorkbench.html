@@ -1,0 +1,181 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Finance Workbench</h1>
+        <p>
+          Revenue reconciliation, attribution, incentive, and dispute oversight.
+        </p>
+      </div>
+    </section>
+
+    <nav class="slds-var-m-bottom_large tab-bar">
+      <template for:each={tabs} for:item="tab">
+        <button
+          key={tab.name}
+          class={tab.className}
+          data-tab={tab.name}
+          onclick={handleSelectTab}
+        >
+          {tab.label}
+        </button>
+      </template>
+    </nav>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading finance data..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <!-- Unmatched Revenue -->
+    <template if:true={isUnmatchedRevenueTab}>
+      <template if:true={hasUnmatchedRevenue}>
+        <div class="queue-grid">
+          <template for:each={unmatchedRevenue} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Match_Method__c}
+              </p>
+              <h2>Revenue {row.Revenue__c}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasUnmatchedRevenue}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No unmatched revenue"
+            message="Revenue that could not be automatically matched to a deal will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Attribution Exceptions -->
+    <template if:true={isAttributionExceptionsTab}>
+      <template if:true={hasAttributionExceptions}>
+        <div class="queue-grid">
+          <template for:each={attributionExceptions} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Attribution_Type__c}
+              </p>
+              <h2>{row.Attribution_Percentage__c}%</h2>
+              <c-ps-status-badge
+                label="Overridden"
+                variant="warning"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasAttributionExceptions}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No attribution exceptions"
+            message="Overridden revenue attribution will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Claims Under Review -->
+    <template if:true={isClaimsUnderReviewTab}>
+      <template if:true={hasClaimsUnderReview}>
+        <div class="queue-grid">
+          <template for:each={claimsUnderReview} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                Claimed {row.Claimed_Amount__c}
+              </p>
+              <h2>Claim {row.Id}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="info"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasClaimsUnderReview}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No claims under review"
+            message="Submitted incentive claims awaiting a decision will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Payment Pending -->
+    <template if:true={isPaymentPendingTab}>
+      <template if:true={hasPaymentPending}>
+        <div class="queue-grid">
+          <template for:each={paymentPending} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Incentive_Type__c}
+              </p>
+              <h2>{row.Approved_Amount__c} {row.CurrencyIsoCode}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="info"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasPaymentPending}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No payments pending"
+            message="Approved incentives awaiting payment will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+
+    <!-- Open Disputes -->
+    <template if:true={isOpenDisputesTab}>
+      <template if:true={hasOpenDisputes}>
+        <div class="queue-grid">
+          <template for:each={openDisputes} for:item="row">
+            <article key={row.Id} class="queue-card">
+              <p class="slds-text-body_small queue-label">
+                {row.Dispute_Type__c}
+              </p>
+              <h2>{row.Description__c}</h2>
+              <c-ps-status-badge
+                label={row.Status__c}
+                variant="danger"
+              ></c-ps-status-badge>
+            </article>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasOpenDisputes}>
+        <template if:false={loading}>
+          <c-ps-empty-state
+            title="No open disputes"
+            message="Partner-submitted revenue disputes will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </template>
+    </template>
+  </div>
+</template>

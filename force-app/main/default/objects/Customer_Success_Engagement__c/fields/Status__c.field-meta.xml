@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description
+  >Trimmed to the values this sprint's commands actually produce (doc Sprint 42 lists more sub-states; Adoption/Commercial Risk collapse into At Risk, Renewal/Expansion phases are tracked on the linked Partner_Renewal__c/Partner_Expansion__c rows instead of duplicated here).</description>
+    <label>Status</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pending Handoff</fullName>
+                <default>true</default>
+                <label>Pending Handoff</label>
+            </value>
+            <value>
+                <fullName>Active</fullName>
+                <default>false</default>
+                <label>Active</label>
+            </value>
+            <value>
+                <fullName>At Risk</fullName>
+                <default>false</default>
+                <label>At Risk</label>
+            </value>
+            <value>
+                <fullName>Suspended</fullName>
+                <default>false</default>
+                <label>Suspended</label>
+            </value>
+            <value>
+                <fullName>Churned</fullName>
+                <default>false</default>
+                <label>Churned</label>
+            </value>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
+            </value>
+            <value>
+                <fullName>Cancelled</fullName>
+                <default>false</default>
+                <label>Cancelled</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

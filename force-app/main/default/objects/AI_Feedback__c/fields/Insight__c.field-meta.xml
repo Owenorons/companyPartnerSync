@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Insight__c</fullName>
+    <description
+  >Feedback can target either an AI_Recommendation__c or a legacy AI_Insight__c - exactly one should be populated.</description>
+    <label>Insight</label>
+    <type>Lookup</type>
+    <referenceTo>AI_Insight__c</referenceTo>
+    <relationshipName>Feedback</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

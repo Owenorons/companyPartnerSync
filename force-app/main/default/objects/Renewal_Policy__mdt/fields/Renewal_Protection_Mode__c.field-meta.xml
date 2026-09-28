@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Renewal_Protection_Mode__c</fullName>
+    <description
+  >'None', 'Automatic', or 'On Approval' - whether qualify()/approve() should create a distinct Protection_Type__c = 'Renewal' Deal_Protection_Grant__c row for this policy.</description>
+    <label>Renewal Protection Mode</label>
+    <length>40</length>
+    <type>Text</type>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

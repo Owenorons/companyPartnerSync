@@ -139,6 +139,65 @@ private class DealParticipantExpiryBatchTest {
     Assert.isTrue(updated.At_Risk_Notified__c);
   }
 
+  // Proves the batch's own configured chunk size (25, not the previous
+  // 100 - see DealParticipantExpiryBatch.execute(SchedulableContext)'s doc
+  // comment) stays within governor limits for an all-overdue chunk: each
+  // expiry costs 1 SOQL + 1 DML via DealParticipantCommandService plus 2
+  // SOQL + up to 1 DML from DealCoSellStatusProjectionService.recompute().
+  @IsTest
+  static void expires25OverdueInvitationsWithinGovernorLimits() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Bulk Expiry Partner'
+    );
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Bulk Expiry Customer'
+    );
+    insert new List<Account>{ partner, customer };
+
+    List<Deal_Registration__c> deals = new List<Deal_Registration__c>();
+    for (Integer index = 0; index < 25; index++) {
+      Deal_Registration__c deal = PartnerSyncTestDataFactory.deal(
+        customer.Id,
+        partner.Id,
+        null,
+        null
+      );
+      deal.Status__c = 'Approved';
+      deals.add(deal);
+    }
+    insert deals;
+
+    List<Deal_Participant__c> participants = new List<Deal_Participant__c>();
+    for (Deal_Registration__c deal : deals) {
+      participants.add(
+        new Deal_Participant__c(
+          Deal__c = deal.Id,
+          Partner_Account__c = partner.Id,
+          Participant_Type__c = 'Co-Sell Partner',
+          Participant_Role__c = 'Co-Sell Contributor',
+          Status__c = 'Invited',
+          Invited_On__c = System.now().addDays(-5),
+          Respond_By__c = System.now().addDays(-1),
+          Active_Participant_Key__c = deal.Id +
+            '|Co-Sell Partner|' +
+            partner.Id +
+            '|Co-Sell Contributor',
+          Version_Number__c = 0
+        )
+      );
+    }
+    insert participants;
+
+    Test.startTest();
+    Database.executeBatch(new DealParticipantExpiryBatch(), 25);
+    Test.stopTest();
+
+    Assert.areEqual(
+      25,
+      [SELECT COUNT() FROM Deal_Participant__c WHERE Status__c = 'Expired']
+    );
+  }
+
   @IsTest
   static void canBeScheduled() {
     Test.startTest();

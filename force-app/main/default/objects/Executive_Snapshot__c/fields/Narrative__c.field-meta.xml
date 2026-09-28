@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Narrative__c</fullName>
+    <description
+  >Optional, explicitly-generated AI summary of this snapshot's own already-computed numbers (ExecutiveNarrativeService) - never the source of truth for any figure shown.</description>
+    <label>Narrative</label>
+    <length>8192</length>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+    <required>false</required>
+</CustomField>

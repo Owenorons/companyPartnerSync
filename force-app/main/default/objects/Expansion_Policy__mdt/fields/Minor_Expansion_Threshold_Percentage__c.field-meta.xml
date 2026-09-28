@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minor_Expansion_Threshold_Percentage__c</fullName>
+    <description
+  >The ceiling below which an expansion may stay Minor-Approved with no new Deal (doc Sprint 42 section 42.35/42.38).</description>
+    <label>Minor Expansion Threshold Percentage</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

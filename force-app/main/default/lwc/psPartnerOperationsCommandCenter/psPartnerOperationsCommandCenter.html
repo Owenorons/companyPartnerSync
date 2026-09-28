@@ -1,0 +1,50 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Partner Operations Command Center</h1>
+        <p>
+          A cross-domain "needs attention" summary. Select a queue to open its
+          workbench.
+        </p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading the operations summary..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <template if:true={hasSummary}>
+        <div class="queue-grid">
+          <template for:each={queues} for:item="queue">
+            <button
+              key={queue.key}
+              type="button"
+              class="queue-card queue-button"
+              data-tab-name={queue.tabName}
+              onclick={handleQueueClick}
+            >
+              <p class="slds-text-body_small queue-label">{queue.label}</p>
+              <h2>{queue.count}</h2>
+            </button>
+          </template>
+        </div>
+      </template>
+      <template if:false={hasSummary}>
+        <c-ps-empty-state
+          title="Nothing to summarize"
+          message="The operations summary could not be loaded."
+        >
+        </c-ps-empty-state>
+      </template>
+    </template>
+  </div>
+</template>

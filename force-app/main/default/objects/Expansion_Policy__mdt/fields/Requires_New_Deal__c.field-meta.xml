@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requires_New_Deal__c</fullName>
+    <description
+  >Org-level default when no more specific policy row matches - defaults to true so an unmatched expansion is conservatively routed through the full Deal pipeline rather than silently staying minor.</description>
+    <defaultValue>true</defaultValue>
+    <label>Requires New Deal</label>
+    <type>Checkbox</type>
+</CustomField>

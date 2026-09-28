@@ -13,7 +13,7 @@ private class PartnerSyncSetupControllerTest {
       PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
       Test.stopTest();
 
-      Assert.areEqual(7, report.totalCount);
+      Assert.areEqual(10, report.totalCount);
       Assert.isTrue(report.readyCount > 0);
       Assert.isNotNull(report.generatedAt);
       Assert.isNotNull(report.coreReady);
@@ -32,6 +32,9 @@ private class PartnerSyncSetupControllerTest {
       Assert.isTrue(checkKeys.contains('core-metadata'));
       Assert.isTrue(checkKeys.contains('experience-cloud'));
       Assert.isTrue(checkKeys.contains('scheduled-automation'));
+      Assert.isTrue(checkKeys.contains('dead-letter-backlog'));
+      Assert.isTrue(checkKeys.contains('ai-usage-health'));
+      Assert.isTrue(checkKeys.contains('analytics-freshness'));
     }
   }
 
@@ -102,6 +105,96 @@ private class PartnerSyncSetupControllerTest {
         PartnerSyncSetupController.liveSiteCountOverride = null;
         PartnerSyncSetupController.activeAiProviderCountOverride = null;
       }
+    }
+  }
+
+  @IsTest
+  static void reportsDeadLetterBacklogAndAiUsageFailuresAsWarnings() {
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      PartnerSyncSetupController.deadLetterBacklogCountOverride = 2;
+      PartnerSyncSetupController.activeAiProviderCountOverride = 1;
+      PartnerSyncSetupController.aiInteractionFailureCountOverride = 3;
+      try {
+        PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
+        Assert.areEqual('WARNING', statusFor(report, 'dead-letter-backlog'));
+        Assert.areEqual('WARNING', statusFor(report, 'ai-usage-health'));
+      } finally {
+        PartnerSyncSetupController.deadLetterBacklogCountOverride = null;
+        PartnerSyncSetupController.activeAiProviderCountOverride = null;
+        PartnerSyncSetupController.aiInteractionFailureCountOverride = null;
+      }
+    }
+  }
+
+  @IsTest
+  static void aiUsageHealthIsReadyWhenNoProviderIsActive() {
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      PartnerSyncSetupController.activeAiProviderCountOverride = 0;
+      try {
+        PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
+        Assert.areEqual('READY', statusFor(report, 'ai-usage-health'));
+      } finally {
+        PartnerSyncSetupController.activeAiProviderCountOverride = null;
+      }
+    }
+  }
+
+  @IsTest
+  static void analyticsFreshnessIsWarningWhenNoSnapshotHasBeenComputed() {
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
+      Assert.areEqual('WARNING', statusFor(report, 'analytics-freshness'));
+    }
+  }
+
+  @IsTest
+  static void analyticsFreshnessIsReadyWhenTheLatestSnapshotIsRecent() {
+    insert new Executive_Snapshot__c(
+      Snapshot_Date__c = Date.today(),
+      Computed_On__c = System.now()
+    );
+
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
+      Assert.areEqual('READY', statusFor(report, 'analytics-freshness'));
+    }
+  }
+
+  @IsTest
+  static void analyticsFreshnessIsWarningWhenTheLatestSnapshotIsStale() {
+    insert new Executive_Snapshot__c(
+      Snapshot_Date__c = Date.today().addDays(-3),
+      Computed_On__c = System.now().addDays(-3)
+    );
+
+    User adminUser = TestUserFactory.createInternalUser();
+    TestUserFactory.assignPermissionSet(
+      adminUser.Id,
+      'PartnerSync_Internal_Admin'
+    );
+    System.runAs(adminUser) {
+      PartnerSyncSetupController.ReadinessReport report = PartnerSyncSetupController.getReadiness();
+      Assert.areEqual('WARNING', statusFor(report, 'analytics-freshness'));
     }
   }
 

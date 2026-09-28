@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Approved_Amount__c</fullName>
+    <description
+  >The approver's decision, kept independent of Calculated_Amount__c so the original calculation stays visible (doc section 41.29).</description>
+    <label>Approved Amount</label>
+    <precision>18</precision>
+    <scale>2</scale>
+    <type>Currency</type>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

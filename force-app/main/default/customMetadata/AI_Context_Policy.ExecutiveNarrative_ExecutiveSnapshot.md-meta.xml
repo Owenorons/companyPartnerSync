@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Executive Narrative - Executive Snapshot</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value
+      xsi:type="xsd:boolean"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >true</value>
+    </values>
+    <values>
+        <field>Use_Case_Key__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >ExecutiveNarrative</value>
+    </values>
+    <values>
+        <field>Allowed_Object__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Executive_Snapshot__c</value>
+    </values>
+    <values>
+        <field>Allowed_Fields__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Active_Partner_Count__c,Average_Health_Score__c,Total_Open_Deal_Count__c,Total_At_Risk_Deal_Count__c,Total_Active_Engagement_Count__c,Total_At_Risk_Engagement_Count__c,Total_Upcoming_Renewal_Count__c,Total_Renewal_Value_At_Risk__c,Total_Open_Expansion_Count__c,Total_Churned_Engagement_Count_Trailing_12mo__c,Total_Revenue_Trailing_12mo__c,Open_AI_Recommendation_Count__c</value>
+    </values>
+</CustomMetadata>

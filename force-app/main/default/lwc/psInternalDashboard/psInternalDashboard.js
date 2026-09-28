@@ -109,6 +109,13 @@ export default class PsInternalDashboard extends NavigationMixin(
   @api coSellWorkbenchTabName = "CoSell_Workbench__c";
   @api salesExecutionWorkbenchTabName = "Sales_Execution_Workbench__c";
   @api implementationWorkbenchTabName = "Implementation_Workbench__c";
+  @api financeWorkbenchTabName = "Finance_Workbench__c";
+  @api customerSuccessWorkbenchTabName = "Customer_Success_Workbench__c";
+  @api portfolioIntelligenceTabName = "Portfolio_Intelligence__c";
+  @api executiveCommandCenterTabName = "Executive_Command_Center__c";
+  @api partnerOperationsCommandCenterTabName =
+    "Partner_Operations_Command_Center__c";
+  @api operationsConsoleTabName = "Operations_Console__c";
 
   dashboard;
   error;
@@ -368,6 +375,30 @@ export default class PsInternalDashboard extends NavigationMixin(
 
   handleImplementationWorkbench() {
     this.handleNavigation(this.implementationWorkbenchTabName);
+  }
+
+  handleFinanceWorkbench() {
+    this.handleNavigation(this.financeWorkbenchTabName);
+  }
+
+  handleCustomerSuccessWorkbench() {
+    this.handleNavigation(this.customerSuccessWorkbenchTabName);
+  }
+
+  handlePortfolioIntelligence() {
+    this.handleNavigation(this.portfolioIntelligenceTabName);
+  }
+
+  handleExecutiveCommandCenter() {
+    this.handleNavigation(this.executiveCommandCenterTabName);
+  }
+
+  handlePartnerOperationsCommandCenter() {
+    this.handleNavigation(this.partnerOperationsCommandCenterTabName);
+  }
+
+  handleOperationsConsole() {
+    this.handleNavigation(this.operationsConsoleTabName);
   }
 
   handlePartner360() {

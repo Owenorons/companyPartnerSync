@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Target_Object__c</fullName>
+    <description
+  >'Partner_Renewal__c' or 'Partner_Expansion__c' - which object Target_Record_Id__c refers to.</description>
+    <label>Target Object</label>
+    <length>40</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

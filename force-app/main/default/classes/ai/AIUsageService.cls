@@ -78,6 +78,89 @@ public without sharing class AIUsageService {
   }
 
   /**
+   * Reserves one unit of today's per-use-case AI interaction quota
+   * (AI_Usage_Policy__mdt.Daily_Interaction_Limit__c), layered on top of -
+   * not a replacement for - the tenant-wide reserve() above. Does not call
+   * reserve() itself; AIInteractionService.execute() calls both.
+   * Day_Key__c alone is already unique on AI_Usage_Day__c, so this uses a
+   * separate AI_Use_Case_Usage_Day__c object keyed by
+   * Use_Case_Key__c + '|' + day rather than reusing that object's schema.
+   *
+   * @param useCaseKey The use case to reserve quota for.
+   * @return True if the reservation succeeded; false if the configured limit has been reached.
+   */
+  public static Boolean reserveForUseCase(String useCaseKey) {
+    Integer limitValue = getUseCaseDailyLimit(useCaseKey);
+    if (limitValue == null) {
+      return true;
+    }
+
+    Date day = System.now().dateGMT();
+    String compositeKey = useCaseKey + '|' + String.valueOf(day);
+    List<AI_Use_Case_Usage_Day__c> rows = [
+      SELECT Id, Reserved_Count__c
+      FROM AI_Use_Case_Usage_Day__c
+      WHERE Use_Case_Day_Key__c = :compositeKey
+      LIMIT 1
+      FOR UPDATE
+    ];
+
+    if (rows.isEmpty()) {
+      if (limitValue <= 0) {
+        return false;
+      }
+      AI_Use_Case_Usage_Day__c counter = new AI_Use_Case_Usage_Day__c(
+        Use_Case_Day_Key__c = compositeKey,
+        Use_Case_Key__c = useCaseKey,
+        Day_Key__c = String.valueOf(day),
+        Reserved_Count__c = 1
+      );
+      try {
+        insert counter;
+      } catch (DmlException ex) {
+        if (
+          ex.getDmlStatusCode(0) == 'DUPLICATE_VALUE' ||
+          ex.getDmlStatusCode(0) == 'UNABLE_TO_LOCK_ROW'
+        ) {
+          throw new PartnerSyncHandledException(
+            'AI quota is busy. Retry the request.'
+          );
+        }
+        throw ex;
+      }
+      return true;
+    }
+
+    AI_Use_Case_Usage_Day__c counter = rows[0];
+    if (counter.Reserved_Count__c >= limitValue) {
+      return false;
+    }
+    counter.Reserved_Count__c++;
+    update counter;
+    return true;
+  }
+
+  private static Integer getUseCaseDailyLimit(String useCaseKey) {
+    if (
+      Test.isRunningTest() && testUseCaseDailyLimits.containsKey(useCaseKey)
+    ) {
+      return testUseCaseDailyLimits.get(useCaseKey);
+    }
+    AI_Usage_Policy__mdt policy = AI_Usage_Policy__mdt.getInstance(useCaseKey);
+    if (
+      policy == null ||
+      !policy.Active__c ||
+      policy.Daily_Interaction_Limit__c == null
+    ) {
+      return null;
+    }
+    return Integer.valueOf(policy.Daily_Interaction_Limit__c);
+  }
+
+  @TestVisible
+  private static Map<String, Integer> testUseCaseDailyLimits = new Map<String, Integer>();
+
+  /**
    * Resolves the configured daily AI request limit.
    *
    * @return The configured daily limit, or null if unset, inactive, or unparseable (meaning no limit is enforced).

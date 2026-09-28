@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Decline Renewal</label>
+  <description
+  >Allows a partner user to decline their continued participation in a renewal.</description>
+  <isLicensed>false</isLicensed>
+</CustomPermission>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Risk_Type__c</fullName>
+    <label>Risk Type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Adoption Risk</fullName>
+                <default>true</default>
+                <label>Adoption Risk</label>
+            </value>
+            <value>
+                <fullName>Commercial Risk</fullName>
+                <default>false</default>
+                <label>Commercial Risk</label>
+            </value>
+            <value>
+                <fullName>Support Risk</fullName>
+                <default>false</default>
+                <label>Support Risk</label>
+            </value>
+            <value>
+                <fullName>Executive Sponsor Change</fullName>
+                <default>false</default>
+                <label>Executive Sponsor Change</label>
+            </value>
+            <value>
+                <fullName>Competitive Threat</fullName>
+                <default>false</default>
+                <label>Competitive Threat</label>
+            </value>
+            <value>
+                <fullName>Budget Risk</fullName>
+                <default>false</default>
+                <label>Budget Risk</label>
+            </value>
+            <value>
+                <fullName>Renewal Risk</fullName>
+                <default>false</default>
+                <label>Renewal Risk</label>
+            </value>
+            <value>
+                <fullName>Partner Relationship Risk</fullName>
+                <default>false</default>
+                <label>Partner Relationship Risk</label>
+            </value>
+            <value>
+                <fullName>Product Fit Risk</fullName>
+                <default>false</default>
+                <label>Product Fit Risk</label>
+            </value>
+            <value>
+                <fullName>Contract Compliance Risk</fullName>
+                <default>false</default>
+                <label>Contract Compliance Risk</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

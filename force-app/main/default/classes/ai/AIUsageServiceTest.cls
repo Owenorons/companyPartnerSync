@@ -161,6 +161,47 @@ private class AIUsageServiceTest {
     );
   }
 
+  @IsTest
+  static void reserveForUseCaseEnforcesItsOwnLimitIndependentlyOfTheTenantLimit() {
+    AIUsageService.testUseCaseDailyLimits.put('PortfolioNarrative', 2);
+
+    Assert.isTrue(AIUsageService.reserveForUseCase('PortfolioNarrative'));
+    Assert.isTrue(AIUsageService.reserveForUseCase('PortfolioNarrative'));
+    Assert.isFalse(
+      AIUsageService.reserveForUseCase('PortfolioNarrative'),
+      'A third reservation must be rejected once the per-use-case limit is reached.'
+    );
+    Assert.isTrue(
+      AIUsageService.reserveForUseCase('SomeOtherUseCase'),
+      'A different use case with no configured limit must not be affected.'
+    );
+  }
+
+  @IsTest
+  static void uniqueUseCaseDayKeyPreventsTwoFirstRequestCounters() {
+    String key = 'PortfolioNarrative|' + String.valueOf(System.now().dateGMT());
+    insert new AI_Use_Case_Usage_Day__c(
+      Use_Case_Day_Key__c = key,
+      Use_Case_Key__c = 'PortfolioNarrative',
+      Day_Key__c = String.valueOf(System.now().dateGMT()),
+      Reserved_Count__c = 1
+    );
+    Database.SaveResult duplicate = Database.insert(
+      new AI_Use_Case_Usage_Day__c(
+        Use_Case_Day_Key__c = key,
+        Use_Case_Key__c = 'PortfolioNarrative',
+        Day_Key__c = String.valueOf(System.now().dateGMT()),
+        Reserved_Count__c = 1
+      ),
+      false
+    );
+    Assert.isFalse(duplicate.isSuccess());
+    Assert.areEqual(
+      StatusCode.DUPLICATE_VALUE,
+      duplicate.getErrors()[0].getStatusCode()
+    );
+  }
+
   private static void enableAI(Integer dailyLimit) {
     TenantConfigService.setConfigForTest(
       new Tenant_Config__mdt(Enable_AI__c = true)

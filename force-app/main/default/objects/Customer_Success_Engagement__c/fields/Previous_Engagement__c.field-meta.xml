@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Previous_Engagement__c</fullName>
+    <description
+  >Self-lookup: when a churned customer re-engages under a new engagement row, this links back to the engagement that churned, per doc Sprint 42 lifecycle guidance to never resurrect a closed engagement in place.</description>
+    <label>Previous Engagement</label>
+    <type>Lookup</type>
+    <referenceTo>Customer_Success_Engagement__c</referenceTo>
+    <relationshipLabel>Subsequent Engagements</relationshipLabel>
+    <relationshipName>Subsequent_Engagements</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

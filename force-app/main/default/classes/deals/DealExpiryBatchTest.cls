@@ -85,6 +85,62 @@ private class DealExpiryBatchTest {
     );
   }
 
+  // Proves the batch's own configured chunk size (25, not the previous
+  // 100 - see DealExpiryBatch.execute(SchedulableContext)'s doc comment)
+  // stays within governor limits: DealProtectionCommandService.execute()
+  // does 3 SOQL + 3 DML per grant expiry.
+  @IsTest
+  static void expires25GrantsWithinGovernorLimits() {
+    Account partner = PartnerSyncTestDataFactory.partnerAccount(
+      'Bulk Expiry Partner'
+    );
+    Account customer = PartnerSyncTestDataFactory.customerAccount(
+      'Bulk Expiry Customer'
+    );
+    insert new List<Account>{ partner, customer };
+
+    List<Deal_Registration__c> deals = new List<Deal_Registration__c>();
+    for (Integer index = 0; index < 25; index++) {
+      Deal_Registration__c deal = PartnerSyncTestDataFactory.deal(
+        customer.Id,
+        partner.Id,
+        null,
+        null
+      );
+      deal.Status__c = 'Approved';
+      deal.Protection_Start_Date__c = Date.today().addDays(-31);
+      deal.Protection_End_Date__c = Date.today().addDays(-1);
+      deals.add(deal);
+    }
+    insert deals;
+
+    List<Deal_Protection_Grant__c> grants = new List<Deal_Protection_Grant__c>();
+    for (Deal_Registration__c deal : deals) {
+      grants.add(
+        new Deal_Protection_Grant__c(
+          Deal__c = deal.Id,
+          Current__c = true,
+          Current_Grant_Key__c = String.valueOf(deal.Id),
+          Status__c = 'Active',
+          Start_Date__c = deal.Protection_Start_Date__c,
+          End_Date__c = deal.Protection_End_Date__c,
+          Version_Number__c = 0,
+          Extension_Count__c = 0
+        )
+      );
+    }
+    insert grants;
+
+    Test.startTest();
+    Database.executeBatch(new DealExpiryBatch(), 25);
+    Test.stopTest();
+
+    Assert.areEqual(
+      25,
+      [SELECT COUNT() FROM Deal_Registration__c WHERE Status__c = 'Expired']
+    );
+  }
+
   @IsTest
   static void scheduledRunKicksOffBatch() {
     Test.startTest();

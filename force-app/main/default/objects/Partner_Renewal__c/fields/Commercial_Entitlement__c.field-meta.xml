@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Commercial_Entitlement__c</fullName>
+    <label>Commercial Entitlement</label>
+    <type>Lookup</type>
+    <referenceTo>Customer_Commercial_Entitlement__c</referenceTo>
+    <relationshipName>Renewals</relationshipName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <required>false</required>
+</CustomField>

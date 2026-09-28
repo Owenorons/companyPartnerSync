@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Target_Command_Service__c</fullName>
+    <description
+  >Documents which Apex command service/method AgentActionGatewayService.executeAction() dispatches this action to (e.g. 'RenewalCommandService.approve') - informational for admins, the actual dispatch mapping is a compiled switch in AgentActionGatewayService, not dynamically invoked from this text.</description>
+    <label>Target Command Service</label>
+    <length>120</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

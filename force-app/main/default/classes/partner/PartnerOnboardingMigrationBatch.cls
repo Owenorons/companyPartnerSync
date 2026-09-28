@@ -29,6 +29,18 @@ public without sharing class PartnerOnboardingMigrationBatch implements Database
   /**
    * Initialises the onboarding aggregate and lifecycle history for each
    * application in the batch scope, matching its existing decision outcome.
+   * Per-record failures are caught and logged so one bad application
+   * doesn't abort the whole chunk (this migration is re-runnable - see
+   * start()'s own filter - so a failed row is simply picked up again on
+   * the next run once its underlying problem is fixed).
+   *
+   * Run this batch at a chunk size no larger than 15 (see
+   * scripts/apex/run-onboarding-v2-backfill.apex) - initialise() does ~5
+   * SOQL + ~7 DML per application, so a larger chunk risks exceeding the
+   * per-transaction governor limits (found during a pre-beta bulk-safety
+   * audit; a full bulk rewrite of initialise() was judged disproportionate
+   * for a one-time migration tool whose supporting services are also used
+   * by the live, interactive onboarding-creation flow).
    *
    * @param context The batch execution context provided by the platform.
    * @param applications The Partner_Application__c records in this batch chunk.
@@ -38,10 +50,18 @@ public without sharing class PartnerOnboardingMigrationBatch implements Database
     List<Partner_Application__c> applications
   ) {
     for (Partner_Application__c application : applications) {
-      PartnerOnboardingLifecycleService.initialise(
-        application,
-        application.Application_Status__c
-      );
+      try {
+        PartnerOnboardingLifecycleService.initialise(
+          application,
+          application.Application_Status__c
+        );
+      } catch (Exception ex) {
+        LoggingService.error(
+          'PartnerOnboardingMigrationBatch',
+          'Failed to initialise onboarding for application ' + application.Id,
+          ex
+        );
+      }
     }
   }
 

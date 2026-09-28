@@ -1,8 +1,8 @@
 /**
  * Trigger handler for PartnerSyncEventTrigger (after insert on
  * PartnerSync_Event__e), fanning each event out to the audit,
- * notification, webhook-dispatch, and approval-return consumers. This is
- * the entry point for the whole events/ package.
+ * notification, webhook-dispatch, approval-return, and customer-success
+ * consumers. This is the entry point for the whole events/ package.
  */
 public with sharing class PartnerSyncEventHandler {
   /**
@@ -39,6 +39,26 @@ public with sharing class PartnerSyncEventHandler {
     }
   }
 
+  /**
+   * Re-dispatches a single event outside the trigger's per-batch isolation,
+   * for manual redrive from the dead-letter queue (EventDLQService.retry()).
+   * Unlike handle(), failures are not caught here - the caller decides how
+   * to record a repeat failure.
+   *
+   * @param eventRecord The event to reprocess, typically reconstructed from a dead-lettered payload.
+   */
+  public static void reprocess(PartnerSync_Event__e eventRecord) {
+    Id partnerAccountId = idOrNull(eventRecord.Partner_Account_Id__c);
+    Set<Id> partnerAccountIds = new Set<Id>();
+    if (partnerAccountId != null) {
+      partnerAccountIds.add(partnerAccountId);
+    }
+    Map<Id, List<User>> recipientsByAccount = NotificationRecipientResolver.resolveByPartnerAccount(
+      partnerAccountIds
+    );
+    process(eventRecord, recipientsByAccount);
+  }
+
   private static void process(
     PartnerSync_Event__e eventRecord,
     Map<Id, List<User>> recipientsByAccount
@@ -51,6 +71,7 @@ public with sharing class PartnerSyncEventHandler {
     );
     WebhookDispatchConsumerService.dispatchBusinessEvent(eventRecord);
     ApprovalReturnConsumerService.handleReturnedPlan(eventRecord);
+    CustomerSuccessEventConsumerService.handleBusinessEvent(eventRecord);
   }
 
   private static Id idOrNull(String value) {

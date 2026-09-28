@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Allowed_Object__c</fullName>
+    <description
+  >One CMDT row per (Use_Case_Key__c, Allowed_Object__c) pair - IntelligenceContextService.buildContext() only ever reads a field on this object if it's also named in Allowed_Fields__c below.</description>
+    <label>Allowed Object</label>
+    <length>80</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

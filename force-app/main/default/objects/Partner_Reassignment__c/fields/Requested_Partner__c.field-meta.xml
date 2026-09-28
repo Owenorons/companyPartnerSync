@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requested_Partner__c</fullName>
+    <label>Requested Partner</label>
+    <type>Lookup</type>
+    <referenceTo>Account</referenceTo>
+    <relationshipName>Reassignments_As_Requested_Partner</relationshipName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <required>true</required>
+</CustomField>

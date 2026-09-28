@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description
+  >Trimmed to the values this sprint's commands actually produce - Planning/Opportunity Created/Negotiation/Commit/Partially Renewed/Superseded are sales-execution-stage nuance the linked Opportunity's own StageName already covers per Sprint 39, not duplicated here.</description>
+    <label>Status</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Identified</fullName>
+                <default>true</default>
+                <label>Identified</label>
+            </value>
+            <value>
+                <fullName>Partner Confirmation Required</fullName>
+                <default>false</default>
+                <label>Partner Confirmation Required</label>
+            </value>
+            <value>
+                <fullName>Partner Confirmed</fullName>
+                <default>false</default>
+                <label>Partner Confirmed</label>
+            </value>
+            <value>
+                <fullName>Qualification</fullName>
+                <default>false</default>
+                <label>Qualification</label>
+            </value>
+            <value>
+                <fullName>Review Required</fullName>
+                <default>false</default>
+                <label>Review Required</label>
+            </value>
+            <value>
+                <fullName>Approved</fullName>
+                <default>false</default>
+                <label>Approved</label>
+            </value>
+            <value>
+                <fullName>Renewed</fullName>
+                <default>false</default>
+                <label>Renewed</label>
+            </value>
+            <value>
+                <fullName>Not Renewed</fullName>
+                <default>false</default>
+                <label>Not Renewed</label>
+            </value>
+            <value>
+                <fullName>Churned</fullName>
+                <default>false</default>
+                <label>Churned</label>
+            </value>
+            <value>
+                <fullName>Cancelled</fullName>
+                <default>false</default>
+                <label>Cancelled</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

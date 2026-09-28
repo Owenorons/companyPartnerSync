@@ -48,6 +48,32 @@ private class PartnerOnboardingMigrationBatchTest {
     Assert.areEqual(5, unchanged.Version_Number__c);
   }
 
+  // Proves the recommended chunk size (15 - see
+  // scripts/apex/run-onboarding-v2-backfill.apex and this batch's own
+  // execute() doc comment) stays within governor limits:
+  // PartnerOnboardingLifecycleService.initialise() does ~5 SOQL + ~7 DML
+  // per application.
+  @IsTest
+  static void backfills15ApplicationsWithinGovernorLimits() {
+    List<Partner_Application__c> applications = new List<Partner_Application__c>();
+    for (Integer index = 0; index < 15; index++) {
+      applications.add(decidedApplication('Approved'));
+    }
+
+    Test.startTest();
+    Database.executeBatch(new PartnerOnboardingMigrationBatch(), 15);
+    Test.stopTest();
+
+    Assert.areEqual(
+      15,
+      [
+        SELECT COUNT()
+        FROM Partner_Onboarding__c
+        WHERE Application__c IN :applications
+      ]
+    );
+  }
+
   private static Partner_Application__c decidedApplication(String status) {
     Partner_Application__c application = new Partner_Application__c(
       Name = 'Migration Test Partner',

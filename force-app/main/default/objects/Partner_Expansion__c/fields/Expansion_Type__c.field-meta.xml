@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Expansion_Type__c</fullName>
+    <label>Expansion Type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Seat Increase</fullName>
+                <default>true</default>
+                <label>Seat Increase</label>
+            </value>
+            <value>
+                <fullName>Usage Increase</fullName>
+                <default>false</default>
+                <label>Usage Increase</label>
+            </value>
+            <value>
+                <fullName>Additional Product</fullName>
+                <default>false</default>
+                <label>Additional Product</label>
+            </value>
+            <value>
+                <fullName>Additional Business Unit</fullName>
+                <default>false</default>
+                <label>Additional Business Unit</label>
+            </value>
+            <value>
+                <fullName>Geographic Expansion</fullName>
+                <default>false</default>
+                <label>Geographic Expansion</label>
+            </value>
+            <value>
+                <fullName>Tier Upgrade</fullName>
+                <default>false</default>
+                <label>Tier Upgrade</label>
+            </value>
+            <value>
+                <fullName>Add-On Module</fullName>
+                <default>false</default>
+                <label>Add-On Module</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

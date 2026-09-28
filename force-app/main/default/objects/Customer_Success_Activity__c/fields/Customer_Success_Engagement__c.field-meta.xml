@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Customer_Success_Engagement__c</fullName>
+    <label>Customer Success Engagement</label>
+    <type>Lookup</type>
+    <referenceTo>Customer_Success_Engagement__c</referenceTo>
+    <relationshipName>Activities</relationshipName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <required>true</required>
+</CustomField>

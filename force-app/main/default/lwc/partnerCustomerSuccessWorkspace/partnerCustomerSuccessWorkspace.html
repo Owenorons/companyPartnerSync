@@ -1,0 +1,97 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Partner</p>
+        <h1>Customer Success &amp; Renewals</h1>
+        <p>Your active customer relationships and upcoming renewals.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading your customer success data..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <section class="slds-var-m-bottom_large">
+        <h2 class="section-title">Customer Success Engagements</h2>
+        <template if:true={hasEngagements}>
+          <div class="queue-grid">
+            <template for:each={engagements} for:item="row">
+              <article key={row.engagementId} class="queue-card">
+                <p class="slds-text-body_small queue-label">{row.status}</p>
+                <h2>{row.engagementId}</h2>
+                <c-ps-status-badge
+                  label={row.healthStatus}
+                  variant="info"
+                ></c-ps-status-badge>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasEngagements}>
+          <c-ps-empty-state
+            title="No customer success engagements yet"
+            message="Engagements are created once one of your implementations completes."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+
+      <section>
+        <h2 class="section-title">Renewals</h2>
+        <template if:true={hasRenewals}>
+          <div class="queue-grid">
+            <template for:each={renewals} for:item="row">
+              <article key={row.renewalId} class="queue-card">
+                <p class="slds-text-body_small queue-label">
+                  Decision by {row.targetDecisionOn}
+                </p>
+                <h2>{row.renewalId}</h2>
+                <c-ps-status-badge
+                  label={row.status}
+                  variant="info"
+                ></c-ps-status-badge>
+                <template if:true={row.canRespond}>
+                  <div class="action-row">
+                    <button
+                      type="button"
+                      class="action-button action-button-confirm"
+                      data-id={row.renewalId}
+                      data-version={row.versionNumber}
+                      onclick={handleConfirmRenewal}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      class="action-button action-button-decline"
+                      data-id={row.renewalId}
+                      data-version={row.versionNumber}
+                      onclick={handleDeclineRenewal}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </template>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasRenewals}>
+          <c-ps-empty-state
+            title="No renewals yet"
+            message="Upcoming renewals for your customers will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+    </template>
+  </div>
+</template>

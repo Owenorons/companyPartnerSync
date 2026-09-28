@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Use_Case_Key__c</fullName>
+    <description
+  >Matches an AI_Context_Policy__mdt/AI_Action_Policy__mdt/AI_Usage_Policy__mdt/AI_Grounding_Source__mdt Use_Case_Key__c - the single key that ties one governed AI capability's policy rows together.</description>
+    <label>Use Case Key</label>
+    <length>80</length>
+    <type>Text</type>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+</CustomField>

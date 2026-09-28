@@ -160,6 +160,40 @@ private class DealOpportunityReconciliationBatchTest {
     Assert.areEqual('Active', refreshedGrant.Status__c);
   }
 
+  // Proves the closed-lost release path - previously only ASSERTED as
+  // "bounded" in this class's own doc comment, never actually proven with
+  // a bulk test (a pre-beta audit finding) - stays within governor limits
+  // at the same honestly-scoped 15 rows used for the closed-won path.
+  @IsTest
+  static void closedLost15ReleasesProtectionWithinGovernorLimits() {
+    List<Fixture> fixtures = new List<Fixture>();
+    List<Deal_Protection_Grant__c> grants = new List<Deal_Protection_Grant__c>();
+    for (Integer index = 0; index < 15; index++) {
+      Fixture fixture = buildFixture('Closed Lost');
+      fixtures.add(fixture);
+      grants.add(insertActiveGrant(fixture.deal.Id));
+    }
+    DealOpportunityReconciliationBatch.testClosedLostBehaviourOverride = 'Release Immediately';
+
+    List<Deal_Opportunity__c> relationships = new List<Deal_Opportunity__c>();
+    for (Fixture fixture : fixtures) {
+      relationships.add(requeryRelationship(fixture.relationship.Id));
+    }
+
+    Test.startTest();
+    new DealOpportunityReconciliationBatch().execute(null, relationships);
+    Test.stopTest();
+
+    Assert.areEqual(
+      15,
+      [
+        SELECT COUNT()
+        FROM Deal_Protection_Grant__c
+        WHERE Id IN :grants AND Status__c = 'Released'
+      ]
+    );
+  }
+
   @IsTest
   static void reopeningAPreviouslyClosedOpportunityFlagsForReviewWithoutRestoringProtection() {
     Fixture fixture = buildFixture('Negotiation/Review');

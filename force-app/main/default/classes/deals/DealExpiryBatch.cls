@@ -65,11 +65,20 @@ public with sharing class DealExpiryBatch implements Database.Batchable<SObject>
   }
 
   /**
-   * Scheduled entry point: launches this class as a batch job with a chunk size of 100.
+   * Scheduled entry point: launches this class as a batch job.
+   *
+   * Chunk size 25, not 100: DealProtectionCommandService.execute() does 3
+   * SOQL + 3 DML per grant (idempotency check, the deal FOR UPDATE,
+   * currentGrant, then the grant/deal update and the action-record insert)
+   * - at a 100-row chunk that's 300 SOQL/300 DML, over both per-transaction
+   * limits, found during a pre-beta bulk-safety audit. A true bulk rewrite
+   * of DealProtectionCommandService is disproportionate here since it's
+   * also used interactively (Activate/Extend/Release) outside this batch;
+   * 25 keeps real headroom under both limits.
    *
    * @param context Scheduled execution context (unused).
    */
   public void execute(SchedulableContext context) {
-    Database.executeBatch(new DealExpiryBatch(), 100);
+    Database.executeBatch(new DealExpiryBatch(), 25);
   }
 }

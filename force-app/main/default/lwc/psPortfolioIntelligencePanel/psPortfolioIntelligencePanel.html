@@ -1,0 +1,83 @@
+<template>
+  <div class="slds-var-p-around_large ps-page">
+    <section class="slds-var-m-bottom_large page-header">
+      <div>
+        <p class="slds-text-body_small eyebrow">Internal</p>
+        <h1>Portfolio Intelligence</h1>
+        <p>Cross-partner health, risk, and AI-recommended actions.</p>
+      </div>
+    </section>
+
+    <template if:true={loading}>
+      <c-ps-loading-state
+        message="Loading portfolio intelligence..."
+      ></c-ps-loading-state>
+    </template>
+
+    <template if:true={error}>
+      <c-ps-error-panel message={error}></c-ps-error-panel>
+    </template>
+
+    <template if:false={loading}>
+      <section class="slds-var-m-bottom_large">
+        <h2 class="section-title">Portfolio Snapshots</h2>
+        <template if:true={hasSnapshots}>
+          <div class="queue-grid">
+            <template for:each={snapshots} for:item="row">
+              <article key={row.Id} class="queue-card">
+                <p class="slds-text-body_small queue-label">
+                  {row.Partner_Account__r.Name}
+                </p>
+                <h2>Health {row.Health_Score__c}</h2>
+                <c-ps-status-badge
+                  label={row.Health_Label__c}
+                  variant="info"
+                ></c-ps-status-badge>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasSnapshots}>
+          <c-ps-empty-state
+            title="No snapshots yet"
+            message="Portfolio snapshots computed today will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+
+      <section>
+        <h2 class="section-title">Proposed AI Actions</h2>
+        <template if:true={hasRecommendations}>
+          <div class="queue-grid">
+            <template for:each={recommendations} for:item="row">
+              <article key={row.Id} class="queue-card">
+                <p class="slds-text-body_small queue-label">
+                  {row.Partner_Account__r.Name}
+                </p>
+                <h2>{row.Recommendation_Text__c}</h2>
+                <div class="action-row">
+                  <button
+                    type="button"
+                    class="action-button action-button-execute"
+                    data-id={row.Id}
+                    onclick={handleExecuteRecommendation}
+                  >
+                    Execute
+                  </button>
+                </div>
+              </article>
+            </template>
+          </div>
+        </template>
+        <template if:false={hasRecommendations}>
+          <c-ps-empty-state
+            title="No proposed actions"
+            message="AI-recommended actions awaiting execution will appear here."
+          >
+          </c-ps-empty-state>
+        </template>
+      </section>
+    </template>
+  </div>
+</template>

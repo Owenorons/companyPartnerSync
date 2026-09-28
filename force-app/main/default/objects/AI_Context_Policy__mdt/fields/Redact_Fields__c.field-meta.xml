@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Redact_Fields__c</fullName>
+    <description
+  >Comma-separated subset of Allowed_Fields__c whose value is replaced with a redaction marker rather than its real value - for fields needed for shape/structure but not their literal content.</description>
+    <label>Redact Fields</label>
+    <length>800</length>
+    <type>Text</type>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+</CustomField>
